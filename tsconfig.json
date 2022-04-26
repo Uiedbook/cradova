@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "strict": false,
+    "lib": ["ES2022", "DOM"],
+    "target": "ES2021",
+    "declaration": true,
+    "module": "ES2022",
+    "moduleResolution": "node"
+  },
+  "include": ["*.ts"]
+}
