@@ -5,7 +5,7 @@ const assets = [
   "/",
 ];
 
-self.addEventListener("install", function (e) {
+self.addEventListener("install", function (e ) {
   e.waitUntil(
     assets.forEach((asset) => {
       fetch(asset)

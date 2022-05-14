@@ -1,23 +1,14 @@
 // for making the dom elements fulscreen
-export default function fullScreen(e: HTMLElement) {
+export default function fullScreen(e: Element) {
   return {
     set() {
-      e.requestFullscreen().catch((err) => {
+      e.requestFullscreen().catch((err: any) => {
         throw err;
       });
     },
     exist() {
       document.exitFullscreen();
     },
-    // toggle: () => {
-    //   if (!document.fullscreenElement) {
-    //     e.requestFullscreen().catch((err) => {
-    //       throw err;
-    //     });
-    //   } else {
-    //     document.exitFullscreen();
-    //   }
-    // },
   };
 }
 

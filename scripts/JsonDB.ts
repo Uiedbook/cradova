@@ -9,10 +9,10 @@
  *  */
 
 export const JSONDBversion = "1.0.0";
-let fs: unknown,
+let fs,
   fileURLToPath,
   isNode = false,
-  _dirname: unknown;
+  _dirname;
 if (!globalThis.localStorage) {
   isNode = true;
   fs = await import("fs");
@@ -24,18 +24,7 @@ if (!globalThis.localStorage) {
     .split("node_modules")[0];
 }
 const schema = class {
-  base_name: string;
-  name: string;
-  last_index: number;
-  columns: string;
-  relations: string | null;
-  constructor(
-    schema_configuration_object: Record<string, string>,
-    validators: {
-      validateColumns: (arg0: string) => void;
-      validateRelations: (arg0: string) => void;
-    }
-  ) {
+  constructor(schema_configuration_object, validators) {
     // validations
     if (!schema_configuration_object.columns) {
       throw new Error(
@@ -44,7 +33,7 @@ const schema = class {
     }
     validators.validateColumns(schema_configuration_object.columns);
 
-    const isEmptyObject = function (obj: any) {
+    const isEmptyObject = function (obj) {
       // for checking for empty objects
       for (const name in obj) {
         return false;
@@ -68,14 +57,9 @@ const schema = class {
 };
 
 class JSONDBTableWrapper {
-  put: (name: string, value: any) => Promise<void>;
-  get: (name: string) => Promise<unknown>;
-  validator: (incoming: { [x: string]: any }, tables: string | any[]) => {};
-  self: any;
-  keys: any;
-  constructor(self: unknown, keys: any) {
-    this.put = async (name: string, value: any) => {
-      function cb(err: string) {
+  constructor(self, keys) {
+    this.put = async (name, value) => {
+      function cb(err) {
         if (err) {
           throw new Error(
             "JSONDB: error failed to update entities in database because " + err
@@ -88,7 +72,7 @@ class JSONDBTableWrapper {
         localStorage.setItem(name, JSON.stringify(value));
       }
     };
-    this.get = async (name: any) => {
+    this.get = async (name) => {
       return new Promise(function (res, rej) {
         try {
           if (!isNode) {
@@ -99,7 +83,7 @@ class JSONDBTableWrapper {
           fs.readFile(
             _dirname + "/" + name + ".json",
             { encoding: "utf-8" },
-            function (err: string, data: string) {
+            function (err, data) {
               if (err) {
                 return rej(
                   "JSONDB: error failed to retrieve entities from database because " +
@@ -118,12 +102,9 @@ class JSONDBTableWrapper {
         } catch (error) {}
       });
     };
-    this.validator = (
-      incoming: { [x: string]: any },
-      tables: string | any[]
-    ) => {
+    this.validator = (incoming, tables) => {
       // works for type, nulllable and unique validations.
-      const outgoing: Record<string, string> = {};
+      const outgoing = {};
       for (const prop in this.self.columns) {
         if (
           this.self.columns[prop].nullable !== true &&
@@ -191,11 +172,7 @@ await PollTable.saveWithRelations(MessageTable, Poll, message);
 // arrays of relations
 await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
 */
-  async saveWithRelations(
-    table: { self: { name: string | number } },
-    incoming: { index: string | number },
-    relations: string | any[]
-  ) {
+  async saveWithRelations(table, incoming, relations) {
     if (!relations) {
       return;
     }
@@ -269,7 +246,7 @@ await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
  * @example
  await PollTable.save(poll)
 */
-  async save(incoming: { index: number; relations: {} }) {
+  async save(incoming) {
     // db.tables[this.self.name] = db.tables[this.self.name].sort(
     //   (a, b) => a.index - b.index
     // );
@@ -297,12 +274,13 @@ await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
  * @example
  await PollTable.remove(poll)
 */
-  async remove(entity: { index: string | number }) {
+  async remove(entity) {
     const db = await this.get(this.self.base_name);
     db.last_access_time = Date();
     // db.tables[this.self.name].splice(entity.index, 1);
     db.tables[this.self.name][entity.index] = null;
     await this.put(this.self.base_name, db);
+    return true;
   }
   /**
  * Save table into a Jsondb instance
@@ -336,10 +314,7 @@ await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
  await PollTable.getWhereAny({name: "friday", age: 121, class: "senior"}) // gets all
  await PollTable.getWhereAny({email: "fridaymaxtour@gmail.com"}, 2) // gets 2 if they are up to two
 */
-  async getWhereAny(
-    props: { [s: string]: unknown } | ArrayLike<unknown>,
-    number: number
-  ) {
+  async getWhereAny(props, number) {
     const results = [];
     let all;
     const db = await this.get(this.self.base_name);
@@ -369,10 +344,7 @@ await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
  await PollTable.getWhereAnyPropsIncludes({name: "fri"}) // gets all
  await PollTable.getWhereAnyPropsIncludes({name: "fri"}, 2) // gets 2 if they are up to two
 */
-  async getWhereAnyPropsIncludes(
-    props: { [s: string]: unknown } | ArrayLike<unknown>,
-    number: number
-  ) {
+  async getWhereAnyPropsIncludes(props, number) {
     const results = [];
     let all;
     const db = await this.get(this.self.base_name);
@@ -401,11 +373,11 @@ await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
   await PollTable.getOne({email: "fridaymaxtour@gamail.com"}) // gets one
 
   */
-  async getOne(props: { [s: string]: unknown } | ArrayLike<unknown>) {
+  async getOne(props) {
     let results = null;
     const db = await this.get(this.self.base_name);
     db.last_access_time = Date();
-    const all = db.tables[this.self.name];
+    all = db.tables[this.self.name];
     for (let i = 0; i < all.length; i++) {
       const element = all[i];
       for (const [k, v] of Object.entries(props)) {
@@ -420,9 +392,7 @@ await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
 }
 
 const JSONDBConnection = class {
-  Entities: any;
-  keys: any;
-  constructor(Entities: any, keys?: any) {
+  constructor(Entities, keys) {
     this.Entities = Entities;
     this.keys = keys;
   }
@@ -442,7 +412,7 @@ const connection = await database.createJSONDBConnection(details);
 // getting a table 
 const MessageTable = connection.getTable("Message");
    * */
-  getTable(table_name: string) {
+  getTable(table_name) {
     for (const [tableName, table] of Object.entries(this.Entities)) {
       if (table_name === tableName) {
         return new JSONDBTableWrapper(table, this.keys);
@@ -464,17 +434,6 @@ const MessageTable = connection.getTable("Message");
  * */
 
 class JSONDB {
-  DB_NAME: string;
-  username: string;
-  encrypted: boolean;
-  initialised: boolean;
-  time_created: string;
-  version: string;
-  last_access_time: string;
-  visuality: string;
-  Entities: {};
-  tables: {};
-  password: string;
   constructor() {
     this.DB_NAME = "";
     this.username = "";
@@ -486,9 +445,8 @@ class JSONDB {
     this.visuality = "";
     this.Entities = {};
     this.tables = {};
-    this.password = "";
   }
-  async getDB(name: string) {
+  async getDB(name) {
     return new Promise(function (res, rej) {
       if (!isNode) {
         res(JSON.parse(localStorage.getItem(name)));
@@ -499,7 +457,7 @@ class JSONDB {
         fs.readFile(
           _dirname + "/" + name + ".json",
           { encoding: "utf-8" },
-          function (err: any, data: string) {
+          function (err, data) {
             if (err) {
               return rej(err);
             }
@@ -578,7 +536,7 @@ class JSONDB {
 });
  */
 
-  schema(schema_configuration_object: Record<string, string>) {
+  schema(schema_configuration_object) {
     return new schema(schema_configuration_object, {
       validateColumns: this.validateColumns,
       validateRelations: this.validateRelations,
@@ -600,12 +558,7 @@ class JSONDB {
  // Creates a new JSONDB instance
    * Database.init(config)  
    * */
-  init(config: {
-    name: string;
-    password: string;
-    username: string;
-    encrypted: boolean;
-  }) {
+  init(config) {
     console.log(`\x1B[32m JSONDB version ${JSONDBversion} \x1B[39m`);
     this.initialised = true;
     this.DB_NAME = config.name;
@@ -632,7 +585,7 @@ class JSONDB {
       throw new Error("JSONDB: error username is empty ");
     }
 
-    function cb(err: string) {
+    function cb(err) {
       if (err) {
         throw new Error(
           "JSONDB: error failed to create database because " + err
@@ -659,7 +612,7 @@ class JSONDB {
 const connection = await database.createJSONDBConnection(details);
 */
 
-  async createJSONDBConnection(details: { username: any; password: any }) {
+  async createJSONDBConnection(details) {
     if (!this.initialised) {
       throw new Error("JSONDB: you haven't create a JSONDB instance yet");
     }
@@ -674,7 +627,7 @@ const connection = await database.createJSONDBConnection(details);
 
     return new JSONDBConnection(connection.Entities);
   }
-  validateRelations(relations: { [s: string]: unknown } | ArrayLike<unknown>) {
+  validateRelations(relations) {
     const types = ["many", "one"];
     for (const [relation, value] of Object.entries(relations)) {
       if (typeof value.target !== "object") {
@@ -700,7 +653,7 @@ const connection = await database.createJSONDBConnection(details);
       }
     }
   }
-  validateColumns(columns: { [s: string]: unknown } | ArrayLike<unknown>) {
+  validateColumns(columns) {
     const types = ["number", "string", "boolean", "blob"];
     for (const [column, value] of Object.entries(columns)) {
       if (column) {
@@ -754,7 +707,7 @@ database.assemble([MessageSchema]);
 *
 */
 
-  assemble(allEntities: string | any[]) {
+  assemble(allEntities) {
     if (!this.initialised) {
       throw new Error("JSONDB: you haven't create a JSONDB instance yet");
     }
@@ -772,7 +725,7 @@ database.assemble([MessageSchema]);
       this.Entities[allEntities[i].name].base_name = this.DB_NAME;
       this.tables[allEntities[i].name] = [];
     }
-    function cb(err: string) {
+    function cb(err) {
       if (err) {
         throw new Error(
           "JSONDB: error failed to assemble entities into database because " +

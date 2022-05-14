@@ -3,35 +3,30 @@
  * page views based on the matched routes.
  */
 
-const Router = {};
-/**
- *
- * @param {object} context Any initial context to be passed to pages.
- */
+const Router: Record<string, any> = {};
 
-Router.routes = {};
+Router["routes"] = {};
 
 /**
  * Registers a route.
  *
  * @param {string}   path     Route path.
- * @param {Function} controller Callback method.
+ * @param {Function} controller the cradova document tree for the route.
  */
 
-Router.route = function (path = "/", controller) {
+Router.route = function (path: string = "/", controller: Function) {
   const link = document.createElement("a");
   link.href = window.location.href.replace(/#(.*)$/, "") + path.split("/")[1];
   Router.routes[path] = {
-    templateId:
-      path.split("/")[1] !== "" ? path.split("/")[1] : window.location.hostname,
     controller: controller,
   };
   return link;
 };
-Router.navigate = function (href) {
+Router.navigate = async function (href: string) {
   let route = null,
     link = null;
   if (href.includes(".")) {
+    //FIXME: add a try catch here some usage errors poped up
     if (new URL(href).pathname === window.location.pathname) {
       return;
     }
@@ -44,23 +39,34 @@ Router.navigate = function (href) {
     route = Router.routes[href];
     link = href;
   }
-
-  if (route) {
-    route.controller();
-  } else {
-    throw new Error("cradova err route doesn't exist");
-  }
-  window.history.pushState(href, null, link);
-  window.scrollTo(0, 0);
+  window.history.pushState({}, "", link);
   return;
 };
 
-Router.router = function (e) {
-  const Alink = e.path.find((el) => el.tagName === "A");
+Router.router = function (e: any) {
+  if (e.target.tagName === "INPUT") {
+    return;
+  }
+  //
+  let Alink;
+  if (e.target.tagName === "A") {
+    Alink = e.target;
+    if (Alink && Alink.href.includes("#")) {
+      return;
+    }
+  }
+  if (e.target.parentElement && e.target.parentElement.tagName === "A") {
+    Alink = e.target.parentElement;
+  }
   if (Alink && Alink.href.includes("#")) {
     return;
   }
+  if (Alink && Alink.href.includes("javascript")) {
+    return;
+  }
+
   e.preventDefault();
+
   if (Alink) {
     if (
       Alink.href === "" ||
@@ -68,13 +74,14 @@ Router.router = function (e) {
     ) {
       return;
     }
+
     const route = Router.routes[new URL(Alink.href).pathname];
     if (route) {
       route.controller(e);
     } else {
       throw new Error("cradova err route doesn't exist  " + Alink.href);
     }
-    window.history.pushState(Alink.href, null, new URL(Alink.href).pathname);
+    window.history.pushState({}, "", new URL(Alink.href).pathname);
     window.scrollTo(0, 0);
     return;
   }
@@ -83,8 +90,8 @@ Router.router = function (e) {
   const route = Router.routes[url];
   if (route) {
     route.controller(e);
+    window.scrollTo(0, 0);
   }
-  window.scrollTo(0, 0);
 };
 
 /**

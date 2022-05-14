@@ -1,7 +1,5 @@
-const w = function (
-  ...childrens: HTMLElement[] | ((el: Record<string, string>) => HTMLElement)[]
-) {
-  let props: Record<string, string>;
+const w = function (...childrens: any[]) {
+  let props: any;
   if (
     typeof childrens[0] === "object" &&
     !(childrens[0] instanceof HTMLElement)

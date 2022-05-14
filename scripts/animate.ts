@@ -21,9 +21,7 @@ _.animate("popanimation",
 
 */
 
-type props = Record<string, string>;
-
-export default function animate(indentifier: string, ...properties: props[]) {
+export default function animate(indentifier: string, ...properties: any[]) {
   /*This is for creating css  
  animations  using javascipt*/
   const styS = "@keyframes " + indentifier + " " + "{",

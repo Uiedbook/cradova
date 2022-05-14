@@ -6,7 +6,7 @@ class store {
     this.#value = initial;
     this.#history.push(initial);
   }
-  status() {
+  get(): unknown {
     return this.#value;
   }
 
@@ -28,20 +28,20 @@ class store {
   }
 }
 
-const Store = function (initial: unknown) {
+const Store = function (initial: any) {
   return new store(initial);
 };
 
 // const value = Store("hello world people");
-// console.log(value.status());
+// console.log(value.get());
 //
 // value.set("hi yall people");
 // console.log(value.status());
 //
 // value.backward();
-// console.log(value.status());
+// console.log(value.get());
 //
 // value.forward();
-// console.log(value.status());
+// console.log(value.get());
 
 export default Store;

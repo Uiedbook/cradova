@@ -1,25 +1,11 @@
-/*         _____
- *        /     \
- *       /   /\  \
- *      /   /  \__\
- *     /   /    _    _
- *    /   /    (_)  (_)
- *   (    \    ___ 
- *    \    \  /  /
- *     \    \/  /
- *      \      /
- *       \____/
- * 
+/* 
  *   Cradova FrameWork
  *     @version 1.0.0
         @licence Apache v2
 
- @publisher : Friday Candour;
  @project : Cradova Framework;
  @copyright-lincense :  Apache v2;
  email > fridaymaxtour@gmail.com
- github > www.github.com/FridayCandour
- telegram > @uiedbooker
 
                                   Apache License
                            Version 2.0, January 2004
@@ -35,8 +21,9 @@
  *       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *       See the License for the specific language governing permissions and
  *       limitations under the License.
- *       
 */
+
+// importing cradova helper scripts
 
 import css from "./scripts/css.js";
 import w from "./scripts/widget.js";
@@ -54,57 +41,45 @@ import ls from "./scripts/localStorage.js";
 import dispatch from "./scripts/dispatcher.js";
 import fullScreen from "./scripts/fullscreen.js";
 import metrics from "./scripts/Metrics.js";
+import PromptBeforeLeave from "./scripts/promptbeforeleave.js";
+import createState from "./scripts/createState.js";
+import fetcher from "./scripts/fetcher.js";
+import littleAxios from "./scripts/littleAxios.js";
+
+// importing types declarations
+
+import { CradovaElemetType } from "./types.js";
 
 ("use strict");
 
 /**
- * Acts as a function or object depending on how it is referenced.
- *
- * :: schemes
+ * Creates new HTML element
  *  @example
- *  // creating html elements
- * @param  element_initials | <html template string, props object?, children?>.
- * @returns Cradova element base function.
- * @example
- * // html template strings examples
- *
- * //template literals example, can't accept props object or children
- *
- * _`p| am a p tag`
- * // equivilent <p> am a p tag</p>
- *
- * or _`p.class| am a p tag`
- * // equivilent <p class="class"> am a p tag </p>
- *
- * or _`p#id| am a p tag`
- * // equivilent <p id="id"> am a p tag </p>
- *
- * or _`p.class#id| am a p tag`
- * // equivilent <p id="id" class="class"> am a p tag </p>
- *
- * // using props and children
- *
- *  _("p| am a p tag" ,{
- *  //props like
- *  text: "am a dynamic paragraph tag", // this will override text value above
- *  style: {
- *   color: "blue"
- *  }
+ * format for static  _`p| am a p tag`  // or _`p.class| am a p tag` or _`p#id| am a p tag` or _`p.class#id| am a p tag`
+ * format for dynamic _(
+ *  "p| am a p tag" // or "p.class| am a p tag" or "p#id| am a p tag" or "p.class#id| am a p tag"
+ * , {
+ * //props like
+ * text: "am a p tag",
+ * style: {
+ * color: "blue"
+ * }
  * },
  * // place other children here like span
- * _`span| am a span tag like so`,
- * _("span| am a span tag like so", {style: {color: "brown"}})
+ * _`span| am a span tag like so`, // this is a static child
+ * _("span| am a span tag like so", {style: {color: "brown"}}) // this is a dynamic child
  * )
+ * @param  {...any} element_initials
+ * @returns function | HTMLElement
  *
- * every other cradova methods like _.dispatch, _.reuse ... can be distructured
- * vist the docs for more info.
- * Enjoy!
+ * // static elements cannot be given props nor children nor state but dynamic can
+ *
+ * // and static are useful too
  */
 
-const _ = (...element_initials: { raw: any }[]) => {
-  let properties: { [x: string]: any },
+const _: any | Record<string, any> = (...element_initials: { raw: any }[]) => {
+  let properties: Record<string, any>,
     childrens: string | any[] = [];
-  // getting props and children set
   if (
     typeof element_initials[1] == "object" &&
     !(element_initials[1] instanceof HTMLElement)
@@ -121,32 +96,16 @@ const _ = (...element_initials: { raw: any }[]) => {
       childrens = element_initials.slice(1, element_initials.length);
     }
   }
-  // don't move this up
+
   if (typeof element_initials[0] === "string") {
     element_initials = element_initials[0];
   }
   // verifing the children array
-  for (let i = 0; i < childrens.length; i++) {
-    if (
-      !(childrens[i] instanceof HTMLElement) &&
-      typeof childrens[i] !== "function"
-    ) {
-      throw new Error(
-        "cradova err invalid children list, should be a Cradova element base  " +
-          childrens[i]
-      );
-    }
-  }
-  /**
-   * sorts props and creates cradova element base
-   * @param element_initials
-   * @returns cradova element base
-   */
+
   function identify(element_initials: any[]) {
     if (typeof element_initials !== "object") {
       element_initials = [element_initials];
     }
-    // getting element id, class and text value if available
     let tag, className, ID;
     const [el, innerValue] = element_initials[0].split("|");
 
@@ -184,15 +143,18 @@ const _ = (...element_initials: { raw: any }[]) => {
      * @returns HTML element
      */
 
-    return (...incoming: string | any[]) => {
+    return (...incoming: string[] | any[]) => {
       let childrens2rd = [],
-        props = {},
+        props: Record<string, string> = {},
         text;
 
       for (let i = 0; i < incoming.length; i++) {
         if (
           typeof incoming[i] === "function" ||
-          incoming[i] instanceof HTMLElement
+          incoming[i] instanceof HTMLElement ||
+          (Array.isArray(incoming[i]) &&
+            (incoming[i][0] instanceof HTMLElement ||
+              typeof incoming[i][0] === "function"))
         ) {
           childrens2rd.push(incoming[i]);
           continue;
@@ -209,18 +171,13 @@ const _ = (...element_initials: { raw: any }[]) => {
           text = incoming[i];
           continue;
         }
-        //
-        if (childrens[0]) {
-          if (childrens2rd) {
-            childrens2rd.push(...childrens);
-          } else {
-            childrens2rd = childrens;
-          }
-          continue;
-        }
       }
 
-      const element = document.createElement(initials.tag);
+      if (childrens.length) {
+        childrens2rd.push(...childrens);
+      }
+
+      const element: CradovaElemetType = document.createElement(initials.tag);
       if (initials.className) {
         element.className = initials.className;
       }
@@ -239,7 +196,7 @@ const _ = (...element_initials: { raw: any }[]) => {
           }
           continue;
         }
-        if (prop === "class") {
+        if (prop === "class" && typeof properties[prop] === "string") {
           element.classList.add(properties[prop]);
           continue;
         }
@@ -250,6 +207,8 @@ const _ = (...element_initials: { raw: any }[]) => {
         element[prop] = properties[prop];
       }
 
+      //
+      // dynamic props
       // over-rides props that appear in the first level
 
       if (props && typeof props === "object" && !Array.isArray(props)) {
@@ -260,11 +219,11 @@ const _ = (...element_initials: { raw: any }[]) => {
             }
             continue;
           }
-          if (prop === "text") {
+          if (prop === "text" && typeof props[prop] === "string") {
             element.innerText = props[prop];
             continue;
           }
-          if (prop === "class") {
+          if (prop === "class" && typeof props[prop] === "string") {
             element.classList.add(props[prop]);
             continue;
           }
@@ -279,37 +238,64 @@ const _ = (...element_initials: { raw: any }[]) => {
           element[prop] = props[prop];
         }
       }
-      // building parent tree if children are available
       if (childrens2rd && childrens2rd[0]) {
+        //
+
         for (let i = 0; i < childrens2rd.length; i++) {
           if (typeof childrens2rd[i] === "function") {
-            element.append(childrens2rd[i]());
+            element.append(childrens2rd[i](props));
+            continue;
+          }
+          if (Array.isArray(childrens2rd[i])) {
+            const arrCX: HTMLElement[] | Function[] = childrens2rd[i];
+            const arrSET = [];
+            for (let p = 0; p < arrCX.length; p++) {
+              if (
+                !(arrCX[p] instanceof HTMLElement) &&
+                typeof arrCX[p] !== "function" &&
+                !Array.isArray(arrCX[p])
+              ) {
+                throw new TypeError(
+                  "cradova err invalid children list, should be a html element from cradova  " +
+                    arrCX[p]
+                );
+              }
+              arrSET.push(arrCX[p]);
+            }
+            //
+            childrens2rd = [
+              ...childrens2rd.slice(0, i + 1),
+              ...arrSET,
+              ...childrens2rd.slice(i + 1, childrens2rd.length),
+            ];
             continue;
           }
           element.append(childrens2rd[i]);
         }
       }
-      // adds text content if available
       if (text) {
         element.append(text);
       }
       if (element.stateID) {
-        // adding cradova dynamic state signature as class name
+        // adding cradova dynamic signature
         element.classList.add("cra_child_doc");
       }
       return element;
     };
   }
+
+  let CradovaElemet: HTMLElement | Function;
+
   if (element_initials[0].raw) {
-    element_initials = identify(element_initials[0].raw);
+    CradovaElemet = identify(element_initials[0].raw);
   } else {
-    element_initials = identify(element_initials);
+    CradovaElemet = identify(element_initials);
   }
 
-  return element_initials;
+  return CradovaElemet;
 };
 
-_.register = (name: any) => {
+_.register = (name: Record<string, any>) => {
   for (const key in name) {
     _[key] = name[key];
   }
@@ -334,14 +320,16 @@ _.register({
   FS: fs,
   Speaker,
   metrics,
+  fetcher,
   animate,
   dispatch,
-  //  App: window.app,
-  globalState: { state: {}, stateID: "" },
+  littleAxios,
+  createState,
+  PromptBeforeLeave,
 });
 
 _.Init();
-window._ = _;
+window["_"] = _;
 
 export default _;
 
@@ -356,10 +344,9 @@ window.addEventListener("load", async () => {
       .register("service-worker.js")
       .then(function (registration) {
         // Registration was successful
-        //         console.log(
-        //           `Service Worker registration successful. Scope: ${registration.scope}
-        // comment this line out at nodemodules/cradova/index.js line 362`
-        //         );
+        console.log(
+          `Service Worker registration successful. Scope: ${registration.scope}`
+        );
       })
       .catch((err) => console.log(err));
   }

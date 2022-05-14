@@ -1,13 +1,5 @@
-type calls = {
-  up: () => void;
-  down: () => void;
-  right: () => void;
-  left: () => void;
-  touch: () => void;
-};
-
-export default function swipe(item: calls) {
-  let caller: calls;
+export default function swipe(item: any) {
+  let caller: { touch: any; right: any; left: any; down: any; up: any };
   let startX = 0,
     startY = 0;
   if (typeof item === "object") {
@@ -16,12 +8,16 @@ export default function swipe(item: calls) {
     throw new Error("no call given for the swipe handler");
   }
 
-  function handleTouchStart(e: TouchEvent) {
+  function handleTouchStart(e: {
+    changedTouches: { screenY: number; screenX: number }[];
+  }) {
     startX = e.changedTouches[0].screenX;
     startY = e.changedTouches[0].screenY;
   }
 
-  function handleTouchEnd(e: TouchEvent) {
+  function handleTouchEnd(e: {
+    changedTouches: { screenY: number; screenX: number }[];
+  }) {
     const diffX = e.changedTouches[0].screenX - startX;
     const diffY = e.changedTouches[0].screenY - startY;
     const ratioX = Math.abs(diffX / diffY);
@@ -64,22 +60,22 @@ export default function swipe(item: calls) {
   document.body.addEventListener("touchend", handleTouchEnd);
 
   const callback = {
-    touch(callback: () => void) {
+    touch(callback: () => any) {
       return callback();
     },
-    right(callback: () => void) {
-      return callback();
-    },
-
-    left(callback: () => void) {
+    right(callback: () => any) {
       return callback();
     },
 
-    down(callback: () => void) {
+    left(callback: () => any) {
       return callback();
     },
 
-    up(callback: () => void) {
+    down(callback: () => any) {
+      return callback();
+    },
+
+    up(callback: () => any) {
       return callback();
     },
   };

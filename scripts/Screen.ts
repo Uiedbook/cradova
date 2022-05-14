@@ -1,35 +1,43 @@
 class Screen {
+  html: HTMLElement | Function;
   name: string;
-  template: HTMLElement;
-  callBacks: ((html: ChildNode | null) => void)[];
-  constructor(name: string, template: HTMLElement | (() => HTMLElement)) {
+  template: HTMLDivElement;
+  callBacks: Function[];
+  treeCreated: boolean;
+  constructor(name: string, template: Function | HTMLElement) {
+    this.html = template;
     this.name = name;
     this.template = document.createElement("div");
     this.template.style.width = "100%";
     this.template.style.display = "flex";
     this.template.style.flexDirection = "column";
     this.template.id = "cradova-screen-set";
-    if (typeof template === "function") {
-      let fuc: HTMLElement | (() => HTMLElement) = template();
-      this.template.append(fuc);
-      // if (typeof fuc === "function") {
-      //   this.template.append(fuc());
-      // } else {
-      //   this.template.append(fuc);
-      // }
-    } else {
-      if (!(template instanceof HTMLElement)) {
-        throw new Error("Cradova err only should a html element is valid");
+    this.callBacks = [];
+    this.treeCreated = false;
+  }
+  async package() {
+    if (typeof this.html === "function") {
+      let fuc = await this.html();
+      if (typeof fuc === "function") {
+        this.template.append(fuc());
       } else {
-        this.template.append(template);
+        this.template.append(fuc);
+      }
+    } else {
+      if (this.html instanceof HTMLElement) {
+        this.template.append(this.html);
       }
     }
-    this.callBacks = [];
+    if (!(this.template.firstChild instanceof HTMLElement)) {
+      throw new Error("Cradova err only parent with descendants is valid ");
+    }
+    this.treeCreated = true;
   }
-  onActivate(cb: (html: ChildNode | null) => void) {
+
+  onActivate(cb: any) {
     this.callBacks.push(cb);
   }
-  addChild(...addOns: HTMLElement[] | (() => HTMLElement)[] | string[]) {
+  addChild(...addOns: any[]) {
     for (let i = 0; i < addOns.length; i++) {
       if (addOns[i] && addOns[i] instanceof HTMLElement) {
         this.template.append(addOns[i]);
@@ -42,20 +50,24 @@ class Screen {
   detach() {
     const screen = document.querySelector("#cradova-screen-set");
     if (screen) {
-      document.querySelector("#app-wrapper")?.removeChild(screen);
+      document.querySelector("#app-wrapper")!.removeChild(screen);
     }
   }
-  Activate() {
+  async Activate() {
     if (document.title === this.name) {
       return;
     }
-    const screen = document.querySelector("#cradova-screen-set");
-    if (screen) {
-      this.detach();
+    if (!this.treeCreated) {
+      await this.package();
     }
     document.title = this.name;
-    document.querySelector("#app-wrapper")?.append(this.template);
-    this.callBacks.forEach((cb) => cb(this.template.firstChild));
+    this.detach();
+    document.querySelector("#app-wrapper")!.append(this.template);
+    if (document.querySelector("#app-wrapper")!.childElementCount > 1) {
+      //   this.detach();
+    }
+    //    console.log(document.querySelector("#app-wrapper").childElementCount);
+    this.callBacks.forEach((cb: Function) => cb(this.template.firstChild));
   }
 }
 

@@ -1,7 +1,7 @@
-const Speaker = {};
+const Speaker: Record<string, Function> = {};
 
 Speaker.speak = function (
-  text,
+  text: string | undefined,
   language = "en",
   volume = 1,
   rate = 1,

@@ -5,13 +5,16 @@ const fs = {};
  *
  * @return {!Promise<FileSystemFileHandle>} Handle to the existing file.
  */
-fs.getFileHandle = function (): Promise<FileSystemFileHandle> {
+fs.getFileHandle = async function (filePicker): Promise<FileSystemFileHandle> {
   // For Chrome 86 and later...
   if ("showOpenFilePicker" in window) {
-    return window.showOpenFilePicker().then((handles: any[]) => handles[0]);
+    return window.showOpenFilePicker().then((handles) => handles[0]);
   }
   // For Chrome 85 and earlier...
-  return window.chooseFileSystemEntries();
+  if ("chooseFileSystemEntries" in window) {
+    return window.chooseFileSystemEntries();
+  }
+  return this.getFileLegacy(filePicker);
 };
 
 /**
@@ -85,10 +88,7 @@ fs.readFileLegacy = function (file: File): Promise<string> {
  * @param {FileSystemFileHandle} fileHandle File handle to write to.
  * @param {string} contents Contents to write.
  */
-fs.writeFile = async function (
-  fileHandle: FileSystemFileHandle,
-  contents: string
-) {
+fs.writeFile = async function (fileHandle: FileSystemFileHandle, contents: string) {
   // Support for Chrome 82 and earlier.
   if (fileHandle.createWriter) {
     // Create a writer (request permission if necessary).
@@ -116,10 +116,7 @@ fs.writeFile = async function (
  * @param {boolean} withWrite True if write permission should be checked.
  * @return {boolean} True if the user has granted read/write permission.
  */
-fs.verifyPermission = async function (
-  fileHandle: FileSystemFileHandle,
-  withWrite: boolean
-): boolean {
+fs.verifyPermission = async function (fileHandle: FileSystemFileHandle, withWrite: boolean): boolean {
   const opts = {};
   if (withWrite) {
     opts.writable = true;
@@ -143,9 +140,9 @@ fs.verifyPermission = async function (
  *
  * @return {!Promise<File>} File selected by the user.
  */
-fs.getFileLegacy = (): Promise<File> => {
+fs.getFileLegacy = (filePicker): Promise<File> => {
   return new Promise((resolve, reject) => {
-    filePicker.onchange = (e: any) => {
+    filePicker.onchange = (e) => {
       const file = filePicker.files[0];
       if (file) {
         resolve(file);
@@ -153,7 +150,6 @@ fs.getFileLegacy = (): Promise<File> => {
       }
       reject(new Error("AbortError"));
     };
-    filePicker.click();
   });
 };
 

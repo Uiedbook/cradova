@@ -1,5 +1,5 @@
 import css from "./css.js";
-const Init = function (config: Record<string, string>) {
+const Init = function (config: any) {
   const Wrapper = document.createElement("div");
   Wrapper.className = "Cradova-app-wrappper";
   Wrapper.id = "app-wrapper";
@@ -10,9 +10,8 @@ const Init = function (config: Record<string, string>) {
     "flex-direction": "column",
     width: "100%",
   });
-  // Wrapper.stateID = "Cradova-app-wrappper-id";
+  Wrapper.stateID = "Cradova-app-wrappper-id";
   document.body.append(Wrapper);
   return Wrapper;
 };
-
 export default Init;

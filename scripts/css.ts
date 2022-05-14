@@ -24,7 +24,8 @@ export default function css(
 ) {
   /*This is for creating
  css styles using javascipt*/
-  const styS = "" + indentifier + "{";
+
+  const styS = "" + indentifier + "" + "{";
   const styE = "}";
   let style = "",
     totalStyle = "";
