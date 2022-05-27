@@ -1,6 +1,6 @@
 {
   "name": "cradova",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Web framework for building web apps and PWAs",
   "main": "index.js",
   "directories": {
