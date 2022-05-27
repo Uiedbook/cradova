@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 define(["require", "exports", "./fullscreen.js"], function (require, exports, fullscreen_js_1) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.__esModule = true;
     fullscreen_js_1 = __importDefault(fullscreen_js_1);
     function dispatch(stateID, state) {
         if (typeof stateID !== "string" ||
@@ -11,20 +11,21 @@ define(["require", "exports", "./fullscreen.js"], function (require, exports, fu
             typeof state !== "string") {
             throw new TypeError("Invalid arguments type for state dispatcher  ");
         }
-        const nodes = document.querySelectorAll(".cra_child_doc");
+        var nodes = document.querySelectorAll(".cra_child_doc");
         if (typeof state === "undefined" && typeof stateID === "object") {
-            for (const [id, eachState] of Object.entries(stateID)) {
-                nodes.forEach((element) => {
+            var _loop_1 = function (id, eachState) {
+                nodes.forEach(function (element) {
                     // abort rendering if the state is not for this element
                     if (!element.stateID || element.stateID !== id) {
                         return;
                     }
                     if (typeof eachState === "object") {
                         // updating the element's eachState
-                        for (const key in eachState) {
+                        for (var key in eachState) {
                             // updating element styling
                             if (key === "style") {
-                                for (const [k, v] of Object.entries(eachState[key])) {
+                                for (var _i = 0, _a = Object.entries(eachState[key]); _i < _a.length; _i++) {
+                                    var _b = _a[_i], k = _b[0], v = _b[1];
                                     element.style[k] = v;
                                 }
                                 continue;
@@ -37,10 +38,10 @@ define(["require", "exports", "./fullscreen.js"], function (require, exports, fu
                             // setting element dimesion to full screen
                             if (key === "fullscreen") {
                                 if (eachState[key]) {
-                                    (0, fullscreen_js_1.default)(element).set();
+                                    fullscreen_js_1["default"](element).set();
                                 }
                                 else {
-                                    (0, fullscreen_js_1.default)(element).exist();
+                                    fullscreen_js_1["default"](element).exist();
                                 }
                                 continue;
                             }
@@ -79,20 +80,25 @@ define(["require", "exports", "./fullscreen.js"], function (require, exports, fu
                         }
                     }
                 });
+            };
+            for (var _i = 0, _a = Object.entries(stateID); _i < _a.length; _i++) {
+                var _b = _a[_i], id = _b[0], eachState = _b[1];
+                _loop_1(id, eachState);
             }
         }
         else {
-            nodes.forEach((element) => {
+            nodes.forEach(function (element) {
                 // abort rendering if the state is not for this element
                 if (!element.stateID || element.stateID !== stateID) {
                     return;
                 }
                 if (typeof state === "object") {
                     // updating the element's state
-                    for (const key in state) {
+                    for (var key in state) {
                         // updating element styling
                         if (key === "style") {
-                            for (const [k, v] of Object.entries(state[key])) {
+                            for (var _i = 0, _a = Object.entries(state[key]); _i < _a.length; _i++) {
+                                var _b = _a[_i], k = _b[0], v = _b[1];
                                 element.style[k] = v;
                             }
                             continue;
@@ -105,10 +111,10 @@ define(["require", "exports", "./fullscreen.js"], function (require, exports, fu
                         // setting element dimesion to full screen
                         if (key === "fullscreen") {
                             if (state[key]) {
-                                (0, fullscreen_js_1.default)(element).set();
+                                fullscreen_js_1["default"](element).set();
                             }
                             else {
-                                (0, fullscreen_js_1.default)(element).exist();
+                                fullscreen_js_1["default"](element).exist();
                             }
                             continue;
                         }
@@ -149,6 +155,6 @@ define(["require", "exports", "./fullscreen.js"], function (require, exports, fu
             });
         }
     }
-    exports.default = dispatch;
+    exports["default"] = dispatch;
 });
 //# sourceMappingURL=dispatcher.js.map

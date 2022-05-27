@@ -1,7 +1,63 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, privateMap, value) {
+    if (!privateMap.has(receiver)) {
+        throw new TypeError("attempted to set private field on non-instance");
+    }
+    privateMap.set(receiver, value);
+    return value;
+};
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, privateMap) {
+    if (!privateMap.has(receiver)) {
+        throw new TypeError("attempted to get private field on non-instance");
+    }
+    return privateMap.get(receiver);
+};
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 define(["require", "exports"], function (require, exports) {
     // @ts-nocheck
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.__esModule = true;
     var __importDefault = (this && this.__importDefault) || function (mod) {
         return (mod && mod.__esModule) ? mod : { "default": mod };
     };
@@ -59,13 +115,14 @@ define(["require", "exports"], function (require, exports) {
         function css(indentifier, properties) {
             /*This is for creating
            css styles using javascipt*/
-            const styS = "" + indentifier + "" + "{";
-            const styE = "}";
-            let style = "", totalStyle = "";
-            for (const [k, v] of Object.entries(properties)) {
+            var styS = "" + indentifier + "" + "{";
+            var styE = "}";
+            var style = "", totalStyle = "";
+            for (var _i = 0, _a = Object.entries(properties); _i < _a.length; _i++) {
+                var _b = _a[_i], k = _b[0], v = _b[1];
                 style += "" + k + ": " + v + ";";
             }
-            let styleTag = document.querySelector("style");
+            var styleTag = document.querySelector("style");
             if (styleTag !== null) {
                 totalStyle += styleTag.innerHTML;
                 totalStyle += styS + style + styE;
@@ -78,20 +135,24 @@ define(["require", "exports"], function (require, exports) {
             styleTag.innerHTML = totalStyle;
             document.head.append(styleTag);
         }
-        exports.default = css;
+        exports["default"] = css;
     });
     define("scripts/widget", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        const w = function (...childrens) {
-            let props;
+        var w = function () {
+            var childrens = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                childrens[_i] = arguments[_i];
+            }
+            var props;
             if (typeof childrens[0] === "object" &&
                 !(childrens[0] instanceof HTMLElement)) {
                 props = childrens[0];
                 childrens = childrens.slice(1, childrens.length);
             }
-            const par = document.createDocumentFragment();
-            childrens.forEach((ch) => {
+            var par = document.createDocumentFragment();
+            childrens.forEach(function (ch) {
                 if (typeof ch === "function") {
                     par.append(ch(props));
                 }
@@ -99,37 +160,37 @@ define(["require", "exports"], function (require, exports) {
                     par.append(ch);
                 }
             });
-            return () => par;
+            return function () { return par; };
         };
-        exports.default = w;
+        exports["default"] = w;
     });
     define("scripts/init", ["require", "exports", "scripts/css"], function (require, exports, css_js_1) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         css_js_1 = __importDefault(css_js_1);
-        const Init = function (config) {
-            const Wrapper = document.createElement("div");
+        var Init = function (config) {
+            var Wrapper = document.createElement("div");
             Wrapper.className = "Cradova-app-wrappper";
             Wrapper.id = "app-wrapper";
-            (0, css_js_1.default)(".Cradova-app-wrappper", {
+            (0, css_js_1["default"])(".Cradova-app-wrappper", {
                 display: "flex",
                 "align-items": "center",
                 "justify-content": "center",
                 "flex-direction": "column",
-                width: "100%",
+                width: "100%"
             });
             Wrapper.stateID = "Cradova-app-wrappper-id";
             document.body.append(Wrapper);
             return Wrapper;
         };
-        exports.default = Init;
+        exports["default"] = Init;
     });
     define("scripts/swipe", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         function swipe(item) {
-            let caller;
-            let startX = 0, startY = 0;
+            var caller;
+            var startX = 0, startY = 0;
             if (typeof item === "object") {
                 caller = item;
             }
@@ -141,11 +202,11 @@ define(["require", "exports"], function (require, exports) {
                 startY = e.changedTouches[0].screenY;
             }
             function handleTouchEnd(e) {
-                const diffX = e.changedTouches[0].screenX - startX;
-                const diffY = e.changedTouches[0].screenY - startY;
-                const ratioX = Math.abs(diffX / diffY);
-                const ratioY = Math.abs(diffY / diffX);
-                const absDiff = Math.abs(ratioX > ratioY ? diffX : diffY);
+                var diffX = e.changedTouches[0].screenX - startX;
+                var diffY = e.changedTouches[0].screenY - startY;
+                var ratioX = Math.abs(diffX / diffY);
+                var ratioY = Math.abs(diffY / diffX);
+                var absDiff = Math.abs(ratioX > ratioY ? diffX : diffY);
                 if (absDiff < 10) {
                     if (caller.touch) {
                         callback.touch(caller.touch);
@@ -180,25 +241,25 @@ define(["require", "exports"], function (require, exports) {
             }
             document.body.addEventListener("touchstart", handleTouchStart);
             document.body.addEventListener("touchend", handleTouchEnd);
-            const callback = {
-                touch(callback) {
+            var callback = {
+                touch: function (callback) {
                     return callback();
                 },
-                right(callback) {
+                right: function (callback) {
                     return callback();
                 },
-                left(callback) {
+                left: function (callback) {
                     return callback();
                 },
-                down(callback) {
+                down: function (callback) {
                     return callback();
                 },
-                up(callback) {
+                up: function (callback) {
                     return callback();
-                },
+                }
             };
         }
-        exports.default = swipe;
+        exports["default"] = swipe;
     });
     /*
      *** HOW TO USE ***
@@ -266,24 +327,29 @@ define(["require", "exports"], function (require, exports) {
         }]
         )
         */
-        function media(value, ...properties) {
+        function media(value) {
+            var properties = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                properties[_i - 1] = arguments[_i];
+            }
             /* This is for creating css
            @media styles using javascipt*/
-            const styS = "@media only screen and (" + value + ") " + "{", styE = "}";
-            let style = "  ", aniSty = " ";
-            const proplen = properties.length;
-            let totalAnimation, Animation = "  ";
-            const animationStep = (num) => {
-                for (const [k, v] of Object.entries(properties[num][1])) {
+            var styS = "@media only screen and (" + value + ") " + "{", styE = "}";
+            var style = "  ", aniSty = " ";
+            var proplen = properties.length;
+            var totalAnimation, Animation = "  ";
+            var animationStep = function (num) {
+                for (var _i = 0, _a = Object.entries(properties[num][1]); _i < _a.length; _i++) {
+                    var _b = _a[_i], k = _b[0], v = _b[1];
                     style += "" + k + ": " + v + ";";
                 }
                 aniSty += "" + properties[num][0] + "{" + style + "}";
                 return aniSty;
             };
-            for (let i = 0; i < proplen; i++) {
+            for (var i = 0; i < proplen; i++) {
                 Animation += animationStep(i);
             }
-            let aniStyleTag = document.querySelector("style");
+            var aniStyleTag = document.querySelector("style");
             if (aniStyleTag === null) {
                 aniStyleTag = document.createElement("style");
             }
@@ -293,40 +359,43 @@ define(["require", "exports"], function (require, exports) {
             aniStyleTag.innerHTML = totalAnimation;
             document.head.append(aniStyleTag);
         }
-        exports.default = media;
+        exports["default"] = media;
     });
     define("scripts/store", ["require", "exports"], function (require, exports) {
         "use strict";
+        var _index, _history, _value;
         Object.defineProperty(exports, "__esModule", { value: true });
-        class store {
-            #index = 0;
-            #history = [];
-            #value = null;
-            constructor(initial) {
-                this.#value = initial;
-                this.#history.push(initial);
+        var store = /** @class */ (function () {
+            function store(initial) {
+                _index.set(this, 0);
+                _history.set(this, []);
+                _value.set(this, null);
+                __classPrivateFieldSet(this, _value, initial);
+                __classPrivateFieldGet(this, _history).push(initial);
             }
-            get() {
-                return this.#value;
-            }
-            set(value) {
-                this.#value = value;
-                this.#history.push(value);
-                this.#index += 1;
-            }
-            forward() {
-                if (this.#history.length > this.#index + 1) {
-                    this.#value = this.#history[this.#index + 1];
+            store.prototype.get = function () {
+                return __classPrivateFieldGet(this, _value);
+            };
+            store.prototype.set = function (value) {
+                __classPrivateFieldSet(this, _value, value);
+                __classPrivateFieldGet(this, _history).push(value);
+                __classPrivateFieldSet(this, _index, __classPrivateFieldGet(this, _index) + 1);
+            };
+            store.prototype.forward = function () {
+                if (__classPrivateFieldGet(this, _history).length > __classPrivateFieldGet(this, _index) + 1) {
+                    __classPrivateFieldSet(this, _value, __classPrivateFieldGet(this, _history)[__classPrivateFieldGet(this, _index) + 1]);
                 }
-            }
-            backward() {
-                if (this.#history.length > 0 && this.#index > 0) {
-                    this.#value = this.#history[this.#index - 1];
-                    this.#index -= 1;
+            };
+            store.prototype.backward = function () {
+                if (__classPrivateFieldGet(this, _history).length > 0 && __classPrivateFieldGet(this, _index) > 0) {
+                    __classPrivateFieldSet(this, _value, __classPrivateFieldGet(this, _history)[__classPrivateFieldGet(this, _index) - 1]);
+                    __classPrivateFieldSet(this, _index, __classPrivateFieldGet(this, _index) - 1);
                 }
-            }
-        }
-        const Store = function (initial) {
+            };
+            return store;
+        }());
+        _index = new WeakMap(), _history = new WeakMap(), _value = new WeakMap();
+        var Store = function (initial) {
             return new store(initial);
         };
         // const value = Store("hello world people");
@@ -340,7 +409,7 @@ define(["require", "exports"], function (require, exports) {
         //
         // value.forward();
         // console.log(value.get());
-        exports.default = Store;
+        exports["default"] = Store;
     });
     /**
      * Facilitates navigation within the application and initializes
@@ -349,7 +418,7 @@ define(["require", "exports"], function (require, exports) {
     define("scripts/Router", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        const Router = {};
+        var Router = {};
         Router["routes"] = {};
         /**
          * Registers a route.
@@ -357,40 +426,46 @@ define(["require", "exports"], function (require, exports) {
          * @param {string}   path     Route path.
          * @param {Function} controller the cradova document tree for the route.
          */
-        Router.route = function (path = "/", controller) {
-            const link = document.createElement("a");
+        Router.route = function (path, controller) {
+            if (path === void 0) { path = "/"; }
+            var link = document.createElement("a");
             link.href = window.location.href.replace(/#(.*)$/, "") + path.split("/")[1];
             Router.routes[path] = {
-                controller: controller,
+                controller: controller
             };
             return link;
         };
-        Router.navigate = async function (href) {
-            let route = null, link = null;
-            if (href.includes(".")) {
-                //FIXME: add a try catch here some usage errors poped up
-                if (new URL(href).pathname === window.location.pathname) {
-                    return;
-                }
-                route = Router.routes[new URL(href).pathname];
-                link = new URL(href).pathname;
-            }
-            else {
-                if (href === window.location.pathname) {
-                    return;
-                }
-                route = Router.routes[href];
-                link = href;
-            }
-            window.history.pushState({}, "", link);
-            return;
+        Router.navigate = function (href) {
+            return __awaiter(this, void 0, void 0, function () {
+                var route, link;
+                return __generator(this, function (_a) {
+                    route = null, link = null;
+                    if (href.includes(".")) {
+                        //FIXME: add a try catch here some usage errors poped up
+                        if (new URL(href).pathname === window.location.pathname) {
+                            return [2 /*return*/];
+                        }
+                        route = Router.routes[new URL(href).pathname];
+                        link = new URL(href).pathname;
+                    }
+                    else {
+                        if (href === window.location.pathname) {
+                            return [2 /*return*/];
+                        }
+                        route = Router.routes[href];
+                        link = href;
+                    }
+                    window.history.pushState({}, "", link);
+                    return [2 /*return*/];
+                });
+            });
         };
         Router.router = function (e) {
             if (e.target.tagName === "INPUT") {
                 return;
             }
             //
-            let Alink;
+            var Alink;
             if (e.target.tagName === "A") {
                 Alink = e.target;
                 if (Alink && Alink.href.includes("#")) {
@@ -412,9 +487,9 @@ define(["require", "exports"], function (require, exports) {
                     new URL(Alink.href).pathname === window.location.pathname) {
                     return;
                 }
-                const route = Router.routes[new URL(Alink.href).pathname];
-                if (route) {
-                    route.controller(e);
+                var route_1 = Router.routes[new URL(Alink.href).pathname];
+                if (route_1) {
+                    route_1.controller(e);
                 }
                 else {
                     throw new Error("cradova err route doesn't exist  " + Alink.href);
@@ -423,8 +498,8 @@ define(["require", "exports"], function (require, exports) {
                 window.scrollTo(0, 0);
                 return;
             }
-            const url = window.location.pathname;
-            const route = Router.routes[url];
+            var url = window.location.pathname;
+            var route = Router.routes[url];
             if (route) {
                 route.controller(e);
                 window.scrollTo(0, 0);
@@ -439,22 +514,17 @@ define(["require", "exports"], function (require, exports) {
          */
         document.addEventListener("click", Router.router);
         window.addEventListener("load", Router.router);
-        window.addEventListener("popstate", (e) => {
+        window.addEventListener("popstate", function (e) {
             e.preventDefault();
             Router.router(e);
         });
-        exports.default = Router;
+        exports["default"] = Router;
     });
     define("scripts/Screen", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        class Screen {
-            html;
-            name;
-            template;
-            callBacks;
-            treeCreated;
-            constructor(name, template) {
+        var Screen = /** @class */ (function () {
+            function Screen(name, template) {
                 this.html = template;
                 this.name = name;
                 this.template = document.createElement("div");
@@ -465,31 +535,47 @@ define(["require", "exports"], function (require, exports) {
                 this.callBacks = [];
                 this.treeCreated = false;
             }
-            async package() {
-                if (typeof this.html === "function") {
-                    let fuc = await this.html();
-                    if (typeof fuc === "function") {
-                        this.template.append(fuc());
-                    }
-                    else {
-                        this.template.append(fuc);
-                    }
-                }
-                else {
-                    if (this.html instanceof HTMLElement) {
-                        this.template.append(this.html);
-                    }
-                }
-                if (!(this.template.firstChild instanceof HTMLElement)) {
-                    throw new Error("Cradova err only parent with descendants is valid ");
-                }
-                this.treeCreated = true;
-            }
-            onActivate(cb) {
+            Screen.prototype.package = function () {
+                return __awaiter(this, void 0, void 0, function () {
+                    var fuc;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                if (!(typeof this.html === "function")) return [3 /*break*/, 2];
+                                return [4 /*yield*/, this.html()];
+                            case 1:
+                                fuc = _a.sent();
+                                if (typeof fuc === "function") {
+                                    this.template.append(fuc());
+                                }
+                                else {
+                                    this.template.append(fuc);
+                                }
+                                return [3 /*break*/, 3];
+                            case 2:
+                                if (this.html instanceof HTMLElement) {
+                                    this.template.append(this.html);
+                                }
+                                _a.label = 3;
+                            case 3:
+                                if (!(this.template.firstChild instanceof HTMLElement)) {
+                                    throw new Error("Cradova err only parent with descendants is valid ");
+                                }
+                                this.treeCreated = true;
+                                return [2 /*return*/];
+                        }
+                    });
+                });
+            };
+            Screen.prototype.onActivate = function (cb) {
                 this.callBacks.push(cb);
-            }
-            addChild(...addOns) {
-                for (let i = 0; i < addOns.length; i++) {
+            };
+            Screen.prototype.addChild = function () {
+                var addOns = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    addOns[_i] = arguments[_i];
+                }
+                for (var i = 0; i < addOns.length; i++) {
                     if (addOns[i] && addOns[i] instanceof HTMLElement) {
                         this.template.append(addOns[i]);
                     }
@@ -497,31 +583,44 @@ define(["require", "exports"], function (require, exports) {
                         this.template.append(addOns[i]());
                     }
                 }
-            }
-            detach() {
-                const screen = document.querySelector("#cradova-screen-set");
+            };
+            Screen.prototype.detach = function () {
+                var screen = document.querySelector("#cradova-screen-set");
                 if (screen) {
                     document.querySelector("#app-wrapper").removeChild(screen);
                 }
-            }
-            async Activate() {
-                if (document.title === this.name) {
-                    return;
-                }
-                if (!this.treeCreated) {
-                    await this.package();
-                }
-                document.title = this.name;
-                this.detach();
-                document.querySelector("#app-wrapper").append(this.template);
-                if (document.querySelector("#app-wrapper").childElementCount > 1) {
-                    //   this.detach();
-                }
-                //    console.log(document.querySelector("#app-wrapper").childElementCount);
-                this.callBacks.forEach((cb) => cb(this.template.firstChild));
-            }
-        }
-        exports.default = Screen;
+            };
+            Screen.prototype.Activate = function () {
+                return __awaiter(this, void 0, void 0, function () {
+                    var _this = this;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                if (document.title === this.name) {
+                                    return [2 /*return*/];
+                                }
+                                if (!!this.treeCreated) return [3 /*break*/, 2];
+                                return [4 /*yield*/, this.package()];
+                            case 1:
+                                _a.sent();
+                                _a.label = 2;
+                            case 2:
+                                document.title = this.name;
+                                this.detach();
+                                document.querySelector("#app-wrapper").append(this.template);
+                                if (document.querySelector("#app-wrapper").childElementCount > 1) {
+                                    //   this.detach();
+                                }
+                                //    console.log(document.querySelector("#app-wrapper").childElementCount);
+                                this.callBacks.forEach(function (cb) { return cb(_this.template.firstChild); });
+                                return [2 /*return*/];
+                        }
+                    });
+                });
+            };
+            return Screen;
+        }());
+        exports["default"] = Screen;
     });
     /**
      *     JSON DB DataBase MIT Licence © 2022
@@ -537,27 +636,27 @@ define(["require", "exports"], function (require, exports) {
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.JSONDBversion = void 0;
         exports.JSONDBversion = "1.0.0";
-        let fs, fileURLToPath, isNode = false, _dirname;
+        var fs, fileURLToPath, isNode = false, _dirname;
         if (!globalThis.localStorage) {
             isNode = true;
-            fs = await new Promise((resolve_1, reject_1) => { require(["fs"], resolve_1, reject_1); }).then(__importStar);
-            const dr = await new Promise((resolve_2, reject_2) => { require(["path"], resolve_2, reject_2); }).then(__importStar);
-            const fp = await new Promise((resolve_3, reject_3) => { require(["url"], resolve_3, reject_3); }).then(__importStar);
+            fs = yield new Promise(function (resolve_1, reject_1) { require(["fs"], resolve_1, reject_1); }).then(__importStar);
+            var dr = yield new Promise(function (resolve_2, reject_2) { require(["path"], resolve_2, reject_2); }).then(__importStar);
+            var fp = yield new Promise(function (resolve_3, reject_3) { require(["url"], resolve_3, reject_3); }).then(__importStar);
             fileURLToPath = fp.fileURLToPath;
             _dirname = dr
                 .dirname(fileURLToPath(import.meta.url))
                 .split("node_modules")[0];
         }
-        const schema = class {
-            constructor(schema_configuration_object, validators) {
+        var schema = /** @class */ (function () {
+            function schema(schema_configuration_object, validators) {
                 // validations
                 if (!schema_configuration_object.columns) {
                     throw new Error("JSONDB: can't create an empty table should have some columns");
                 }
                 validators.validateColumns(schema_configuration_object.columns);
-                const isEmptyObject = function (obj) {
+                var isEmptyObject = function (obj) {
                     // for checking for empty objects
-                    for (const name in obj) {
+                    for (var name_1 in obj) {
                         return false;
                     }
                     return true;
@@ -573,62 +672,69 @@ define(["require", "exports"], function (require, exports) {
                 this.columns = schema_configuration_object.columns;
                 this.relations = schema_configuration_object.relations || null;
             }
-        };
-        class JSONDBTableWrapper {
-            constructor(self, keys) {
-                this.put = async (name, value) => {
+            return schema;
+        }());
+        var JSONDBTableWrapper = /** @class */ (function () {
+            function JSONDBTableWrapper(self, keys) {
+                var _this = this;
+                this.put = function (name, value) { return __awaiter(_this, void 0, void 0, function () {
                     function cb(err) {
                         if (err) {
                             throw new Error("JSONDB: error failed to update entities in database because " + err);
                         }
                     }
-                    if (isNode) {
-                        fs.writeFile(name + ".json", JSON.stringify(value), cb);
-                    }
-                    else {
-                        localStorage.setItem(name, JSON.stringify(value));
-                    }
-                };
-                this.get = async (name) => {
-                    return new Promise(function (res, rej) {
-                        try {
-                            if (!isNode) {
-                                res(JSON.parse(localStorage.getItem(name)));
-                                return;
-                            }
-                            fs.readFile(_dirname + "/" + name + ".json", { encoding: "utf-8" }, function (err, data) {
-                                if (err) {
-                                    return rej("JSONDB: error failed to retrieve entities from database because " +
-                                        err);
-                                }
-                                try {
-                                    res(JSON.parse(data));
-                                }
-                                catch (error) {
-                                    try {
-                                        res(JSON.parse(fs.readFileSync(name + ".json", "utf-8")));
-                                    }
-                                    catch (error) { }
-                                }
-                            });
+                    return __generator(this, function (_a) {
+                        if (isNode) {
+                            fs.writeFile(name + ".json", JSON.stringify(value), cb);
                         }
-                        catch (error) { }
+                        else {
+                            localStorage.setItem(name, JSON.stringify(value));
+                        }
+                        return [2 /*return*/];
                     });
-                };
-                this.validator = (incoming, tables) => {
+                }); };
+                this.get = function (name) { return __awaiter(_this, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        return [2 /*return*/, new Promise(function (res, rej) {
+                                try {
+                                    if (!isNode) {
+                                        res(JSON.parse(localStorage.getItem(name)));
+                                        return;
+                                    }
+                                    fs.readFile(_dirname + "/" + name + ".json", { encoding: "utf-8" }, function (err, data) {
+                                        if (err) {
+                                            return rej("JSONDB: error failed to retrieve entities from database because " +
+                                                err);
+                                        }
+                                        try {
+                                            res(JSON.parse(data));
+                                        }
+                                        catch (error) {
+                                            try {
+                                                res(JSON.parse(fs.readFileSync(name + ".json", "utf-8")));
+                                            }
+                                            catch (error) { }
+                                        }
+                                    });
+                                }
+                                catch (error) { }
+                            })];
+                    });
+                }); };
+                this.validator = function (incoming, tables) {
                     // works for type, nulllable and unique validations.
-                    const outgoing = {};
-                    for (const prop in this.self.columns) {
-                        if (this.self.columns[prop].nullable !== true &&
+                    var outgoing = {};
+                    for (var prop in _this.self.columns) {
+                        if (_this.self.columns[prop].nullable !== true &&
                             !Object.hasOwnProperty.call(incoming, prop)) {
                             throw new Error("JSONDB: error failed to validate incoming data because " +
                                 prop +
                                 " is required for " +
-                                this.self.name +
+                                _this.self.name +
                                 " Schema");
                         }
-                        if (!this.self.columns[prop].nullable &&
-                            typeof incoming[prop] !== this.self.columns[prop].type) {
+                        if (!_this.self.columns[prop].nullable &&
+                            typeof incoming[prop] !== _this.self.columns[prop].type) {
                             throw new Error("JSONDB: error failed to validate incoming data because " +
                                 prop +
                                 "'s value " +
@@ -636,19 +742,19 @@ define(["require", "exports"], function (require, exports) {
                                 " has got a wrong data type of " +
                                 typeof incoming[prop] +
                                 " for " +
-                                this.self.name +
+                                _this.self.name +
                                 " should be " +
-                                this.self.columns[prop].type +
+                                _this.self.columns[prop].type +
                                 " type instead");
                         }
-                        if (this.self.columns[prop].unique === true) {
-                            for (let i = 0; i < tables.length; i++) {
-                                const element = tables[i];
+                        if (_this.self.columns[prop].unique === true) {
+                            for (var i = 0; i < tables.length; i++) {
+                                var element = tables[i];
                                 if (element[prop] === incoming[prop]) {
                                     throw new Error("JSONDB: error failed to validate incoming data because " +
                                         prop +
                                         " is unique for " +
-                                        this.self.name +
+                                        _this.self.name +
                                         " Schema can't have more than one instance");
                                 }
                             }
@@ -671,55 +777,65 @@ define(["require", "exports"], function (require, exports) {
           // arrays of relations
           await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
           */
-            async saveWithRelations(table, incoming, relations) {
-                if (!relations) {
-                    return;
-                }
-                const db = await this.get(this.self.base_name);
-                db.last_access_time = Date();
-                if (incoming && typeof incoming.index !== "number") {
-                    throw new Error("JsonDB: save before saving with relations");
-                }
-                db.tables[this.self.name][incoming.index] = incoming;
-                if (relations && Array.isArray(relations)) {
-                    for (let i = 0; i < relations.length; i++) {
-                        if (db.Entities[this.self.name].relations[table.self.name]) {
-                            if (db.Entities[this.self.name].relations[table.self.name].type ===
-                                "many") {
-                                db.tables[this.self.name][incoming.index].relations[table.self.name] = !db.tables[this.self.name][incoming.index].relations[table.self.name]
-                                    ? [relations[i]]
-                                    : [
-                                        ...db.tables[this.self.name][incoming.index].relations[table.self.name],
-                                        relations[i],
-                                    ];
-                            }
-                            else {
-                                db.tables[this.self.name][incoming.index].relations[table.self.name] = relations[i];
-                            }
+            JSONDBTableWrapper.prototype.saveWithRelations = function (table, incoming, relations) {
+                return __awaiter(this, void 0, void 0, function () {
+                    var db, i;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                if (!relations) {
+                                    return [2 /*return*/];
+                                }
+                                return [4 /*yield*/, this.get(this.self.base_name)];
+                            case 1:
+                                db = _a.sent();
+                                db.last_access_time = Date();
+                                if (incoming && typeof incoming.index !== "number") {
+                                    throw new Error("JsonDB: save before saving with relations");
+                                }
+                                db.tables[this.self.name][incoming.index] = incoming;
+                                if (relations && Array.isArray(relations)) {
+                                    for (i = 0; i < relations.length; i++) {
+                                        if (db.Entities[this.self.name].relations[table.self.name]) {
+                                            if (db.Entities[this.self.name].relations[table.self.name].type ===
+                                                "many") {
+                                                db.tables[this.self.name][incoming.index].relations[table.self.name] = !db.tables[this.self.name][incoming.index].relations[table.self.name]
+                                                    ? [relations[i]]
+                                                    : __spreadArrays(db.tables[this.self.name][incoming.index].relations[table.self.name], [
+                                                        relations[i],
+                                                    ]);
+                                            }
+                                            else {
+                                                db.tables[this.self.name][incoming.index].relations[table.self.name] = relations[i];
+                                            }
+                                        }
+                                    }
+                                }
+                                else {
+                                    if (relations) {
+                                        if (db.Entities[this.self.name].relations[table.self.name]) {
+                                            if (db.Entities[this.self.name].relations[table.self.name].type ===
+                                                "many") {
+                                                db.tables[this.self.name][incoming.index].relations[table.self.name] = !db.tables[this.self.name][incoming.index].relations[table.self.name]
+                                                    ? [relations]
+                                                    : __spreadArrays(db.tables[this.self.name][incoming.index].relations[table.self.name], [
+                                                        relations,
+                                                    ]);
+                                            }
+                                            else {
+                                                db.tables[this.self.name][incoming.index].relations[table.self.name] = relations;
+                                            }
+                                        }
+                                    }
+                                }
+                                return [4 /*yield*/, this.put(this.self.base_name, db)];
+                            case 2:
+                                _a.sent();
+                                return [2 /*return*/, db.tables[this.self.name][incoming.index]];
                         }
-                    }
-                }
-                else {
-                    if (relations) {
-                        if (db.Entities[this.self.name].relations[table.self.name]) {
-                            if (db.Entities[this.self.name].relations[table.self.name].type ===
-                                "many") {
-                                db.tables[this.self.name][incoming.index].relations[table.self.name] = !db.tables[this.self.name][incoming.index].relations[table.self.name]
-                                    ? [relations]
-                                    : [
-                                        ...db.tables[this.self.name][incoming.index].relations[table.self.name],
-                                        relations,
-                                    ];
-                            }
-                            else {
-                                db.tables[this.self.name][incoming.index].relations[table.self.name] = relations;
-                            }
-                        }
-                    }
-                }
-                await this.put(this.self.base_name, db);
-                return db.tables[this.self.name][incoming.index];
-            }
+                    });
+                });
+            };
             /**
            * Save table into a Jsondb instance
            * -----------------------------
@@ -727,27 +843,35 @@ define(["require", "exports"], function (require, exports) {
            * @example
            await PollTable.save(poll)
           */
-            async save(incoming) {
-                // db.tables[this.self.name] = db.tables[this.self.name].sort(
-                //   (a, b) => a.index - b.index
-                // );
-                const db = await this.get(this.self.base_name);
-                db.last_access_time = Date();
-                if (typeof incoming.index !== "number") {
-                    incoming = this.validator(incoming, db.tables[this.self.name]);
-                    if (this.self.relations && !incoming.relations) {
-                        incoming.relations = {};
-                    }
-                    db.Entities[this.self.name].last_index += 1;
-                    incoming.index = db.Entities[this.self.name].last_index;
-                    db.tables[this.self.name].push(incoming);
-                }
-                else {
-                    db.tables[this.self.name][incoming.index] = incoming;
-                }
-                await this.put(this.self.base_name, db);
-                return incoming;
-            }
+            JSONDBTableWrapper.prototype.save = function (incoming) {
+                return __awaiter(this, void 0, void 0, function () {
+                    var db;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, this.get(this.self.base_name)];
+                            case 1:
+                                db = _a.sent();
+                                db.last_access_time = Date();
+                                if (typeof incoming.index !== "number") {
+                                    incoming = this.validator(incoming, db.tables[this.self.name]);
+                                    if (this.self.relations && !incoming.relations) {
+                                        incoming.relations = {};
+                                    }
+                                    db.Entities[this.self.name].last_index += 1;
+                                    incoming.index = db.Entities[this.self.name].last_index;
+                                    db.tables[this.self.name].push(incoming);
+                                }
+                                else {
+                                    db.tables[this.self.name][incoming.index] = incoming;
+                                }
+                                return [4 /*yield*/, this.put(this.self.base_name, db)];
+                            case 2:
+                                _a.sent();
+                                return [2 /*return*/, incoming];
+                        }
+                    });
+                });
+            };
             /**
            * Save table into a Jsondb instance
            * -----------------------------
@@ -755,14 +879,25 @@ define(["require", "exports"], function (require, exports) {
            * @example
            await PollTable.remove(poll)
           */
-            async remove(entity) {
-                const db = await this.get(this.self.base_name);
-                db.last_access_time = Date();
-                // db.tables[this.self.name].splice(entity.index, 1);
-                db.tables[this.self.name][entity.index] = null;
-                await this.put(this.self.base_name, db);
-                return true;
-            }
+            JSONDBTableWrapper.prototype.remove = function (entity) {
+                return __awaiter(this, void 0, void 0, function () {
+                    var db;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, this.get(this.self.base_name)];
+                            case 1:
+                                db = _a.sent();
+                                db.last_access_time = Date();
+                                // db.tables[this.self.name].splice(entity.index, 1);
+                                db.tables[this.self.name][entity.index] = null;
+                                return [4 /*yield*/, this.put(this.self.base_name, db)];
+                            case 2:
+                                _a.sent();
+                                return [2 /*return*/, true];
+                        }
+                    });
+                });
+            };
             /**
            * Save table into a Jsondb instance
            * -----------------------------
@@ -770,11 +905,20 @@ define(["require", "exports"], function (require, exports) {
            * @example
            await PollTable.count(poll)
           */
-            async count() {
-                const db = await this.get(this.self.base_name);
-                db.last_access_time = Date();
-                return db.tables[this.self.name].length;
-            }
+            JSONDBTableWrapper.prototype.count = function () {
+                return __awaiter(this, void 0, void 0, function () {
+                    var db;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, this.get(this.self.base_name)];
+                            case 1:
+                                db = _a.sent();
+                                db.last_access_time = Date();
+                                return [2 /*return*/, db.tables[this.self.name].length];
+                        }
+                    });
+                });
+            };
             /**
            * Save table into a Jsondb instance
            * -----------------------------
@@ -782,11 +926,20 @@ define(["require", "exports"], function (require, exports) {
            * @example
            await PollTable.getAll()
           */
-            async getAll() {
-                const db = await this.get(this.self.base_name);
-                db.last_access_time = Date();
-                return db.tables[this.self.name];
-            }
+            JSONDBTableWrapper.prototype.getAll = function () {
+                return __awaiter(this, void 0, void 0, function () {
+                    var db;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, this.get(this.self.base_name)];
+                            case 1:
+                                db = _a.sent();
+                                db.last_access_time = Date();
+                                return [2 /*return*/, db.tables[this.self.name]];
+                        }
+                    });
+                });
+            };
             /**
            * get entities with any of the values specifiled from a Jsondb instance
            * -----------------------------
@@ -795,25 +948,35 @@ define(["require", "exports"], function (require, exports) {
            await PollTable.getWhereAny({name: "friday", age: 121, class: "senior"}) // gets all
            await PollTable.getWhereAny({email: "fridaymaxtour@gmail.com"}, 2) // gets 2 if they are up to two
           */
-            async getWhereAny(props, number) {
-                const results = [];
-                let all;
-                const db = await this.get(this.self.base_name);
-                db.last_access_time = Date();
-                all = db.tables[this.self.name];
-                for (let i = 0; i < all.length; i++) {
-                    const element = all[i];
-                    for (const [k, v] of Object.entries(props)) {
-                        if (element[k] && element[k] === v) {
-                            results.push(element);
-                            if (typeof number === "number" && results.length === number) {
-                                return results;
-                            }
+            JSONDBTableWrapper.prototype.getWhereAny = function (props, number) {
+                return __awaiter(this, void 0, void 0, function () {
+                    var results, all, db, i, element, _i, _a, _b, k, v;
+                    return __generator(this, function (_c) {
+                        switch (_c.label) {
+                            case 0:
+                                results = [];
+                                return [4 /*yield*/, this.get(this.self.base_name)];
+                            case 1:
+                                db = _c.sent();
+                                db.last_access_time = Date();
+                                all = db.tables[this.self.name];
+                                for (i = 0; i < all.length; i++) {
+                                    element = all[i];
+                                    for (_i = 0, _a = Object.entries(props); _i < _a.length; _i++) {
+                                        _b = _a[_i], k = _b[0], v = _b[1];
+                                        if (element[k] && element[k] === v) {
+                                            results.push(element);
+                                            if (typeof number === "number" && results.length === number) {
+                                                return [2 /*return*/, results];
+                                            }
+                                        }
+                                    }
+                                }
+                                return [2 /*return*/, results];
                         }
-                    }
-                }
-                return results;
-            }
+                    });
+                });
+            };
             /**
            * get entities with the given prop of type "string" where the values specifiled is included
            * -----------------------------
@@ -824,25 +987,35 @@ define(["require", "exports"], function (require, exports) {
            await PollTable.getWhereAnyPropsIncludes({name: "fri"}) // gets all
            await PollTable.getWhereAnyPropsIncludes({name: "fri"}, 2) // gets 2 if they are up to two
           */
-            async getWhereAnyPropsIncludes(props, number) {
-                const results = [];
-                let all;
-                const db = await this.get(this.self.base_name);
-                db.last_access_time = Date();
-                all = db.tables[this.self.name];
-                for (let i = 0; i < all.length; i++) {
-                    const element = all[i];
-                    for (const [k, v] of Object.entries(props)) {
-                        if (element[k] && typeof v === "string" && element[k].includes(v)) {
-                            results.push(element);
-                            if (typeof number === "number" && results.length === number) {
-                                return results;
-                            }
+            JSONDBTableWrapper.prototype.getWhereAnyPropsIncludes = function (props, number) {
+                return __awaiter(this, void 0, void 0, function () {
+                    var results, all, db, i, element, _i, _a, _b, k, v;
+                    return __generator(this, function (_c) {
+                        switch (_c.label) {
+                            case 0:
+                                results = [];
+                                return [4 /*yield*/, this.get(this.self.base_name)];
+                            case 1:
+                                db = _c.sent();
+                                db.last_access_time = Date();
+                                all = db.tables[this.self.name];
+                                for (i = 0; i < all.length; i++) {
+                                    element = all[i];
+                                    for (_i = 0, _a = Object.entries(props); _i < _a.length; _i++) {
+                                        _b = _a[_i], k = _b[0], v = _b[1];
+                                        if (element[k] && typeof v === "string" && element[k].includes(v)) {
+                                            results.push(element);
+                                            if (typeof number === "number" && results.length === number) {
+                                                return [2 /*return*/, results];
+                                            }
+                                        }
+                                    }
+                                }
+                                return [2 /*return*/, results];
                         }
-                    }
-                }
-                return results;
-            }
+                    });
+                });
+            };
             /**
            * get an entity with the values specifiled from a Jsondb instance
            * -----------------------------
@@ -852,25 +1025,37 @@ define(["require", "exports"], function (require, exports) {
             await PollTable.getOne({email: "fridaymaxtour@gamail.com"}) // gets one
           
             */
-            async getOne(props) {
-                let results = null;
-                const db = await this.get(this.self.base_name);
-                db.last_access_time = Date();
-                all = db.tables[this.self.name];
-                for (let i = 0; i < all.length; i++) {
-                    const element = all[i];
-                    for (const [k, v] of Object.entries(props)) {
-                        if (element[k] && element[k] === v) {
-                            results = element;
-                            break;
+            JSONDBTableWrapper.prototype.getOne = function (props) {
+                return __awaiter(this, void 0, void 0, function () {
+                    var results, db, i, element, _i, _a, _b, k, v;
+                    return __generator(this, function (_c) {
+                        switch (_c.label) {
+                            case 0:
+                                results = null;
+                                return [4 /*yield*/, this.get(this.self.base_name)];
+                            case 1:
+                                db = _c.sent();
+                                db.last_access_time = Date();
+                                all = db.tables[this.self.name];
+                                for (i = 0; i < all.length; i++) {
+                                    element = all[i];
+                                    for (_i = 0, _a = Object.entries(props); _i < _a.length; _i++) {
+                                        _b = _a[_i], k = _b[0], v = _b[1];
+                                        if (element[k] && element[k] === v) {
+                                            results = element;
+                                            break;
+                                        }
+                                    }
+                                }
+                                return [2 /*return*/, results];
                         }
-                    }
-                }
-                return results;
-            }
-        }
-        const JSONDBConnection = class {
-            constructor(Entities, keys) {
+                    });
+                });
+            };
+            return JSONDBTableWrapper;
+        }());
+        var JSONDBConnection = /** @class */ (function () {
+            function JSONDBConnection(Entities, keys) {
                 this.Entities = Entities;
                 this.keys = keys;
             }
@@ -889,14 +1074,16 @@ define(["require", "exports"], function (require, exports) {
           // getting a table
           const MessageTable = connection.getTable("Message");
              * */
-            getTable(table_name) {
-                for (const [tableName, table] of Object.entries(this.Entities)) {
+            JSONDBConnection.prototype.getTable = function (table_name) {
+                for (var _i = 0, _a = Object.entries(this.Entities); _i < _a.length; _i++) {
+                    var _b = _a[_i], tableName = _b[0], table = _b[1];
                     if (table_name === tableName) {
                         return new JSONDBTableWrapper(table, this.keys);
                     }
                 }
-            }
-        };
+            };
+            return JSONDBConnection;
+        }());
         /**
          * Create a new JSONDB object
          *------------------------
@@ -908,8 +1095,8 @@ define(["require", "exports"], function (require, exports) {
          *
          * .
          * */
-        class JSONDB {
-            constructor() {
+        var JSONDB = /** @class */ (function () {
+            function JSONDB() {
                 this.DB_NAME = "";
                 this.username = "";
                 this.encrypted = false;
@@ -921,31 +1108,35 @@ define(["require", "exports"], function (require, exports) {
                 this.Entities = {};
                 this.tables = {};
             }
-            async getDB(name) {
-                return new Promise(function (res, rej) {
-                    if (!isNode) {
-                        res(JSON.parse(localStorage.getItem(name)));
-                        return;
-                    }
-                    try {
-                        fs.readFile(_dirname + "/" + name + ".json", { encoding: "utf-8" }, function (err, data) {
-                            if (err) {
-                                return rej(err);
-                            }
-                            try {
-                                res(JSON.parse(data));
-                            }
-                            catch (error) {
+            JSONDB.prototype.getDB = function (name) {
+                return __awaiter(this, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        return [2 /*return*/, new Promise(function (res, rej) {
+                                if (!isNode) {
+                                    res(JSON.parse(localStorage.getItem(name)));
+                                    return;
+                                }
                                 try {
-                                    res(JSON.parse(fs.readFileSync(name + ".json", "utf-8")));
+                                    fs.readFile(_dirname + "/" + name + ".json", { encoding: "utf-8" }, function (err, data) {
+                                        if (err) {
+                                            return rej(err);
+                                        }
+                                        try {
+                                            res(JSON.parse(data));
+                                        }
+                                        catch (error) {
+                                            try {
+                                                res(JSON.parse(fs.readFileSync(name + ".json", "utf-8")));
+                                            }
+                                            catch (error) { }
+                                        }
+                                    });
                                 }
                                 catch (error) { }
-                            }
-                        });
-                    }
-                    catch (error) { }
+                            })];
+                    });
                 });
-            }
+            };
             /**
            * Schema constructor for Jsondb
            * -----------------------------
@@ -1007,12 +1198,12 @@ define(["require", "exports"], function (require, exports) {
             },
           });
            */
-            schema(schema_configuration_object) {
+            JSONDB.prototype.schema = function (schema_configuration_object) {
                 return new schema(schema_configuration_object, {
                     validateColumns: this.validateColumns,
-                    validateRelations: this.validateRelations,
+                    validateRelations: this.validateRelations
                 });
-            }
+            };
             /**
              * Create a new JSONDB instance
              *------------------------
@@ -1029,8 +1220,8 @@ define(["require", "exports"], function (require, exports) {
            // Creates a new JSONDB instance
              * Database.init(config)
              * */
-            init(config) {
-                console.log(`\x1B[32m JSONDB version ${exports.JSONDBversion} \x1B[39m`);
+            JSONDB.prototype.init = function (config) {
+                console.log("\u001B[32m JSONDB version " + exports.JSONDBversion + " \u001B[39m");
                 this.initialised = true;
                 this.DB_NAME = config.name;
                 this.password = config.password || "";
@@ -1039,7 +1230,7 @@ define(["require", "exports"], function (require, exports) {
                 this.time_created = Date();
                 this.tables = {};
                 try {
-                    let wasThere;
+                    var wasThere = void 0;
                     if (isNode) {
                         wasThere = fs.readFileSync(config.name + ".json", "utf-8");
                     }
@@ -1066,10 +1257,10 @@ define(["require", "exports"], function (require, exports) {
                     fs.writeFile(config.name + ".json", JSON.stringify(this), cb);
                 }
                 else {
-                    let db = JSON.stringify(this);
+                    var db = JSON.stringify(this);
                     localStorage.setItem(config.name, db);
                 }
-            }
+            };
             /**
            * Create secure connection a Jsondb instance
            * -----------------------------
@@ -1081,21 +1272,32 @@ define(["require", "exports"], function (require, exports) {
           };
           const connection = await database.createJSONDBConnection(details);
           */
-            async createJSONDBConnection(details) {
-                if (!this.initialised) {
-                    throw new Error("JSONDB: you haven't create a JSONDB instance yet");
-                }
-                if (details.username !== this.username ||
-                    details.password !== this.password) {
-                    throw new Error("JSONDB: Access Denied");
-                }
-                const connection = await this.getDB(this.DB_NAME);
-                connection.last_access_time = Date();
-                return new JSONDBConnection(connection.Entities);
-            }
-            validateRelations(relations) {
-                const types = ["many", "one"];
-                for (const [relation, value] of Object.entries(relations)) {
+            JSONDB.prototype.createJSONDBConnection = function (details) {
+                return __awaiter(this, void 0, void 0, function () {
+                    var connection;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                if (!this.initialised) {
+                                    throw new Error("JSONDB: you haven't create a JSONDB instance yet");
+                                }
+                                if (details.username !== this.username ||
+                                    details.password !== this.password) {
+                                    throw new Error("JSONDB: Access Denied");
+                                }
+                                return [4 /*yield*/, this.getDB(this.DB_NAME)];
+                            case 1:
+                                connection = _a.sent();
+                                connection.last_access_time = Date();
+                                return [2 /*return*/, new JSONDBConnection(connection.Entities)];
+                        }
+                    });
+                });
+            };
+            JSONDB.prototype.validateRelations = function (relations) {
+                var types = ["many", "one"];
+                for (var _i = 0, _a = Object.entries(relations); _i < _a.length; _i++) {
+                    var _b = _a[_i], relation = _b[0], value = _b[1];
                     if (typeof value.target !== "object") {
                         throw new Error("JSONDB: wrong relationship target type given " +
                             value.target +
@@ -1112,10 +1314,11 @@ define(["require", "exports"], function (require, exports) {
                             " should be true or false");
                     }
                 }
-            }
-            validateColumns(columns) {
-                const types = ["number", "string", "boolean", "blob"];
-                for (const [column, value] of Object.entries(columns)) {
+            };
+            JSONDB.prototype.validateColumns = function (columns) {
+                var types = ["number", "string", "boolean", "blob"];
+                for (var _i = 0, _a = Object.entries(columns); _i < _a.length; _i++) {
+                    var _b = _a[_i], column = _b[0], value = _b[1];
                     if (column) {
                         if (!types.includes(value.type)) {
                             throw new Error("JSONDB: wrong data type given " +
@@ -1134,7 +1337,7 @@ define(["require", "exports"], function (require, exports) {
                         }
                     }
                 }
-            }
+            };
             /**
            * Assemble Entities into Jsondb
            * -----------------------------
@@ -1159,12 +1362,12 @@ define(["require", "exports"], function (require, exports) {
           database.assemble([MessageSchema]);
           *
           */
-            assemble(allEntities) {
+            JSONDB.prototype.assemble = function (allEntities) {
                 if (!this.initialised) {
                     throw new Error("JSONDB: you haven't create a JSONDB instance yet");
                 }
                 try {
-                    const wasThere = fs.readFileSync(this.DB_NAME + ".json", "utf-8");
+                    var wasThere = fs.readFileSync(this.DB_NAME + ".json", "utf-8");
                     if (wasThere) {
                         return;
                     }
@@ -1173,7 +1376,7 @@ define(["require", "exports"], function (require, exports) {
                 if (!Array.isArray(allEntities) || typeof allEntities[0] !== "object") {
                     throw new Error("JSONDB: invalid entity array list, can't be assembled");
                 }
-                for (let i = 0; i < allEntities.length; i++) {
+                for (var i = 0; i < allEntities.length; i++) {
                     this.Entities[allEntities[i].name] = allEntities[i];
                     this.Entities[allEntities[i].name].base_name = this.DB_NAME;
                     this.tables[allEntities[i].name] = [];
@@ -1190,32 +1393,37 @@ define(["require", "exports"], function (require, exports) {
                 else {
                     localStorage.setItem(this.DB_NAME, JSON.stringify(this));
                 }
-            }
-        }
+            };
+            return JSONDB;
+        }());
         /**
          * @exports
          */
-        exports.default = JSONDB;
+        exports["default"] = JSONDB;
     });
     define("scripts/speaker", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        const Speaker = {};
-        Speaker.speak = function (text, language = "en", volume = 1, rate = 1, pitch = 1) {
+        var Speaker = {};
+        Speaker.speak = function (text, language, volume, rate, pitch) {
+            if (language === void 0) { language = "en"; }
+            if (volume === void 0) { volume = 1; }
+            if (rate === void 0) { rate = 1; }
+            if (pitch === void 0) { pitch = 1; }
             // common languages (not supported by all browsers)
             // en - english,  it - italian, fr - french,  de - german, es - spanish
             // ja - japanese, ru - russian, zh - chinese, hi - hindi,  ko - korean
-            const utterance = new SpeechSynthesisUtterance(text);
+            var utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = language;
             utterance.volume = volume;
             utterance.rate = rate;
             utterance.pitch = pitch;
             speechSynthesis.speak(utterance);
         };
-        Speaker.stop = () => {
+        Speaker.stop = function () {
             return speechSynthesis && speechSynthesis.cancel();
         };
-        exports.default = Speaker;
+        exports["default"] = Speaker;
     });
     /**
     Write animation value in javascript
@@ -1242,22 +1450,27 @@ define(["require", "exports"], function (require, exports) {
     define("scripts/animate", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        function animate(indentifier, ...properties) {
+        function animate(indentifier) {
+            var properties = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                properties[_i - 1] = arguments[_i];
+            }
             /*This is for creating css
            animations  using javascipt*/
-            const styS = "@keyframes " + indentifier + " " + "{", styE = "}", proplen = properties.length;
-            let style = " ", aniSty = " ", Animation = "  ", totalAnimation = null;
-            const animationStep = (num) => {
-                for (const [k, v] of Object.entries(properties[num][1])) {
+            var styS = "@keyframes " + indentifier + " " + "{", styE = "}", proplen = properties.length;
+            var style = " ", aniSty = " ", Animation = "  ", totalAnimation = null;
+            var animationStep = function (num) {
+                for (var _i = 0, _a = Object.entries(properties[num][1]); _i < _a.length; _i++) {
+                    var _b = _a[_i], k = _b[0], v = _b[1];
                     style += "" + k + ": " + v + ";";
                 }
                 aniSty += "" + properties[num][0] + "{" + style + "}";
                 return aniSty;
             };
-            for (let i = 0; i < proplen; i++) {
+            for (var i = 0; i < proplen; i++) {
                 Animation += animationStep(i);
             }
-            let aniStyleTag = document.querySelector("style");
+            var aniStyleTag = document.querySelector("style");
             if (aniStyleTag === null) {
                 aniStyleTag = document.createElement("style");
             }
@@ -1267,27 +1480,31 @@ define(["require", "exports"], function (require, exports) {
             aniStyleTag.innerHTML = totalAnimation;
             document.head.append(aniStyleTag);
         }
-        exports.default = animate;
+        exports["default"] = animate;
     });
     define("scripts/file-system", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        const fs = {};
+        var fs = {};
         /**
          * Open a handle to an existing file on the local file system.
          *
          * @return {!Promise<FileSystemFileHandle>} Handle to the existing file.
          */
-        fs.getFileHandle = async function (filePicker) {
-            // For Chrome 86 and later...
-            if ("showOpenFilePicker" in window) {
-                return window.showOpenFilePicker().then((handles) => handles[0]);
-            }
-            // For Chrome 85 and earlier...
-            if ("chooseFileSystemEntries" in window) {
-                return window.chooseFileSystemEntries();
-            }
-            return this.getFileLegacy(filePicker);
+        fs.getFileHandle = function (filePicker) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    // For Chrome 86 and later...
+                    if ("showOpenFilePicker" in window) {
+                        return [2 /*return*/, window.showOpenFilePicker().then(function (handles) { return handles[0]; })];
+                    }
+                    // For Chrome 85 and earlier...
+                    if ("chooseFileSystemEntries" in window) {
+                        return [2 /*return*/, window.chooseFileSystemEntries()];
+                    }
+                    return [2 /*return*/, this.getFileLegacy(filePicker)];
+                });
+            });
         };
         /**
          * Create a handle to a new (text) file on the local file system.
@@ -1297,26 +1514,26 @@ define(["require", "exports"], function (require, exports) {
         fs.getNewFileHandle = function () {
             // For Chrome 86 and later...
             if ("showSaveFilePicker" in window) {
-                const opts = {
+                var opts_1 = {
                     types: [
                         {
                             description: "Text file",
-                            accept: { "text/plain": [".txt"] },
+                            accept: { "text/plain": [".txt"] }
                         },
-                    ],
+                    ]
                 };
-                return window.showSaveFilePicker(opts);
+                return window.showSaveFilePicker(opts_1);
             }
             // For Chrome 85 and earlier...
-            const opts = {
+            var opts = {
                 type: "save-file",
                 accepts: [
                     {
                         description: "Text file",
                         extensions: ["txt"],
-                        mimeTypes: ["text/plain"],
+                        mimeTypes: ["text/plain"]
                     },
-                ],
+                ]
             };
             return window.chooseFileSystemEntries(opts);
         };
@@ -1342,10 +1559,10 @@ define(["require", "exports"], function (require, exports) {
          * @return {Promise<string>} A promise that resolves to the parsed string.
          */
         fs.readFileLegacy = function (file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.addEventListener("loadend", (e) => {
-                    const text = e.srcElement.result;
+            return new Promise(function (resolve) {
+                var reader = new FileReader();
+                reader.addEventListener("loadend", function (e) {
+                    var text = e.srcElement.result;
                     resolve(text);
                 });
                 reader.readAsText(file);
@@ -1357,24 +1574,44 @@ define(["require", "exports"], function (require, exports) {
          * @param {FileSystemFileHandle} fileHandle File handle to write to.
          * @param {string} contents Contents to write.
          */
-        fs.writeFile = async function (fileHandle, contents) {
-            // Support for Chrome 82 and earlier.
-            if (fileHandle.createWriter) {
-                // Create a writer (request permission if necessary).
-                const writer = await fileHandle.createWriter();
-                // Write the full length of the contents
-                await writer.write(0, contents);
-                // Close the file and write the contents to disk
-                await writer.close();
-                return;
-            }
-            // For Chrome 83 and later.
-            // Create a FileSystemWritableFileStream to write to.
-            const writable = await fileHandle.createWritable();
-            // Write the contents of the file to the stream.
-            await writable.write(contents);
-            // Close the file and write the contents to disk.
-            await writable.close();
+        fs.writeFile = function (fileHandle, contents) {
+            return __awaiter(this, void 0, void 0, function () {
+                var writer, writable;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!fileHandle.createWriter) return [3 /*break*/, 4];
+                            return [4 /*yield*/, fileHandle.createWriter()];
+                        case 1:
+                            writer = _a.sent();
+                            // Write the full length of the contents
+                            return [4 /*yield*/, writer.write(0, contents)];
+                        case 2:
+                            // Write the full length of the contents
+                            _a.sent();
+                            // Close the file and write the contents to disk
+                            return [4 /*yield*/, writer.close()];
+                        case 3:
+                            // Close the file and write the contents to disk
+                            _a.sent();
+                            return [2 /*return*/];
+                        case 4: return [4 /*yield*/, fileHandle.createWritable()];
+                        case 5:
+                            writable = _a.sent();
+                            // Write the contents of the file to the stream.
+                            return [4 /*yield*/, writable.write(contents)];
+                        case 6:
+                            // Write the contents of the file to the stream.
+                            _a.sent();
+                            // Close the file and write the contents to disk.
+                            return [4 /*yield*/, writable.close()];
+                        case 7:
+                            // Close the file and write the contents to disk.
+                            _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            });
         };
         /**
          * Verify the user has granted permission to read or write to the file, if
@@ -1384,33 +1621,45 @@ define(["require", "exports"], function (require, exports) {
          * @param {boolean} withWrite True if write permission should be checked.
          * @return {boolean} True if the user has granted read/write permission.
          */
-        fs.verifyPermission = async function (fileHandle, withWrite) {
-            const opts = {};
-            if (withWrite) {
-                opts.writable = true;
-                // For Chrome 86 and later...
-                opts.mode = "readwrite";
-            }
-            // Check if we already have permission, if so, return true.
-            if ((await fileHandle.queryPermission(opts)) === "granted") {
-                return true;
-            }
-            // Request permission to the file, if the user grants permission, return true.
-            if ((await fileHandle.requestPermission(opts)) === "granted") {
-                return true;
-            }
-            // The user did nt grant permission, return false.
-            return false;
+        fs.verifyPermission = function (fileHandle, withWrite) {
+            return __awaiter(this, void 0, void 0, function () {
+                var opts;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            opts = {};
+                            if (withWrite) {
+                                opts.writable = true;
+                                // For Chrome 86 and later...
+                                opts.mode = "readwrite";
+                            }
+                            return [4 /*yield*/, fileHandle.queryPermission(opts)];
+                        case 1:
+                            // Check if we already have permission, if so, return true.
+                            if ((_a.sent()) === "granted") {
+                                return [2 /*return*/, true];
+                            }
+                            return [4 /*yield*/, fileHandle.requestPermission(opts)];
+                        case 2:
+                            // Request permission to the file, if the user grants permission, return true.
+                            if ((_a.sent()) === "granted") {
+                                return [2 /*return*/, true];
+                            }
+                            // The user did nt grant permission, return false.
+                            return [2 /*return*/, false];
+                    }
+                });
+            });
         };
         /**
          * Uses the <input type="file"> to open a new file
          *
          * @return {!Promise<File>} File selected by the user.
          */
-        fs.getFileLegacy = (filePicker) => {
-            return new Promise((resolve, reject) => {
-                filePicker.onchange = (e) => {
-                    const file = filePicker.files[0];
+        fs.getFileLegacy = function (filePicker) {
+            return new Promise(function (resolve, reject) {
+                filePicker.onchange = function (e) {
+                    var file = filePicker.files[0];
                     if (file) {
                         resolve(file);
                         return;
@@ -1427,36 +1676,36 @@ define(["require", "exports"], function (require, exports) {
          * @param {string} contents Contents of the file to save.
          */
         // function saveAsLegacy(filename, contents) {
-        fs.saveAsLegacy = (filename, contents) => {
+        fs.saveAsLegacy = function (filename, contents) {
             filename = filename || "Untitled.txt";
-            const opts = { type: "text/plain" };
-            const file = new File([contents], "", opts);
+            var opts = { type: "text/plain" };
+            var file = new File([contents], "", opts);
             aDownloadFile.href = window.URL.createObjectURL(file);
             aDownloadFile.setAttribute("download", filename);
             aDownloadFile.click();
         };
-        exports.default = fs;
+        exports["default"] = fs;
     });
     define("scripts/localStorage", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        const ls = {};
-        ls.store = (name, value) => {
+        var ls = {};
+        ls.store = function (name, value) {
             localStorage.setItem(name, JSON.stringify(value));
         };
-        ls.retrieve = (name) => {
+        ls.retrieve = function (name) {
             return localStorage.getItem(name);
         };
-        ls.remove = (name) => {
+        ls.remove = function (name) {
             localStorage.removeItem(name);
         };
-        ls.getKey = (index) => {
+        ls.getKey = function (index) {
             return window.localStorage.key(index);
         };
-        ls.clear = () => {
+        ls.clear = function () {
             localStorage.clear();
         };
-        exports.default = ls;
+        exports["default"] = ls;
     });
     define("scripts/fullscreen", ["require", "exports"], function (require, exports) {
         "use strict";
@@ -1464,17 +1713,17 @@ define(["require", "exports"], function (require, exports) {
         // for making the dom elements fulscreen
         function fullScreen(e) {
             return {
-                set() {
-                    e.requestFullscreen().catch((err) => {
+                set: function () {
+                    e.requestFullscreen()["catch"](function (err) {
                         throw err;
                     });
                 },
-                exist() {
+                exist: function () {
                     document.exitFullscreen();
-                },
+                }
             };
         }
-        exports.default = fullScreen;
+        exports["default"] = fullScreen;
     });
     /*
      *** HOW TO USE ***
@@ -1493,20 +1742,21 @@ define(["require", "exports"], function (require, exports) {
                 typeof state !== "string") {
                 throw new TypeError("Invalid arguments type for state dispatcher  ");
             }
-            const nodes = document.querySelectorAll(".cra_child_doc");
+            var nodes = document.querySelectorAll(".cra_child_doc");
             if (typeof state === "undefined" && typeof stateID === "object") {
-                for (const [id, eachState] of Object.entries(stateID)) {
-                    nodes.forEach((element) => {
+                var _loop_1 = function (id, eachState) {
+                    nodes.forEach(function (element) {
                         // abort rendering if the state is not for this element
                         if (!element.stateID || element.stateID !== id) {
                             return;
                         }
                         if (typeof eachState === "object") {
                             // updating the element's eachState
-                            for (const key in eachState) {
+                            for (var key in eachState) {
                                 // updating element styling
                                 if (key === "style") {
-                                    for (const [k, v] of Object.entries(eachState[key])) {
+                                    for (var _i = 0, _a = Object.entries(eachState[key]); _i < _a.length; _i++) {
+                                        var _b = _a[_i], k = _b[0], v = _b[1];
                                         element.style[k] = v;
                                     }
                                     continue;
@@ -1519,10 +1769,10 @@ define(["require", "exports"], function (require, exports) {
                                 // setting element dimesion to full screen
                                 if (key === "fullscreen") {
                                     if (eachState[key]) {
-                                        (0, fullscreen_js_1.default)(element).set();
+                                        (0, fullscreen_js_1["default"])(element).set();
                                     }
                                     else {
-                                        (0, fullscreen_js_1.default)(element).exist();
+                                        (0, fullscreen_js_1["default"])(element).exist();
                                     }
                                     continue;
                                 }
@@ -1561,20 +1811,25 @@ define(["require", "exports"], function (require, exports) {
                             }
                         }
                     });
+                };
+                for (var _i = 0, _a = Object.entries(stateID); _i < _a.length; _i++) {
+                    var _b = _a[_i], id = _b[0], eachState = _b[1];
+                    _loop_1(id, eachState);
                 }
             }
             else {
-                nodes.forEach((element) => {
+                nodes.forEach(function (element) {
                     // abort rendering if the state is not for this element
                     if (!element.stateID || element.stateID !== stateID) {
                         return;
                     }
                     if (typeof state === "object") {
                         // updating the element's state
-                        for (const key in state) {
+                        for (var key in state) {
                             // updating element styling
                             if (key === "style") {
-                                for (const [k, v] of Object.entries(state[key])) {
+                                for (var _i = 0, _a = Object.entries(state[key]); _i < _a.length; _i++) {
+                                    var _b = _a[_i], k = _b[0], v = _b[1];
                                     element.style[k] = v;
                                 }
                                 continue;
@@ -1587,10 +1842,10 @@ define(["require", "exports"], function (require, exports) {
                             // setting element dimesion to full screen
                             if (key === "fullscreen") {
                                 if (state[key]) {
-                                    (0, fullscreen_js_1.default)(element).set();
+                                    (0, fullscreen_js_1["default"])(element).set();
                                 }
                                 else {
-                                    (0, fullscreen_js_1.default)(element).exist();
+                                    (0, fullscreen_js_1["default"])(element).exist();
                                 }
                                 continue;
                             }
@@ -1631,15 +1886,15 @@ define(["require", "exports"], function (require, exports) {
                 });
             }
         }
-        exports.default = dispatch;
+        exports["default"] = dispatch;
     });
     define("scripts/Metrics", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        const { innerWidth, innerHeight } = window;
-        const height = innerHeight;
-        const width = innerWidth;
-        const metrics = {
+        var innerWidth = window.innerWidth, innerHeight = window.innerHeight;
+        var height = innerHeight;
+        var width = innerWidth;
+        var metrics = {
             // global sizes
             base: "8px",
             font: "14px",
@@ -1682,23 +1937,23 @@ define(["require", "exports"], function (require, exports) {
                 small: "20px",
                 medium: "30px",
                 large: "45px",
-                xl: "50px",
+                xl: "50px"
             },
             images: {
                 small: "20px",
                 medium: "40px",
                 large: "60px",
-                logo: "200px",
-            },
+                logo: "200px"
+            }
         };
-        exports.default = metrics;
+        exports["default"] = metrics;
     });
     define("scripts/promptbeforeleave", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         function PromptBeforeLeave() {
-            window.addEventListener("beforeunload", (ev) => {
-                const e = ev || window.event;
+            window.addEventListener("beforeunload", function (ev) {
+                var e = ev || window.event;
                 if (e) {
                     e.preventDefault();
                     e.returnValue = "";
@@ -1706,7 +1961,7 @@ define(["require", "exports"], function (require, exports) {
                 return "";
             });
         }
-        exports.default = PromptBeforeLeave;
+        exports["default"] = PromptBeforeLeave;
     });
     define("types", ["require", "exports"], function (require, exports) {
         "use strict";
@@ -1715,14 +1970,15 @@ define(["require", "exports"], function (require, exports) {
     define("scripts/uuid", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        function uuid(len = 10) {
+        function uuid(len) {
+            if (len === void 0) { len = 10; }
             function dec2hex(dec) {
                 return dec.toString(16).padStart(2, "0");
             }
             len = Math.round(len / 2);
             return Array.from(crypto.getRandomValues(new Uint8Array(len || 10)), dec2hex).join("");
         }
-        exports.default = uuid;
+        exports["default"] = uuid;
     });
     define("scripts/createState", ["require", "exports", "index", "scripts/dispatcher", "scripts/uuid"], function (require, exports, index_js_1, dispatcher_js_1, uuid_js_1) {
         "use strict";
@@ -1731,10 +1987,10 @@ define(["require", "exports"], function (require, exports) {
         dispatcher_js_1 = __importDefault(dispatcher_js_1);
         uuid_js_1 = __importDefault(uuid_js_1);
         function createState(element) {
-            let CradovaElement;
-            const id = (0, uuid_js_1.default)();
+            var CradovaElement;
+            var id = (0, uuid_js_1["default"])();
             if (typeof element === "string") {
-                CradovaElement = (0, index_js_1.default)(element, { stateID: id });
+                CradovaElement = (0, index_js_1["default"])(element, { stateID: id });
             }
             else if (typeof element === "function") {
                 CradovaElement = element({ stateID: id });
@@ -1748,9 +2004,9 @@ define(["require", "exports"], function (require, exports) {
                     element +
                     "  should be  string, or cradova element type");
             }
-            return [CradovaElement, dispatcher_js_1.default.bind(CradovaElement, id)];
+            return [CradovaElement, dispatcher_js_1["default"].bind(CradovaElement, id)];
         }
-        exports.default = createState;
+        exports["default"] = createState;
     });
     /**
      * An fetch based fetcher
@@ -1765,22 +2021,34 @@ define(["require", "exports"], function (require, exports) {
     define("scripts/fetcher", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
-        async function fetcher(url, method = "GET", headers, data) {
-            return await fetch(url, {
-                headers,
-                method,
-                body: JSON.stringify(data),
-            }).catch((err) => {
-                return {
-                    async text() {
-                        return {
-                            message: JSON.stringify(`${method} ${url} net::ERR_FAILED`),
-                        };
-                    },
-                };
+        function fetcher(url, method, headers, data) {
+            if (method === void 0) { method = "GET"; }
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, fetch(url, {
+                                headers: headers,
+                                method: method,
+                                body: JSON.stringify(data)
+                            })["catch"](function (err) {
+                                return {
+                                    text: function () {
+                                        return __awaiter(this, void 0, void 0, function () {
+                                            return __generator(this, function (_a) {
+                                                return [2 /*return*/, {
+                                                        message: JSON.stringify(method + " " + url + " net::ERR_FAILED")
+                                                    }];
+                                            });
+                                        });
+                                    }
+                                };
+                            })];
+                        case 1: return [2 /*return*/, _a.sent()];
+                    }
+                });
             });
         }
-        exports.default = fetcher;
+        exports["default"] = fetcher;
     });
     define("scripts/littleAxios", ["require", "exports"], function (require, exports) {
         "use strict";
@@ -1797,29 +2065,41 @@ define(["require", "exports"], function (require, exports) {
          * @param {function?} callback only?
          * @return void
          */
-        async function littleAxios(url, data, header, callback) {
-            if (!callback && typeof header === "function") {
-                callback = header;
-            }
-            if (typeof url !== "string") {
-                throw new Error("Cradova err : little Axios invalid url " + url);
-            }
-            const ajax = new XMLHttpRequest();
-            let formData = new FormData();
-            const method = data && typeof data !== "object" ? "GET" : "POST";
-            ajax.addEventListener("load", async function (res) {
-                callback(res.target);
+        function littleAxios(url, data, header, callback) {
+            return __awaiter(this, void 0, void 0, function () {
+                var ajax, formData, method, _i, _a, _b, k, v;
+                return __generator(this, function (_c) {
+                    if (!callback && typeof header === "function") {
+                        callback = header;
+                    }
+                    if (typeof url !== "string") {
+                        throw new Error("Cradova err : little Axios invalid url " + url);
+                    }
+                    ajax = new XMLHttpRequest();
+                    formData = new FormData();
+                    method = data && typeof data !== "object" ? "GET" : "POST";
+                    ajax.addEventListener("load", function (res) {
+                        return __awaiter(this, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                callback(res.target);
+                                return [2 /*return*/];
+                            });
+                        });
+                    });
+                    for (_i = 0, _a = Object.entries(data); _i < _a.length; _i++) {
+                        _b = _a[_i], k = _b[0], v = _b[1];
+                        formData.append(k, v);
+                    }
+                    ajax.addEventListener("error", function (e) {
+                        return callback(e);
+                    });
+                    ajax.open(method, url, true);
+                    ajax.send(formData);
+                    return [2 /*return*/];
+                });
             });
-            for (const [k, v] of Object.entries(data)) {
-                formData.append(k, v);
-            }
-            ajax.addEventListener("error", (e) => {
-                return callback(e);
-            });
-            ajax.open(method, url, true);
-            ajax.send(formData);
         }
-        exports.default = littleAxios;
+        exports["default"] = littleAxios;
     });
     /*
      *   Cradova FrameWork
@@ -1847,6 +2127,7 @@ define(["require", "exports"], function (require, exports) {
     */
     define("index", ["require", "exports", "scripts/css", "scripts/widget", "scripts/init", "scripts/swipe", "scripts/media", "scripts/store", "scripts/Router", "scripts/Screen", "scripts/JsonDB", "scripts/speaker", "scripts/animate", "scripts/file-system", "scripts/localStorage", "scripts/dispatcher", "scripts/fullscreen", "scripts/Metrics", "scripts/promptbeforeleave", "scripts/createState", "scripts/fetcher", "scripts/littleAxios"], function (require, exports, css_js_2, widget_js_1, init_js_1, swipe_js_1, media_js_1, store_js_1, Router_js_1, Screen_js_1, JsonDB_js_1, speaker_js_1, animate_js_1, file_system_js_1, localStorage_js_1, dispatcher_js_2, fullscreen_js_2, Metrics_js_1, promptbeforeleave_js_1, createState_js_1, fetcher_js_1, littleAxios_js_1) {
         "use strict";
+        var _this = this;
         Object.defineProperty(exports, "__esModule", { value: true });
         css_js_2 = __importDefault(css_js_2);
         widget_js_1 = __importDefault(widget_js_1);
@@ -1893,8 +2174,12 @@ define(["require", "exports"], function (require, exports) {
          *
          * // and static are useful too
          */
-        const _ = (...element_initials) => {
-            let properties, childrens = [];
+        var _ = function () {
+            var element_initials = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                element_initials[_i] = arguments[_i];
+            }
+            var properties, childrens = [];
             if (typeof element_initials[1] == "object" &&
                 !(element_initials[1] instanceof HTMLElement)) {
                 properties = element_initials[1];
@@ -1916,8 +2201,8 @@ define(["require", "exports"], function (require, exports) {
                 if (typeof element_initials !== "object") {
                     element_initials = [element_initials];
                 }
-                let tag, className, ID;
-                const [el, innerValue] = element_initials[0].split("|");
+                var tag, className, ID;
+                var _a = element_initials[0].split("|"), el = _a[0], innerValue = _a[1];
                 if (el.indexOf("#") > -1) {
                     ID = el.split("#")[1];
                     tag = el.split("#")[0];
@@ -1930,7 +2215,7 @@ define(["require", "exports"], function (require, exports) {
                     if (!className) {
                         className = el.split(".")[1];
                         tag = el.split(".")[0];
-                        let locID = className.split("#")[1];
+                        var locID = className.split("#")[1];
                         if (locID) {
                             className = className.split("#")[0];
                         }
@@ -1942,14 +2227,18 @@ define(["require", "exports"], function (require, exports) {
                 if (!tag && tag !== "") {
                     tag = el;
                 }
-                const initials = { tag, className, ID, innerValue };
+                var initials = { tag: tag, className: className, ID: ID, innerValue: innerValue };
                 /**
                  * params [incoming]:any elements and props object
                  * @returns HTML element
                  */
-                return (...incoming) => {
-                    let childrens2rd = [], props = {}, text;
-                    for (let i = 0; i < incoming.length; i++) {
+                return function () {
+                    var incoming = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        incoming[_i] = arguments[_i];
+                    }
+                    var childrens2rd = [], props = {}, text;
+                    for (var i = 0; i < incoming.length; i++) {
                         if (typeof incoming[i] === "function" ||
                             incoming[i] instanceof HTMLElement ||
                             (Array.isArray(incoming[i]) &&
@@ -1970,9 +2259,9 @@ define(["require", "exports"], function (require, exports) {
                         }
                     }
                     if (childrens.length) {
-                        childrens2rd.push(...childrens);
+                        childrens2rd.push.apply(childrens2rd, childrens);
                     }
-                    const element = document.createElement(initials.tag);
+                    var element = document.createElement(initials.tag);
                     if (initials.className) {
                         element.className = initials.className;
                     }
@@ -1982,9 +2271,10 @@ define(["require", "exports"], function (require, exports) {
                     if (initials.innerValue) {
                         element.append(initials.innerValue);
                     }
-                    for (const prop in properties) {
+                    for (var prop in properties) {
                         if (prop === "style") {
-                            for (const [k, v] of Object.entries(properties[prop])) {
+                            for (var _a = 0, _b = Object.entries(properties[prop]); _a < _b.length; _a++) {
+                                var _c = _b[_a], k = _c[0], v = _c[1];
                                 element.style[k] = v;
                             }
                             continue;
@@ -2003,9 +2293,10 @@ define(["require", "exports"], function (require, exports) {
                     // dynamic props
                     // over-rides props that appear in the first level
                     if (props && typeof props === "object" && !Array.isArray(props)) {
-                        for (const prop in props) {
+                        for (var prop in props) {
                             if (prop === "style") {
-                                for (const [k, v] of Object.entries(props[prop])) {
+                                for (var _d = 0, _e = Object.entries(props[prop]); _d < _e.length; _d++) {
+                                    var _f = _e[_d], k = _f[0], v = _f[1];
                                     element.style[k] = v;
                                 }
                                 continue;
@@ -2020,10 +2311,10 @@ define(["require", "exports"], function (require, exports) {
                             }
                             if (prop === "fullscreen") {
                                 if (properties[prop]) {
-                                    (0, fullscreen_js_2.default)(element).set();
+                                    (0, fullscreen_js_2["default"])(element).set();
                                 }
                                 else {
-                                    (0, fullscreen_js_2.default)(element).exist();
+                                    (0, fullscreen_js_2["default"])(element).exist();
                                 }
                                 continue;
                             }
@@ -2032,15 +2323,15 @@ define(["require", "exports"], function (require, exports) {
                     }
                     if (childrens2rd && childrens2rd[0]) {
                         //
-                        for (let i = 0; i < childrens2rd.length; i++) {
+                        for (var i = 0; i < childrens2rd.length; i++) {
                             if (typeof childrens2rd[i] === "function") {
                                 element.append(childrens2rd[i](props));
                                 continue;
                             }
                             if (Array.isArray(childrens2rd[i])) {
-                                const arrCX = childrens2rd[i];
-                                const arrSET = [];
-                                for (let p = 0; p < arrCX.length; p++) {
+                                var arrCX = childrens2rd[i];
+                                var arrSET = [];
+                                for (var p = 0; p < arrCX.length; p++) {
                                     if (!(arrCX[p] instanceof HTMLElement) &&
                                         typeof arrCX[p] !== "function" &&
                                         !Array.isArray(arrCX[p])) {
@@ -2050,11 +2341,7 @@ define(["require", "exports"], function (require, exports) {
                                     arrSET.push(arrCX[p]);
                                 }
                                 //
-                                childrens2rd = [
-                                    ...childrens2rd.slice(0, i + 1),
-                                    ...arrSET,
-                                    ...childrens2rd.slice(i + 1, childrens2rd.length),
-                                ];
+                                childrens2rd = __spreadArrays(childrens2rd.slice(0, i + 1), arrSET, childrens2rd.slice(i + 1, childrens2rd.length));
                                 continue;
                             }
                             element.append(childrens2rd[i]);
@@ -2070,7 +2357,7 @@ define(["require", "exports"], function (require, exports) {
                     return element;
                 };
             }
-            let CradovaElemet;
+            var CradovaElemet;
             if (element_initials[0].raw) {
                 CradovaElemet = identify(element_initials[0].raw);
             }
@@ -2079,8 +2366,8 @@ define(["require", "exports"], function (require, exports) {
             }
             return CradovaElemet;
         };
-        _.register = (name) => {
-            for (const key in name) {
+        _.register = function (name) {
+            for (var key in name) {
                 _[key] = name[key];
             }
         };
@@ -2090,49 +2377,56 @@ define(["require", "exports"], function (require, exports) {
          * these can be safely destructured to use alone
          */
         _.register({
-            w: widget_js_1.default,
-            css: css_js_2.default,
-            Init: init_js_1.default,
-            media: media_js_1.default,
-            swipe: swipe_js_1.default,
-            Store: store_js_1.default,
-            JSONDB: JsonDB_js_1.default,
-            Screen: Screen_js_1.default,
-            Router: Router_js_1.default,
-            LS: localStorage_js_1.default,
-            FS: file_system_js_1.default,
-            Speaker: speaker_js_1.default,
-            metrics: Metrics_js_1.default,
-            fetcher: fetcher_js_1.default,
-            animate: animate_js_1.default,
-            dispatch: dispatcher_js_2.default,
-            littleAxios: littleAxios_js_1.default,
-            createState: createState_js_1.default,
-            PromptBeforeLeave: promptbeforeleave_js_1.default,
+            w: widget_js_1["default"],
+            css: css_js_2["default"],
+            Init: init_js_1["default"],
+            media: media_js_1["default"],
+            swipe: swipe_js_1["default"],
+            Store: store_js_1["default"],
+            JSONDB: JsonDB_js_1["default"],
+            Screen: Screen_js_1["default"],
+            Router: Router_js_1["default"],
+            LS: localStorage_js_1["default"],
+            FS: file_system_js_1["default"],
+            Speaker: speaker_js_1["default"],
+            metrics: Metrics_js_1["default"],
+            fetcher: fetcher_js_1["default"],
+            animate: animate_js_1["default"],
+            dispatch: dispatcher_js_2["default"],
+            littleAxios: littleAxios_js_1["default"],
+            createState: createState_js_1["default"],
+            PromptBeforeLeave: promptbeforeleave_js_1["default"]
         });
         _.Init();
         window["_"] = _;
-        exports.default = _;
+        exports["default"] = _;
         /**
          *
          * Registering ServiceWorker
          *
          *  */
-        window.addEventListener("load", async () => {
-            if ("serviceWorker" in navigator) {
-                await navigator.serviceWorker
-                    .register("service-worker.js")
-                    .then(function (registration) {
-                    // Registration was successful
-                    console.log(`Service Worker registration successful. Scope: ${registration.scope}`);
-                })
-                    .catch((err) => console.log(err));
-            }
-        });
+        window.addEventListener("load", function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!("serviceWorker" in navigator)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, navigator.serviceWorker
+                                .register("service-worker.js")
+                                .then(function (registration) {
+                                // Registration was successful
+                                console.log("Service Worker registration successful. Scope: " + registration.scope);
+                            })["catch"](function (err) { return console.log(err); })];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2: return [2 /*return*/];
+                }
+            });
+        }); });
     });
     var CACHE_VERSION = 1;
     var CURRENT_CACHES = {
-        prefetch: "prefetch-cache-v" + CACHE_VERSION,
+        prefetch: "prefetch-cache-v" + CACHE_VERSION
     };
     self.addEventListener("install", function (event) {
         var now = Date.now();
@@ -2142,47 +2436,59 @@ define(["require", "exports"], function (require, exports) {
         console.log("Handling install event. Resources to prefetch:", urlsToPrefetch);
         event.waitUntil(caches
             .open(CURRENT_CACHES.prefetch)
-            .then(async function (cache) {
-            var cachePromises = urlsToPrefetch.map(async function (urlToPrefetch) {
-                // This constructs a new URL object using the service worker's script location as the base
-                // for relative URLs.
-                var url = new URL(urlToPrefetch, location.href);
-                // Append a cache-bust=TIMESTAMP URL parameter to each URL's query string.
-                // This is particularly important when precaching resources that are later used in the
-                // fetch handler as responses directly, without consulting the network (i.e. cache-first).
-                // If we were to get back a response from the HTTP browser cache for this precaching request
-                // then that stale response would be used indefinitely, or at least until the next time
-                // the service worker script changes triggering the install flow.
-                url.search += (url.search ? "&" : "?") + "cache-bust=" + now;
-                // It's very important to use {mode: 'no-cors'} if there is any chance that
-                // the resources being fetched are served off of a server that doesn't support
-                // CORS (http://en.wikipedia.org/wiki/Cross-origin_resource_sharing).
-                // In this example, www.chromium.org doesn't support CORS, and the fetch()
-                // would fail if the default mode of 'cors' was used for the fetch() request.
-                // The drawback of hardcoding {mode: 'no-cors'} is that the response from all
-                // cross-origin hosts will always be opaque
-                // (https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#cross-origin-resources)
-                // and it is not possible to determine whether an opaque response represents a success or failure
-                // (https://github.com/whatwg/fetch/issues/14).
-                var request = new Request(url, { mode: "no-cors" });
-                try {
-                    const response = await fetch(request);
-                    if (response.status >= 400) {
-                        throw new Error("request for " +
-                            urlToPrefetch +
-                            " failed with status " +
-                            response.statusText);
+            .then(function (cache) {
+            return __awaiter(this, void 0, void 0, function () {
+                var cachePromises;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            cachePromises = urlsToPrefetch.map(function (urlToPrefetch) {
+                                return __awaiter(this, void 0, void 0, function () {
+                                    var url, request, response, error_1;
+                                    return __generator(this, function (_a) {
+                                        switch (_a.label) {
+                                            case 0:
+                                                url = new URL(urlToPrefetch, location.href);
+                                                // Append a cache-bust=TIMESTAMP URL parameter to each URL's query string.
+                                                // This is particularly important when precaching resources that are later used in the
+                                                // fetch handler as responses directly, without consulting the network (i.e. cache-first).
+                                                // If we were to get back a response from the HTTP browser cache for this precaching request
+                                                // then that stale response would be used indefinitely, or at least until the next time
+                                                // the service worker script changes triggering the install flow.
+                                                url.search += (url.search ? "&" : "?") + "cache-bust=" + now;
+                                                request = new Request(url, { mode: "no-cors" });
+                                                _a.label = 1;
+                                            case 1:
+                                                _a.trys.push([1, 4, , 5]);
+                                                return [4 /*yield*/, fetch(request)];
+                                            case 2:
+                                                response = _a.sent();
+                                                if (response.status >= 400) {
+                                                    throw new Error("request for " +
+                                                        urlToPrefetch +
+                                                        " failed with status " +
+                                                        response.statusText);
+                                                }
+                                                return [4 /*yield*/, cache.put(urlToPrefetch, response)];
+                                            case 3: return [2 /*return*/, _a.sent()];
+                                            case 4:
+                                                error_1 = _a.sent();
+                                                console.error("Not caching " + urlToPrefetch + " due to " + error_1);
+                                                return [3 /*break*/, 5];
+                                            case 5: return [2 /*return*/];
+                                        }
+                                    });
+                                });
+                            });
+                            return [4 /*yield*/, Promise.all(cachePromises)];
+                        case 1:
+                            _a.sent();
+                            console.log("Pre-fetching complete.");
+                            return [2 /*return*/];
                     }
-                    return await cache.put(urlToPrefetch, response);
-                }
-                catch (error) {
-                    console.error("Not caching " + urlToPrefetch + " due to " + error);
-                }
+                });
             });
-            await Promise.all(cachePromises);
-            console.log("Pre-fetching complete.");
-        })
-            .catch(function (error) {
+        })["catch"](function (error) {
             console.error("Pre-fetching failed:", error);
         }));
     });
@@ -2198,7 +2504,7 @@ define(["require", "exports"], function (require, exports) {
                 if (expectedCacheNames.indexOf(cacheName) === -1) {
                     // If this cache name isn't present in the array of "expected" cache names, then delete it.
                     console.log("Deleting out of date cache:", cacheName);
-                    return caches.delete(cacheName);
+                    return caches["delete"](cacheName);
                 }
             }));
         }));
@@ -2219,13 +2525,12 @@ define(["require", "exports"], function (require, exports) {
             return fetch(event.request)
                 .then(function (res) {
                 console.log("Response from network is:", res);
-                const response = res.clone();
-                caches.open(CURRENT_CACHES.prefetch).then((cache) => {
+                var response = res.clone();
+                caches.open(CURRENT_CACHES.prefetch).then(function (cache) {
                     cache.put(event.request, response);
                 });
                 return response;
-            })
-                .catch(function (error) {
+            })["catch"](function (error) {
                 // This catch() will handle exceptions thrown from the fetch() operation.
                 // Note that a HTTP error response (e.g. 404) will NOT trigger an exception.
                 // It will return a normal response object that has the appropriate error code set.
@@ -2234,53 +2539,55 @@ define(["require", "exports"], function (require, exports) {
             });
         }));
     });
-    const store = "sample_store";
-    const assets = [
+    var store = "sample_store";
+    var assets = [
         // put all the files you want cached here
         "/",
     ];
     self.addEventListener("install", function (e) {
-        e.waitUntil(assets.forEach((asset) => {
+        e.waitUntil(assets.forEach(function (asset) {
             fetch(asset)
-                .then((res) => {
-                const response = res.clone();
-                caches.open(store).then((cache) => {
+                .then(function (res) {
+                var response = res.clone();
+                caches.open(store).then(function (cache) {
                     cache.put(e.request, response);
                 });
                 return res;
-            })
-                .catch((err) => console.log(err));
+            })["catch"](function (err) { return console.log(err); });
         }));
         self["skipWaiting"]();
     });
     self.addEventListener("activate", function (e) {
-        e.waitUntil(caches.keys().then((cach) => {
+        e.waitUntil(caches.keys().then(function (cach) {
             if (cach !== store) {
-                return caches.delete(cach);
+                return caches["delete"](cach);
             }
         }));
         return self.clients.claim();
     });
     self.addEventListener("fetch", function (e) {
         e.waitUntil(e.respondWith(fetch(e.request)
-            .then((res) => {
-            const response = res.clone();
-            caches.open(store).then((cache) => {
+            .then(function (res) {
+            var response = res.clone();
+            caches.open(store).then(function (cache) {
                 console.log(response, "    fetching");
                 cache.put(e.request, response);
             });
             return res;
-        })
-            .catch(() => caches.match(e.request).then((res) => res))));
+        })["catch"](function () { return caches.match(e.request).then(function (res) { return res; }); })));
         self["skipWaiting"]();
     });
     define("scripts/reuse", ["require", "exports"], function (require, exports) {
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         function reuse(element) {
-            return (...incoming) => {
-                let childrens2rd, props, text;
-                for (let i = 0; i < incoming.length; i++) {
+            return function () {
+                var incoming = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    incoming[_i] = arguments[_i];
+                }
+                var childrens2rd, props, text;
+                for (var i = 0; i < incoming.length; i++) {
                     if (typeof incoming[i] === "function" ||
                         incoming[i] instanceof HTMLElement) {
                         if (Array.isArray(childrens2rd)) {
@@ -2306,9 +2613,10 @@ define(["require", "exports"], function (require, exports) {
                 // dynamic props
                 //
                 if (props && typeof props === "object" && !Array.isArray(props)) {
-                    for (const prop in props) {
+                    for (var prop in props) {
                         if (prop === "style") {
-                            for (const [k, v] of Object.entries(props[prop])) {
+                            for (var _a = 0, _b = Object.entries(props[prop]); _a < _b.length; _a++) {
+                                var _c = _b[_a], k = _c[0], v = _c[1];
                                 element.style[k] = v;
                             }
                             continue;
@@ -2325,7 +2633,7 @@ define(["require", "exports"], function (require, exports) {
                     }
                 }
                 if (childrens2rd && childrens2rd[0]) {
-                    for (let i = 0; i < childrens2rd.length; i++) {
+                    for (var i = 0; i < childrens2rd.length; i++) {
                         if (typeof childrens2rd[i] === "function") {
                             element.append(childrens2rd[i](props));
                             continue;
@@ -2343,7 +2651,7 @@ define(["require", "exports"], function (require, exports) {
                 return element;
             };
         }
-        exports.default = reuse;
+        exports["default"] = reuse;
     });
 });
 //# sourceMappingURL=index.js.map

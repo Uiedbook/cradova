@@ -1,15 +1,19 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const w = function (...childrens) {
-        let props;
+    exports.__esModule = true;
+    var w = function () {
+        var childrens = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            childrens[_i] = arguments[_i];
+        }
+        var props;
         if (typeof childrens[0] === "object" &&
             !(childrens[0] instanceof HTMLElement)) {
             props = childrens[0];
             childrens = childrens.slice(1, childrens.length);
         }
-        const par = document.createDocumentFragment();
-        childrens.forEach((ch) => {
+        var par = document.createDocumentFragment();
+        childrens.forEach(function (ch) {
             if (typeof ch === "function") {
                 par.append(ch(props));
             }
@@ -17,8 +21,8 @@ define(["require", "exports"], function (require, exports) {
                 par.append(ch);
             }
         });
-        return () => par;
+        return function () { return par; };
     };
-    exports.default = w;
+    exports["default"] = w;
 });
 //# sourceMappingURL=widget.js.map

@@ -9,11 +9,7 @@
  *  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -30,32 +26,75 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.__esModule = true;
     exports.JSONDBversion = void 0;
     exports.JSONDBversion = "1.0.0";
-    let fs, fileURLToPath, isNode = false, _dirname;
+    var fs, fileURLToPath, isNode = false, _dirname;
     if (!globalThis.localStorage) {
         isNode = true;
-        fs = await new Promise((resolve_1, reject_1) => { require(["fs"], resolve_1, reject_1); }).then(__importStar);
-        const dr = await new Promise((resolve_2, reject_2) => { require(["path"], resolve_2, reject_2); }).then(__importStar);
-        const fp = await new Promise((resolve_3, reject_3) => { require(["url"], resolve_3, reject_3); }).then(__importStar);
+        fs = await new Promise(function (resolve_1, reject_1) { require(["fs"], resolve_1, reject_1); }).then(__importStar);
+        var dr = await new Promise(function (resolve_2, reject_2) { require(["path"], resolve_2, reject_2); }).then(__importStar);
+        var fp = await new Promise(function (resolve_3, reject_3) { require(["url"], resolve_3, reject_3); }).then(__importStar);
         fileURLToPath = fp.fileURLToPath;
         _dirname = dr
             .dirname(fileURLToPath(import.meta.url))
             .split("node_modules")[0];
     }
-    const schema = class {
-        constructor(schema_configuration_object, validators) {
+    var schema = /** @class */ (function () {
+        function schema(schema_configuration_object, validators) {
             // validations
             if (!schema_configuration_object.columns) {
                 throw new Error("JSONDB: can't create an empty table should have some columns");
             }
             validators.validateColumns(schema_configuration_object.columns);
-            const isEmptyObject = function (obj) {
+            var isEmptyObject = function (obj) {
                 // for checking for empty objects
-                for (const name in obj) {
+                for (var name_1 in obj) {
                     return false;
                 }
                 return true;
@@ -71,62 +110,69 @@ define(["require", "exports"], function (require, exports) {
             this.columns = schema_configuration_object.columns;
             this.relations = schema_configuration_object.relations || null;
         }
-    };
-    class JSONDBTableWrapper {
-        constructor(self, keys) {
-            this.put = async (name, value) => {
+        return schema;
+    }());
+    var JSONDBTableWrapper = /** @class */ (function () {
+        function JSONDBTableWrapper(self, keys) {
+            var _this = this;
+            this.put = function (name, value) { return __awaiter(_this, void 0, void 0, function () {
                 function cb(err) {
                     if (err) {
                         throw new Error("JSONDB: error failed to update entities in database because " + err);
                     }
                 }
-                if (isNode) {
-                    fs.writeFile(name + ".json", JSON.stringify(value), cb);
-                }
-                else {
-                    localStorage.setItem(name, JSON.stringify(value));
-                }
-            };
-            this.get = async (name) => {
-                return new Promise(function (res, rej) {
-                    try {
-                        if (!isNode) {
-                            res(JSON.parse(localStorage.getItem(name)));
-                            return;
-                        }
-                        fs.readFile(_dirname + "/" + name + ".json", { encoding: "utf-8" }, function (err, data) {
-                            if (err) {
-                                return rej("JSONDB: error failed to retrieve entities from database because " +
-                                    err);
-                            }
-                            try {
-                                res(JSON.parse(data));
-                            }
-                            catch (error) {
-                                try {
-                                    res(JSON.parse(fs.readFileSync(name + ".json", "utf-8")));
-                                }
-                                catch (error) { }
-                            }
-                        });
+                return __generator(this, function (_a) {
+                    if (isNode) {
+                        fs.writeFile(name + ".json", JSON.stringify(value), cb);
                     }
-                    catch (error) { }
+                    else {
+                        localStorage.setItem(name, JSON.stringify(value));
+                    }
+                    return [2 /*return*/];
                 });
-            };
-            this.validator = (incoming, tables) => {
+            }); };
+            this.get = function (name) { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, new Promise(function (res, rej) {
+                            try {
+                                if (!isNode) {
+                                    res(JSON.parse(localStorage.getItem(name)));
+                                    return;
+                                }
+                                fs.readFile(_dirname + "/" + name + ".json", { encoding: "utf-8" }, function (err, data) {
+                                    if (err) {
+                                        return rej("JSONDB: error failed to retrieve entities from database because " +
+                                            err);
+                                    }
+                                    try {
+                                        res(JSON.parse(data));
+                                    }
+                                    catch (error) {
+                                        try {
+                                            res(JSON.parse(fs.readFileSync(name + ".json", "utf-8")));
+                                        }
+                                        catch (error) { }
+                                    }
+                                });
+                            }
+                            catch (error) { }
+                        })];
+                });
+            }); };
+            this.validator = function (incoming, tables) {
                 // works for type, nulllable and unique validations.
-                const outgoing = {};
-                for (const prop in this.self.columns) {
-                    if (this.self.columns[prop].nullable !== true &&
+                var outgoing = {};
+                for (var prop in _this.self.columns) {
+                    if (_this.self.columns[prop].nullable !== true &&
                         !Object.hasOwnProperty.call(incoming, prop)) {
                         throw new Error("JSONDB: error failed to validate incoming data because " +
                             prop +
                             " is required for " +
-                            this.self.name +
+                            _this.self.name +
                             " Schema");
                     }
-                    if (!this.self.columns[prop].nullable &&
-                        typeof incoming[prop] !== this.self.columns[prop].type) {
+                    if (!_this.self.columns[prop].nullable &&
+                        typeof incoming[prop] !== _this.self.columns[prop].type) {
                         throw new Error("JSONDB: error failed to validate incoming data because " +
                             prop +
                             "'s value " +
@@ -134,19 +180,19 @@ define(["require", "exports"], function (require, exports) {
                             " has got a wrong data type of " +
                             typeof incoming[prop] +
                             " for " +
-                            this.self.name +
+                            _this.self.name +
                             " should be " +
-                            this.self.columns[prop].type +
+                            _this.self.columns[prop].type +
                             " type instead");
                     }
-                    if (this.self.columns[prop].unique === true) {
-                        for (let i = 0; i < tables.length; i++) {
-                            const element = tables[i];
+                    if (_this.self.columns[prop].unique === true) {
+                        for (var i = 0; i < tables.length; i++) {
+                            var element = tables[i];
                             if (element[prop] === incoming[prop]) {
                                 throw new Error("JSONDB: error failed to validate incoming data because " +
                                     prop +
                                     " is unique for " +
-                                    this.self.name +
+                                    _this.self.name +
                                     " Schema can't have more than one instance");
                             }
                         }
@@ -169,55 +215,65 @@ define(["require", "exports"], function (require, exports) {
       // arrays of relations
       await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
       */
-        async saveWithRelations(table, incoming, relations) {
-            if (!relations) {
-                return;
-            }
-            const db = await this.get(this.self.base_name);
-            db.last_access_time = Date();
-            if (incoming && typeof incoming.index !== "number") {
-                throw new Error("JsonDB: save before saving with relations");
-            }
-            db.tables[this.self.name][incoming.index] = incoming;
-            if (relations && Array.isArray(relations)) {
-                for (let i = 0; i < relations.length; i++) {
-                    if (db.Entities[this.self.name].relations[table.self.name]) {
-                        if (db.Entities[this.self.name].relations[table.self.name].type ===
-                            "many") {
-                            db.tables[this.self.name][incoming.index].relations[table.self.name] = !db.tables[this.self.name][incoming.index].relations[table.self.name]
-                                ? [relations[i]]
-                                : [
-                                    ...db.tables[this.self.name][incoming.index].relations[table.self.name],
-                                    relations[i],
-                                ];
-                        }
-                        else {
-                            db.tables[this.self.name][incoming.index].relations[table.self.name] = relations[i];
-                        }
+        JSONDBTableWrapper.prototype.saveWithRelations = function (table, incoming, relations) {
+            return __awaiter(this, void 0, void 0, function () {
+                var db, i;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!relations) {
+                                return [2 /*return*/];
+                            }
+                            return [4 /*yield*/, this.get(this.self.base_name)];
+                        case 1:
+                            db = _a.sent();
+                            db.last_access_time = Date();
+                            if (incoming && typeof incoming.index !== "number") {
+                                throw new Error("JsonDB: save before saving with relations");
+                            }
+                            db.tables[this.self.name][incoming.index] = incoming;
+                            if (relations && Array.isArray(relations)) {
+                                for (i = 0; i < relations.length; i++) {
+                                    if (db.Entities[this.self.name].relations[table.self.name]) {
+                                        if (db.Entities[this.self.name].relations[table.self.name].type ===
+                                            "many") {
+                                            db.tables[this.self.name][incoming.index].relations[table.self.name] = !db.tables[this.self.name][incoming.index].relations[table.self.name]
+                                                ? [relations[i]]
+                                                : __spreadArrays(db.tables[this.self.name][incoming.index].relations[table.self.name], [
+                                                    relations[i],
+                                                ]);
+                                        }
+                                        else {
+                                            db.tables[this.self.name][incoming.index].relations[table.self.name] = relations[i];
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                if (relations) {
+                                    if (db.Entities[this.self.name].relations[table.self.name]) {
+                                        if (db.Entities[this.self.name].relations[table.self.name].type ===
+                                            "many") {
+                                            db.tables[this.self.name][incoming.index].relations[table.self.name] = !db.tables[this.self.name][incoming.index].relations[table.self.name]
+                                                ? [relations]
+                                                : __spreadArrays(db.tables[this.self.name][incoming.index].relations[table.self.name], [
+                                                    relations,
+                                                ]);
+                                        }
+                                        else {
+                                            db.tables[this.self.name][incoming.index].relations[table.self.name] = relations;
+                                        }
+                                    }
+                                }
+                            }
+                            return [4 /*yield*/, this.put(this.self.base_name, db)];
+                        case 2:
+                            _a.sent();
+                            return [2 /*return*/, db.tables[this.self.name][incoming.index]];
                     }
-                }
-            }
-            else {
-                if (relations) {
-                    if (db.Entities[this.self.name].relations[table.self.name]) {
-                        if (db.Entities[this.self.name].relations[table.self.name].type ===
-                            "many") {
-                            db.tables[this.self.name][incoming.index].relations[table.self.name] = !db.tables[this.self.name][incoming.index].relations[table.self.name]
-                                ? [relations]
-                                : [
-                                    ...db.tables[this.self.name][incoming.index].relations[table.self.name],
-                                    relations,
-                                ];
-                        }
-                        else {
-                            db.tables[this.self.name][incoming.index].relations[table.self.name] = relations;
-                        }
-                    }
-                }
-            }
-            await this.put(this.self.base_name, db);
-            return db.tables[this.self.name][incoming.index];
-        }
+                });
+            });
+        };
         /**
        * Save table into a Jsondb instance
        * -----------------------------
@@ -225,27 +281,35 @@ define(["require", "exports"], function (require, exports) {
        * @example
        await PollTable.save(poll)
       */
-        async save(incoming) {
-            // db.tables[this.self.name] = db.tables[this.self.name].sort(
-            //   (a, b) => a.index - b.index
-            // );
-            const db = await this.get(this.self.base_name);
-            db.last_access_time = Date();
-            if (typeof incoming.index !== "number") {
-                incoming = this.validator(incoming, db.tables[this.self.name]);
-                if (this.self.relations && !incoming.relations) {
-                    incoming.relations = {};
-                }
-                db.Entities[this.self.name].last_index += 1;
-                incoming.index = db.Entities[this.self.name].last_index;
-                db.tables[this.self.name].push(incoming);
-            }
-            else {
-                db.tables[this.self.name][incoming.index] = incoming;
-            }
-            await this.put(this.self.base_name, db);
-            return incoming;
-        }
+        JSONDBTableWrapper.prototype.save = function (incoming) {
+            return __awaiter(this, void 0, void 0, function () {
+                var db;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.get(this.self.base_name)];
+                        case 1:
+                            db = _a.sent();
+                            db.last_access_time = Date();
+                            if (typeof incoming.index !== "number") {
+                                incoming = this.validator(incoming, db.tables[this.self.name]);
+                                if (this.self.relations && !incoming.relations) {
+                                    incoming.relations = {};
+                                }
+                                db.Entities[this.self.name].last_index += 1;
+                                incoming.index = db.Entities[this.self.name].last_index;
+                                db.tables[this.self.name].push(incoming);
+                            }
+                            else {
+                                db.tables[this.self.name][incoming.index] = incoming;
+                            }
+                            return [4 /*yield*/, this.put(this.self.base_name, db)];
+                        case 2:
+                            _a.sent();
+                            return [2 /*return*/, incoming];
+                    }
+                });
+            });
+        };
         /**
        * Save table into a Jsondb instance
        * -----------------------------
@@ -253,14 +317,25 @@ define(["require", "exports"], function (require, exports) {
        * @example
        await PollTable.remove(poll)
       */
-        async remove(entity) {
-            const db = await this.get(this.self.base_name);
-            db.last_access_time = Date();
-            // db.tables[this.self.name].splice(entity.index, 1);
-            db.tables[this.self.name][entity.index] = null;
-            await this.put(this.self.base_name, db);
-            return true;
-        }
+        JSONDBTableWrapper.prototype.remove = function (entity) {
+            return __awaiter(this, void 0, void 0, function () {
+                var db;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.get(this.self.base_name)];
+                        case 1:
+                            db = _a.sent();
+                            db.last_access_time = Date();
+                            // db.tables[this.self.name].splice(entity.index, 1);
+                            db.tables[this.self.name][entity.index] = null;
+                            return [4 /*yield*/, this.put(this.self.base_name, db)];
+                        case 2:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
         /**
        * Save table into a Jsondb instance
        * -----------------------------
@@ -268,11 +343,20 @@ define(["require", "exports"], function (require, exports) {
        * @example
        await PollTable.count(poll)
       */
-        async count() {
-            const db = await this.get(this.self.base_name);
-            db.last_access_time = Date();
-            return db.tables[this.self.name].length;
-        }
+        JSONDBTableWrapper.prototype.count = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var db;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.get(this.self.base_name)];
+                        case 1:
+                            db = _a.sent();
+                            db.last_access_time = Date();
+                            return [2 /*return*/, db.tables[this.self.name].length];
+                    }
+                });
+            });
+        };
         /**
        * Save table into a Jsondb instance
        * -----------------------------
@@ -280,11 +364,20 @@ define(["require", "exports"], function (require, exports) {
        * @example
        await PollTable.getAll()
       */
-        async getAll() {
-            const db = await this.get(this.self.base_name);
-            db.last_access_time = Date();
-            return db.tables[this.self.name];
-        }
+        JSONDBTableWrapper.prototype.getAll = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var db;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.get(this.self.base_name)];
+                        case 1:
+                            db = _a.sent();
+                            db.last_access_time = Date();
+                            return [2 /*return*/, db.tables[this.self.name]];
+                    }
+                });
+            });
+        };
         /**
        * get entities with any of the values specifiled from a Jsondb instance
        * -----------------------------
@@ -293,25 +386,35 @@ define(["require", "exports"], function (require, exports) {
        await PollTable.getWhereAny({name: "friday", age: 121, class: "senior"}) // gets all
        await PollTable.getWhereAny({email: "fridaymaxtour@gmail.com"}, 2) // gets 2 if they are up to two
       */
-        async getWhereAny(props, number) {
-            const results = [];
-            let all;
-            const db = await this.get(this.self.base_name);
-            db.last_access_time = Date();
-            all = db.tables[this.self.name];
-            for (let i = 0; i < all.length; i++) {
-                const element = all[i];
-                for (const [k, v] of Object.entries(props)) {
-                    if (element[k] && element[k] === v) {
-                        results.push(element);
-                        if (typeof number === "number" && results.length === number) {
-                            return results;
-                        }
+        JSONDBTableWrapper.prototype.getWhereAny = function (props, number) {
+            return __awaiter(this, void 0, void 0, function () {
+                var results, all, db, i, element, _i, _a, _b, k, v;
+                return __generator(this, function (_c) {
+                    switch (_c.label) {
+                        case 0:
+                            results = [];
+                            return [4 /*yield*/, this.get(this.self.base_name)];
+                        case 1:
+                            db = _c.sent();
+                            db.last_access_time = Date();
+                            all = db.tables[this.self.name];
+                            for (i = 0; i < all.length; i++) {
+                                element = all[i];
+                                for (_i = 0, _a = Object.entries(props); _i < _a.length; _i++) {
+                                    _b = _a[_i], k = _b[0], v = _b[1];
+                                    if (element[k] && element[k] === v) {
+                                        results.push(element);
+                                        if (typeof number === "number" && results.length === number) {
+                                            return [2 /*return*/, results];
+                                        }
+                                    }
+                                }
+                            }
+                            return [2 /*return*/, results];
                     }
-                }
-            }
-            return results;
-        }
+                });
+            });
+        };
         /**
        * get entities with the given prop of type "string" where the values specifiled is included
        * -----------------------------
@@ -322,25 +425,35 @@ define(["require", "exports"], function (require, exports) {
        await PollTable.getWhereAnyPropsIncludes({name: "fri"}) // gets all
        await PollTable.getWhereAnyPropsIncludes({name: "fri"}, 2) // gets 2 if they are up to two
       */
-        async getWhereAnyPropsIncludes(props, number) {
-            const results = [];
-            let all;
-            const db = await this.get(this.self.base_name);
-            db.last_access_time = Date();
-            all = db.tables[this.self.name];
-            for (let i = 0; i < all.length; i++) {
-                const element = all[i];
-                for (const [k, v] of Object.entries(props)) {
-                    if (element[k] && typeof v === "string" && element[k].includes(v)) {
-                        results.push(element);
-                        if (typeof number === "number" && results.length === number) {
-                            return results;
-                        }
+        JSONDBTableWrapper.prototype.getWhereAnyPropsIncludes = function (props, number) {
+            return __awaiter(this, void 0, void 0, function () {
+                var results, all, db, i, element, _i, _a, _b, k, v;
+                return __generator(this, function (_c) {
+                    switch (_c.label) {
+                        case 0:
+                            results = [];
+                            return [4 /*yield*/, this.get(this.self.base_name)];
+                        case 1:
+                            db = _c.sent();
+                            db.last_access_time = Date();
+                            all = db.tables[this.self.name];
+                            for (i = 0; i < all.length; i++) {
+                                element = all[i];
+                                for (_i = 0, _a = Object.entries(props); _i < _a.length; _i++) {
+                                    _b = _a[_i], k = _b[0], v = _b[1];
+                                    if (element[k] && typeof v === "string" && element[k].includes(v)) {
+                                        results.push(element);
+                                        if (typeof number === "number" && results.length === number) {
+                                            return [2 /*return*/, results];
+                                        }
+                                    }
+                                }
+                            }
+                            return [2 /*return*/, results];
                     }
-                }
-            }
-            return results;
-        }
+                });
+            });
+        };
         /**
        * get an entity with the values specifiled from a Jsondb instance
        * -----------------------------
@@ -350,25 +463,37 @@ define(["require", "exports"], function (require, exports) {
         await PollTable.getOne({email: "fridaymaxtour@gamail.com"}) // gets one
       
         */
-        async getOne(props) {
-            let results = null;
-            const db = await this.get(this.self.base_name);
-            db.last_access_time = Date();
-            all = db.tables[this.self.name];
-            for (let i = 0; i < all.length; i++) {
-                const element = all[i];
-                for (const [k, v] of Object.entries(props)) {
-                    if (element[k] && element[k] === v) {
-                        results = element;
-                        break;
+        JSONDBTableWrapper.prototype.getOne = function (props) {
+            return __awaiter(this, void 0, void 0, function () {
+                var results, db, i, element, _i, _a, _b, k, v;
+                return __generator(this, function (_c) {
+                    switch (_c.label) {
+                        case 0:
+                            results = null;
+                            return [4 /*yield*/, this.get(this.self.base_name)];
+                        case 1:
+                            db = _c.sent();
+                            db.last_access_time = Date();
+                            all = db.tables[this.self.name];
+                            for (i = 0; i < all.length; i++) {
+                                element = all[i];
+                                for (_i = 0, _a = Object.entries(props); _i < _a.length; _i++) {
+                                    _b = _a[_i], k = _b[0], v = _b[1];
+                                    if (element[k] && element[k] === v) {
+                                        results = element;
+                                        break;
+                                    }
+                                }
+                            }
+                            return [2 /*return*/, results];
                     }
-                }
-            }
-            return results;
-        }
-    }
-    const JSONDBConnection = class {
-        constructor(Entities, keys) {
+                });
+            });
+        };
+        return JSONDBTableWrapper;
+    }());
+    var JSONDBConnection = /** @class */ (function () {
+        function JSONDBConnection(Entities, keys) {
             this.Entities = Entities;
             this.keys = keys;
         }
@@ -387,14 +512,16 @@ define(["require", "exports"], function (require, exports) {
       // getting a table
       const MessageTable = connection.getTable("Message");
          * */
-        getTable(table_name) {
-            for (const [tableName, table] of Object.entries(this.Entities)) {
+        JSONDBConnection.prototype.getTable = function (table_name) {
+            for (var _i = 0, _a = Object.entries(this.Entities); _i < _a.length; _i++) {
+                var _b = _a[_i], tableName = _b[0], table = _b[1];
                 if (table_name === tableName) {
                     return new JSONDBTableWrapper(table, this.keys);
                 }
             }
-        }
-    };
+        };
+        return JSONDBConnection;
+    }());
     /**
      * Create a new JSONDB object
      *------------------------
@@ -406,8 +533,8 @@ define(["require", "exports"], function (require, exports) {
      *
      * .
      * */
-    class JSONDB {
-        constructor() {
+    var JSONDB = /** @class */ (function () {
+        function JSONDB() {
             this.DB_NAME = "";
             this.username = "";
             this.encrypted = false;
@@ -419,31 +546,35 @@ define(["require", "exports"], function (require, exports) {
             this.Entities = {};
             this.tables = {};
         }
-        async getDB(name) {
-            return new Promise(function (res, rej) {
-                if (!isNode) {
-                    res(JSON.parse(localStorage.getItem(name)));
-                    return;
-                }
-                try {
-                    fs.readFile(_dirname + "/" + name + ".json", { encoding: "utf-8" }, function (err, data) {
-                        if (err) {
-                            return rej(err);
-                        }
-                        try {
-                            res(JSON.parse(data));
-                        }
-                        catch (error) {
+        JSONDB.prototype.getDB = function (name) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, new Promise(function (res, rej) {
+                            if (!isNode) {
+                                res(JSON.parse(localStorage.getItem(name)));
+                                return;
+                            }
                             try {
-                                res(JSON.parse(fs.readFileSync(name + ".json", "utf-8")));
+                                fs.readFile(_dirname + "/" + name + ".json", { encoding: "utf-8" }, function (err, data) {
+                                    if (err) {
+                                        return rej(err);
+                                    }
+                                    try {
+                                        res(JSON.parse(data));
+                                    }
+                                    catch (error) {
+                                        try {
+                                            res(JSON.parse(fs.readFileSync(name + ".json", "utf-8")));
+                                        }
+                                        catch (error) { }
+                                    }
+                                });
                             }
                             catch (error) { }
-                        }
-                    });
-                }
-                catch (error) { }
+                        })];
+                });
             });
-        }
+        };
         /**
        * Schema constructor for Jsondb
        * -----------------------------
@@ -505,12 +636,12 @@ define(["require", "exports"], function (require, exports) {
         },
       });
        */
-        schema(schema_configuration_object) {
+        JSONDB.prototype.schema = function (schema_configuration_object) {
             return new schema(schema_configuration_object, {
                 validateColumns: this.validateColumns,
-                validateRelations: this.validateRelations,
+                validateRelations: this.validateRelations
             });
-        }
+        };
         /**
          * Create a new JSONDB instance
          *------------------------
@@ -527,8 +658,8 @@ define(["require", "exports"], function (require, exports) {
        // Creates a new JSONDB instance
          * Database.init(config)
          * */
-        init(config) {
-            console.log(`\x1B[32m JSONDB version ${exports.JSONDBversion} \x1B[39m`);
+        JSONDB.prototype.init = function (config) {
+            console.log("\u001B[32m JSONDB version " + exports.JSONDBversion + " \u001B[39m");
             this.initialised = true;
             this.DB_NAME = config.name;
             this.password = config.password || "";
@@ -537,7 +668,7 @@ define(["require", "exports"], function (require, exports) {
             this.time_created = Date();
             this.tables = {};
             try {
-                let wasThere;
+                var wasThere = void 0;
                 if (isNode) {
                     wasThere = fs.readFileSync(config.name + ".json", "utf-8");
                 }
@@ -564,10 +695,10 @@ define(["require", "exports"], function (require, exports) {
                 fs.writeFile(config.name + ".json", JSON.stringify(this), cb);
             }
             else {
-                let db = JSON.stringify(this);
+                var db = JSON.stringify(this);
                 localStorage.setItem(config.name, db);
             }
-        }
+        };
         /**
        * Create secure connection a Jsondb instance
        * -----------------------------
@@ -579,21 +710,32 @@ define(["require", "exports"], function (require, exports) {
       };
       const connection = await database.createJSONDBConnection(details);
       */
-        async createJSONDBConnection(details) {
-            if (!this.initialised) {
-                throw new Error("JSONDB: you haven't create a JSONDB instance yet");
-            }
-            if (details.username !== this.username ||
-                details.password !== this.password) {
-                throw new Error("JSONDB: Access Denied");
-            }
-            const connection = await this.getDB(this.DB_NAME);
-            connection.last_access_time = Date();
-            return new JSONDBConnection(connection.Entities);
-        }
-        validateRelations(relations) {
-            const types = ["many", "one"];
-            for (const [relation, value] of Object.entries(relations)) {
+        JSONDB.prototype.createJSONDBConnection = function (details) {
+            return __awaiter(this, void 0, void 0, function () {
+                var connection;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!this.initialised) {
+                                throw new Error("JSONDB: you haven't create a JSONDB instance yet");
+                            }
+                            if (details.username !== this.username ||
+                                details.password !== this.password) {
+                                throw new Error("JSONDB: Access Denied");
+                            }
+                            return [4 /*yield*/, this.getDB(this.DB_NAME)];
+                        case 1:
+                            connection = _a.sent();
+                            connection.last_access_time = Date();
+                            return [2 /*return*/, new JSONDBConnection(connection.Entities)];
+                    }
+                });
+            });
+        };
+        JSONDB.prototype.validateRelations = function (relations) {
+            var types = ["many", "one"];
+            for (var _i = 0, _a = Object.entries(relations); _i < _a.length; _i++) {
+                var _b = _a[_i], relation = _b[0], value = _b[1];
                 if (typeof value.target !== "object") {
                     throw new Error("JSONDB: wrong relationship target type given " +
                         value.target +
@@ -610,10 +752,11 @@ define(["require", "exports"], function (require, exports) {
                         " should be true or false");
                 }
             }
-        }
-        validateColumns(columns) {
-            const types = ["number", "string", "boolean", "blob"];
-            for (const [column, value] of Object.entries(columns)) {
+        };
+        JSONDB.prototype.validateColumns = function (columns) {
+            var types = ["number", "string", "boolean", "blob"];
+            for (var _i = 0, _a = Object.entries(columns); _i < _a.length; _i++) {
+                var _b = _a[_i], column = _b[0], value = _b[1];
                 if (column) {
                     if (!types.includes(value.type)) {
                         throw new Error("JSONDB: wrong data type given " +
@@ -632,7 +775,7 @@ define(["require", "exports"], function (require, exports) {
                     }
                 }
             }
-        }
+        };
         /**
        * Assemble Entities into Jsondb
        * -----------------------------
@@ -657,12 +800,12 @@ define(["require", "exports"], function (require, exports) {
       database.assemble([MessageSchema]);
       *
       */
-        assemble(allEntities) {
+        JSONDB.prototype.assemble = function (allEntities) {
             if (!this.initialised) {
                 throw new Error("JSONDB: you haven't create a JSONDB instance yet");
             }
             try {
-                const wasThere = fs.readFileSync(this.DB_NAME + ".json", "utf-8");
+                var wasThere = fs.readFileSync(this.DB_NAME + ".json", "utf-8");
                 if (wasThere) {
                     return;
                 }
@@ -671,7 +814,7 @@ define(["require", "exports"], function (require, exports) {
             if (!Array.isArray(allEntities) || typeof allEntities[0] !== "object") {
                 throw new Error("JSONDB: invalid entity array list, can't be assembled");
             }
-            for (let i = 0; i < allEntities.length; i++) {
+            for (var i = 0; i < allEntities.length; i++) {
                 this.Entities[allEntities[i].name] = allEntities[i];
                 this.Entities[allEntities[i].name].base_name = this.DB_NAME;
                 this.tables[allEntities[i].name] = [];
@@ -688,11 +831,12 @@ define(["require", "exports"], function (require, exports) {
             else {
                 localStorage.setItem(this.DB_NAME, JSON.stringify(this));
             }
-        }
-    }
+        };
+        return JSONDB;
+    }());
     /**
      * @exports
      */
-    exports.default = JSONDB;
+    exports["default"] = JSONDB;
 });
 //# sourceMappingURL=JsonDB.js.map

@@ -3,23 +3,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 define(["require", "exports", "./css.js"], function (require, exports, css_js_1) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.__esModule = true;
     css_js_1 = __importDefault(css_js_1);
-    const Init = function (config) {
-        const Wrapper = document.createElement("div");
+    var Init = function (config) {
+        var Wrapper = document.createElement("div");
         Wrapper.className = "Cradova-app-wrappper";
         Wrapper.id = "app-wrapper";
-        (0, css_js_1.default)(".Cradova-app-wrappper", {
+        css_js_1["default"](".Cradova-app-wrappper", {
             display: "flex",
             "align-items": "center",
             "justify-content": "center",
             "flex-direction": "column",
-            width: "100%",
+            width: "100%"
         });
         Wrapper.stateID = "Cradova-app-wrappper-id";
         document.body.append(Wrapper);
         return Wrapper;
     };
-    exports.default = Init;
+    exports["default"] = Init;
 });
 //# sourceMappingURL=init.js.map

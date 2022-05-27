@@ -22,23 +22,28 @@ _.animate("popanimation",
 */
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    function animate(indentifier, ...properties) {
+    exports.__esModule = true;
+    function animate(indentifier) {
+        var properties = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            properties[_i - 1] = arguments[_i];
+        }
         /*This is for creating css
        animations  using javascipt*/
-        const styS = "@keyframes " + indentifier + " " + "{", styE = "}", proplen = properties.length;
-        let style = " ", aniSty = " ", Animation = "  ", totalAnimation = null;
-        const animationStep = (num) => {
-            for (const [k, v] of Object.entries(properties[num][1])) {
+        var styS = "@keyframes " + indentifier + " " + "{", styE = "}", proplen = properties.length;
+        var style = " ", aniSty = " ", Animation = "  ", totalAnimation = null;
+        var animationStep = function (num) {
+            for (var _i = 0, _a = Object.entries(properties[num][1]); _i < _a.length; _i++) {
+                var _b = _a[_i], k = _b[0], v = _b[1];
                 style += "" + k + ": " + v + ";";
             }
             aniSty += "" + properties[num][0] + "{" + style + "}";
             return aniSty;
         };
-        for (let i = 0; i < proplen; i++) {
+        for (var i = 0; i < proplen; i++) {
             Animation += animationStep(i);
         }
-        let aniStyleTag = document.querySelector("style");
+        var aniStyleTag = document.querySelector("style");
         if (aniStyleTag === null) {
             aniStyleTag = document.createElement("style");
         }
@@ -48,6 +53,6 @@ define(["require", "exports"], function (require, exports) {
         aniStyleTag.innerHTML = totalAnimation;
         document.head.append(aniStyleTag);
     }
-    exports.default = animate;
+    exports["default"] = animate;
 });
 //# sourceMappingURL=animate.js.map

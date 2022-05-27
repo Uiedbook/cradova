@@ -1,22 +1,22 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const ls = {};
-    ls.store = (name, value) => {
+    exports.__esModule = true;
+    var ls = {};
+    ls.store = function (name, value) {
         localStorage.setItem(name, JSON.stringify(value));
     };
-    ls.retrieve = (name) => {
+    ls.retrieve = function (name) {
         return localStorage.getItem(name);
     };
-    ls.remove = (name) => {
+    ls.remove = function (name) {
         localStorage.removeItem(name);
     };
-    ls.getKey = (index) => {
+    ls.getKey = function (index) {
         return window.localStorage.key(index);
     };
-    ls.clear = () => {
+    ls.clear = function () {
         localStorage.clear();
     };
-    exports.default = ls;
+    exports["default"] = ls;
 });
 //# sourceMappingURL=localStorage.js.map

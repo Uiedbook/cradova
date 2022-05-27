@@ -1,9 +1,9 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.__esModule = true;
     function PromptBeforeLeave() {
-        window.addEventListener("beforeunload", (ev) => {
-            const e = ev || window.event;
+        window.addEventListener("beforeunload", function (ev) {
+            var e = ev || window.event;
             if (e) {
                 e.preventDefault();
                 e.returnValue = "";
@@ -11,6 +11,6 @@ define(["require", "exports"], function (require, exports) {
             return "";
         });
     }
-    exports.default = PromptBeforeLeave;
+    exports["default"] = PromptBeforeLeave;
 });
 //# sourceMappingURL=promptbeforeleave.js.map

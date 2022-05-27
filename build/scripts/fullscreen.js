@@ -1,20 +1,20 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.__esModule = true;
     // for making the dom elements fulscreen
     function fullScreen(e) {
         return {
-            set() {
-                e.requestFullscreen().catch((err) => {
+            set: function () {
+                e.requestFullscreen()["catch"](function (err) {
                     throw err;
                 });
             },
-            exist() {
+            exist: function () {
                 document.exitFullscreen();
-            },
+            }
         };
     }
-    exports.default = fullScreen;
+    exports["default"] = fullScreen;
 });
 /*
  *** HOW TO USE ***

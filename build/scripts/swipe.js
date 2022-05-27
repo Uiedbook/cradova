@@ -1,9 +1,9 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.__esModule = true;
     function swipe(item) {
-        let caller;
-        let startX = 0, startY = 0;
+        var caller;
+        var startX = 0, startY = 0;
         if (typeof item === "object") {
             caller = item;
         }
@@ -15,11 +15,11 @@ define(["require", "exports"], function (require, exports) {
             startY = e.changedTouches[0].screenY;
         }
         function handleTouchEnd(e) {
-            const diffX = e.changedTouches[0].screenX - startX;
-            const diffY = e.changedTouches[0].screenY - startY;
-            const ratioX = Math.abs(diffX / diffY);
-            const ratioY = Math.abs(diffY / diffX);
-            const absDiff = Math.abs(ratioX > ratioY ? diffX : diffY);
+            var diffX = e.changedTouches[0].screenX - startX;
+            var diffY = e.changedTouches[0].screenY - startY;
+            var ratioX = Math.abs(diffX / diffY);
+            var ratioY = Math.abs(diffY / diffX);
+            var absDiff = Math.abs(ratioX > ratioY ? diffX : diffY);
             if (absDiff < 10) {
                 if (caller.touch) {
                     callback.touch(caller.touch);
@@ -54,25 +54,25 @@ define(["require", "exports"], function (require, exports) {
         }
         document.body.addEventListener("touchstart", handleTouchStart);
         document.body.addEventListener("touchend", handleTouchEnd);
-        const callback = {
-            touch(callback) {
+        var callback = {
+            touch: function (callback) {
                 return callback();
             },
-            right(callback) {
+            right: function (callback) {
                 return callback();
             },
-            left(callback) {
+            left: function (callback) {
                 return callback();
             },
-            down(callback) {
+            down: function (callback) {
                 return callback();
             },
-            up(callback) {
+            up: function (callback) {
                 return callback();
-            },
+            }
         };
     }
-    exports.default = swipe;
+    exports["default"] = swipe;
 });
 /*
  *** HOW TO USE ***

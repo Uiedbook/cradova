@@ -1,1 +1,1 @@
-export default function uuid(len?: number): string;
+export default function uuid(len?: number): any;

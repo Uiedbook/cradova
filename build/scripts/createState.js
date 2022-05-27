@@ -3,15 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 define(["require", "exports", "../index.js", "./dispatcher.js", "./uuid.js"], function (require, exports, index_js_1, dispatcher_js_1, uuid_js_1) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.__esModule = true;
     index_js_1 = __importDefault(index_js_1);
     dispatcher_js_1 = __importDefault(dispatcher_js_1);
     uuid_js_1 = __importDefault(uuid_js_1);
     function createState(element) {
-        let CradovaElement;
-        const id = (0, uuid_js_1.default)();
+        var CradovaElement;
+        var id = uuid_js_1["default"]();
         if (typeof element === "string") {
-            CradovaElement = (0, index_js_1.default)(element, { stateID: id });
+            CradovaElement = index_js_1["default"](element, { stateID: id });
         }
         else if (typeof element === "function") {
             CradovaElement = element({ stateID: id });
@@ -25,8 +25,8 @@ define(["require", "exports", "../index.js", "./dispatcher.js", "./uuid.js"], fu
                 element +
                 "  should be  string, or cradova element type");
         }
-        return [CradovaElement, dispatcher_js_1.default.bind(CradovaElement, id)];
+        return [CradovaElement, dispatcher_js_1["default"].bind(CradovaElement, id)];
     }
-    exports.default = createState;
+    exports["default"] = createState;
 });
 //# sourceMappingURL=createState.js.map

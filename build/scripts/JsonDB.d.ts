@@ -97,7 +97,7 @@ declare class JSONDBTableWrapper {
  * */
 declare class JSONDB {
     constructor();
-    getDB(name: any): Promise<unknown>;
+    getDB(name: any): Promise<any>;
     /**
    * Schema constructor for Jsondb
    * -----------------------------

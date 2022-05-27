@@ -1,10 +1,10 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const { innerWidth, innerHeight } = window;
-    const height = innerHeight;
-    const width = innerWidth;
-    const metrics = {
+    exports.__esModule = true;
+    var innerWidth = window.innerWidth, innerHeight = window.innerHeight;
+    var height = innerHeight;
+    var width = innerWidth;
+    var metrics = {
         // global sizes
         base: "8px",
         font: "14px",
@@ -47,15 +47,15 @@ define(["require", "exports"], function (require, exports) {
             small: "20px",
             medium: "30px",
             large: "45px",
-            xl: "50px",
+            xl: "50px"
         },
         images: {
             small: "20px",
             medium: "40px",
             large: "60px",
-            logo: "200px",
-        },
+            logo: "200px"
+        }
     };
-    exports.default = metrics;
+    exports["default"] = metrics;
 });
 //# sourceMappingURL=Metrics.js.map

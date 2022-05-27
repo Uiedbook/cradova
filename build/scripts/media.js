@@ -1,6 +1,6 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.__esModule = true;
     /**
     Write CSS media in javascript
     
@@ -22,24 +22,29 @@ define(["require", "exports"], function (require, exports) {
     }]
     )
     */
-    function media(value, ...properties) {
+    function media(value) {
+        var properties = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            properties[_i - 1] = arguments[_i];
+        }
         /* This is for creating css
        @media styles using javascipt*/
-        const styS = "@media only screen and (" + value + ") " + "{", styE = "}";
-        let style = "  ", aniSty = " ";
-        const proplen = properties.length;
-        let totalAnimation, Animation = "  ";
-        const animationStep = (num) => {
-            for (const [k, v] of Object.entries(properties[num][1])) {
+        var styS = "@media only screen and (" + value + ") " + "{", styE = "}";
+        var style = "  ", aniSty = " ";
+        var proplen = properties.length;
+        var totalAnimation, Animation = "  ";
+        var animationStep = function (num) {
+            for (var _i = 0, _a = Object.entries(properties[num][1]); _i < _a.length; _i++) {
+                var _b = _a[_i], k = _b[0], v = _b[1];
                 style += "" + k + ": " + v + ";";
             }
             aniSty += "" + properties[num][0] + "{" + style + "}";
             return aniSty;
         };
-        for (let i = 0; i < proplen; i++) {
+        for (var i = 0; i < proplen; i++) {
             Animation += animationStep(i);
         }
-        let aniStyleTag = document.querySelector("style");
+        var aniStyleTag = document.querySelector("style");
         if (aniStyleTag === null) {
             aniStyleTag = document.createElement("style");
         }
@@ -49,6 +54,6 @@ define(["require", "exports"], function (require, exports) {
         aniStyleTag.innerHTML = totalAnimation;
         document.head.append(aniStyleTag);
     }
-    exports.default = media;
+    exports["default"] = media;
 });
 //# sourceMappingURL=media.js.map

@@ -1,5 +1,6 @@
 const store = "sample_store";
 
+
 const assets = [
   // put all the files you want cached here
   "/",

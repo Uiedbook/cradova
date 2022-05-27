@@ -1,10 +1,14 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.__esModule = true;
     function reuse(element) {
-        return (...incoming) => {
-            let childrens2rd, props, text;
-            for (let i = 0; i < incoming.length; i++) {
+        return function () {
+            var incoming = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                incoming[_i] = arguments[_i];
+            }
+            var childrens2rd, props, text;
+            for (var i = 0; i < incoming.length; i++) {
                 if (typeof incoming[i] === "function" ||
                     incoming[i] instanceof HTMLElement) {
                     if (Array.isArray(childrens2rd)) {
@@ -30,9 +34,10 @@ define(["require", "exports"], function (require, exports) {
             // dynamic props
             //
             if (props && typeof props === "object" && !Array.isArray(props)) {
-                for (const prop in props) {
+                for (var prop in props) {
                     if (prop === "style") {
-                        for (const [k, v] of Object.entries(props[prop])) {
+                        for (var _a = 0, _b = Object.entries(props[prop]); _a < _b.length; _a++) {
+                            var _c = _b[_a], k = _c[0], v = _c[1];
                             element.style[k] = v;
                         }
                         continue;
@@ -49,7 +54,7 @@ define(["require", "exports"], function (require, exports) {
                 }
             }
             if (childrens2rd && childrens2rd[0]) {
-                for (let i = 0; i < childrens2rd.length; i++) {
+                for (var i = 0; i < childrens2rd.length; i++) {
                     if (typeof childrens2rd[i] === "function") {
                         element.append(childrens2rd[i](props));
                         continue;
@@ -67,6 +72,6 @@ define(["require", "exports"], function (require, exports) {
             return element;
         };
     }
-    exports.default = reuse;
+    exports["default"] = reuse;
 });
 //# sourceMappingURL=reuse.js.map
