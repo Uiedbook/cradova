@@ -1,21 +1,21 @@
 # cradova PWA sample
 
 <p>
-	<a href="https://www.npmjs.com/package/Cradova">
-		<img src="https://img.shields.io/npm/v/Cradova.svg" alt="npm Version" />
+	<a href="https://www.npmjs.com/package/cradova">
+		<img src="https://img.shields.io/npm/v/cradova.svg" alt="npm Version" />
 	</a>&nbsp;
-	<a href="https://github.com/Cradova/Cradova.js/blob/next/LICENSE">
+	<a href="https://github.com/fridaycandour/cradova/blob/next/LICENSE">
 		<img src="https://img.shields.io/npm/l/Cradova.svg" alt="License" />
 	</a>&nbsp;
-	<a href="https://www.npmjs.com/package/Cradova">
+	<a href="https://www.npmjs.com/package/cradova">
 		<img src="https://img.shields.io/npm/dm/Cradova.svg" alt="npm Downloads">
 	</a>&nbsp;
-	<a href="https://www.npmjs.com/package/Cradova">
-		<img src="https://img.shields.io/travis/Cradova/Cradova.js/next.svg?colorB=brightgreen" alt="Build Status">
+	<a href="https://www.npmjs.com/package/cradova">
+		<img src="https://img.shields.io/travis/cradova/cradova.js/next.svg?colorB=brightgreen" alt="Build Status">
 	</a>
     &nbsp;
-	<a href="https://opencollective.com/Cradova">
-		<img src="https://img.shields.io/opencollective/all/Cradova.svg?colorB=brightgreen" alt="Donate at OpenCollective">
+	<a href="https://opencollective.com/cradova">
+		<img src="https://img.shields.io/opencollective/all/cradova.svg?colorB=brightgreen" alt="Donate at OpenCollective">
 	</a>&nbsp;
 </p>
 
