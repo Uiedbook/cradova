@@ -4,7 +4,7 @@
 	<a href="https://www.npmjs.com/package/cradova">
 		<img src="https://img.shields.io/npm/v/cradova.svg" alt="npm Version" />
 	</a>&nbsp;
-	<a href="https://github.com/fridaycandour/cradova/blob/next/LICENSE">
+	<a href="https://github.com/fridaycandour/cradova/LICENSE">
 		<img src="https://img.shields.io/npm/l/Cradova.svg" alt="License" />
 	</a>&nbsp;
 	<a href="https://www.npmjs.com/package/cradova">
