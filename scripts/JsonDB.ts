@@ -10,32 +10,28 @@
 
 export const JSONDBversion = "1.0.0";
 let fs: any,
-  fileURLToPath,
   isNode = false,
   _dirname: string;
 
- (async function () {
-   if (!globalThis.localStorage) {
-     isNode = true;
-     fs = await import("fs");
-     const dr = await import("path");
-     const fp = await import("url");
-     fileURLToPath = fp.fileURLToPath;
-     _dirname = dr
-       .dirname(fileURLToPath(import.meta.url))
-       .split("node_modules")[0];
-   }
- })()
-
-
+(async function () {
+  if (!globalThis.localStorage) {
+    isNode = true;
+  }
+})();
 
 const schema = class {
-  base_name: string;
   name: any;
-  last_index: number;
-  columns: any;
-  relations: null;
-  constructor(schema_configuration_object: { columns: any; relations: null; name: any; }, validators: { validateColumns: (arg0: any) => void; validateRelations: (arg0: any) => void; }) {
+  columns: Record<string, any>;
+  base_name?: string;
+  last_index?: number;
+  relations?: Record<string, any>;
+  constructor(
+    schema_configuration_object: { columns: any; relations?: any; name: any },
+    validators: {
+      validateColumns: (arg0: any) => void;
+      validateRelations: (arg0: any) => void;
+    }
+  ) {
     // validations
     if (!schema_configuration_object.columns) {
       throw new Error(
@@ -46,7 +42,7 @@ const schema = class {
 
     const isEmptyObject = function (obj: any) {
       // for checking for empty objects
-      for (const name in obj) {
+      for (const _name in obj) {
         return false;
       }
       return true;
@@ -67,7 +63,7 @@ const schema = class {
   }
 };
 
-class JSONDBTableWrapper {
+export class JSONDBTableWrapper {
   put: (name: any, value: any) => Promise<void>;
   get: (name: any) => Promise<unknown>;
   validator: (incoming: any, tables: any) => {};
@@ -75,48 +71,27 @@ class JSONDBTableWrapper {
   keys: any;
   constructor(self: unknown, keys?: any) {
     this.put = async (name, value) => {
-      function cb(err: string) {
-        if (err) {
-          throw new Error(
-            "JSONDB: error failed to update entities in database because " + err
-          );
-        }
-      }
       if (isNode) {
-        fs.writeFile(name + ".json", JSON.stringify(value), cb);
+        await fs.writeFile(name + ".json", JSON.stringify(value), "utf-8");
       } else {
         localStorage.setItem(name, JSON.stringify(value));
       }
     };
     this.get = async (name) => {
-      return new Promise(function (res, rej) {
-        try {
-          if (!isNode) {
-            res(JSON.parse(localStorage.getItem(name)!));
-            return;
-          }
+      if (!isNode) {
+        return JSON.parse(localStorage.getItem(name)!);
+      }
 
-          fs.readFile(
-            _dirname + "/" + name + ".json",
-            { encoding: "utf-8" },
-            function (err: string, data: string) {
-              if (err) {
-                return rej(
-                  "JSONDB: error failed to retrieve entities from database because " +
-                    err
-                );
-              }
-              try {
-                res(JSON.parse(data));
-              } catch (error) {
-                try {
-                  res(JSON.parse(fs.readFileSync(name + ".json", "utf-8")));
-                } catch (error) {}
-              }
-            }
-          );
-        } catch (error) {}
+      const data = await fs.readFile(_dirname + "/" + name + ".json", {
+        encoding: "utf-8",
       });
+      if (data) {
+        return JSON.parse(data);
+      } else {
+        throw new Error(
+          "JSONDB: error failed to retrieve entities from database "
+        );
+      }
     };
     this.validator = (incoming, tables) => {
       // works for type, nulllable and unique validations.
@@ -188,9 +163,21 @@ await PollTable.saveWithRelations(MessageTable, Poll, message);
 // arrays of relations
 await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
 */
-  async saveWithRelations(table: { self: { name: string | number; }; }, incoming: { index: string | number; }, relations: string | any[]) {
-    if (!relations) {
-      return;
+  async saveWithRelations(table: any, incoming: any, relations: any[]) {
+    if (!relations || !table) {
+      throw new TypeError(
+        "JsonDB: error saving with relations  table name or relation cannot be null   " +
+          JSON.stringify(relations) +
+          "   " +
+          JSON.stringify(table)
+      );
+    }
+
+    if (!table.self || !table.self.name) {
+      throw new TypeError(
+        "JsonDB: error saving with relations  table is invalid   " +
+          JSON.stringify(table)
+      );
     }
     const db: any = await this.get(this.self.base_name);
     db.last_access_time = Date();
@@ -262,7 +249,7 @@ await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
  * @example
  await PollTable.save(poll)
 */
-  async save(incoming: { index?: any; relations?: any; }) {
+  async save(incoming: any) {
     // db.tables[this.self.name] = db.tables[this.self.name].sort(
     //   (a, b) => a.index - b.index
     // );
@@ -290,7 +277,7 @@ await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
  * @example
  await PollTable.remove(poll)
 */
-  async remove(entity: { index: string | number; }) {
+  async remove(entity: { index: string | number }) {
     const db: any = await this.get(this.self.base_name);
     db.last_access_time = Date();
     // db.tables[this.self.name].splice(entity.index, 1);
@@ -330,7 +317,10 @@ await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
  await PollTable.getWhereAny({name: "friday", age: 121, class: "senior"}) // gets all
  await PollTable.getWhereAny({email: "fridaymaxtour@gmail.com"}, 2) // gets 2 if they are up to two
 */
-  async getWhereAny(props: { [s: string]: unknown; } | ArrayLike<unknown>, number: number) {
+  async getWhereAny(
+    props: { [s: string]: unknown } | ArrayLike<unknown>,
+    number: number
+  ) {
     const results = [];
     let all;
     const db: any = await this.get(this.self.base_name);
@@ -360,11 +350,14 @@ await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
  await PollTable.getWhereAnyPropsIncludes({name: "fri"}) // gets all
  await PollTable.getWhereAnyPropsIncludes({name: "fri"}, 2) // gets 2 if they are up to two
 */
-  async getWhereAnyPropsIncludes(props: { [s: string]: unknown; } | ArrayLike<unknown>, number: number) {
+  async getWhereAnyPropsIncludes(
+    props: { [s: string]: unknown } | ArrayLike<unknown>,
+    number: number
+  ) {
     const results = [];
     const db: any = await this.get(this.self.base_name);
     db.last_access_time = Date();
-    const    all = db.tables[this.self.name];
+    const all = db.tables[this.self.name];
     for (let i = 0; i < all.length; i++) {
       const element = all[i];
       for (const [k, v] of Object.entries(props)) {
@@ -388,7 +381,7 @@ await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
   await PollTable.getOne({email: "fridaymaxtour@gamail.com"}) // gets one
 
   */
-  async getOne(props: ArrayLike<unknown> | { [s: string]: unknown; }) {
+  async getOne(props: ArrayLike<unknown> | { [s: string]: unknown }) {
     let results = null;
     const db: any = await this.get(this.self.base_name);
     db.last_access_time = Date();
@@ -435,6 +428,7 @@ const MessageTable = connection.getTable("Message");
         return new JSONDBTableWrapper(table, this.keys);
       }
     }
+    return undefined;
   }
 };
 
@@ -475,31 +469,19 @@ export class JSONDB {
     this.tables = {};
   }
   async getDB(name: string) {
-    return new Promise(function (res, rej) {
-      if (!isNode) {
-        res(JSON.parse(localStorage.getItem(name)!));
-        return;
-      }
-
-      try {
-        fs.readFile(
-          _dirname + "/" + name + ".json",
-          { encoding: "utf-8" },
-          function (err: any, data: string) {
-            if (err) {
-              return rej(err);
-            }
-            try {
-              res(JSON.parse(data));
-            } catch (error) {
-              try {
-                res(JSON.parse(fs.readFileSync(name + ".json", "utf-8")));
-              } catch (error) {}
-            }
-          }
-        );
-      } catch (error) {}
+    if (!isNode) {
+      return JSON.parse(localStorage.getItem(name)!);
+    }
+    const data = await fs.readFile(_dirname + "/" + name + ".json", {
+      encoding: "utf-8",
     });
+    if (data) {
+      return JSON.parse(data);
+    } else {
+      throw new Error(
+        "JSONDB: error failed to retrieve entities from database "
+      );
+    }
   }
 
   /**
@@ -564,7 +546,11 @@ export class JSONDB {
 });
  */
 
-  schema(schema_configuration_object: { columns: any; relations: null; name: any; }) {
+  schema(schema_configuration_object: {
+    columns: any;
+    relations?: any;
+    name: any;
+  }) {
     return new schema(schema_configuration_object, {
       validateColumns: this.validateColumns,
       validateRelations: this.validateRelations,
@@ -586,7 +572,12 @@ export class JSONDB {
  // Creates a new JSONDB instance
    * Database.init(config)  
    * */
-  init(config: { name: string; password: string; username: string; encrypted: boolean; }) {
+  async init(config: {
+    name: string;
+    password: string;
+    username: string;
+    encrypted: boolean;
+  }) {
     console.log(`\x1B[32m JSONDB version ${JSONDBversion} \x1B[39m`);
     this.initialised = true;
     this.DB_NAME = config.name;
@@ -598,7 +589,7 @@ export class JSONDB {
     try {
       let wasThere;
       if (isNode) {
-        wasThere = fs.readFileSync(config.name + ".json", "utf-8");
+        wasThere = this.getDB(config.name);
       } else {
         wasThere = localStorage.getItem(config.name);
       }
@@ -612,16 +603,8 @@ export class JSONDB {
     if (!config.username) {
       throw new Error("JSONDB: error username is empty ");
     }
-
-    function cb(err: string) {
-      if (err) {
-        throw new Error(
-          "JSONDB: error failed to create database because " + err
-        );
-      }
-    }
     if (isNode) {
-      fs.writeFile(config.name + ".json", JSON.stringify(this), cb);
+      await fs.writeFile(config.name + ".json", JSON.stringify(this), "utf-8");
     } else {
       let db = JSON.stringify(this);
       localStorage.setItem(config.name, db);
@@ -640,7 +623,7 @@ export class JSONDB {
 const connection = await database.createJSONDBConnection(details);
 */
 
-  async createJSONDBConnection(details: { username: string; password: any; }) {
+  async createJSONDBConnection(details: { username: string; password: any }) {
     if (!this.initialised) {
       throw new Error("JSONDB: you haven't create a JSONDB instance yet");
     }
@@ -650,15 +633,15 @@ const connection = await database.createJSONDBConnection(details);
     ) {
       throw new Error("JSONDB: Access Denied");
     }
-    const connection : any = await this.getDB(this.DB_NAME);
+    const connection: any = await this.getDB(this.DB_NAME);
     connection.last_access_time = Date();
 
     return new JSONDBConnection(connection.Entities);
   }
-  validateRelations(relations: { [x: string]: any; }) {
+  validateRelations(relations: { [x: string]: any }) {
     const types = ["many", "one"];
     for (const relation in relations) {
-      const value = relations[relation]
+      const value = relations[relation];
       if (typeof value.target !== "object") {
         throw new Error(
           "JSONDB: wrong relationship target type given " +
@@ -682,10 +665,10 @@ const connection = await database.createJSONDBConnection(details);
       }
     }
   }
-  validateColumns(columns: { [x: string]: any; }) {
+  validateColumns(columns: { [x: string]: any }) {
     const types = ["number", "string", "boolean", "blob"];
     for (const column in columns) {
-      const value = columns[column]
+      const value = columns[column];
       if (column) {
         if (!types.includes(value.type)) {
           throw new Error(
@@ -737,12 +720,12 @@ database.assemble([MessageSchema]);
 *
 */
 
-  assemble(allEntities: string | any[]) {
+  async assemble(allEntities: any[]) {
     if (!this.initialised) {
       throw new Error("JSONDB: you haven't create a JSONDB instance yet");
     }
     try {
-      const wasThere = fs.readFileSync(this.DB_NAME + ".json", "utf-8");
+      const wasThere = await this.getDB(this.DB_NAME);
       if (wasThere) {
         return;
       }
@@ -755,16 +738,8 @@ database.assemble([MessageSchema]);
       this.Entities[allEntities[i].name].base_name = this.DB_NAME;
       this.tables[allEntities[i].name] = [];
     }
-    function cb(err: string) {
-      if (err) {
-        throw new Error(
-          "JSONDB: error failed to assemble entities into database because " +
-            err
-        );
-      }
-    }
     if (isNode) {
-      fs.writeFile(this.DB_NAME + ".json", JSON.stringify(this), cb);
+      await fs.writeFile(this.DB_NAME + ".json", JSON.stringify(this), "utf-8");
     } else {
       localStorage.setItem(this.DB_NAME, JSON.stringify(this));
     }

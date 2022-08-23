@@ -5,7 +5,7 @@ const assets = [
   "/",
 ];
 
-self.addEventListener("install", function (e) {
+self.addEventListener("install", function (e: any) {
   e.waitUntil(
     assets.forEach((asset) => {
       fetch(asset)
@@ -19,28 +19,33 @@ self.addEventListener("install", function (e) {
         .catch((err) => console.log(err));
     })
   );
-  self["skipWaiting"]();
+  const sf = self as any;
+  sf.skipWaiting();
 });
 
-self.addEventListener("activate", function (e) {
+self.addEventListener("activate", function (e: any) {
   e.waitUntil(
     caches.keys().then((cach) => {
-      if (cach !== store) {
-        return caches.delete(cach);
+      console.log(cach, store);
+      for (let i = 0; i < cach.length; i++) {
+        if (cach[i] !== store) {
+          return caches.delete(cach[i]);
+        }
       }
+      return undefined;
     })
   );
-  return self.clients.claim();
+  const sf = self as any;
+  return sf.clients.claim();
 });
 
-self.addEventListener("fetch", function (e) {
+self.addEventListener("fetch", function (e: any) {
   e.waitUntil(
     e.respondWith(
       fetch(e.request)
         .then((res) => {
           const response = res.clone();
           caches.open(store).then((cache) => {
-            //            console.log(response, "    fetching");
             cache.put(e.request, response);
           });
           return res;
@@ -48,5 +53,8 @@ self.addEventListener("fetch", function (e) {
         .catch(() => caches.match(e.request).then((res) => res))
     )
   );
-  self["skipWaiting"]();
+  const sf = self as any;
+  sf.skipWaiting();
 });
+
+export {};

@@ -55,9 +55,9 @@ export  function swipe(item: any) {
       }
     }
   }
-
-  document.body.addEventListener("touchstart", handleTouchStart);
-  document.body.addEventListener("touchend", handleTouchEnd);
+const escapeTSError = document.body as any
+  escapeTSError.addEventListener("touchstart", handleTouchStart);
+  escapeTSError.addEventListener("touchend", handleTouchEnd);
 
   const callback = {
     touch(callback: () => any) {

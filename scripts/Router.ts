@@ -6,41 +6,110 @@
 export const Router: Record<string, any> = {};
 
 Router["routes"] = {};
+Router["params"] = {};
 
+/**
+ * 
+ * @param url 
+ * @returns 
+ */
+
+const checker = (url: string): [{controller: (params: object)=> any}, Record<string, any> | null] | []=> {
+  // first strict check
+  if (Router.routes[url]) {
+    return [Router.routes[url], null];
+  }
+  
+  // place holder check
+  for (const path in Router.routes) {
+    if (!path.includes("$")) {
+      continue;
+    }
+    //
+    const urlFixtures = url.split("/")
+    const pathFixtures = path.split("/")
+    // length check
+    if (pathFixtures.length === urlFixtures.length) {
+      urlFixtures.shift()
+      pathFixtures.shift()
+      let isIt = true;
+      let routesParams: Record<string, any> = {}
+      for (let i = 0; i < pathFixtures.length; i++) {
+        // loosely item checking by N indexes & includes
+        // FIXME: may be problematic but works faster than any other solutions
+        // NO regex :)
+        // this is faster and better
+        if (!pathFixtures[i].includes("$") && path.includes(urlFixtures[i] + "/") && (pathFixtures.indexOf(urlFixtures[i]) === pathFixtures.lastIndexOf(urlFixtures[i]))) {
+          if (!isIt) isIt = true;
+        } else {
+     if (pathFixtures[i].includes("$")) {
+       continue;
+      }
+      isIt = false
+        }
+        
+    if (!(pathFixtures.indexOf(urlFixtures[i]) === pathFixtures.lastIndexOf(urlFixtures[i]) )) {
+      throw new Error("cradova router doesn't allow paths with multiple names")
+     }
+    }
+      if (isIt) {
+        for (let i = 0; i < pathFixtures.length; i++) {
+          if (pathFixtures[i].includes("$")) {
+            routesParams[pathFixtures[i].split("$")[1]] = urlFixtures[i]
+          }
+        }
+        return [Router.routes[path], routesParams]
+      } 
+    }
+  }
+  return []
+}
 /**
  * Registers a route.
  *
  * @param {string}   path     Route path.
  * @param {Function} controller the cradova document tree for the route.
  */
-
 Router.route = function (path: string = "/", controller: Function) {
-  const link = document.createElement("a");
-  link.href = window.location.href.replace(/#(.*)$/, "") + path.split("/")[1];
   Router.routes[path] = {
     controller: controller,
   };
-  return link;
 };
-Router.navigate = async function (href: string) {
-  let route = null,
+
+Router.navigate = function (href: string, data: Record<string, any> = {}) {
+    if(typeof href !== "string") {
+     throw new TypeError("cradova err href must be a defined path but got " + href + " instaed")
+    }
+    let route = null, params,
     link = null;
   if (href.includes(".")) {
-    //FIXME: add a try catch here some usage errors poped up
-    if (new URL(href).pathname === window.location.pathname) {
-      return;
+    try {
+      if (new URL(href).pathname === window.location.pathname) {
+        return;
+      }
+      route = Router.routes[new URL(href).pathname];
+      link = new URL(href).pathname;
+    } catch (error) {
+      throw new Error("cradova: invlaid route  " + href)
     }
-    route = Router.routes[new URL(href).pathname];
-    link = new URL(href).pathname;
   } else {
     if (href === window.location.pathname) {
       return;
     }
-    route = Router.routes[href];
-    link = href;
+    [route, params] = checker(href)
+    if (route) {
+      Router.params.params = params || null;
+      Router.params.data = data || null
+      link = href;
+      window.history.pushState({}, "", link);
+      document.body.click()
   }
-  window.history.pushState({}, "", link);
+  }
   return;
+};
+
+Router.goTo = (path: string) => {
+  window.location.pathname = path;
 };
 
 Router.router = function (e: any) {
@@ -75,22 +144,25 @@ Router.router = function (e: any) {
       return;
     }
 
-    const route = Router.routes[new URL(Alink.href).pathname];
+    const [route, params] = checker(new URL(Alink.href).pathname);
     if (route) {
-      route.controller(e);
+      Router.params.event = e
+      Router.params.params = params|| null;
+      Router.params.data = Router.params.data || null;
+      route.controller(Router.params);
     } else {
-      // throw new Error("cradova err route doesn't exist  " + Alink.href);
+      throw new Error("cradova err route doesn't exist  " + Alink.href);
     }
     window.history.pushState({}, "", new URL(Alink.href).pathname);
-    window.scrollTo(0, 0);
     return;
   }
-
   const url = window.location.pathname;
-  const route = Router.routes[url];
+  const [route, params] = checker(url);
   if (route) {
-    route.controller(e);
-    window.scrollTo(0, 0);
+    Router.params.event = e
+    Router.params.params = params|| null;
+    Router.params.data = Router.params.data || null;
+    route.controller(Router.params);
   }
 };
 

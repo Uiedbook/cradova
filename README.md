@@ -82,3 +82,5 @@ This section has moved here: [https://fridaycandour.github.io/cradova/docs/analy
 ### Making a Progressive Web App
 
 This section has moved here: [https://fridaycandour.github.io/cradova/docs/making-a-progressive-web-app](https://fridaycandour.github.io/cradova/docs/making-a-progressive-web-app)
+
+    "build:cradova": "tsc --build --clean && tsc && rollup dist/index.js --format umd --name 'cradova' --file dist/rolled-cradova.js && mkdir build && touch build/build.js && terser --compress --mangle -- dist/rolled-cradova.js --output build/build.js"

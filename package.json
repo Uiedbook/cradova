@@ -2,14 +2,14 @@
   "name": "cradova",
   "version": "1.0.1",
   "description": "Web framework for building web apps and PWAs",
-  "main": "index.js",
-  "directories": {
-    "production": "dist",
-    "scripts": "scripts",
-    "doc": "docs"
-  },
+  "main": "dist/index.js",
   "scripts": {
-    "clean": "tsc --build --clean"
+    "clean": "rm -rf build dist",
+    "build": "tsc",
+    "roll": "rollup dist/index.js --format umd --name 'cradova' --file dist/rolled-cradova.js",
+    "set": "mkdir build && touch build/build.js",
+    "minify": "terser --compress --mangle -- dist/rolled-cradova.js > build/build.js",
+    "build:cradova": "npm run clean && npm run build && npm run roll && npm run set && npm run minify"
   },
   "repository": {
     "type": "git",
@@ -30,7 +30,7 @@
   ],
   "author": "fridaycandour",
   "license": "Apache-2.0",
-  "types": "./index.d.ts",
+  "types": "dist/index.d.ts",
   "bugs": {
     "url": "https://github.com/FridayCandour/cradova/issues"
   },
@@ -38,11 +38,14 @@
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.4.1"
+    "prettier": "^2.4.1",
+    "rollup": "^2.78.1"
   },
   "homepage": "https://github.com/FridayCandour/cradova#readme",
-  "displayName": "cradvova",
-  "dist": {},
+  "displayName": "cradvova web framework",
   "funding": "https://github.com/FridayCandour/cradova#readme",
-  "typings": "typescript"
+  "typings": "typescript",
+  "dependencies": {
+    "terser": "^5.14.2"
+  }
 }

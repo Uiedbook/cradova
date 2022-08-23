@@ -1,79 +1,68 @@
-/* 
- *   Cradova FrameWork
- *     @version 1.0.0
-        @licence Apache v2
+/*
 
- @project : Cradova Framework;
- @copyright-lincense :  Apache v2;
- email > fridaymaxtour@gmail.com
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+"   ██████╗  ██████╗    █████      ██████╗    ███████╗  ██╗   ██╗   █████  
+"  ██╔════╝  ██╔══██╗  ██╔═╗██    █      ██  ██╔═════╝  ██║   ██║  ██╔═╗██ 
+"  ██║        ██████╔╝  ██████╗    █      ██  ██║     ██  ██║   ██║  ██████╗    
+"  ██║        ██╔══██   ██║  ██║   █      ██  ██║     ██  ╚██╗ ██╔╝  ██║  ██    
+"  ╚██████╗  ██║  ██║  ██║  ██║   ███████╔╝   ███████     ╚████╔╝   ██║  ██║
+"   ╚═════╝  ╚═╝  ╚═╝  ╚═╝  ╚═╝   ╚══════╝     ╚════╝     ╚═══╝     ╚═╝  ╚═╝  
+"  JSONDB inside
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" =============================================================================
+" By Friday Candour
+" -----------------------------------------------------------------------------
+" =============================================================================
+"   Cradova FrameWork
+"   @version 1.*.*
+" -----------------------------------------------------------------------------
+" License: Apache V2
+" -----------------------------------------------------------------------------
+" fridaymaxtour@gmail.com ...
+" =============================================================================
 
                                   Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
  
- *       Copyright 2022 Friday Candour. All Rights Reserved.
- *       Licensed under the Apache License, Version 2.0 (the "License");
- *       you may not use this file except in compliance with the License.
- *       You may obtain a copy of the License at
- *           http://www.apache.org/licenses/LICENSE-2.0
- *       Unless required by applicable law or agreed to in writing, software
- *       distributed under the License is distributed on an "AS IS" BASIS,
- *       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *       See the License for the specific language governing permissions and
- *       limitations under the License.
+        Copyright 2022 Friday Candour. All Rights Reserved.
+        Licensed under the Apache License, Version 2.0 (the "License");
+        you may not use this file except in compliance with the License.
+        You may obtain a copy of the License at
+            http://www.apache.org/licenses/LICENSE-2.0
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.
 */
 
 // importing cradova helper scripts
 
-export {css} from "./scripts/css.js";
-export {w} from "./scripts/widget.js";
-export {Init} from "./scripts/init.js";
-export {swipe} from "./scripts/swipe.js";
-export {media} from "./scripts/media.js";
-export {Store} from "./scripts/store.js";
-export {Router} from "./scripts/Router.js";
-export {Screen} from "./scripts/Screen.js";
-export {JSONDB} from "./scripts/JsonDB.js";
-export {Speaker} from "./scripts/speaker.js";
-export {animate} from "./scripts/animate.js";
-export {fs} from "./scripts/file-system.js";
-export {ls} from "./scripts/localStorage.js";
-export {dispatch} from "./scripts/dispatcher.js";
-export {fullScreen} from "./scripts/fullscreen.js";
-export {metrics} from "./scripts/Metrics.js";
-export {HotReload} from "./scripts/hotReload.js";
-export {PromptBeforeLeave} from "./scripts/promptbeforeleave.js";
-export {$} from "./scripts/createState.js";
-export {fetcher} from "./scripts/fetcher.js";
-export {littleAxios} from "./scripts/littleAxios.js";
-export {assert} from "./scripts/assert.js";
-export {uuid} from "./scripts/uuid.js";
-export {stack} from "./scripts/stack.js";
-export {listBuilder} from "./scripts/listBuilder.js";
-
-import { animate } from "./scripts/animate.js";
-import {assert} from "./scripts/assert.js";
-import { css } from "./scripts/css.js";
-import { dispatch } from "./scripts/dispatcher.js";
-import { fetcher } from "./scripts/fetcher.js";
-import { fs } from "./scripts/file-system.js";
-import { fullScreen } from "./scripts/fullscreen.js";
-import { HotReload } from "./scripts/hotReload.js";
-import {Init} from "./scripts/init.js";
-import { JSONDB } from "./scripts/JsonDB.js";
-import {listBuilder} from "./scripts/listBuilder.js";
-import { littleAxios } from "./scripts/littleAxios.js";
-import { ls } from "./scripts/localStorage.js";
-import { media } from "./scripts/media.js";
-import { metrics } from "./scripts/Metrics.js";
-import {PromptBeforeLeave} from "./scripts/promptbeforeleave.js";
-import { Router } from "./scripts/Router.js";
-import { Speaker } from "./scripts/speaker.js";
-import { stack } from "./scripts/stack.js";
-import { Store } from "./scripts/store.js";
+import { fragment } from "./scripts/widget.js";
 import { swipe } from "./scripts/swipe.js";
-import { uuid } from "./scripts/uuid.js";
-import { w } from "./scripts/widget.js";
+import { Store } from "./scripts/store.js";
+import { Router } from "./scripts/Router.js";
+import { Screen } from "./scripts/Screen.js";
+import { JSONDB } from "./scripts/JsonDB.js";
+import { littleAxios, fetcher } from "./scripts/ajax.js";
+import { loadCradovaUICss } from "./scripts/loadCss.js";
+import {
+  assert,
+  animate,
+  PromptBeforeLeave,
+  css,
+  media,
+  ls,
+  list,
+} from "./scripts/fns.js";
+import { dispatch, fullScreen } from "./scripts/track.js";
+import { uuid } from "./scripts/fns.js";
+
+import { Init } from "./scripts/init.js";
+
 // importing types declarations
 
 import { CradovaElemetType } from "./types.js";
@@ -82,49 +71,53 @@ import { CradovaElemetType } from "./types.js";
 
 const make = function (txx: any) {
   if (Array.isArray(txx)) {
-    txx = txx[0].trim()
+    txx = txx[0].trim();
   }
-  
+
   if (!txx) {
-     return {tag: "div", Classes: null, ID: null, innerValue: null}
+    return {
+      tag: "div",
+      Classes: undefined,
+      ID: undefined,
+      innerValue: undefined,
+    };
   }
-  
+
   let tag;
-  const itemsPurifier = (impure: string, items: Array<String>) =>
-  {
+  const itemsPurifier = (impure: string, items: Array<String>) => {
     const pureItems = [];
     for (let i = 0; i < items.length; i++) {
       if (items[i].includes(impure)) {
-      items [i] = items[i].split(impure)[0]
+        items[i] = items[i].split(impure)[0];
       }
-        pureItems.push(items[i])
+      pureItems.push(items[i]);
     }
-    return pureItems
-  }
-  
+    return pureItems;
+  };
+
   let textContent;
-  tag =  txx.trim()[0] === "|" &&  "p";
+  tag = txx.trim()[0] === "|" && "p";
   if (txx.includes("|")) {
-    textContent = txx.split("|")[1]
-    txx = txx.split("|")[0] && txx.split("|")[0]
+    textContent = txx.split("|")[1];
+    txx = txx.split("|")[0] && txx.split("|")[0];
   }
 
-  const classes = itemsPurifier("#", txx.split("."))
+  const classes = itemsPurifier("#", txx.split("."));
 
-  const ids = itemsPurifier(".", txx.split("#"))
- 
+  const ids = itemsPurifier(".", txx.split("#"));
+
   if (!tag) {
-  tag = classes.shift();
+    tag = classes.shift();
   }
   if (!tag) {
-  tag = ids.shift();
+    tag = ids.shift();
   }
   if (!tag) {
-  tag = "div";
+    tag = "div";
   }
 
   if (!txx.includes(".") && !txx.includes("#")) {
-    tag = txx  
+    tag = txx;
     ids.length = 0;
     classes.length = 0;
   }
@@ -138,9 +131,8 @@ const make = function (txx: any) {
   return { tag, className, ID, innerValue };
 };
 
-
 /**
- * Creates new HTML element
+ * Creates new cradova HTML element
  *  @example
  * format for static  _`p| am a p tag`  // or _`p.class| am a p tag` or _`p#id| am a p tag` or _`p.class#id| am a p tag`
  * format for dynamic _(
@@ -159,19 +151,26 @@ const make = function (txx: any) {
  * @param  {...any} element_initials
  * @returns function | HTMLElement
  *
- * // static elements cannot be given props nor children nor state but dynamic can
+ *  static elements cannot be given props nor children nor state but dynamic can
  *
- * // and static are useful too
+ *  and static are useful too
  */
 
-const _: any | Record<string, any> = (...element_initials: { raw: any }[]) => {
+const _: any = (...element_initials: any) => {
   let properties: Record<string, any>,
-    childrens: string | any[] = [];
+    childrens: string | any[] = [],
+    beforeMount: (self: HTMLElement) => void;
+
   if (
     typeof element_initials[1] == "object" &&
-    !(element_initials[1] instanceof HTMLElement)
+    !(
+      element_initials[1] instanceof HTMLElement && !element_initials[1].tagName
+    )
   ) {
     properties = element_initials[1];
+    if (properties?.beforeMount) {
+      beforeMount = properties["beforeMount"];
+    }
     if (element_initials.length > 2) {
       childrens = element_initials.slice(2, element_initials.length);
     }
@@ -184,8 +183,9 @@ const _: any | Record<string, any> = (...element_initials: { raw: any }[]) => {
     }
   }
 
-  if (typeof element_initials[0] === "string") {
-    element_initials = element_initials[0];
+  if (element_initials[0].raw) {
+    // getting the value of static cradova calls
+    element_initials[0] = element_initials[0]["raw"][0];
   }
   // verifing the children array
 
@@ -194,38 +194,75 @@ const _: any | Record<string, any> = (...element_initials: { raw: any }[]) => {
       element_initials = [element_initials];
     }
     const initials = make(element_initials[0]);
-    //  console.log(initials)
-//    const { tag, className, ID, innerValue } = initials;
+    // TODO: tag debugger
+    // const { tag, className, ID, innerValue } = initials;
+    // if (tag === "div" && properties?.style?.pp === "o") {
+    //   // console.log(properties.beforeMount);
+    //   properties.beforeMount();
+    // }
 
     /**
-     * params [incoming]:any elements and props object
-     * @returns HTML element
+     *
+     * --- Cradova Element Initials  ---
+     * --------------------------------
+     *
+     * Note: this element has not been initialised!
+     *
+     * add to a parent element or call this return fuction
+     *
+     * .
      */
-
     return (...incoming: string[] | any[]) => {
+      /*
+       *
+       * --- Cradova Element Initials  ---
+       * --------------------------------
+       *
+       * Note: this element has not been initialised!
+       *
+       * add to a parent element or call this return fuction
+       *
+       * .
+       */
       let childrens2rd = [],
-        props: Record<string, string> = {},
+        props: Record<string, any> = {},
         text;
 
       for (let i = 0; i < incoming.length; i++) {
         if (
           typeof incoming[i] === "function" ||
-          incoming[i] instanceof HTMLElement ||
-          (Array.isArray(incoming[i]) &&
-            (incoming[i][0] instanceof HTMLElement ||
-              typeof incoming[i][0] === "function"))
+          incoming[i] instanceof HTMLElement
+          // ||
+          // incoming[i].tagName
         ) {
           childrens2rd.push(incoming[i]);
           continue;
         }
+        //         if (
+        //           !incoming[i]
+        //         ) {
+        // console.log(incoming[i]);
+        //           continue;
+        //         }
         //
         if (
+          // !incoming[i].tagName &&
           !(incoming[i] instanceof HTMLElement) &&
-          typeof incoming[i] === "object"
+          !Array.isArray(incoming[i]) &&
+          typeof incoming[i] === "object" &&
+          !incoming[i].tagName
         ) {
+          if (incoming[i].beforeMount) {
+            beforeMount = incoming[i]["beforeMount"];
+            continue;
+          }
+          if (incoming[i].composedPath) {
+            continue;
+          }
           props = incoming[i];
           continue;
         }
+        //
         if (typeof incoming[i] === "string") {
           text = incoming[i];
           continue;
@@ -236,7 +273,16 @@ const _: any | Record<string, any> = (...element_initials: { raw: any }[]) => {
         childrens2rd.push(...childrens);
       }
 
-      const element: CradovaElemetType = document.createElement(initials.tag.trim());
+      let element: CradovaElemetType | undefined;
+
+      try {
+        element = document.createElement(initials.tag.trim());
+      } catch (error) {
+        throw new TypeError("cradova err invalid tag given  " + initials.tag);
+      }
+      if (!element) {
+        return;
+      }
       if (initials.className) {
         element.className = initials.className.trim();
       }
@@ -255,15 +301,35 @@ const _: any | Record<string, any> = (...element_initials: { raw: any }[]) => {
           }
           continue;
         }
+
+        if (element.style[prop] === "" && prop !== "src") {
+          element.style[prop] = properties[prop];
+          continue;
+        }
+
         if (prop === "class" && typeof properties[prop] === "string") {
-          element.classList.add(properties[prop]);
+          const classes = properties[prop].split(" ");
+          for (let i = 0; i < classes.length; i++) {
+            if (classes[i]) {
+              element.classList.add(classes[i]);
+            }
+          }
           continue;
         }
         if (prop === "text") {
           element.innerText = properties[prop];
           continue;
         }
-        element[prop] = properties[prop];
+        try {
+          element[prop] = properties[prop];
+        } catch (error) {
+          throw new Error(
+            "cradova err invalid props  " +
+              prop +
+              " for this element type with value " +
+              properties[prop]
+          );
+        }
       }
 
       //
@@ -286,6 +352,12 @@ const _: any | Record<string, any> = (...element_initials: { raw: any }[]) => {
             element.classList.add(props[prop]);
             continue;
           }
+
+          if (prop === "beforeMount") {
+            beforeMount = props["beforeMount"];
+            continue;
+          }
+
           if (prop === "fullscreen") {
             if (properties[prop]) {
               fullScreen(element).set();
@@ -294,15 +366,25 @@ const _: any | Record<string, any> = (...element_initials: { raw: any }[]) => {
             }
             continue;
           }
-          element[prop] = props[prop];
+          try {
+            element[prop] = props[prop];
+          } catch (error) {
+            // console.log(element);
+            // console.log(props);
+            console.error(error);
+          }
         }
       }
       if (childrens2rd && childrens2rd[0]) {
         //
-
         for (let i = 0; i < childrens2rd.length; i++) {
           if (typeof childrens2rd[i] === "function") {
-            element.append(childrens2rd[i](props));
+            const child = childrens2rd[i]();
+            element.append(child);
+            if (child.afterMount) {
+              child.afterMount(child);
+              child.afterMount = undefined;
+            }
             continue;
           }
           if (Array.isArray(childrens2rd[i])) {
@@ -329,90 +411,132 @@ const _: any | Record<string, any> = (...element_initials: { raw: any }[]) => {
             ];
             continue;
           }
-          element.append(childrens2rd[i]);
+          const child = childrens2rd[i];
+          element.append(child);
+          if (child.afterMount) {
+            child.afterMount(child);
+            child.afterMount = undefined;
+          }
         }
       }
       if (text) {
         element.append(text);
       }
+      // TODO: this will be updated to use data-stateid soon
+      // spped test still going on
       if (element.stateID) {
         // adding cradova dynamic signature
         element.classList.add("cra_child_doc");
       }
+
+      if (beforeMount) {
+        beforeMount(element);
+      }
+
       return element;
     };
   }
-
-  let CradovaElemet: ()=> HTMLElement;
-
-  if (element_initials[0].raw) {
-    CradovaElemet = identify(element_initials[0].raw);
-  } else {
-    CradovaElemet = identify(element_initials);
+  if (typeof element_initials[0] !== "string") {
+    return () => "empty cradova call";
   }
-
+  const CradovaElemet: () => HTMLElement | undefined =
+    identify(element_initials);
+  if (!CradovaElemet) {
+    throw new Error(
+      "Cradova err invalid element initials  " + element_initials
+    );
+  }
   return CradovaElemet;
 };
 
-_.register = (name: Record<string, any>) => {
-  for (const key in name) {
-    _[key] = name[key];
+Init(_);
+
+/**
+ * Create element and get a callback to update their state
+ * no need to manage stateIDs
+ * ----------------------------------------------------------------
+ *
+ * @param element_initials
+ * @param props
+ * @returns
+ */
+
+function $(element_initials = "div", props: Record<string, string> = {}) {
+  props.stateID = uuid();
+  const element = _(element_initials, props);
+  return [element, dispatch.bind(null, props.stateID)];
+}
+
+const controls = function () {
+  const svg = `<svg width="20" height="20" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+ <path d="M4.49975 5.625C4.3402 5.6242 4.18282 5.58788 4.03904 5.5187C3.89526 5.44951 3.76869 5.34919 3.6685 5.225L1.03725 2.0375C0.8835 1.84561 0.786745 1.61438 0.758014 1.37017C0.729283 1.12596 0.769733 0.878589 0.874753 0.65625C0.959928 0.463017 1.09892 0.298383 1.27514 0.182014C1.45136 0.0656449 1.65734 0.00245816 1.8685 0H7.131C7.34216 0.00245816 7.54815 0.0656449 7.72437 0.182014C7.90058 0.298383 8.03958 0.463017 8.12475 0.65625C8.22977 0.878589 8.27023 1.12596 8.24149 1.37017C8.21276 1.61438 8.11601 1.84561 7.96226 2.0375L5.331 5.225C5.23082 5.34919 5.10424 5.44951 4.96047 5.5187C4.81669 5.58788 4.65931 5.6242 4.49975 5.625Z" fill="#2c3e50"/>
+</svg>
+`;
+  const icon = (styles: any) => _("div", { ...styles, innerHTML: svg });
+  const constr = _(
+    "div",
+    {
+      display: "flex",
+      position: "fixed",
+      alignContent: "center",
+      justifyContent: "space-around",
+      flexDirection: "row",
+      width: "80px",
+      top: "4px",
+      right: "4px",
+      backgroundColor: "#fff",
+      transform: "rotate(0deg)",
+      border: "aqua 2px solid",
+      borderRadius: "6px",
+    },
+    icon({
+      transform: "rotate(90deg)",
+      /* border: "red 2px solid", */ onclick() {
+        window.history.back();
+      },
+    }),
+    icon({
+      transform: "rotate(270deg)",
+      /* border: "red 2px solid", */ onclick() {
+        window.history.forward();
+      },
+    })
+  );
+  const cont = constr();
+  if (cont) {
+    document.body.append(cont);
   }
 };
 
-/**
- * registering added methods to the cradova object _
- *
- * these can be safely destructured to use alone
- */
+function register(modules: any[]) {
+  for (let i = 0; i < modules.length; i++) {
+    _[modules[i]] = modules[i];
+  }
+}
 
-_.register({
-    w,
-  css,
-  Init,
-  media,
+register([
+  fragment,
   swipe,
   Store,
-  listBuilder,
-   JSONDB,
-  Screen,
   Router,
-  LS: ls,
-  FS: fs,
-  Speaker,
-  assert,
-  metrics,
+  Screen,
+  JSONDB,
   fetcher,
-  animate,
-  dispatch,
-  HotReload,
   littleAxios,
-  $,
-  uuid,
-  stack: stack(),
+  loadCradovaUICss,
+  assert,
+  animate,
   PromptBeforeLeave,
-});
+  css,
+  media,
+  ls,
+  list,
+  $,
+  controls,
+]);
 
-_.Init(_);
-// window["_"] = _;
+for (const key in _) {
+  console.log(key);
+}
 
 export default _;
-
-/**
- *
- * Registering ServiceWorker
- *
- *  */
-// window.addEventListener("load", async () => {
-//   if ("serviceWorker" in navigator) {
-//     await navigator.serviceWorker
-//       .register("service-worker.js")
-//       .then(function (registration) {
-//         // Registration was successful
-//         console.log(
-//           `Service Worker registration successful. Scope: ${registration.scope}`
-//         );
-//       })
-//       .catch((err) => console.log(err));
-//   }
-// });

@@ -1,5 +1,6 @@
 /**
- *
+ * Save values to memory 
+ * get them when needed
  */
 
 export class memory {
