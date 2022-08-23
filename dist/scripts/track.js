@@ -1,5 +1,6 @@
 // the global dispatcher
 function cradovaDispatchtrack(nodes /*NodeListOf<Element>*/, stateID, state) {
+    var _a;
     const updated = [];
     for (let i = 0; i < nodes.length; i++) {
         const element = nodes[i];
@@ -70,7 +71,7 @@ function cradovaDispatchtrack(nodes /*NodeListOf<Element>*/, stateID, state) {
                 }
                 //removing element class
                 if (key === "remove") {
-                    element.parentElement?.remove(element);
+                    (_a = element.parentElement) === null || _a === void 0 ? void 0 : _a.remove(element);
                     continue;
                 }
                 // changing the element children tree

@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 /**
    *
    * @param name
@@ -29,21 +38,23 @@ export class Screen {
             this.persist = false;
         }
     }
-    async package(data) {
-        this.template.innerHTML = '';
-        if (typeof this.html === "function") {
-            let fuc = await this.html(data);
-            if (typeof fuc === "function") {
-                fuc = fuc();
-                if (!(fuc instanceof HTMLElement)) {
-                    throw new Error("Cradova err only parent with descendants is valid");
-                }
-                else {
-                    this.template.append(fuc);
+    package(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.template.innerHTML = '';
+            if (typeof this.html === "function") {
+                let fuc = yield this.html(data);
+                if (typeof fuc === "function") {
+                    fuc = fuc();
+                    if (!(fuc instanceof HTMLElement)) {
+                        throw new Error("Cradova err only parent with descendants is valid");
+                    }
+                    else {
+                        this.template.append(fuc);
+                    }
                 }
             }
-        }
-        this.template.append(...this.secondaryChildren);
+            this.template.append(...this.secondaryChildren);
+        });
     }
     onActivate(cb) {
         this.callBack = cb;
@@ -59,6 +70,7 @@ export class Screen {
         }
     }
     detach() {
+        var _a;
         // crearing the dom 
         const screens = document.querySelectorAll("#cradova-screen-set");
         for (let i = 0; i < screens.length; i++) {
@@ -66,32 +78,35 @@ export class Screen {
             if (this.transition) {
                 screen.classList.remove("CRADOVA-UI-" + this.transition);
             }
-            screen.parentElement?.removeChild(screen);
+            (_a = screen.parentElement) === null || _a === void 0 ? void 0 : _a.removeChild(screen);
         }
     }
-    async Activate(data) {
-        let packed = false;
-        if (document.title === this.name) {
-            return;
-        }
-        if (!this.template.firstChild) {
-            packed = true;
-            await this.package(data);
-        }
-        if (!this.persist && !packed) {
-            await this.package(data);
-        }
-        document.title = this.name;
-        this.detach();
-        document.querySelector("#app-wrapper").append(this.template);
-        if (this.transition) {
-            this.template?.classList.add("CRADOVA-UI-" + this.transition);
-            // console.log(this.template.className);
-        }
-        if (this.callBack) {
-            this.callBack(this.template.firstChild, data);
-        }
-        window.scrollTo(0, 0);
+    Activate(data) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            let packed = false;
+            if (document.title === this.name) {
+                return;
+            }
+            if (!this.template.firstChild) {
+                packed = true;
+                yield this.package(data);
+            }
+            if (!this.persist && !packed) {
+                yield this.package(data);
+            }
+            document.title = this.name;
+            this.detach();
+            document.querySelector("#app-wrapper").append(this.template);
+            if (this.transition) {
+                (_a = this.template) === null || _a === void 0 ? void 0 : _a.classList.add("CRADOVA-UI-" + this.transition);
+                // console.log(this.template.className);
+            }
+            if (this.callBack) {
+                this.callBack(this.template.firstChild, data);
+            }
+            window.scrollTo(0, 0);
+        });
     }
 }
 // SCREEN ANIMATION CLASSES

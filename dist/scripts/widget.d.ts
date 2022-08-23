@@ -3,6 +3,4 @@
  * @param childrens
  * @returns
  */
-declare type fragmentTYPE = (() => any) | HTMLElement;
-export declare const fragment: (...childrens: fragmentTYPE[]) => () => DocumentFragment;
-export {};
+export declare const frag: (...childrens: any[]) => DocumentFragment;

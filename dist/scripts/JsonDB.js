@@ -7,12 +7,23 @@
  *      telegram > @uiedbooker
  *   JSONDB  @version 1.0.0
  *  */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 export const JSONDBversion = "1.0.0";
 let fs, isNode = false, _dirname;
-(async function () {
-    if (!globalThis.localStorage) {
-        isNode = true;
-    }
+(function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!globalThis.localStorage) {
+            isNode = true;
+        }
+    });
 })();
 const schema = class {
     constructor(schema_configuration_object, validators) {
@@ -42,19 +53,19 @@ const schema = class {
 };
 export class JSONDBTableWrapper {
     constructor(self, keys) {
-        this.put = async (name, value) => {
+        this.put = (name, value) => __awaiter(this, void 0, void 0, function* () {
             if (isNode) {
-                await fs.writeFile(name + ".json", JSON.stringify(value), "utf-8");
+                yield fs.writeFile(name + ".json", JSON.stringify(value), "utf-8");
             }
             else {
                 localStorage.setItem(name, JSON.stringify(value));
             }
-        };
-        this.get = async (name) => {
+        });
+        this.get = (name) => __awaiter(this, void 0, void 0, function* () {
             if (!isNode) {
                 return JSON.parse(localStorage.getItem(name));
             }
-            const data = await fs.readFile(_dirname + "/" + name + ".json", {
+            const data = yield fs.readFile(_dirname + "/" + name + ".json", {
                 encoding: "utf-8",
             });
             if (data) {
@@ -63,7 +74,7 @@ export class JSONDBTableWrapper {
             else {
                 throw new Error("JSONDB: error failed to retrieve entities from database ");
             }
-        };
+        });
         this.validator = (incoming, tables) => {
             // works for type, nulllable and unique validations.
             const outgoing = {};
@@ -120,61 +131,63 @@ export class JSONDBTableWrapper {
   // arrays of relations
   await PollTable.saveWithRelations(MessageTable, Poll, allMessages);
   */
-    async saveWithRelations(table, incoming, relations) {
-        if (!relations || !table) {
-            throw new TypeError("JsonDB: error saving with relations  table name or relation cannot be null   " +
-                JSON.stringify(relations) +
-                "   " +
-                JSON.stringify(table));
-        }
-        if (!table.self || !table.self.name) {
-            throw new TypeError("JsonDB: error saving with relations  table is invalid   " +
-                JSON.stringify(table));
-        }
-        const db = await this.get(this.self.base_name);
-        db.last_access_time = Date();
-        if (incoming && typeof incoming.index !== "number") {
-            throw new Error("JsonDB: save before saving with relations");
-        }
-        db.tables[this.self.name][incoming.index] = incoming;
-        if (relations && Array.isArray(relations)) {
-            for (let i = 0; i < relations.length; i++) {
-                if (db.Entities[this.self.name].relations[table.self.name]) {
-                    if (db.Entities[this.self.name].relations[table.self.name].type ===
-                        "many") {
-                        db.tables[this.self.name][incoming.index].relations[table.self.name] = !db.tables[this.self.name][incoming.index].relations[table.self.name]
-                            ? [relations[i]]
-                            : [
-                                ...db.tables[this.self.name][incoming.index].relations[table.self.name],
-                                relations[i],
-                            ];
-                    }
-                    else {
-                        db.tables[this.self.name][incoming.index].relations[table.self.name] = relations[i];
+    saveWithRelations(table, incoming, relations) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!relations || !table) {
+                throw new TypeError("JsonDB: error saving with relations  table name or relation cannot be null   " +
+                    JSON.stringify(relations) +
+                    "   " +
+                    JSON.stringify(table));
+            }
+            if (!table.self || !table.self.name) {
+                throw new TypeError("JsonDB: error saving with relations  table is invalid   " +
+                    JSON.stringify(table));
+            }
+            const db = yield this.get(this.self.base_name);
+            db.last_access_time = Date();
+            if (incoming && typeof incoming.index !== "number") {
+                throw new Error("JsonDB: save before saving with relations");
+            }
+            db.tables[this.self.name][incoming.index] = incoming;
+            if (relations && Array.isArray(relations)) {
+                for (let i = 0; i < relations.length; i++) {
+                    if (db.Entities[this.self.name].relations[table.self.name]) {
+                        if (db.Entities[this.self.name].relations[table.self.name].type ===
+                            "many") {
+                            db.tables[this.self.name][incoming.index].relations[table.self.name] = !db.tables[this.self.name][incoming.index].relations[table.self.name]
+                                ? [relations[i]]
+                                : [
+                                    ...db.tables[this.self.name][incoming.index].relations[table.self.name],
+                                    relations[i],
+                                ];
+                        }
+                        else {
+                            db.tables[this.self.name][incoming.index].relations[table.self.name] = relations[i];
+                        }
                     }
                 }
             }
-        }
-        else {
-            if (relations) {
-                if (db.Entities[this.self.name].relations[table.self.name]) {
-                    if (db.Entities[this.self.name].relations[table.self.name].type ===
-                        "many") {
-                        db.tables[this.self.name][incoming.index].relations[table.self.name] = !db.tables[this.self.name][incoming.index].relations[table.self.name]
-                            ? [relations]
-                            : [
-                                ...db.tables[this.self.name][incoming.index].relations[table.self.name],
-                                relations,
-                            ];
-                    }
-                    else {
-                        db.tables[this.self.name][incoming.index].relations[table.self.name] = relations;
+            else {
+                if (relations) {
+                    if (db.Entities[this.self.name].relations[table.self.name]) {
+                        if (db.Entities[this.self.name].relations[table.self.name].type ===
+                            "many") {
+                            db.tables[this.self.name][incoming.index].relations[table.self.name] = !db.tables[this.self.name][incoming.index].relations[table.self.name]
+                                ? [relations]
+                                : [
+                                    ...db.tables[this.self.name][incoming.index].relations[table.self.name],
+                                    relations,
+                                ];
+                        }
+                        else {
+                            db.tables[this.self.name][incoming.index].relations[table.self.name] = relations;
+                        }
                     }
                 }
             }
-        }
-        await this.put(this.self.base_name, db);
-        return db.tables[this.self.name][incoming.index];
+            yield this.put(this.self.base_name, db);
+            return db.tables[this.self.name][incoming.index];
+        });
     }
     /**
    * Save table into a Jsondb instance
@@ -183,26 +196,28 @@ export class JSONDBTableWrapper {
    * @example
    await PollTable.save(poll)
   */
-    async save(incoming) {
-        // db.tables[this.self.name] = db.tables[this.self.name].sort(
-        //   (a, b) => a.index - b.index
-        // );
-        const db = await this.get(this.self.base_name);
-        db.last_access_time = Date();
-        if (typeof incoming.index !== "number") {
-            incoming = this.validator(incoming, db.tables[this.self.name]);
-            if (this.self.relations && !incoming.relations) {
-                incoming.relations = {};
+    save(incoming) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // db.tables[this.self.name] = db.tables[this.self.name].sort(
+            //   (a, b) => a.index - b.index
+            // );
+            const db = yield this.get(this.self.base_name);
+            db.last_access_time = Date();
+            if (typeof incoming.index !== "number") {
+                incoming = this.validator(incoming, db.tables[this.self.name]);
+                if (this.self.relations && !incoming.relations) {
+                    incoming.relations = {};
+                }
+                db.Entities[this.self.name].last_index += 1;
+                incoming.index = db.Entities[this.self.name].last_index;
+                db.tables[this.self.name].push(incoming);
             }
-            db.Entities[this.self.name].last_index += 1;
-            incoming.index = db.Entities[this.self.name].last_index;
-            db.tables[this.self.name].push(incoming);
-        }
-        else {
-            db.tables[this.self.name][incoming.index] = incoming;
-        }
-        await this.put(this.self.base_name, db);
-        return incoming;
+            else {
+                db.tables[this.self.name][incoming.index] = incoming;
+            }
+            yield this.put(this.self.base_name, db);
+            return incoming;
+        });
     }
     /**
    * Save table into a Jsondb instance
@@ -211,13 +226,15 @@ export class JSONDBTableWrapper {
    * @example
    await PollTable.remove(poll)
   */
-    async remove(entity) {
-        const db = await this.get(this.self.base_name);
-        db.last_access_time = Date();
-        // db.tables[this.self.name].splice(entity.index, 1);
-        db.tables[this.self.name][entity.index] = null;
-        await this.put(this.self.base_name, db);
-        return true;
+    remove(entity) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const db = yield this.get(this.self.base_name);
+            db.last_access_time = Date();
+            // db.tables[this.self.name].splice(entity.index, 1);
+            db.tables[this.self.name][entity.index] = null;
+            yield this.put(this.self.base_name, db);
+            return true;
+        });
     }
     /**
    * Save table into a Jsondb instance
@@ -226,10 +243,12 @@ export class JSONDBTableWrapper {
    * @example
    await PollTable.count(poll)
   */
-    async count() {
-        const db = await this.get(this.self.base_name);
-        db.last_access_time = Date();
-        return db.tables[this.self.name].length;
+    count() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const db = yield this.get(this.self.base_name);
+            db.last_access_time = Date();
+            return db.tables[this.self.name].length;
+        });
     }
     /**
    * Save table into a Jsondb instance
@@ -238,10 +257,12 @@ export class JSONDBTableWrapper {
    * @example
    await PollTable.getAll()
   */
-    async getAll() {
-        const db = await this.get(this.self.base_name);
-        db.last_access_time = Date();
-        return db.tables[this.self.name];
+    getAll() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const db = yield this.get(this.self.base_name);
+            db.last_access_time = Date();
+            return db.tables[this.self.name];
+        });
     }
     /**
    * get entities with any of the values specifiled from a Jsondb instance
@@ -251,24 +272,26 @@ export class JSONDBTableWrapper {
    await PollTable.getWhereAny({name: "friday", age: 121, class: "senior"}) // gets all
    await PollTable.getWhereAny({email: "fridaymaxtour@gmail.com"}, 2) // gets 2 if they are up to two
   */
-    async getWhereAny(props, number) {
-        const results = [];
-        let all;
-        const db = await this.get(this.self.base_name);
-        db.last_access_time = Date();
-        all = db.tables[this.self.name];
-        for (let i = 0; i < all.length; i++) {
-            const element = all[i];
-            for (const [k, v] of Object.entries(props)) {
-                if (element[k] && element[k] === v) {
-                    results.push(element);
-                    if (typeof number === "number" && results.length === number) {
-                        return results;
+    getWhereAny(props, number) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const results = [];
+            let all;
+            const db = yield this.get(this.self.base_name);
+            db.last_access_time = Date();
+            all = db.tables[this.self.name];
+            for (let i = 0; i < all.length; i++) {
+                const element = all[i];
+                for (const [k, v] of Object.entries(props)) {
+                    if (element[k] && element[k] === v) {
+                        results.push(element);
+                        if (typeof number === "number" && results.length === number) {
+                            return results;
+                        }
                     }
                 }
             }
-        }
-        return results;
+            return results;
+        });
     }
     /**
    * get entities with the given prop of type "string" where the values specifiled is included
@@ -280,23 +303,25 @@ export class JSONDBTableWrapper {
    await PollTable.getWhereAnyPropsIncludes({name: "fri"}) // gets all
    await PollTable.getWhereAnyPropsIncludes({name: "fri"}, 2) // gets 2 if they are up to two
   */
-    async getWhereAnyPropsIncludes(props, number) {
-        const results = [];
-        const db = await this.get(this.self.base_name);
-        db.last_access_time = Date();
-        const all = db.tables[this.self.name];
-        for (let i = 0; i < all.length; i++) {
-            const element = all[i];
-            for (const [k, v] of Object.entries(props)) {
-                if (element[k] && typeof v === "string" && element[k].includes(v)) {
-                    results.push(element);
-                    if (typeof number === "number" && results.length === number) {
-                        return results;
+    getWhereAnyPropsIncludes(props, number) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const results = [];
+            const db = yield this.get(this.self.base_name);
+            db.last_access_time = Date();
+            const all = db.tables[this.self.name];
+            for (let i = 0; i < all.length; i++) {
+                const element = all[i];
+                for (const [k, v] of Object.entries(props)) {
+                    if (element[k] && typeof v === "string" && element[k].includes(v)) {
+                        results.push(element);
+                        if (typeof number === "number" && results.length === number) {
+                            return results;
+                        }
                     }
                 }
             }
-        }
-        return results;
+            return results;
+        });
     }
     /**
    * get an entity with the values specifiled from a Jsondb instance
@@ -307,21 +332,23 @@ export class JSONDBTableWrapper {
     await PollTable.getOne({email: "fridaymaxtour@gamail.com"}) // gets one
   
     */
-    async getOne(props) {
-        let results = null;
-        const db = await this.get(this.self.base_name);
-        db.last_access_time = Date();
-        const all = db.tables[this.self.name];
-        for (let i = 0; i < all.length; i++) {
-            const element = all[i];
-            for (const [k, v] of Object.entries(props)) {
-                if (element[k] && element[k] === v) {
-                    results = element;
-                    break;
+    getOne(props) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let results = null;
+            const db = yield this.get(this.self.base_name);
+            db.last_access_time = Date();
+            const all = db.tables[this.self.name];
+            for (let i = 0; i < all.length; i++) {
+                const element = all[i];
+                for (const [k, v] of Object.entries(props)) {
+                    if (element[k] && element[k] === v) {
+                        results = element;
+                        break;
+                    }
                 }
             }
-        }
-        return results;
+            return results;
+        });
     }
 }
 const JSONDBConnection = class {
@@ -377,19 +404,21 @@ export class JSONDB {
         this.Entities = {};
         this.tables = {};
     }
-    async getDB(name) {
-        if (!isNode) {
-            return JSON.parse(localStorage.getItem(name));
-        }
-        const data = await fs.readFile(_dirname + "/" + name + ".json", {
-            encoding: "utf-8",
+    getDB(name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!isNode) {
+                return JSON.parse(localStorage.getItem(name));
+            }
+            const data = yield fs.readFile(_dirname + "/" + name + ".json", {
+                encoding: "utf-8",
+            });
+            if (data) {
+                return JSON.parse(data);
+            }
+            else {
+                throw new Error("JSONDB: error failed to retrieve entities from database ");
+            }
         });
-        if (data) {
-            return JSON.parse(data);
-        }
-        else {
-            throw new Error("JSONDB: error failed to retrieve entities from database ");
-        }
     }
     /**
    * Schema constructor for Jsondb
@@ -474,41 +503,43 @@ export class JSONDB {
    // Creates a new JSONDB instance
      * Database.init(config)
      * */
-    async init(config) {
-        console.log(`\x1B[32m JSONDB version ${JSONDBversion} \x1B[39m`);
-        this.initialised = true;
-        this.DB_NAME = config.name;
-        this.password = config.password || "";
-        this.username = config.username || "";
-        this.encrypted = config.encrypted || false;
-        this.time_created = Date();
-        this.tables = {};
-        try {
-            let wasThere;
+    init(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`\x1B[32m JSONDB version ${JSONDBversion} \x1B[39m`);
+            this.initialised = true;
+            this.DB_NAME = config.name;
+            this.password = config.password || "";
+            this.username = config.username || "";
+            this.encrypted = config.encrypted || false;
+            this.time_created = Date();
+            this.tables = {};
+            try {
+                let wasThere;
+                if (isNode) {
+                    wasThere = this.getDB(config.name);
+                }
+                else {
+                    wasThere = localStorage.getItem(config.name);
+                }
+                if (wasThere) {
+                    return;
+                }
+            }
+            catch (error) { }
+            if (!config.password) {
+                throw new Error("JSONDB: error password is empty ");
+            }
+            if (!config.username) {
+                throw new Error("JSONDB: error username is empty ");
+            }
             if (isNode) {
-                wasThere = this.getDB(config.name);
+                yield fs.writeFile(config.name + ".json", JSON.stringify(this), "utf-8");
             }
             else {
-                wasThere = localStorage.getItem(config.name);
+                let db = JSON.stringify(this);
+                localStorage.setItem(config.name, db);
             }
-            if (wasThere) {
-                return;
-            }
-        }
-        catch (error) { }
-        if (!config.password) {
-            throw new Error("JSONDB: error password is empty ");
-        }
-        if (!config.username) {
-            throw new Error("JSONDB: error username is empty ");
-        }
-        if (isNode) {
-            await fs.writeFile(config.name + ".json", JSON.stringify(this), "utf-8");
-        }
-        else {
-            let db = JSON.stringify(this);
-            localStorage.setItem(config.name, db);
-        }
+        });
     }
     /**
    * Create secure connection a Jsondb instance
@@ -521,17 +552,19 @@ export class JSONDB {
   };
   const connection = await database.createJSONDBConnection(details);
   */
-    async createJSONDBConnection(details) {
-        if (!this.initialised) {
-            throw new Error("JSONDB: you haven't create a JSONDB instance yet");
-        }
-        if (details.username !== this.username ||
-            details.password !== this.password) {
-            throw new Error("JSONDB: Access Denied");
-        }
-        const connection = await this.getDB(this.DB_NAME);
-        connection.last_access_time = Date();
-        return new JSONDBConnection(connection.Entities);
+    createJSONDBConnection(details) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.initialised) {
+                throw new Error("JSONDB: you haven't create a JSONDB instance yet");
+            }
+            if (details.username !== this.username ||
+                details.password !== this.password) {
+                throw new Error("JSONDB: Access Denied");
+            }
+            const connection = yield this.getDB(this.DB_NAME);
+            connection.last_access_time = Date();
+            return new JSONDBConnection(connection.Entities);
+        });
     }
     validateRelations(relations) {
         const types = ["many", "one"];
@@ -601,31 +634,33 @@ export class JSONDB {
   database.assemble([MessageSchema]);
   *
   */
-    async assemble(allEntities) {
-        if (!this.initialised) {
-            throw new Error("JSONDB: you haven't create a JSONDB instance yet");
-        }
-        try {
-            const wasThere = await this.getDB(this.DB_NAME);
-            if (wasThere) {
-                return;
+    assemble(allEntities) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.initialised) {
+                throw new Error("JSONDB: you haven't create a JSONDB instance yet");
             }
-        }
-        catch (error) { }
-        if (!Array.isArray(allEntities) || typeof allEntities[0] !== "object") {
-            throw new Error("JSONDB: invalid entity array list, can't be assembled");
-        }
-        for (let i = 0; i < allEntities.length; i++) {
-            this.Entities[allEntities[i].name] = allEntities[i];
-            this.Entities[allEntities[i].name].base_name = this.DB_NAME;
-            this.tables[allEntities[i].name] = [];
-        }
-        if (isNode) {
-            await fs.writeFile(this.DB_NAME + ".json", JSON.stringify(this), "utf-8");
-        }
-        else {
-            localStorage.setItem(this.DB_NAME, JSON.stringify(this));
-        }
+            try {
+                const wasThere = yield this.getDB(this.DB_NAME);
+                if (wasThere) {
+                    return;
+                }
+            }
+            catch (error) { }
+            if (!Array.isArray(allEntities) || typeof allEntities[0] !== "object") {
+                throw new Error("JSONDB: invalid entity array list, can't be assembled");
+            }
+            for (let i = 0; i < allEntities.length; i++) {
+                this.Entities[allEntities[i].name] = allEntities[i];
+                this.Entities[allEntities[i].name].base_name = this.DB_NAME;
+                this.tables[allEntities[i].name] = [];
+            }
+            if (isNode) {
+                yield fs.writeFile(this.DB_NAME + ".json", JSON.stringify(this), "utf-8");
+            }
+            else {
+                localStorage.setItem(this.DB_NAME, JSON.stringify(this));
+            }
+        });
     }
 }
 /**

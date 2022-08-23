@@ -3,13 +3,18 @@
  * @param childrens
  * @returns
  */
-export const fragment = function (...childrens) {
+export const frag = function (...childrens) {
     const par = document.createDocumentFragment();
     // building it's children tree.
     for (let i = 0; i < childrens.length; i++) {
-        const ch = childrens[i];
+        let ch = childrens[i];
         if (typeof ch === "function") {
-            par.append(ch());
+            if (typeof ch === "function") {
+                ch = ch();
+            }
+            if (ch instanceof HTMLElement) {
+                par.append(ch);
+            }
         }
         else {
             if (ch instanceof HTMLElement) {
@@ -17,5 +22,5 @@ export const fragment = function (...childrens) {
             }
         }
     }
-    return () => par;
+    return par;
 };

@@ -39,7 +39,7 @@
         limitations under the License.
 */
 // importing cradova helper scripts
-import { fragment } from "./scripts/widget.js";
+import { frag } from "./scripts/widget.js";
 import { swipe } from "./scripts/swipe.js";
 import { Store } from "./scripts/store.js";
 import { Router } from "./scripts/Router.js";
@@ -134,7 +134,7 @@ const _ = (...element_initials) => {
     if (typeof element_initials[1] == "object" &&
         !(element_initials[1] instanceof HTMLElement && !element_initials[1].tagName)) {
         properties = element_initials[1];
-        if (properties?.beforeMount) {
+        if (properties === null || properties === void 0 ? void 0 : properties.beforeMount) {
             beforeMount = properties["beforeMount"];
         }
         if (element_initials.length > 2) {
@@ -407,7 +407,7 @@ const controls = function () {
  <path d="M4.49975 5.625C4.3402 5.6242 4.18282 5.58788 4.03904 5.5187C3.89526 5.44951 3.76869 5.34919 3.6685 5.225L1.03725 2.0375C0.8835 1.84561 0.786745 1.61438 0.758014 1.37017C0.729283 1.12596 0.769733 0.878589 0.874753 0.65625C0.959928 0.463017 1.09892 0.298383 1.27514 0.182014C1.45136 0.0656449 1.65734 0.00245816 1.8685 0H7.131C7.34216 0.00245816 7.54815 0.0656449 7.72437 0.182014C7.90058 0.298383 8.03958 0.463017 8.12475 0.65625C8.22977 0.878589 8.27023 1.12596 8.24149 1.37017C8.21276 1.61438 8.11601 1.84561 7.96226 2.0375L5.331 5.225C5.23082 5.34919 5.10424 5.44951 4.96047 5.5187C4.81669 5.58788 4.65931 5.6242 4.49975 5.625Z" fill="#2c3e50"/>
 </svg>
 `;
-    const icon = (styles) => _("div", { ...styles, innerHTML: svg });
+    const icon = (styles) => _("div", Object.assign(Object.assign({}, styles), { innerHTML: svg }));
     const constr = _("div", {
         display: "flex",
         position: "fixed",
@@ -443,7 +443,7 @@ function register(modules) {
     }
 }
 register([
-    fragment,
+    frag,
     swipe,
     Store,
     Router,

@@ -1,3 +1,17 @@
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, privateMap, value) {
+    if (!privateMap.has(receiver)) {
+        throw new TypeError("attempted to set private field on non-instance");
+    }
+    privateMap.set(receiver, value);
+    return value;
+};
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, privateMap) {
+    if (!privateMap.has(receiver)) {
+        throw new TypeError("attempted to get private field on non-instance");
+    }
+    return privateMap.get(receiver);
+};
+var _component, _stateID, _parentElement;
 import { dispatch } from "./track.js";
 /**
  * @param {number} num
@@ -263,13 +277,11 @@ ls.clear = () => {
 };
 export class list {
     constructor(component) {
-        this.#stateID = uuid();
-        this.#parentElement = null;
-        this.#component = component;
+        _component.set(this, void 0);
+        _stateID.set(this, uuid());
+        _parentElement.set(this, null);
+        __classPrivateFieldSet(this, _component, component);
     }
-    #component;
-    #stateID;
-    #parentElement;
     build(datas) {
         if (!datas[0]) {
             return;
@@ -277,31 +289,33 @@ export class list {
         const elements = [];
         for (let i = 0; i < datas.length; i++) {
             const data = datas[i];
-            const chtml = this.#component(data);
-            const element = chtml({ stateID: this.#stateID });
+            const chtml = __classPrivateFieldGet(this, _component).call(this, data);
+            const element = chtml({ stateID: __classPrivateFieldGet(this, _stateID) });
             elements.push(element);
         }
         return elements;
     }
     update(datas) {
+        var _a;
         if (!datas[0]) {
             return;
         }
-        if (!this.#parentElement) {
+        if (!__classPrivateFieldGet(this, _parentElement)) {
             // only for the first call
-            this.#parentElement = dispatch(this.#stateID, {
+            __classPrivateFieldSet(this, _parentElement, dispatch(__classPrivateFieldGet(this, _stateID), {
                 display: "none",
-            })[0].parentElement;
+            })[0].parentElement);
         }
-        dispatch(this.#stateID, { remove: true });
-        if (!this.#parentElement) {
+        dispatch(__classPrivateFieldGet(this, _stateID), { remove: true });
+        if (!__classPrivateFieldGet(this, _parentElement)) {
             throw new Error("cannot update list");
         }
         for (let i = 0; i < datas.length; i++) {
             const data = datas[i];
-            const chtml = this.#component(data);
-            const element = chtml({ stateID: this.#stateID });
-            this.#parentElement?.append(element);
+            const chtml = __classPrivateFieldGet(this, _component).call(this, data);
+            const element = chtml({ stateID: __classPrivateFieldGet(this, _stateID) });
+            (_a = __classPrivateFieldGet(this, _parentElement)) === null || _a === void 0 ? void 0 : _a.append(element);
         }
     }
 }
+_component = new WeakMap(), _stateID = new WeakMap(), _parentElement = new WeakMap();

@@ -41,7 +41,7 @@
 
 // importing cradova helper scripts
 
-import { fragment } from "./scripts/widget.js";
+import { frag } from "./scripts/widget.js";
 import { swipe } from "./scripts/swipe.js";
 import { Store } from "./scripts/store.js";
 import { Router } from "./scripts/Router.js";
@@ -515,7 +515,7 @@ function register(modules: any[]) {
 }
 
 register([
-  fragment,
+  frag,
   swipe,
   Store,
   Router,

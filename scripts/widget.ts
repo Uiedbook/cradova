@@ -1,23 +1,26 @@
 /**
- * Document fragment 
- * @param childrens 
- * @returns 
+ * Document fragment
+ * @param childrens
+ * @returns
  */
 
-type fragmentTYPE = (()=> any) | HTMLElement;
-
-export const fragment = function (...childrens: fragmentTYPE[]) {
+export const frag = function (...childrens: any[]) {
   const par = document.createDocumentFragment();
-// building it's children tree.
-for ( let i = 0; i < childrens.length;i++ ) {
-    const ch = childrens[i];
+  // building it's children tree.
+  for (let i = 0; i < childrens.length; i++) {
+    let ch = childrens[i];
     if (typeof ch === "function") {
-      par.append(ch());
+      if (typeof ch === "function") {
+        ch = ch();
+      }
+      if (ch instanceof HTMLElement) {
+        par.append(ch);
+      }
     } else {
-      if (ch instanceof HTMLElement) { 
+      if (ch instanceof HTMLElement) {
         par.append(ch);
       }
     }
   }
-  return () => par;
+  return par;
 };
