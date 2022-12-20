@@ -1,18 +1,9 @@
+import { fullScreen } from "./fns.js";
 // the global dispatcher
 
-function cradovaDispatchtrack(
-  nodes: NodeList /*NodeListOf<Element>*/,
-  stateID: string,
-  state?: Record<string, any>
-) {
-  const updated: HTMLElement[] = [];
+function cradovaDispatchtrack(nodes: any[], state?: Record<string, any>) {
   for (let i = 0; i < nodes.length; i++) {
-    const element = nodes[i] as any;
-    // abort re-rendering if the state is not for this element
-    if (!element.stateID || element.stateID !== stateID) {
-      continue;
-    }
-    updated.push(element);
+    const element = nodes[i];
     if (typeof state === "object") {
       // updating the element's state
       for (const key in state) {
@@ -33,7 +24,7 @@ function cradovaDispatchtrack(
           continue;
         }
         if (typeof element[key] === "function") {
-          element[key]();
+          element[key](element);
           continue;
         }
         // updating element's inner text
@@ -41,7 +32,7 @@ function cradovaDispatchtrack(
           element.innerText = state[key];
           continue;
         }
-        // setting element dimesion to full screen
+        // setting element dimension to full screen
         if (key === "fullscreen") {
           if (state[key]) {
             fullScreen(element).set();
@@ -73,9 +64,9 @@ function cradovaDispatchtrack(
           //  console.log(element.className, "rm");
           continue;
         }
-        //removing element class
+        //removing element element
         if (key === "remove") {
-          element.parentElement?.remove(element);
+          element.parentElement?.removeChild(element);
           continue;
         }
 
@@ -84,19 +75,20 @@ function cradovaDispatchtrack(
           if (typeof state[key] === "function") {
             state[key] = state[key]();
           }
+
           if (typeof state[key] === "function") {
             state[key] = state[key]();
           }
 
           if (Array.isArray(state[key])) {
             throw new TypeError(
-              "cradova err invalid element, should be a single element or parent element from cradova"
+              "cradova err invalid tree element type, should be a single element or parent element from cradova"
             );
           }
 
           if (!(state[key] instanceof HTMLElement)) {
             console.error(
-              "cradova err wrong element type: can't create element state on " +
+              "cradova err wrong element type: can't update element state on " +
                 state[key]
             );
             throw new TypeError(
@@ -104,10 +96,8 @@ function cradovaDispatchtrack(
             );
           }
           // destroy the component tree
-          element.innerHTML = "";
+          element.replaceChildren();
           // rebuild the component tree
-          // console.log(state[key]);
-
           element.append(state[key]);
           continue;
         }
@@ -115,7 +105,6 @@ function cradovaDispatchtrack(
       }
     }
   }
-  return updated;
 }
 
 /**
@@ -130,42 +119,40 @@ export function dispatch(
   stateID: string | Record<string, any>,
   state?: Record<string, any>
 ) {
-  // TODO: this will be updated to use data-stateid soon
-  // speed test still going on
-  const nodes: NodeList = document.querySelectorAll(".cra_child_doc");
-  let updated: HTMLElement[] = [];
+  const nodes: Node[] = [];
+  let updated: Node[] = [];
   if (typeof state === "undefined" && typeof stateID === "object") {
     for (const [id, eachState] of Object.entries(stateID)) {
-      const node: HTMLElement[] = cradovaDispatchtrack(nodes, id, eachState);
-      updated.push(...node);
+      // filtering;
+      const elements = document.querySelectorAll(".cra_child_doc");
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements[i] as any;
+        if (!element.stateID || element.stateID !== id) {
+          continue;
+        }
+        nodes.push(element);
+      }
+      cradovaDispatchtrack(nodes, eachState);
+      updated.push(...nodes);
     }
   } else {
     if (typeof stateID === "string") {
-      const node: HTMLElement[] = cradovaDispatchtrack(nodes, stateID, state);
-      updated.push(...node);
+      // filtering;
+      const elements = document.querySelectorAll(".cra_child_doc");
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements[i] as any;
+        if (!element.stateID || element.stateID !== stateID) {
+          continue;
+        }
+        nodes.push(element);
+      }
+      if (state?.cradovaDispatchtrackBreak) {
+        updated.push(...nodes);
+      } else {
+        cradovaDispatchtrack(nodes, state);
+        updated.push(...nodes);
+      }
     }
   }
   return updated;
 }
-
-// for making the dom elements fulscreen
-export function fullScreen(e: Element) {
-  return {
-    set() {
-      e.requestFullscreen().catch((err: any) => {
-        throw err;
-      });
-    },
-    exist() {
-      document.exitFullscreen();
-    },
-  };
-}
-
-/*
- *** HOW TO USE ***
-
-u("#container").fullscreen().toggle()
-u("#container").fullscreen().exist()
-u("#container").fullscreen().set()
-*/

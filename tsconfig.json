@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "esnext",
     "target": "ES2015",
-    "lib": ["es2017", "esnext", "dom", "dom.iterable"],
+    "lib": ["es2016", "esnext", "dom", "dom.iterable"],
     "declaration": true,
     "outDir": "./dist",
     "strict": true,
@@ -17,5 +17,5 @@
     "isolatedModules": true
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules", "workers", ""]
+  "exclude": ["node_modules", "site/workers", "sacho"]
 }

@@ -1,78 +1,84 @@
 /**
  *
- *  little Axios request handler
- *  ----------------------
- *  supports files upload
- * ----------------------
- * @param {string} url
- * @param {object?} data?
- * @param {(object | function) ?} header or callback?
- * @param {function?} callback only?
- * @return void
+ * Cradova Ajax
+ * ------------------
+ * your new axios alternative
+ * supports files upload
+ * @param url string
+ * @param {{method: string;data;header;callbacks;}} opts
+ * @returns any
  */
-export  async function littleAxios(
+export function Ajax(
   url: string | URL,
-  callback: (arg0: XMLHttpRequestEventTarget | null) => void,
-  data?: any,
-  header?: any,
+  opts:
+    | {
+        method?: string;
+        data?: Record<string, any>;
+        header?: Record<string, any>;
+        callbacks?: Record<string, (arg: any) => void>;
+      }
+    | any = {}
 ) {
-  if (!callback && typeof header === "function") {
-    callback = header;
-  }
+  // getting params
+  let { method, data, header, callbacks } = opts;
   if (typeof url !== "string") {
     throw new Error("Cradova err : little Axios invalid url " + url);
   }
-  const ajax = new XMLHttpRequest();
-  let formData = new FormData();
-  const method = data && typeof data !== "object" ? "GET" : "POST";
-
-  ajax.addEventListener("load", async function (res) {
-    console.log(res.target);
-    
-    callback(res.target);
-  });
-  if (data) {
-    for (const key  in data) {
-      const value = data[key]
-      formData.append(key, value);
-    }
+  // setting method
+  if (!method) {
+    method = data && typeof data === "object" ? "POST" : "GET";
   }
-  ajax.addEventListener("error", (e: any) => {
-    return callback(e);
-  });
-  ajax.open(method, url, true);
-  ajax.send(formData);
-}
+  // promisified xhr function
+  return new Promise(function (resolve) {
+    const ajax: any = new XMLHttpRequest();
+    let formData = new FormData();
+    // setting methods
+    if (callbacks && typeof callbacks === "object") {
+      for (const [k, v] of Object.entries(callbacks)) {
+        if (typeof v === "function" && ajax[k]) {
+          ajax[k] = v;
+        }
+      }
+    }
 
+    ajax.addEventListener("load", function () {
+      resolve(ajax.response);
+    });
 
-/**
- * An fetch based fetcher
- * ----------------------
- *
- * @param url string
- * @param method string
- * @param headers object
- * @param data object
- * @returns any
- */
+    if (data && typeof data === "object") {
+      for (const [k, v] of Object.entries(data)) {
+        let value = v as any;
+        if (typeof value === "object" && value && !value.name) {
+          value = JSON.stringify(value);
+        }
+        formData.set(k, value);
+      }
+    }
 
-export  async function fetcher(
-  url: RequestInfo,
-  method = "GET",
-  headers: any,
-  data: any
-) {
-  return await fetch(url, {
-    headers,
-    method,
-    body: JSON.stringify(data),
-  }).catch((_err) => {
-    return {
-      async text() {
-        return {
-          message: JSON.stringify(`${method} ${url} net::ERR_FAILED`),
-        };
-      },
-    };
+    ajax.addEventListener("error", (e: any) => {
+      console.log("Ajax error   +", e);
+      if (!navigator.onLine) {
+        resolve(
+          JSON.stringify({
+            message: `you are offline!`,
+          })
+        );
+      } else {
+        resolve(
+          JSON.stringify({
+            message: `something went wrong please try again!`,
+          })
+        );
+      }
+    });
+
+    ajax.open(method, url, true);
+    // setting header
+    if (header && typeof header === "object") {
+      Object.keys(header).forEach(function (key) {
+        ajax.setRequestHeader(key, header[key]);
+      });
+    }
+    ajax.send(formData);
   });
 }

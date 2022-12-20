@@ -6,9 +6,9 @@
 "  ██╔════╝  ██╔══██╗  ██╔═╗██    █      ██  ██╔═════╝  ██║   ██║  ██╔═╗██ 
 "  ██║        ██████╔╝  ██████╗    █      ██  ██║     ██  ██║   ██║  ██████╗    
 "  ██║        ██╔══██   ██║  ██║   █      ██  ██║     ██  ╚██╗ ██╔╝  ██║  ██    
-"  ╚██████╗  ██║  ██║  ██║  ██║   ███████╔╝   ███████     ╚████╔╝   ██║  ██║
+"  ╚██████╗  ██║  ██║  ██║  ██║   ███████╔╝   ██████     ╚████╔╝   ██║  ██║
 "   ╚═════╝  ╚═╝  ╚═╝  ╚═╝  ╚═╝   ╚══════╝     ╚════╝     ╚═══╝     ╚═╝  ╚═╝  
-"  JSONDB inside
+"  Sacho inside
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " =============================================================================
@@ -41,31 +41,34 @@
 
 // importing cradova helper scripts
 
-import { frag } from "./scripts/widget.js";
-import { swipe } from "./scripts/swipe.js";
-import { Store } from "./scripts/store.js";
-import { Router } from "./scripts/Router.js";
-import { Screen } from "./scripts/Screen.js";
-import { JSONDB } from "./scripts/JsonDB.js";
-import { littleAxios, fetcher } from "./scripts/ajax.js";
-import { loadCradovaUICss } from "./scripts/loadCss.js";
-import {
+export { swipe } from "./sacho/swipe.js";
+export { Signal as createSignal } from "./scripts/createSignal.js";
+export { Router } from "./scripts/Router.js";
+export { Screen } from "./scripts/Screen.js";
+export { dispatch } from "./scripts/track.js";
+export { Ajax } from "./scripts/ajax.js";
+export {
+  frag,
+  fullScreen,
   assert,
+  uuid,
   animate,
+  controls,
   PromptBeforeLeave,
+  RefElement,
   css,
   media,
   ls,
-  list,
+  Ref,
+  RefList,
+  assertOr,
 } from "./scripts/fns.js";
-import { dispatch, fullScreen } from "./scripts/track.js";
-import { uuid } from "./scripts/fns.js";
 
 import { Init } from "./scripts/init.js";
 
 // importing types declarations
 
-import { CradovaElemetType } from "./types.js";
+import { CradovaElementType } from "./types.js";
 
 ("use strict");
 
@@ -77,15 +80,14 @@ const make = function (txx: any) {
   if (!txx) {
     return {
       tag: "div",
-      Classes: undefined,
-      ID: undefined,
-      innerValue: undefined,
     };
   }
 
   let tag;
-  const itemsPurifier = (impure: string, items: Array<String>) => {
+  const itemsPurifier = (impure: string, pure: string, items: any) => {
+    if (!items.includes(pure)) return [];
     const pureItems = [];
+    items = items.split(pure);
     for (let i = 0; i < items.length; i++) {
       if (items[i].includes(impure)) {
         items[i] = items[i].split(impure)[0];
@@ -95,23 +97,23 @@ const make = function (txx: any) {
     return pureItems;
   };
 
-  let textContent;
-  tag = txx.trim()[0] === "|" && "p";
+  let innerValue;
   if (txx.includes("|")) {
-    textContent = txx.split("|")[1];
-    txx = txx.split("|")[0] && txx.split("|")[0];
+    const tc = txx.split("|");
+    innerValue = tc[1];
+    txx = tc[0] && tc[0];
   }
 
-  const classes = itemsPurifier("#", txx.split("."));
+  const classes = itemsPurifier("#", ".", txx);
+  const ids = itemsPurifier(".", "#", txx);
 
-  const ids = itemsPurifier(".", txx.split("#"));
-
-  if (!tag) {
+  if (typeof tag !== "string") {
     tag = classes.shift();
   }
-  if (!tag) {
+  if (typeof tag !== "string") {
     tag = ids.shift();
   }
+
   if (!tag) {
     tag = "div";
   }
@@ -124,36 +126,43 @@ const make = function (txx: any) {
 
   let ID = ids[1] ? ids[1].trim() : null;
   const className = classes.join(" ");
-  let innerValue;
-  if (textContent) {
-    innerValue = textContent;
-  }
   return { tag, className, ID, innerValue };
 };
 
 /**
  * Creates new cradova HTML element
  *  @example
- * format for static  _`p| am a p tag`  // or _`p.class| am a p tag` or _`p#id| am a p tag` or _`p.class#id| am a p tag`
- * format for dynamic _(
- *  "p| am a p tag" // or "p.class| am a p tag" or "p#id| am a p tag" or "p.class#id| am a p tag"
- * , {
- * //props like
+ * _("p") // or _("p.class") or _("p#id") or _("p.class#id")
+ * using inline props
+ * _("p",{
  * text: "am a p tag",
  * style: {
  * color: "blue"
  * }
- * },
- * // place other children here like span
- * _`span| am a span tag like so`, // this is a static child
- * _("span| am a span tag like so", {style: {color: "brown"}}) // this is a dynamic child
  * )
+ * adding children
+ * _("p",
+ * _("span",{text:" am a span tag like so",
+ *  {style: {color: "brown"}
+ * })
+ * )
+ *
+ * props and children
+ * _("p",
+ * // props first
+ * {
+ * text: "am a p tag",
+ * style: {
+ * color: "blue"
+ * },
+ * // all children goes after
+ * _("span",{text:" am a span tag like so",
+ *  {style: {color: "brown"}
+ * })
+ * )
+ *
  * @param  {...any} element_initials
- * @returns function | HTMLElement
- *
- *  static elements cannot be given props nor children nor state but dynamic can
- *
- *  and static are useful too
+ * @returns function - cradova element
  */
 
 const _: any = (...element_initials: any) => {
@@ -177,7 +186,8 @@ const _: any = (...element_initials: any) => {
   } else {
     if (
       element_initials[1] instanceof HTMLElement ||
-      typeof element_initials[1] === "function"
+      typeof element_initials[1] === "function" ||
+      typeof element_initials[1] === "string"
     ) {
       childrens = element_initials.slice(1, element_initials.length);
     }
@@ -187,7 +197,7 @@ const _: any = (...element_initials: any) => {
     // getting the value of static cradova calls
     element_initials[0] = element_initials[0]["raw"][0];
   }
-  // verifing the children array
+  // verifying the children array
 
   function identify(element_initials: any) {
     if (typeof element_initials !== "object") {
@@ -196,19 +206,15 @@ const _: any = (...element_initials: any) => {
     const initials = make(element_initials[0]);
     // TODO: tag debugger
     // const { tag, className, ID, innerValue } = initials;
-    // if (tag === "div" && properties?.style?.pp === "o") {
-    //   // console.log(properties.beforeMount);
-    //   properties.beforeMount();
-    // }
 
     /**
      *
      * --- Cradova Element Initials  ---
      * --------------------------------
      *
-     * Note: this element has not been initialised!
+     * Note: this element has not been initialized!
      *
-     * add to a parent element or call this return fuction
+     * add to a parent element or call this return function
      *
      * .
      */
@@ -218,9 +224,9 @@ const _: any = (...element_initials: any) => {
        * --- Cradova Element Initials  ---
        * --------------------------------
        *
-       * Note: this element has not been initialised!
+       * Note: this element has not been initialized!
        *
-       * add to a parent element or call this return fuction
+       * add to a parent element or call this return function
        *
        * .
        */
@@ -238,13 +244,7 @@ const _: any = (...element_initials: any) => {
           childrens2rd.push(incoming[i]);
           continue;
         }
-        //         if (
-        //           !incoming[i]
-        //         ) {
-        // console.log(incoming[i]);
-        //           continue;
-        //         }
-        //
+
         if (
           // !incoming[i].tagName &&
           !(incoming[i] instanceof HTMLElement) &&
@@ -273,7 +273,7 @@ const _: any = (...element_initials: any) => {
         childrens2rd.push(...childrens);
       }
 
-      let element: CradovaElemetType | undefined;
+      let element: CradovaElementType | undefined;
 
       try {
         element = document.createElement(initials.tag.trim());
@@ -295,7 +295,7 @@ const _: any = (...element_initials: any) => {
       }
 
       for (const prop in properties) {
-        if (prop === "style") {
+        if (prop === "style" && typeof properties[prop] === "object") {
           for (const [k, v] of Object.entries(properties[prop])) {
             element.style[k] = v;
           }
@@ -323,6 +323,8 @@ const _: any = (...element_initials: any) => {
         try {
           element[prop] = properties[prop];
         } catch (error) {
+          console.log(properties);
+
           throw new Error(
             "cradova err invalid props  " +
               prop +
@@ -338,10 +340,15 @@ const _: any = (...element_initials: any) => {
 
       if (props && typeof props === "object" && !Array.isArray(props)) {
         for (const prop in props) {
-          if (prop === "style") {
+          if (prop === "style" && typeof props[prop] === "object") {
             for (const [k, v] of Object.entries(props[prop])) {
               element.style[k] = v;
             }
+            continue;
+          }
+          if (element.style[prop] === "" && prop !== "src") {
+            console.log(prop);
+            element.style[prop] = props[prop];
             continue;
           }
           if (prop === "text" && typeof props[prop] === "string") {
@@ -358,47 +365,58 @@ const _: any = (...element_initials: any) => {
             continue;
           }
 
-          if (prop === "fullscreen") {
-            if (properties[prop]) {
-              fullScreen(element).set();
-            } else {
-              fullScreen(element).exist();
-            }
-            continue;
-          }
           try {
             element[prop] = props[prop];
           } catch (error) {
-            // console.log(element);
-            // console.log(props);
             console.error(error);
           }
         }
       }
-      if (childrens2rd && childrens2rd[0]) {
-        //
+      // getting children ready
+      if (childrens2rd.length) {
         for (let i = 0; i < childrens2rd.length; i++) {
+          // single child lane
           if (typeof childrens2rd[i] === "function") {
-            const child = childrens2rd[i]();
-            element.append(child);
-            if (child.afterMount) {
-              child.afterMount(child);
-              child.afterMount = undefined;
+            let child = childrens2rd[i]();
+            if (typeof child === "function") {
+              child = child();
+            }
+            try {
+              if (child) {
+                element.append(child);
+              }
+              if (child && child.afterMount) {
+                child.afterMount(child);
+                child.afterMount = undefined;
+              }
+            } catch (error) {
+              console.error(error);
+              if (!(child instanceof HTMLElement)) {
+                throw new Error(
+                  " cradova err invalid child type: " +
+                    child +
+                    " (" +
+                    typeof child +
+                    ")"
+                );
+              }
             }
             continue;
           }
+          // children array
           if (Array.isArray(childrens2rd[i])) {
             const arrCX: HTMLElement[] | Function[] = childrens2rd[i];
+            const arrCXLenght = arrCX.length;
             const arrSET = [];
-            for (let p = 0; p < arrCX.length; p++) {
+            for (let p = 0; p < arrCXLenght; p++) {
               if (
                 !(arrCX[p] instanceof HTMLElement) &&
                 typeof arrCX[p] !== "function" &&
                 !Array.isArray(arrCX[p])
               ) {
+                console.error(arrCX[p]);
                 throw new TypeError(
-                  "cradova err invalid children list, should be a html element from cradova  " +
-                    arrCX[p]
+                  "cradova err: invalid tag type or template literal, cradova was enable to create this element show above ⇑"
                 );
               }
               arrSET.push(arrCX[p]);
@@ -412,18 +430,28 @@ const _: any = (...element_initials: any) => {
             continue;
           }
           const child = childrens2rd[i];
-          element.append(child);
-          if (child.afterMount) {
-            child.afterMount(child);
-            child.afterMount = undefined;
+          if (child instanceof HTMLElement || typeof child === "string") {
+            element.append(child);
+            // @ts-ignore
+            if (child.afterMount) {
+              // @ts-ignore
+              child.afterMount(child);
+              // @ts-ignore
+              child.afterMount = undefined;
+            }
+          } else {
+            throw new Error(
+              " cradova err invalid child type: " + "(" + typeof child + ")"
+            );
           }
         }
       }
+      //
       if (text) {
         element.append(text);
       }
       // TODO: this will be updated to use data-stateid soon
-      // spped test still going on
+      // speed test still going on
       if (element.stateID) {
         // adding cradova dynamic signature
         element.classList.add("cra_child_doc");
@@ -437,106 +465,19 @@ const _: any = (...element_initials: any) => {
     };
   }
   if (typeof element_initials[0] !== "string") {
-    return () => "empty cradova call";
+    console.error("cradova err: NO TEMPLATE STRING PROVIDED");
+    return () => "NO TEMPLATE STRING PROVIDED";
   }
-  const CradovaElemet: () => HTMLElement | undefined =
+  const CradovaElement: () => HTMLElement | undefined =
     identify(element_initials);
-  if (!CradovaElemet) {
+  if (!CradovaElement) {
     throw new Error(
       "Cradova err invalid element initials  " + element_initials
     );
   }
-  return CradovaElemet;
+  return CradovaElement;
 };
 
-Init(_);
-
-/**
- * Create element and get a callback to update their state
- * no need to manage stateIDs
- * ----------------------------------------------------------------
- *
- * @param element_initials
- * @param props
- * @returns
- */
-
-function $(element_initials = "div", props: Record<string, string> = {}) {
-  props.stateID = uuid();
-  const element = _(element_initials, props);
-  return [element, dispatch.bind(null, props.stateID)];
-}
-
-const controls = function () {
-  const svg = `<svg width="20" height="20" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
- <path d="M4.49975 5.625C4.3402 5.6242 4.18282 5.58788 4.03904 5.5187C3.89526 5.44951 3.76869 5.34919 3.6685 5.225L1.03725 2.0375C0.8835 1.84561 0.786745 1.61438 0.758014 1.37017C0.729283 1.12596 0.769733 0.878589 0.874753 0.65625C0.959928 0.463017 1.09892 0.298383 1.27514 0.182014C1.45136 0.0656449 1.65734 0.00245816 1.8685 0H7.131C7.34216 0.00245816 7.54815 0.0656449 7.72437 0.182014C7.90058 0.298383 8.03958 0.463017 8.12475 0.65625C8.22977 0.878589 8.27023 1.12596 8.24149 1.37017C8.21276 1.61438 8.11601 1.84561 7.96226 2.0375L5.331 5.225C5.23082 5.34919 5.10424 5.44951 4.96047 5.5187C4.81669 5.58788 4.65931 5.6242 4.49975 5.625Z" fill="#2c3e50"/>
-</svg>
-`;
-  const icon = (styles: any) => _("div", { ...styles, innerHTML: svg });
-  const constr = _(
-    "div",
-    {
-      display: "flex",
-      position: "fixed",
-      alignContent: "center",
-      justifyContent: "space-around",
-      flexDirection: "row",
-      width: "80px",
-      top: "4px",
-      right: "4px",
-      backgroundColor: "#fff",
-      transform: "rotate(0deg)",
-      border: "aqua 2px solid",
-      borderRadius: "6px",
-    },
-    icon({
-      transform: "rotate(90deg)",
-      /* border: "red 2px solid", */ onclick() {
-        window.history.back();
-      },
-    }),
-    icon({
-      transform: "rotate(270deg)",
-      /* border: "red 2px solid", */ onclick() {
-        window.history.forward();
-      },
-    })
-  );
-  const cont = constr();
-  if (cont) {
-    document.body.append(cont);
-  }
-};
-
-function register(modules: any[]) {
-  for (let i = 0; i < modules.length; i++) {
-    _[modules[i]] = modules[i];
-  }
-}
-
-register([
-  frag,
-  swipe,
-  Store,
-  Router,
-  Screen,
-  JSONDB,
-  fetcher,
-  littleAxios,
-  loadCradovaUICss,
-  assert,
-  animate,
-  PromptBeforeLeave,
-  css,
-  media,
-  ls,
-  list,
-  $,
-  controls,
-]);
-
-for (const key in _) {
-  console.log(key);
-}
+Init();
 
 export default _;

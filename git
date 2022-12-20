@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+#!/bin/bash
+
+# Color variables
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+blue='\033[0;34m'
+magenta='\033[0;35m'
+cyan='\033[0;36m'
+clear='\033[0m'
+
+echo ""
+echo ""
+echo ""
+echo "this script help clear development files and push to git for no reason!"
+echo ""
+echo  "${cyan} Please wait ...${clear}"
+echo  "${red} deleting project development files${clear}"
+echo  "${cyan}running ...${clear}"
+echo ""
+
+echo  "${yellow} pulling from git!${clear}"
+#git pull
+echo  "${green} done pulling!${clear}"
+echo ""
+echo  "${green} pushing to git!${clear}"
+git add .  
+echo  "${magenta} i need your commit message!${clear}"
+read -p "Commit message please! " desc  
+echo "the commit message is $desc"
+git commit -m "$desc"  
+git push
+echo  "${green} am done with the task! good luck${clear}"
+echo ""

@@ -3,17 +3,16 @@
   "version": "1.0.2",
   "description": "Web framework for building web apps and PWAs",
   "main": "dist/index.js",
-  "scripts": {
-    "clean": "rm -rf build dist",
-    "build": "tsc",
-    "roll": "rollup dist/index.js --format umd --name 'cradova' --file dist/cradova.js",
-    "set": "mkdir build && touch build/cradova.js",
-    "minify": "terser --compress --mangle -- dist/cradova.js > build/build.js",
-    "build:cradova": "npm run clean && npm run build && npm run roll && npm run set && npm run minify"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/FridayCandour/cradova.git"
+  },
+  "scripts": {
+    "tsc": "tsc --build --clean && tsc",
+    "compile": "rm -rf dist && tsc --build --clean && tsc && touch dist/index.min.js && esbuild --bundle --platform=node dist/index.js --minify --outfile=dist/index.min.js",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "keywords": [
     "framework",
@@ -34,18 +33,12 @@
   "bugs": {
     "url": "https://github.com/FridayCandour/cradova/issues"
   },
-  "devDependencies": {
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.4.1",
-    "rollup": "^2.78.1"
-  },
   "homepage": "https://github.com/FridayCandour/cradova#readme",
-  "displayName": "cradvova web framework",
+  "displayName": "cradova web framework",
   "funding": "https://github.com/FridayCandour/cradova#readme",
   "typings": "typescript",
-  "dependencies": {
-    "terser": "^5.14.2"
+  "devDependencies": {
+    "esbuild": "^0.15.12",
+    "vite": "^3.1.8"
   }
 }
