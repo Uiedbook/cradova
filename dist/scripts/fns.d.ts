@@ -1,7 +1,7 @@
 export declare const err: (errors: string[], err: string, type?: string | undefined) => never;
 export declare const controls: () => void;
 export declare function uuid(num?: number): string;
-export declare function PromptBeforeLeave(): void;
+export declare function PromptBeforeLeave(callback?: (e: any) => void): void;
 /**
 Write CSS media in javascript
 

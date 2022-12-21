@@ -1,9 +1,3 @@
-/**
- * Cradova Router
- * ---
- * Facilitates navigation within the application and initializes
- * page views based on the matched routes.
- */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -13,6 +7,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+/**
+ * Cradova Router
+ * ---
+ * Facilitates navigation within the application and initializes
+ * page views based on the matched routes.
+ */
 export const Router = {};
 Router["lastNavigatedRouteController"] = null;
 Router["nextRouteController"] = null;
@@ -117,7 +117,7 @@ Router.navigate = function (href, data = null, force = false) {
     }
     let route = null, params, link = null;
     if (href.includes(".")) {
-        throw new Error("cradova: invalid route  " + href + "  only internal pages supported");
+        window.location.href = href;
     }
     else {
         if (href === window.location.pathname) {
@@ -131,10 +131,10 @@ Router.navigate = function (href, data = null, force = false) {
             link = href;
             Router["pageHide"] && Router["pageHide"](href + " :navigated");
             window.history.pushState({}, "", link);
-            setTimeout(() => {
+            setTimeout(() => __awaiter(this, void 0, void 0, function* () {
                 // INFO: this fixed a bug but isn't necessary
-                Router.router(null, force);
-            }, 0);
+                yield Router.router(null, force);
+            }), 0);
         }
     }
 };
@@ -150,66 +150,67 @@ Router.navigate = function (href, data = null, force = false) {
  * @param {Event} e Click event | popstate event | load event.
  */
 Router.router = function (e, force = false) {
-    let Alink, url, route, params;
-    if (e && e.target.tagName) {
-        if (e.target.tagName === "A") {
-            Alink = e.target.parentElement;
+    return __awaiter(this, void 0, void 0, function* () {
+        let Alink, url, route, params;
+        if (e && e.target.tagName) {
+            Alink = e.target;
+            if (Alink && Alink.href.includes("#")) {
+                return;
+            }
+            if (Alink && Alink.href.includes("javascript")) {
+                return;
+            }
+            e.preventDefault();
+            if (Alink) {
+                url = new URL(Alink.href).pathname;
+            }
         }
-        if (!Alink && e.target.parentElement.tagName === "A") {
-            Alink = e.target.parentElement;
+        if (!url) {
+            url = window.location.pathname;
+        }
+        if (url === Router["lastNavigatedRoute"]) {
+            return;
+        }
+        if (Router["nextRouteController"]) {
+            route = Router["nextRouteController"];
+            Router["nextRouteController"] = null;
+            params = Router.params.params;
         }
         else {
-            return;
+            [route, params] = checker(url);
         }
-        if (Alink && Alink.href.includes("#")) {
-            return;
-        }
-        if (Alink && Alink.href.includes("javascript")) {
-            return;
-        }
-        e.preventDefault();
-        if (Alink) {
-            url = new URL(Alink.href).pathname;
-        }
-    }
-    if (!url) {
-        url = window.location.pathname;
-    }
-    if (url === Router["lastNavigatedRoute"]) {
-        return;
-    }
-    if (Router["nextRouteController"]) {
-        route = Router["nextRouteController"];
-        Router["nextRouteController"] = null;
-        params = Router.params.params;
-    }
-    else {
-        [route, params] = checker(url);
-    }
-    if (route) {
-        Router.params.event = e;
-        Router.params.params = params || null;
-        Router.params.data = Router.params.data || null;
-        route.controller(Router.params, force);
-        Router["lastNavigatedRouteController"] &&
-            Router["lastNavigatedRouteController"].deactivate(Router.params);
-        Router["pageShow"] && Router["pageShow"](url);
-        Router["lastNavigatedRoute"] = url;
-        Router["lastNavigatedRouteController"] = route;
-    }
-    else {
-        // or 404
-        if (Router.routes["/404"]) {
-            Router.routes["/404"].controller(Router.params);
+        if (route) {
+            Router.params.event = e;
+            Router.params.params = params || null;
+            Router.params.data = Router.params.data || null;
+            Router["lastNavigatedRouteController"] &&
+                Router["lastNavigatedRouteController"].deactivate(Router.params);
+            yield route.controller(Router.params, force);
+            Router["pageShow"] && Router["pageShow"](url);
+            Router["lastNavigatedRoute"] = url;
+            Router["lastNavigatedRouteController"] = route;
+            // click handlers
+            Array.from(window.document.querySelectorAll("a")).forEach((a) => {
+                a.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    Router.navigate(a.pathname);
+                });
+            });
         }
         else {
-            // or error
-            console.error("No /404 route screen specified");
-            throw new Error("Cradova err route doesn't exist  " +
-                url +
-                "  did you create this route?");
+            // or 404
+            if (Router.routes["/404"]) {
+                Router.routes["/404"].controller(Router.params);
+            }
+            else {
+                // or error
+                console.error("No /404 route screen specified");
+                throw new Error("Cradova err route doesn't exist  " +
+                    url +
+                    "  did you create this route?");
+            }
         }
-    }
+    });
 };
 Router["onPageShow"] =
     /**
@@ -246,7 +247,6 @@ Router.packageScreen = function (path, data) {
         yield Router.routes[path].packager(data);
     });
 };
-window.document.addEventListener("click", Router.router);
 window.addEventListener("pageshow", Router.router);
 window.addEventListener("popstate", (e) => {
     e.preventDefault();

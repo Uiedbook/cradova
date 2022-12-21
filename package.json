@@ -34,7 +34,7 @@
     "url": "https://github.com/FridayCandour/cradova/issues"
   },
   "homepage": "https://github.com/FridayCandour/cradova#readme",
-  "displayName": "cradova web framework",
+  "displayName": "cradvova web framework",
   "funding": "https://github.com/FridayCandour/cradova#readme",
   "typings": "typescript",
   "devDependencies": {

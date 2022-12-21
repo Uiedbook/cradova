@@ -1,11 +1,11 @@
+import { RouterType, RouterRouteObject } from "../types.js";
+
 /**
  * Cradova Router
  * ---
  * Facilitates navigation within the application and initializes
  * page views based on the matched routes.
  */
-
-import { RouterType, RouterRouteObject } from "../types.js";
 
 export const Router: RouterType = {};
 
@@ -132,9 +132,7 @@ Router.navigate = function (
     params,
     link = null;
   if (href.includes(".")) {
-    throw new Error(
-      "cradova: invalid route  " + href + "  only internal pages supported"
-    );
+    window.location.href = href;
   } else {
     if (href === window.location.pathname) {
       return;
@@ -147,9 +145,9 @@ Router.navigate = function (
       link = href;
       Router["pageHide"] && Router["pageHide"](href + " :navigated");
       window.history.pushState({}, "", link);
-      setTimeout(() => {
+      setTimeout(async () => {
         // INFO: this fixed a bug but isn't necessary
-        Router.router(null, force);
+        await Router.router(null, force);
       }, 0);
     }
   }
@@ -166,17 +164,10 @@ Router.navigate = function (
  * * Responds to popstate and load events and does it's job
  * @param {Event} e Click event | popstate event | load event.
  */
-Router.router = function (e: any, force: boolean = false) {
+Router.router = async function (e: any, force: boolean = false) {
   let Alink, url, route, params;
   if (e && e.target.tagName) {
-    if (e.target.tagName === "A") {
-      Alink = e.target.parentElement;
-    }
-    if (!Alink && e.target.parentElement.tagName === "A") {
-      Alink = e.target.parentElement;
-    } else {
-      return;
-    }
+    Alink = e.target;
     if (Alink && Alink.href.includes("#")) {
       return;
     }
@@ -206,12 +197,19 @@ Router.router = function (e: any, force: boolean = false) {
     Router.params.event = e;
     Router.params.params = params || null;
     Router.params.data = Router.params.data || null;
-    route.controller(Router.params, force);
     Router["lastNavigatedRouteController"] &&
       Router["lastNavigatedRouteController"].deactivate(Router.params);
+    await route.controller(Router.params, force);
     Router["pageShow"] && Router["pageShow"](url);
     Router["lastNavigatedRoute"] = url;
     Router["lastNavigatedRouteController"] = route;
+    // click handlers
+    Array.from(window.document.querySelectorAll("a")).forEach((a) => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        Router.navigate(a.pathname);
+      });
+    });
   } else {
     // or 404
     if (Router.routes["/404"]) {
@@ -263,7 +261,6 @@ Router.packageScreen = async function (path: string, data: any) {
   }
   await Router.routes[path].packager(data);
 };
-window.document.addEventListener("click", Router.router);
 window.addEventListener("pageshow", Router.router);
 window.addEventListener("popstate", (e) => {
   e.preventDefault();

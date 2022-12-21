@@ -62,14 +62,18 @@ export function uuid(num = 10) {
   });
 }
 
-export function PromptBeforeLeave() {
-  window.addEventListener("beforeunload", (ev) => {
-    const e = ev || window.event;
-    if (e) {
-      e.preventDefault();
-      e.returnValue = "";
+export function PromptBeforeLeave(callback?: (e: any) => void) {
+  window.history.pushState(
+    "forward",
+    "",
+    window.location.pathname + "#forward"
+  );
+  window.addEventListener("popstate", (e) => {
+    if (callback) {
+      callback(e);
+    } else {
+      alert("Are you sure, you want to go back?");
     }
-    return "";
   });
 }
 

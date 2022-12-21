@@ -1,4 +1,4 @@
-import _, { frag, Screen } from "../../../cradova/index.js";
+import _, { frag, Screen, PromptBeforeLeave } from "../../../cradova/index.js";
 // reusable  elements
 const logo = _("img.domimg", {
   src: "site/assets/cradova.png",
@@ -134,6 +134,9 @@ const body = _(
 );
 
 function page() {
+  PromptBeforeLeave(() => {
+    console.log(7);
+  });
   return body;
 }
 

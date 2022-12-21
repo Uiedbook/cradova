@@ -229,6 +229,12 @@ export type RouterRouteObject = {
 
 export type RouterType =
   | {
+      /**
+       * Registers a route.
+       *
+       * @param {string}   path     Route path.
+       * @param {any} screen the cradova document tree for the route.
+       */
       route: (path: string, screen: CradovaScreenType) => void;
       routes: Record<string, RouterRouteObject>;
       lastNavigatedRoute: string | null;

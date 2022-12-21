@@ -4,7 +4,10 @@ function header() {
     "div",
     _("img", { src: "site/assets/cradova.png" }),
     _("h1.cradova|Cradova"),
-    _("h2", { text: "Build apps that feels native" })
+    _("h2", { text: "Build apps that feels native" }),
+    _("a|go to info screen", {
+      href: "/info",
+    })
   );
 }
 

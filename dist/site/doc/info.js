@@ -1,4 +1,4 @@
-import _, { frag, Screen } from "../../../cradova/index.js";
+import _, { frag, Screen, PromptBeforeLeave } from "../../../cradova/index.js";
 // reusable  elements
 const logo = _("img.domimg", {
     src: "site/assets/cradova.png",
@@ -56,6 +56,9 @@ div({
 }, h2({ text: "Creating elements in Cradova" }), p(`There two types of  elements in Cradova, which are dynamic and static `), p(`Static elements don't require any state update in the way they are constructed, they have an unchanged life cycle in the app, examples are .`), code(`_("p")   // creates a p tag only`), code(`_("p.paragraph") // with class`), code(`_("p#paragraph") // with id`), code(`_("p.paragraph#paragraph") // with both`), code(`_("p.paragraph| hello world") // with text`), p("where every given above optional"), p(`Dynamic elements can be given props at call time and also undergo state update, examples are.`), code(`_("p")   // creates a p tag only`), code(`_("p.paragraph") // with class `), code(`_("p#paragraph") // with id `), code(`_("p.paragraph#paragraph") // both`), code(`_("p| hello world") // adding text`), code(`_("p.para", {class:"pa", id: "pa}) //props`), code(`_("p.pa",{style: {color: "aqua"}}) //styles`), p(`Dynamic element declaration like these return funtions not html, and by so you can add and overwrite props and add more children later on`), p(`When creating elements with _ both dynamic or static be sure to follow the follow the order selector, properties, children, 
       it's not important when calling dynamic components`)));
 function page() {
+    PromptBeforeLeave(() => {
+        console.log(7);
+    });
     return body;
 }
 const info = new Screen({ name: "set up cradova", template: page });

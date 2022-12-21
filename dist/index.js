@@ -364,7 +364,9 @@ const _ = (...element_initials) => {
                         continue;
                     }
                     const child = childrens2rd[i];
-                    if (child instanceof HTMLElement || typeof child === "string") {
+                    if (child instanceof HTMLElement ||
+                        child instanceof DocumentFragment ||
+                        typeof child === "string") {
                         element.append(child);
                         // @ts-ignore
                         if (child.afterMount) {
@@ -375,6 +377,8 @@ const _ = (...element_initials) => {
                         }
                     }
                     else {
+                        console.error("cradova got");
+                        console.error(child);
                         throw new Error(" cradova err invalid child type: " + "(" + typeof child + ")");
                     }
                 }
