@@ -1,6 +1,6 @@
 {
   "name": "@fridaycandour/cradova",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Web framework for building web apps and PWAs",
   "main": "dist/index.js",
   "source": "src/index.ts",
