@@ -41,12 +41,12 @@
 
 // importing cradova helper scripts
 
-export { swipe } from "./sacho/swipe.js";
-export { Signal as createSignal } from "./scripts/createSignal.js";
-export { Router } from "./scripts/Router.js";
-export { Screen } from "./scripts/Screen.js";
-export { dispatch } from "./scripts/track.js";
-export { Ajax } from "./scripts/ajax.js";
+export { swipe } from "./sacho/swipe";
+export { Signal as createSignal } from "./scripts/createSignal";
+export { Router } from "./scripts/Router";
+export { Screen } from "./scripts/Screen";
+export { dispatch } from "./scripts/track";
+export { Ajax } from "./scripts/ajax";
 export {
   frag,
   fullScreen,
@@ -62,13 +62,13 @@ export {
   Ref,
   RefList,
   assertOr,
-} from "./scripts/fns.js";
+} from "./scripts/fns";
 
-import { Init } from "./scripts/init.js";
+import { Init } from "./scripts/init";
 
 // importing types declarations
 
-import { CradovaElementType } from "./types.js";
+import { CradovaElementType } from "./types";
 
 ("use strict");
 
@@ -124,7 +124,7 @@ const make = function (txx: any) {
     classes.length = 0;
   }
 
-  let ID = ids[1] ? ids[1].trim() : null;
+  const ID = ids[1] ? ids[1].trim() : null;
   const className = classes.join(" ");
   return { tag, className, ID, innerValue };
 };
@@ -324,7 +324,6 @@ const _: any = (...element_initials: any) => {
           element[prop] = properties[prop];
         } catch (error) {
           console.log(properties);
-
           throw new Error(
             "cradova err invalid props  " +
               prop +
@@ -347,7 +346,6 @@ const _: any = (...element_initials: any) => {
             continue;
           }
           if (element.style[prop] === "" && prop !== "src") {
-            console.log(prop);
             element.style[prop] = props[prop];
             continue;
           }

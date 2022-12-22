@@ -1,5 +1,5 @@
-import { dispatch } from "./track.js";
-import _ from "../index.js";
+import { dispatch } from "./track";
+import _ from "../index";
 export const err = function (errors: string[], err: string, type?: string) {
   for (let er = 0; er < errors.length; er++) {
     console.error(errors[er]);

@@ -20,19 +20,15 @@ export function Ajax(
     | any = {}
 ) {
   // getting params
-  let { method, data, header, callbacks } = opts;
+  const { method, data, header, callbacks } = opts;
   if (typeof url !== "string") {
     throw new Error("Cradova err : little Axios invalid url " + url);
-  }
-  // setting method
-  if (!method) {
-    method = data && typeof data === "object" ? "POST" : "GET";
   }
   // promisified xhr function
   return new Promise(function (resolve) {
     const ajax: any = new XMLHttpRequest();
-    let formData = new FormData();
-    // setting methods
+    const formData = new FormData();
+    // setting callbacks
     if (callbacks && typeof callbacks === "object") {
       for (const [k, v] of Object.entries(callbacks)) {
         if (typeof v === "function" && ajax[k]) {
@@ -56,7 +52,7 @@ export function Ajax(
     }
 
     ajax.addEventListener("error", (e: any) => {
-      console.log("Ajax error   +", e);
+      console.error("Ajax error   +", e);
       if (!navigator.onLine) {
         resolve(
           JSON.stringify({
@@ -71,8 +67,11 @@ export function Ajax(
         );
       }
     });
-
-    ajax.open(method, url, true);
+    if (!method) {
+      ajax.open(data && typeof data === "object" ? "POST" : "GET", url, true);
+    } else {
+      ajax.open(method, url, true);
+    }
     // setting header
     if (header && typeof header === "object") {
       Object.keys(header).forEach(function (key) {

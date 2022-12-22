@@ -43,7 +43,7 @@ const checker = (
       urlFixtures.shift();
       pathFixtures.shift();
       let isIt = true;
-      let routesParams: Record<string, any> = {};
+      const routesParams: Record<string, any> = {};
       for (let i = 0; i < pathFixtures.length; i++) {
         // loosely item checking by N indexes & includes
         // FIXME: may be problematic but works faster than any other solutions
@@ -92,7 +92,7 @@ const checker = (
  * @param {string}   path     Route path.
  * @param {any} screen the cradova document tree for the route.
  */
-Router.route = function (path: string = "/", screen: any) {
+Router.route = function (path = "/", screen: any) {
   if (!screen.Activate && screen.name) {
     console.error("not a valid screen  " + screen);
     throw new Error("cradova err: Not a valid cradova screen component");
@@ -164,7 +164,7 @@ Router.navigate = function (
  * * Responds to popstate and load events and does it's job
  * @param {Event} e Click event | popstate event | load event.
  */
-Router.router = async function (e: any, force: boolean = false) {
+Router.router = async function (e: any, force = false) {
   let Alink, url, route, params;
   if (e && e.target.tagName) {
     Alink = e.target;

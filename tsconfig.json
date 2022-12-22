@@ -16,6 +16,5 @@
     "useDefineForClassFields": false,
     "isolatedModules": true
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules", "site/workers", "sacho"]
+  "exclude": ["node_modules", "site/workers"]
 }

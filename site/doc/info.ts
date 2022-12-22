@@ -1,4 +1,5 @@
-import _, { frag, Screen, PromptBeforeLeave } from "../../../cradova/index.js";
+import _, { Screen, frag } from "../../src/index";
+
 // reusable  elements
 const logo = _("img.domimg", {
   src: "site/assets/cradova.png",
@@ -14,7 +15,7 @@ const h2 = _("h2| Cradova Documentation page", {
 
 const p = _("p.paragraph");
 
-const code = (code: string, type: string = "js") =>
+const code = (code: string, type = "js") =>
   _(
     "pre",
     { class: "language-" + type, tabindex: 0 },
@@ -76,7 +77,7 @@ const body = _(
     "ul",
     { style: { margin: "20px" } },
     a(_`li| creating a Cradova project`, { href: "#create" }),
-    a(_`li| creating elelments Cradova`, { href: "#elements" })
+    a(_`li| creating elements Cradova`, { href: "#elements" })
   ),
 
   // creating a cradova project
@@ -126,7 +127,7 @@ const body = _(
     code(`_("p.para", {class:"pa", id: "pa}) //props`),
     code(`_("p.pa",{style: {color: "aqua"}}) //styles`),
     p(
-      `Dynamic element declaration like these return funtions not html, and by so you can add and overwrite props and add more children later on`
+      `Dynamic element declaration like these return function not html, and by so you can add and overwrite props and add more children later on`
     ),
     p(`When creating elements with _ both dynamic or static be sure to follow the follow the order selector, properties, children, 
       it's not important when calling dynamic components`)
@@ -134,9 +135,6 @@ const body = _(
 );
 
 function page() {
-  PromptBeforeLeave(() => {
-    console.log(7);
-  });
   return body;
 }
 

@@ -14,7 +14,7 @@ export class Screen {
    * this is the name of the screen that appears as the title
    */
   public name: string;
-  private packed: boolean = false;
+  private packed = false;
   secondaryChildren: Array<any> = [];
   /**
    * used internally
@@ -49,7 +49,7 @@ export class Screen {
    * this tells cradova to persist state on the screen or not
    * persisting is better
    */
-  persist: boolean = true;
+  persist = true;
 
   constructor(cradova_screen_initials: CradovaScreenType) {
     const { template, name, callBack, transition, persist } =

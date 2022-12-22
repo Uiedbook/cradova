@@ -1,4 +1,4 @@
-import { fullScreen } from "./fns.js";
+import { fullScreen } from "./fns";
 // the global dispatcher
 
 function cradovaDispatchtrack(nodes: any[], state?: Record<string, any>) {
@@ -120,7 +120,7 @@ export function dispatch(
   state?: Record<string, any>
 ) {
   const nodes: Node[] = [];
-  let updated: Node[] = [];
+  const updated: Node[] = [];
   if (typeof state === "undefined" && typeof stateID === "object") {
     for (const [id, eachState] of Object.entries(stateID)) {
       // filtering;

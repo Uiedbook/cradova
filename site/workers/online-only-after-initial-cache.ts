@@ -1,12 +1,12 @@
-let CACHE_VERSION = 1;
-let CURRENT_CACHES: Record<string, any> = {
+const CACHE_VERSION = 1;
+const CURRENT_CACHES: Record<string, any> = {
   prefetch: "prefetch-cache-v" + CACHE_VERSION,
 };
 
 self.addEventListener("install", function (event: any) {
-  let now = Date.now();
+  const now = Date.now();
 
-  let urlsToPrefetch = ["/"];
+  const urlsToPrefetch = ["/"];
 
   // All of these logging statements should be visible via the "Inspect" interface
   // for the relevant SW accessed via chrome://serviceworker-internals
@@ -16,10 +16,12 @@ self.addEventListener("install", function (event: any) {
     caches
       .open(CURRENT_CACHES.prefetch)
       .then(async function (cache) {
-        let cachePromises = urlsToPrefetch.map(async function (urlToPrefetch) {
+        const cachePromises = urlsToPrefetch.map(async function (
+          urlToPrefetch
+        ) {
           // This constructs a new URL object using the service worker's script location as the base
           // for relative URLs.
-          let url = new URL(urlToPrefetch, location.href);
+          const url = new URL(urlToPrefetch, location.href);
           // Append a cache-bust=TIMESTAMP URL parameter to each URL's query string.
           // This is particularly important when precaching resources that are later used in the
           // fetch handler as responses directly, without consulting the network (i.e. cache-first).
@@ -38,7 +40,7 @@ self.addEventListener("install", function (event: any) {
           // (https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#cross-origin-resources)
           // and it is not possible to determine whether an opaque response represents a success or failure
           // (https://github.com/whatwg/fetch/issues/14).
-          let request = new Request(url.href, { mode: "no-cors" });
+          const request = new Request(url.href, { mode: "no-cors" });
           try {
             const response = await fetch(request);
             if (response.status >= 400) {
@@ -68,7 +70,7 @@ self.addEventListener("activate", function (event: any) {
   // Delete all caches that aren't named in CURRENT_CACHES.
   // While there is only one cache in this example, the same logic will handle the case where
   // there are multiple versioned caches.
-  let expectedCacheNames = Object.keys(CURRENT_CACHES).map(function (key) {
+  const expectedCacheNames = Object.keys(CURRENT_CACHES).map(function (key) {
     return CURRENT_CACHES[key];
   });
 

@@ -8,7 +8,7 @@
  */
 export function swipe(
   callabck: (swipe_data: Record<string, number>) => void,
-  touching: boolean = false
+  touching = false
 ) {
   if (!(typeof callabck === "function")) {
     throw new Error("no function given for the swipe handler");
@@ -88,7 +88,7 @@ export function swipe(
     const keys = Object.keys(capturedGesture);
     let max = keys[0];
     for (let i = 1; i < keys.length; i++) {
-      var value = keys[i];
+      const value = keys[i];
       if (capturedGesture[value] > capturedGesture[max]) max = value;
     }
 

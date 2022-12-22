@@ -17,7 +17,7 @@
 //   padding: 0px;
 //   margin: 0px;
 // }
-export function loadCradovaUICss(seconds: number = 0.3) {
+export function loadCradovaUICss(seconds = 0.3) {
   const css = `:root {
 --animation-timing: ${seconds + ""}s;
 }

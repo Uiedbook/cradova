@@ -1,4 +1,4 @@
-import _, { Screen } from "../../../cradova/index.js";
+import _, { Screen } from "../../src/index";
 function header() {
   return _(
     "div",

@@ -1,4 +1,4 @@
-import { Router } from "../index.js";
+import { Router } from "../src/index";
 /**
  * import screens
  */

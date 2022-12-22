@@ -18,7 +18,7 @@ export class Signal {
   private callback: undefined | ((newValue: any) => void);
   private persistName: string | undefined = "";
   private actions: Record<string, any> = {};
-  private useHistory: boolean = false;
+  private useHistory = false;
   private history: unknown[] = [];
   private ref: any;
   private index = 0;
