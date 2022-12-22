@@ -1,5 +1,5 @@
 {
-  "name": "@fridaycandour/cradova",
+  "name": "cradova",
   "version": "1.0.3",
   "description": "Web framework for building web apps and PWAs",
   "main": "dist/index.js",
