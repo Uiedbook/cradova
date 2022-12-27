@@ -1,3 +1,2 @@
-import { Screen } from "../../src/index";
-declare const home: Screen;
+declare const home: any;
 export default home;

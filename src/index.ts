@@ -45,6 +45,7 @@ export { swipe } from "./sacho/swipe";
 export { Signal as createSignal } from "./scripts/createSignal";
 export { Router } from "./scripts/Router";
 export { Screen } from "./scripts/Screen";
+export { Scaffold } from "./scripts/Scaffold";
 export { dispatch } from "./scripts/track";
 export { Ajax } from "./scripts/ajax";
 export {
@@ -278,7 +279,9 @@ const _: any = (...element_initials: any) => {
       try {
         element = document.createElement(initials.tag.trim());
       } catch (error) {
-        throw new TypeError("cradova err invalid tag given  " + initials.tag);
+        throw new TypeError(
+          " ✘  Cradova err:  invalid tag given  " + initials.tag
+        );
       }
       if (!element) {
         return;
@@ -323,9 +326,13 @@ const _: any = (...element_initials: any) => {
         try {
           element[prop] = properties[prop];
         } catch (error) {
-          console.log(properties);
+          console.error(
+            " ✘  Cradova err:  cradova got ",
+            properties[prop],
+            "   which is invalid!"
+          );
           throw new Error(
-            "cradova err invalid props  " +
+            " ✘  Cradova err:  invalid props  " +
               prop +
               " for this element type with value " +
               properties[prop]
@@ -366,7 +373,7 @@ const _: any = (...element_initials: any) => {
           try {
             element[prop] = props[prop];
           } catch (error) {
-            console.error(error);
+            console.error(" ✘  Cradova err:  " , error);
           }
         }
       }
@@ -388,10 +395,10 @@ const _: any = (...element_initials: any) => {
                 child.afterMount = undefined;
               }
             } catch (error) {
-              console.error(error);
+              console.error(" ✘  Cradova err:  " , error);
               if (!(child instanceof HTMLElement)) {
                 throw new Error(
-                  " cradova err invalid child type: " +
+                  "  ✘  Cradova err:  invalid child type: " +
                     child +
                     " (" +
                     typeof child +
@@ -412,9 +419,9 @@ const _: any = (...element_initials: any) => {
                 typeof arrCX[p] !== "function" &&
                 !Array.isArray(arrCX[p])
               ) {
-                console.error(arrCX[p]);
+                console.error(" ✘  Cradova err:  ", arrCX[p]);
                 throw new TypeError(
-                  "cradova err: invalid tag type or template literal, cradova was enable to create this element show above ⇑"
+                  " ✘  Cradova err: invalid tag type or template literal, cradova was enable to create this element show above ⇑"
                 );
               }
               arrSET.push(arrCX[p]);
@@ -442,10 +449,12 @@ const _: any = (...element_initials: any) => {
               child.afterMount = undefined;
             }
           } else {
-            console.error("cradova got");
-            console.error(child);
+            console.error(" ✘  Cradova err:   got", child);
             throw new Error(
-              " cradova err invalid child type: " + "(" + typeof child + ")"
+              "  ✘  Cradova err:  invalid child type: " +
+                "(" +
+                typeof child +
+                ")"
             );
           }
         }
@@ -469,14 +478,14 @@ const _: any = (...element_initials: any) => {
     };
   }
   if (typeof element_initials[0] !== "string") {
-    console.error("cradova err: NO TEMPLATE STRING PROVIDED");
+    console.error(" ✘  Cradova err: NO TEMPLATE STRING PROVIDED");
     return () => "NO TEMPLATE STRING PROVIDED";
   }
   const CradovaElement: () => HTMLElement | undefined =
     identify(element_initials);
   if (!CradovaElement) {
     throw new Error(
-      "Cradova err invalid element initials  " + element_initials
+      " ✘  Cradova err:  invalid element initials  " + element_initials
     );
   }
   return CradovaElement;

@@ -1,6 +1,5 @@
 import { CradovaScreenType } from "../types.js";
 /**
- *
  * @param name
  * @param template
  * @param transitions
@@ -21,7 +20,6 @@ export class Screen {
    */
   private template: HTMLElement;
   /**
-   *
    * this a set of two class names
    * one for the entry transition
    * and one for the exit transition
@@ -50,16 +48,17 @@ export class Screen {
    * persisting is better
    */
   persist = true;
+  rendered = false;
 
   constructor(cradova_screen_initials: CradovaScreenType) {
     const { template, name, callBack, transition, persist } =
       cradova_screen_initials;
     if (typeof template !== "function") {
       throw new Error(
-        "Cradova err: only functions that returns a cradova element is valid as screen"
+        " ✘  Cradova err:   only functions that returns a cradova element is valid as screen"
       );
     }
-    this.html = template;
+    this.html = template.bind(this);
     this.name = name;
     this.template = document.createElement("div");
     // this.template.style.width = "100%";
@@ -75,6 +74,15 @@ export class Screen {
       this.persist = false;
     }
   }
+
+  async effect(fn: () => unknown | Promise<unknown>) {
+    const data = await fn();
+    if (data && this.rendered) {
+      this.persist = false;
+      await this.Activate(data, true);
+    }
+  }
+
   async package(data: any) {
     if (this.template.firstChild) {
       // @ts-ignore
@@ -86,7 +94,9 @@ export class Screen {
       if (typeof fuc === "function") {
         fuc = fuc(data);
         if (!(fuc instanceof HTMLElement)) {
-          throw new Error("Cradova err only parent with descendants is valid");
+          throw new Error(
+            " ✘  Cradova err:   only parent with descendants is valid"
+          );
         } else {
           this.template.append(fuc);
         }
@@ -95,7 +105,7 @@ export class Screen {
     //  @ts-ignore
     if (!this.template.firstChild) {
       throw new Error(
-        "no screen is rendered, may have been past wrongly, try ()=> screen in cradova Router.route(name, screen)"
+        " ✘  Cradova err:  no screen is rendered, may have been past wrongly, try ()=> screen; in cradova Router.route(name, screen)"
       );
     }
     this.template.append(...this.secondaryChildren);
@@ -127,6 +137,7 @@ export class Screen {
         screen.classList.remove("CRADOVA-UI-" + this.transition);
       }
       screen.parentElement?.removeChild(screen);
+      this.rendered = false;
     }
   }
   async Activate(data: any, force: boolean) {
@@ -149,6 +160,7 @@ export class Screen {
     this.detach();
 
     document.getElementById("Cradova-app-wrappper")!.append(this.template);
+    this.rendered = true;
     if (!this.persist) {
       this.packed = false;
     }

@@ -2,12 +2,12 @@ import { dispatch } from "./track";
 import _ from "../index";
 export const err = function (errors: string[], err: string, type?: string) {
   for (let er = 0; er < errors.length; er++) {
-    console.error(errors[er]);
+    console.error(" ✘  Cradova err:  ", errors[er]);
   }
   if (!type) {
-    throw new Error(err);
+    throw new Error(" ✘  Cradova err:  " + err);
   } else {
-    throw new TypeError(err);
+    throw new TypeError(" ✘  Cradova err:  " + err);
   }
 };
 
@@ -409,10 +409,14 @@ export class RefList {
     }
 
     if (!this.datas) {
-      throw new Error("Cradova err: RefList cannot be rendered without input");
+      throw new Error(
+        " ✘  Cradova err:  RefList cannot be rendered without input"
+      );
     }
     if (!Array.isArray(this.datas)) {
-      throw new Error("Cradova err: RefList cannot render non-array input");
+      throw new Error(
+        " ✘  Cradova err:  RefList cannot render non-array input"
+      );
     }
     const elements: any = [];
     const data = this.datas.length;
@@ -426,10 +430,12 @@ export class RefList {
 
   updateState(datas: any[]) {
     if (!datas) {
-      throw new Error("Cradova err: Ref cannot be rendered without input");
+      throw new Error(" ✘  Cradova err:  Ref cannot be rendered without input");
     }
     if (!Array.isArray(datas)) {
-      throw new Error("Cradova err: RefList cannot render non-array input");
+      throw new Error(
+        " ✘  Cradova err:  RefList cannot render non-array input"
+      );
     }
     if (!datas[0]) {
       return;
@@ -443,7 +449,7 @@ export class RefList {
     }
     if (!this.parentElement) {
       throw new Error(
-        "cannot update list parent element is no where to be found"
+        "✘  Cradova err :  cannot update list parent element is no where to be found"
       );
     }
     const elements: Node[] = [];
@@ -491,12 +497,13 @@ export class Ref {
       this.data = data;
     }
     if (!this.data) {
-      throw new Error("Cradova err: Ref cannot be rendered without input");
+      throw new Error(" ✘  Cradova err : Ref cannot be rendered without input");
     }
     const chtml = this.component(...this.data);
     if (typeof chtml !== "function") {
       throw new Error(
-        "Invalid component type for cradova Ref, got  -  " + chtml
+        " ✘  Cradova err :  Invalid component type for cradova Ref, got  -  " +
+          chtml
       );
     }
 
@@ -534,26 +541,30 @@ export class Ref {
     }
     if (!this) {
       console.error(
-        "update has been passed wrongly please send the ref where you want to call it"
+        " ✘  Cradova err:  update has been passed wrongly please send the ref where you want to call it"
       );
-      console.error(" Then call as ref.updateState({ your state }) ");
+      console.error(
+        " ✘  Cradova err: Then call as ref.updateState({ your new data }) = ui state"
+      );
     }
 
     const guy = dispatch(this.stateID, {
-      display: "none",
+      cradovaDispatchtrackBreak: true,
     })![0];
     if (!guy) {
       // console.log(this.component);
-      throw new Error("Ref is not rendered but updateState was called");
+      throw new Error(
+        " ✘  Cradova err:  Ref is not rendered but updateState was called"
+      );
     }
     const chtml = this.component(...data);
     if (typeof chtml !== "function") {
       try {
         guy.parentNode!.replaceChild(chtml, guy);
       } catch (e) {
-        console.error(e);
+        console.error(" ✘  Cradova err:  ", e);
         throw new Error(
-          "cradova err: Ref got an invalid datatype for ref updateSate call  got >>>  ' " +
+          " ✘  Cradova err:   Ref got an invalid datatype for ref updateSate call  got >>>  ' " +
             chtml +
             "';"
         );

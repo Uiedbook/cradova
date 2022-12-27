@@ -11,7 +11,9 @@ export function swipe(
   touching = false
 ) {
   if (!(typeof callabck === "function")) {
-    throw new Error("no function given for the swipe handler");
+    throw new Error(
+      " ✘  Cradova err:  no function given for the swipe handler"
+    );
   }
   let touchingState = false;
   let touchstartX = 0;

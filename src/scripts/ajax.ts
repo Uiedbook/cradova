@@ -22,7 +22,7 @@ export function Ajax(
   // getting params
   const { method, data, header, callbacks } = opts;
   if (typeof url !== "string") {
-    throw new Error("Cradova err : little Axios invalid url " + url);
+    throw new Error("✘  Cradova err : little Axios invalid url " + url);
   }
   // promisified xhr function
   return new Promise(function (resolve) {
@@ -52,7 +52,7 @@ export function Ajax(
     }
 
     ajax.addEventListener("error", (e: any) => {
-      console.error("Ajax error   +", e);
+      console.error("✘  Cradova Ajax err : ", e);
       if (!navigator.onLine) {
         resolve(
           JSON.stringify({

@@ -141,7 +141,7 @@ export class Signal {
       this.value[key][index] = value;
     } else {
       throw new Error(
-        "cradova err:  " + this.value[key] + "  is not an array "
+        "✘  Cradova err :  " + this.value[key] + "  is not an array "
       );
     }
     if (this.ref && shouldRefRender !== false) {
@@ -171,11 +171,11 @@ export class Signal {
           if (typeof nam === "string" && typeof action === "function") {
             this.actions[nam] = action;
           } else {
-            throw new Error(`cradova err: can't create action ${nam}`);
+            throw new Error(`✘  Cradova err : can't create action ${nam}`);
           }
         }
       } else {
-        throw new Error(`cradova err: can't create action ${name}`);
+        throw new Error(`✘  Cradova err : can't create action ${name}`);
       }
     }
   }
@@ -192,7 +192,7 @@ export class Signal {
         throw Error("");
       }
     } catch (_e) {
-      throw Error("Cradova err: action " + name + "  does not exist!");
+      throw Error("✘  Cradova err : action " + name + "  does not exist!");
     }
     this.actions[name](this, data);
   }
@@ -215,7 +215,7 @@ export class Signal {
         Ref.stale(this.value);
       }
     } else {
-      throw new Error("Invalid ref component" + Ref);
+      throw new Error("✘  Cradova err :  Invalid ref component" + Ref);
     }
   }
   /**

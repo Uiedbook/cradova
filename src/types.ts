@@ -54,6 +54,7 @@ export type CradovaScreenType = {
   transition?: string;
   callBack?: (html?: any, data?: Record<string, any>) => void;
   persist?: boolean;
+  effect: (fn: () => any) => void;
 };
 
 export type RefType = {

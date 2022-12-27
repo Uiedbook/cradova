@@ -82,17 +82,17 @@ function cradovaDispatchtrack(nodes: any[], state?: Record<string, any>) {
 
           if (Array.isArray(state[key])) {
             throw new TypeError(
-              "cradova err invalid tree element type, should be a single element or parent element from cradova"
+              " ✘  Cradova err:   invalid tree element type, should be a single element or parent element from cradova"
             );
           }
 
           if (!(state[key] instanceof HTMLElement)) {
             console.error(
-              "cradova err wrong element type: can't update element state on " +
+              " ✘  Cradova err:   wrong element type: can't update element state on " +
                 state[key]
             );
             throw new TypeError(
-              "cradova err invalid element, should be a html element from cradova"
+              " ✘  Cradova err:   invalid element, should be a html element from cradova"
             );
           }
           // destroy the component tree

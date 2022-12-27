@@ -1,8 +1,9 @@
-import _, { Screen, frag } from "../../src/index";
+// @ts-ignore
+import _, { Screen, frag } from "../../module.js";
 
 // reusable  elements
 const logo = _("img.domimg", {
-  src: "site/assets/cradova.png",
+  src: "assets/cradova.png",
 });
 
 const h3 = _("h3|Build apps that feels native", {

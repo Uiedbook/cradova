@@ -11,9 +11,10 @@
   },
   "scripts": {
     "tsc": "tsc --build --clean && tsc",
-    "compile": "rm -rf dist && tsc --build --clean && tsc && touch dist/index.min.js && esbuild --bundle --platform=node dist/index.js --minify --outfile=dist/index.min.js",
-    "dev": "parcel watch",
-    "build": "parcel build",
+    "cp": "cp site/index.html dist/site && cp -r site/assets dist/site && cp -r site/styles dist/site && cp -r site/prism dist/site",
+    "dev": "parcel build && npm run cp && parcel watch",
+    "build": "npm run tsc && parcel build && npm run cp",
+    "serve": "parcel dist/site/index.html",
     "lint": "eslint . --fix"
   },
   "keywords": [
@@ -36,7 +37,7 @@
     "url": "https://github.com/FridayCandour/cradova/issues"
   },
   "homepage": "https://github.com/FridayCandour/cradova#readme",
-  "displayName": "cradvova web framework",
+  "displayName": "cradova web framework",
   "funding": "https://github.com/FridayCandour/cradova#readme",
   "typings": "typescript",
   "devDependencies": {
@@ -45,7 +46,6 @@
     "@types/jest": "^29.2.4",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.47.0",
-    "esbuild": "^0.15.12",
     "eslint": "^8.30.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",

@@ -18,6 +18,21 @@
 
 ## 1.0.4
 
+this version never existed
+"npm version patch" was mistakenly entered twice
+and we went along with it.
+
+## 1.0.5
+
 - big performance gain
 - improved state management
 - battle testing and production readiness
+
+## 1.0.6
+
+- introducing scaffold - a simple way to render page components
+  without url manipulation.
+  this brings app experience
+- bug fixes
+- big performance gain
+- battle testing green

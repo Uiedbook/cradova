@@ -1,1 +1,2 @@
-console.log("cradova installed!");
+console.log("cradova installed! right");
+export {};

@@ -70,7 +70,7 @@ const checker = (
           )
         ) {
           throw new Error(
-            "cradova router doesn't allow paths with multiple names"
+            " ✘  Cradova err:  cradova router doesn't allow paths with multiple names"
           );
         }
       }
@@ -94,8 +94,8 @@ const checker = (
  */
 Router.route = function (path = "/", screen: any) {
   if (!screen.Activate && screen.name) {
-    console.error("not a valid screen  " + screen);
-    throw new Error("cradova err: Not a valid cradova screen component");
+    console.error(" ✘  Cradova err:  not a valid screen  " + screen);
+    throw new Error(" ✘  Cradova err:  Not a valid cradova screen component");
   }
   Router.routes[path] = {
     controller: (params: any, force?: boolean) =>
@@ -125,7 +125,9 @@ Router.navigate = function (
   }
   if (typeof href !== "string") {
     throw new TypeError(
-      "cradova err: href must be a defined path but got " + href + " instead"
+      " ✘  Cradova err:  href must be a defined path but got " +
+        href +
+        " instead"
     );
   }
   let route = null,
@@ -216,11 +218,10 @@ Router.router = async function (e: any, force = false) {
       Router.routes["/404"].controller(Router.params);
     } else {
       // or error
-      console.error("No /404 route screen specified");
-      throw new Error(
-        "Cradova err route doesn't exist  " +
+      console.error(
+        " ✘  Cradova err: route '" +
           url +
-          "  did you create this route?"
+          "' does not exist and no /404 route given!"
       );
     }
   }
@@ -235,7 +236,7 @@ Router["onPageShow"] =
       Router["pageShow"] = callback;
     } else {
       throw new Error(
-        "Cradova err: callback for pageShow event is not a function"
+        " ✘  Cradova err:  callback for pageShow event is not a function"
       );
     }
   };
@@ -244,7 +245,7 @@ Router["onPageHide"] = function (callback: () => void) {
     Router["pageHide"] = callback;
   } else {
     throw new Error(
-      "Cradova err: callback for pageHide event is not a function"
+      " ✘  Cradova err:  callback for pageHide event is not a function"
     );
   }
 };
@@ -256,8 +257,8 @@ Router["onPageHide"] = function (callback: () => void) {
  */
 Router.packageScreen = async function (path: string, data: any) {
   if (!Router.routes[path]) {
-    console.error("no screen with path " + path);
-    throw new Error("cradova err: Not a defined screen path");
+    console.error(" ✘  Cradova err:  no screen with path " + path);
+    throw new Error(" ✘  Cradova err:  cradova err: Not a defined screen path");
   }
   await Router.routes[path].packager(data);
 };

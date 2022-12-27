@@ -1,3 +1,2 @@
-import { Screen } from "../../src/index";
-declare const info: Screen;
+declare const info: any;
 export default info;

@@ -1,15 +1,24 @@
-import _, { Router } from "../src/index";
+// @ts-ignore
+import { Router, Scaffold } from "../module.js";
 
 /**
  * import screens
  */
-
+// @ts-ignore
 import home from "./doc/home.js";
+// @ts-ignore
 import info from "./doc/info.js";
-
+// @ts-ignore
+const sm = new Scaffold();
+sm.addScaffolds({
+  home,
+  info,
+});
+export default sm;
 /**
  * Router setup.
  */
 
-Router.route("/", home);
-Router.route("/info", info);
+// Router.route("/dist/site/index.html", home);
+// Router.route("/", home);
+// Router.route("/info", info);
