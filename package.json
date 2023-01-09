@@ -1,6 +1,6 @@
 {
   "name": "cradova",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Web framework for building web apps and PWAs",
   "main": "dist/src/index.js",
   "module": "dist/src/module.js",
