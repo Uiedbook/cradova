@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 import { CradovaScreenType } from "../types.js";
 /**
  * @param name
@@ -28,10 +30,6 @@ export class Screen {
   private callBack:
     | ((data?: Record<string, any>) => void | undefined)
     | undefined;
-  // @ts-ignore
-  private deactivatecallBack:
-    | ((data?: Record<string, any>) => void | undefined)
-    | undefined;
   // SCREEN ANIMATION CLASSES
   static SCALE_IN = "SCALE-IN";
   static SCALE_OUT = "SCALE-OUT";
@@ -49,6 +47,7 @@ export class Screen {
    */
   persist = true;
   rendered = false;
+  effects: (() => unknown | Promise<unknown>)[] = [];
 
   constructor(cradova_screen_initials: CradovaScreenType) {
     const { template, name, callBack, transition, persist } =
@@ -75,20 +74,26 @@ export class Screen {
     }
   }
 
-  async effect(fn: () => unknown | Promise<unknown>) {
-    const data = await fn();
-    if (data && this.rendered) {
-      this.persist = false;
-      await this.Activate(data, true);
+  effect(fn: () => unknown | Promise<unknown>) {
+    if (!this.rendered) {
+      this.effects.push(fn);
+    }
+  }
+  async effector() {
+    if (!this.rendered) {
+      this.rendered = true;
+      for (let fnIdex = 0; fnIdex < this.effects.length; fnIdex++) {
+        const fn = this.effects[fnIdex];
+        const data = await fn();
+        await this.Activate(data, true);
+      }
     }
   }
 
-  async package(data: any) {
-    if (this.template.firstChild) {
-      // @ts-ignore
-      this.template.replaceChildren();
-    }
-    // console.log(this.persist, this.name);
+  async package(data?: any) {
+    // if (this.template.firstChild) {
+    //   this.template.replaceChildren();
+    // }
     if (typeof this.html === "function") {
       let fuc = await this.html(data);
       if (typeof fuc === "function") {
@@ -98,11 +103,10 @@ export class Screen {
             " ✘  Cradova err:   only parent with descendants is valid"
           );
         } else {
-          this.template.append(fuc);
+          this.template.replaceChildren(fuc);
         }
       }
     }
-    //  @ts-ignore
     if (!this.template.firstChild) {
       throw new Error(
         " ✘  Cradova err:  no screen is rendered, may have been past wrongly, try ()=> screen; in cradova Router.route(name, screen)"
@@ -113,9 +117,6 @@ export class Screen {
 
   onActivate(cb: (data: any) => void) {
     this.callBack = cb;
-  }
-  onDeactivate(cb: (data: any) => void) {
-    this.deactivatecallBack = cb;
   }
   addChild(...addOns: any[]) {
     for (let i = 0; i < addOns.length; i++) {
@@ -128,20 +129,27 @@ export class Screen {
     }
   }
 
-  detach() {
+  // detach() {
+  //   // clearing the dom
+  //   const screens = document.querySelectorAll("#cradova-screen-set");
+  //   if (!screens.length) {
+  //     return;
+  //   }
+  //   for (let i = 0; i < screens.length; i++) {
+  //     const screen = screens[i];
+  //     if (this.transition) {
+  //       screen.classList.remove("CRADOVA-UI-" + this.transition);
+  //     }
+  //     screen.parentElement?.removeChild(screen);
+  //   }
+  // }
+  deActivate() {
     // clearing the dom
-    const screens = document.querySelectorAll("#cradova-screen-set");
-    for (let i = 0; i < screens.length; i++) {
-      const screen = screens[i];
-      if (this.transition) {
-        screen.classList.remove("CRADOVA-UI-" + this.transition);
-      }
-      screen.parentElement?.removeChild(screen);
-      this.rendered = false;
-    }
+    this.rendered = false;
+    this.template.parentElement?.removeChild(this.template);
+    // console.log("removed " + this.name);
   }
-  async Activate(data: any, force: boolean) {
-    // console.log(1);
+  async Activate(data?: any, force?: boolean) {
     if (!this.persist) {
       await this.package(data);
       this.packed = true;
@@ -157,13 +165,13 @@ export class Screen {
     }
 
     document.title = this.name;
-    this.detach();
-
-    document.getElementById("Cradova-app-wrappper")!.append(this.template);
-    this.rendered = true;
+    // this.detach();
+    document.getElementById("Cradova-app-wrapper")!.append(this.template);
     if (!this.persist) {
       this.packed = false;
     }
+    // running effects if any available
+    await this.effector();
     //  @ts-ignore
     if (this.template.firstChild.afterMount) {
       //  @ts-ignore

@@ -1,8 +1,9 @@
 // @ts-ignore
-import _, { Screen, frag } from "../../module.js";
+import _, { Screen, frag } from "../../dist/src/src";
 
+import sm from "../index";
 // reusable  elements
-const logo = _("img.domimg", {
+const logo = _("img.doming", {
   src: "assets/cradova.png",
 });
 
@@ -55,6 +56,9 @@ const body = _(
     style: {
       borderBottom: "2px black solid",
       width: "fit-content",
+    },
+    onclick() {
+      sm.push("home");
     },
   }),
   _(

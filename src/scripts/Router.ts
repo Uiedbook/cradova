@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { RouterType, RouterRouteObject } from "../types.js";
 
 /**
@@ -101,10 +102,8 @@ Router.route = function (path = "/", screen: any) {
     controller: (params: any, force?: boolean) =>
       screen.Activate(params, force),
     packager: async (params: any) => await screen.package(params),
-    deactivate: async (params: any) => {
-      if (screen.deactivatecallBack) {
-        await screen.deactivatecallBack(params);
-      }
+    deactivate: () => {
+      screen.deActivate();
     },
   };
 };
@@ -200,7 +199,7 @@ Router.router = async function (e: any, force = false) {
     Router.params.params = params || null;
     Router.params.data = Router.params.data || null;
     Router["lastNavigatedRouteController"] &&
-      Router["lastNavigatedRouteController"].deactivate(Router.params);
+      Router["lastNavigatedRouteController"].deactivate();
     await route.controller(Router.params, force);
     Router["pageShow"] && Router["pageShow"](url);
     Router["lastNavigatedRoute"] = url;

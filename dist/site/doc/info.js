@@ -1,7 +1,8 @@
 // @ts-ignore
-import _, { Screen, frag } from "../../module.js";
+import _, { Screen, frag } from "../../dist/src/src";
+import sm from "../index";
 // reusable  elements
-const logo = _("img.domimg", {
+const logo = _("img.doming", {
     src: "assets/cradova.png",
 });
 const h3 = _("h3|Build apps that feels native", {
@@ -36,6 +37,9 @@ const body = _("div.section", {
     style: {
         borderBottom: "2px black solid",
         width: "fit-content",
+    },
+    onclick() {
+        sm.push("home");
     },
 }), _("ul", { style: { margin: "20px" } }, _ `li| Easy to use template engine syntax`, _ `li| State management`, _ `li| Screens, Routes, CreateSignal, ajax, Ref and more .`), 
 //

@@ -1,6 +1,5 @@
 // @ts-ignore
-import { Router, Scaffold } from "../module.js";
-
+import { Scaffold } from "../dist/src/module.js";
 /**
  * import screens
  */
@@ -15,6 +14,7 @@ sm.addScaffolds({
   info,
 });
 export default sm;
+
 /**
  * Router setup.
  */

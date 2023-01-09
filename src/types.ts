@@ -65,7 +65,14 @@ export type RefType = {
    * @param data
    * @returns html
    */
-  render: (data: any) => any;
+  render: (data: any) => () => HTMLElement;
+  /**
+   * Cradova Ref
+   * ---
+   * runs on every state update
+   *
+   */
+  onStateUpdate: (callback: () => void) => void;
   /**
    * Cradova Ref
    * ---

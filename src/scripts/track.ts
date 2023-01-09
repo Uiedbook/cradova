@@ -10,7 +10,13 @@ function cradovaDispatchtrack(nodes: any[], state?: Record<string, any>) {
         // updating element styling
         if (key === "style") {
           for (const [k, v] of Object.entries(state[key])) {
-            element.style[k] = v;
+            if (element.style[k] === "" && k !== "src") {
+              element.style[k] = v;
+            } else {
+              throw new Error(
+                "✘  Cradova err : " + k + " is not a valid css style property"
+              );
+            }
           }
           continue;
         }

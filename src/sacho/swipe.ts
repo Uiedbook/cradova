@@ -1,16 +1,19 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 /**
  * swipe
  * ---
  * Now you can detect swipes the best way possible
  *
- * @param callabck
+ * @param callback
  * @param touching?
  */
 export function swipe(
-  callabck: (swipe_data: Record<string, number>) => void,
-  touching = false
+  callback: (swipe_data: Record<string, number>) => void,
+  touching = false,
+  element?: HTMLElement
 ) {
-  if (!(typeof callabck === "function")) {
+  if (!(typeof callback === "function")) {
     throw new Error(
       " ✘  Cradova err:  no function given for the swipe handler"
     );
@@ -35,7 +38,7 @@ export function swipe(
     touch: 0,
   };
 
-  function handleGesure(event: TouchEvent) {
+  function handleGesture(event: TouchEvent) {
     touchendX = Math.round(
       event.changedTouches[event.changedTouches.length - 1].clientX
     );
@@ -94,45 +97,30 @@ export function swipe(
       if (capturedGesture[value] > capturedGesture[max]) max = value;
     }
 
-    if (callabck) {
-      callabck({ [max]: capturedGesture[max] });
+    if (callback) {
+      callback({ [max]: capturedGesture[max] });
     }
   }
 
-  const escapeTSError = document.body as any;
+  const escapeTSError = element || document.body;
 
   return {
     // swipe event
     start() {
       if (touching) {
-        escapeTSError.addEventListener("touchmove", handleGesure);
+        escapeTSError.addEventListener("touchmove", handleGesture);
       } else {
         escapeTSError.addEventListener("touchstart", handleTouchStart);
-        escapeTSError.addEventListener("touchend", handleGesure);
+        escapeTSError.addEventListener("touchend", handleGesture);
       }
     },
     stop() {
       if (touching) {
-        escapeTSError.removeEventListener("touchmove", handleGesure);
+        escapeTSError.removeEventListener("touchmove", handleGesture);
       } else {
         escapeTSError.removeEventListener("touchstart", handleTouchStart);
-        escapeTSError.removeEventListener("touchend", handleGesure);
+        escapeTSError.removeEventListener("touchend", handleGesture);
       }
     },
   };
 }
-
-/*
-   *** HOW TO USE ***
-import swipe from "where you saved it"  
-      function handleTouch(){
-       console.log("touching")
-      }
-      
-const swiper =  swipe(handleTouch) // tapping and swiping mode
-const swiper =  swipe(handleTouch, ) // touching and swiping mode (aka touch move mode)
-
-swiper.start() // starts the swipe event
-swiper.stop() // stopes the swipe event
-
-*/

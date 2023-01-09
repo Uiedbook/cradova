@@ -2,28 +2,30 @@
   "name": "cradova",
   "version": "1.0.6",
   "description": "Web framework for building web apps and PWAs",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
+  "module": "dist/src/module.js",
   "source": "src/index.ts",
-  "module": "dist/module.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/FridayCandour/cradova.git"
   },
   "scripts": {
-    "tsc": "tsc --build --clean && tsc",
     "cp": "cp site/index.html dist/site && cp -r site/assets dist/site && cp -r site/styles dist/site && cp -r site/prism dist/site",
-    "dev": "parcel build && npm run cp && parcel watch",
-    "build": "npm run tsc && parcel build && npm run cp",
+    "produce:static": "parcel build",
+    "produce:build": "rm -rf dist && tsc && npm run cp",
+    "build": "npm run produce:build && npm run produce:static",
     "serve": "parcel dist/site/index.html",
     "lint": "eslint . --fix"
   },
   "keywords": [
+    "PWA",
     "framework",
+    "frontend",
     "javascript",
     "typescript",
     "web",
     "app",
-    "PWA",
+    "mobile",
     "android",
     "IOS",
     "windows",
@@ -32,7 +34,7 @@
   ],
   "author": "fridaycandour",
   "license": "Apache-2.0",
-  "types": "dist/index.d.ts",
+  "types": "dist/src/types.d.ts",
   "bugs": {
     "url": "https://github.com/FridayCandour/cradova/issues"
   },

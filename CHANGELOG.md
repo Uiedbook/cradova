@@ -36,3 +36,9 @@ and we went along with it.
 - bug fixes
 - big performance gain
 - battle testing green
+
+## 1.0.7
+
+- bug fixes
+- big performance gain
+- battle testing green

@@ -1,5 +1,5 @@
 // @ts-ignore
-import _, { Screen } from "../../module.js";
+import _, { Screen } from "../../dist/src/module.js";
 import sm from "../index";
 function header() {
   return _(

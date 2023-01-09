@@ -1,2 +1,2 @@
-declare const home: any;
-export default home;
+declare const _default: any;
+export default _default;
