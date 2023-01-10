@@ -3,7 +3,7 @@
     "module": "esnext",
     "target": "ES2022",
     "lib": ["es2016", "esnext", "dom", "dom.iterable"],
-    // "declaration": true,
+    "declaration": true,
     "outDir": "./dist",
     "strict": true,
     "noUnusedLocals": true,
@@ -16,5 +16,5 @@
     "useDefineForClassFields": false,
     "isolatedModules": true
   },
-  "exclude": ["node_modules", "site/workers"]
+  "exclude": ["node_modules", "site"]
 }

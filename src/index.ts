@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /*
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -48,6 +49,8 @@ export { Screen } from "./scripts/Screen";
 export { Scaffold } from "./scripts/Scaffold";
 export { dispatch } from "./scripts/track";
 export { Ajax } from "./scripts/ajax";
+export { IsElementInView } from "./scripts/utils";
+
 export {
   frag,
   fullScreen,
@@ -204,6 +207,7 @@ const _: any = (...element_initials: any) => {
     if (typeof element_initials !== "object") {
       element_initials = [element_initials];
     }
+
     const initials = make(element_initials[0]);
     // TODO: tag debugger
     // const { tag, className, ID, innerValue } = initials;
@@ -239,25 +243,15 @@ const _: any = (...element_initials: any) => {
         if (
           typeof incoming[i] === "function" ||
           incoming[i] instanceof HTMLElement
-          // ||
-          // incoming[i].tagName
         ) {
           childrens2rd.push(incoming[i]);
           continue;
         }
 
-        if (
-          // !incoming[i].tagName &&
-          !(incoming[i] instanceof HTMLElement) &&
-          !Array.isArray(incoming[i]) &&
-          typeof incoming[i] === "object" &&
-          !incoming[i].tagName
-        ) {
+        if (!Array.isArray(incoming[i]) && typeof incoming[i] === "object") {
           if (incoming[i].beforeMount) {
             beforeMount = incoming[i]["beforeMount"];
-            continue;
-          }
-          if (incoming[i].composedPath) {
+            incoming[i]["beforeMount"] = undefined;
             continue;
           }
           props = incoming[i];
@@ -269,13 +263,14 @@ const _: any = (...element_initials: any) => {
           continue;
         }
       }
+      // @ts-ignore
+      incoming = undefined;
 
       if (childrens.length) {
         childrens2rd.push(...childrens);
       }
 
       let element: CradovaElementType | undefined;
-
       try {
         element = document.createElement(initials.tag.trim());
       } catch (error) {
@@ -291,16 +286,29 @@ const _: any = (...element_initials: any) => {
       }
 
       if (initials.ID) {
-        element.id = initials.ID.trim();
+        element.setAttribute("id", initials.ID.trim());
       }
       if (initials.innerValue) {
-        element.append(initials.innerValue);
+        element.innerText = initials.innerValue;
       }
-
       for (const prop in properties) {
         if (prop === "style" && typeof properties[prop] === "object") {
           for (const [k, v] of Object.entries(properties[prop])) {
-            element.style[k] = v;
+            if (
+              (element.style[k] === "" && k !== "src") ||
+              typeof element.style[k] === "string"
+            ) {
+              element.style[k] = v;
+            } else {
+              console.error(element);
+              throw new Error(
+                "✘  Cradova err :  " +
+                  element +
+                  " does not have " +
+                  k +
+                  " as a valid css style property"
+              );
+            }
           }
           continue;
         }
@@ -320,7 +328,7 @@ const _: any = (...element_initials: any) => {
           continue;
         }
         if (prop === "text") {
-          element.innerText = properties[prop];
+          text = properties[prop];
           continue;
         }
         try {
@@ -348,7 +356,15 @@ const _: any = (...element_initials: any) => {
         for (const prop in props) {
           if (prop === "style" && typeof props[prop] === "object") {
             for (const [k, v] of Object.entries(props[prop])) {
-              element.style[k] = v;
+              if (typeof element.style[k] !== "undefined" && k !== "src") {
+                element.style[k] = v;
+              } else {
+                throw new Error(
+                  "✘  Cradova err :  " +
+                    k +
+                    " is not a valid css style property"
+                );
+              }
             }
             continue;
           }
@@ -357,7 +373,7 @@ const _: any = (...element_initials: any) => {
             continue;
           }
           if (prop === "text" && typeof props[prop] === "string") {
-            element.innerText = props[prop];
+            text = props[prop];
             continue;
           }
           if (prop === "class" && typeof props[prop] === "string") {
@@ -367,13 +383,14 @@ const _: any = (...element_initials: any) => {
 
           if (prop === "beforeMount") {
             beforeMount = props["beforeMount"];
+            props["beforeMount"] = undefined;
             continue;
           }
 
           try {
             element[prop] = props[prop];
           } catch (error) {
-            console.error(" ✘  Cradova err:  " , error);
+            console.error(" ✘  Cradova err:  ", error);
           }
         }
       }
@@ -395,7 +412,7 @@ const _: any = (...element_initials: any) => {
                 child.afterMount = undefined;
               }
             } catch (error) {
-              console.error(" ✘  Cradova err:  " , error);
+              console.error(" ✘  Cradova err:  ", error);
               if (!(child instanceof HTMLElement)) {
                 throw new Error(
                   "  ✘  Cradova err:  invalid child type: " +
@@ -437,8 +454,7 @@ const _: any = (...element_initials: any) => {
           const child = childrens2rd[i];
           if (
             child instanceof HTMLElement ||
-            child instanceof DocumentFragment ||
-            typeof child === "string"
+            child instanceof DocumentFragment
           ) {
             element.append(child);
             // @ts-ignore
@@ -449,22 +465,24 @@ const _: any = (...element_initials: any) => {
               child.afterMount = undefined;
             }
           } else {
-            console.error(" ✘  Cradova err:   got", child);
-            throw new Error(
-              "  ✘  Cradova err:  invalid child type: " +
-                "(" +
-                typeof child +
-                ")"
-            );
+            if (typeof child === "string") {
+              text = child;
+            } else {
+              console.error(" ✘  Cradova err:   got", child);
+              throw new Error(
+                "  ✘  Cradova err:  invalid child type: " +
+                  "(" +
+                  typeof child +
+                  ")"
+              );
+            }
           }
         }
       }
       //
       if (text) {
-        element.append(text);
+        element.innerText = text;
       }
-      // TODO: this will be updated to use data-stateid soon
-      // speed test still going on
       if (element.stateID) {
         // adding cradova dynamic signature
         element.classList.add("cra_child_doc");
@@ -481,14 +499,15 @@ const _: any = (...element_initials: any) => {
     console.error(" ✘  Cradova err: NO TEMPLATE STRING PROVIDED");
     return () => "NO TEMPLATE STRING PROVIDED";
   }
-  const CradovaElement: () => HTMLElement | undefined =
-    identify(element_initials);
-  if (!CradovaElement) {
-    throw new Error(
-      " ✘  Cradova err:  invalid element initials  " + element_initials
-    );
-  }
-  return CradovaElement;
+  // const CradovaElement: () => HTMLElement | undefined =
+  //   identify(element_initials);
+  // if (!CradovaElement) {
+  //   throw new Error(
+  //     " ✘  Cradova err:  invalid element initials  " + element_initials
+  //   );
+  // }
+  // return CradovaElement;
+  return identify(element_initials);
 };
 
 Init();

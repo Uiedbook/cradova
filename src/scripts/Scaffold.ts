@@ -1,11 +1,23 @@
+/* eslint-disable no-undef */
 import { CradovaScreenType } from "../types.js";
 export class Scaffold {
   private history: string[] = [];
   private Scaffolds: Record<string, CradovaScreenType> = {};
   async push(label: string, data?: unknown, force?: boolean) {
     if (this.Scaffolds[label]) {
-      // @ts-ignore
-      await this.Scaffolds[label].Activate(data, force);
+      if (this.history.length) {
+        // console.log("deact");
+        // @ts-ignore
+        this.Scaffolds[this.history[this.history.length - 1]].deActivate();
+      }
+      if (data) {
+        // @ts-ignore
+        await this.Scaffolds[label].Activate(data, force);
+      } else {
+        // @ts-ignore
+        await this.Scaffolds[label].Activate();
+      }
+      // console.log("rendered new");
       this.history.push(label);
     } else {
       throw new Error(
@@ -14,13 +26,18 @@ export class Scaffold {
     }
   }
   async pop(data?: unknown, force?: boolean) {
-    if (!this.history.length) {
+    if (!this.history.length || this.history.length === 1) {
       return;
     }
-    this.history.pop();
-    const label = this.history[this.history.length - 1];
     // @ts-ignore
-    await this.Scaffolds[label].Activate(data, force);
+    this.Scaffolds[this.history[this.history.length - 1]].deActivate();
+    this.history.pop();
+    // label = ;
+    // @ts-ignore
+    await this.Scaffolds[this.history[this.history.length - 1]].Activate(
+      data,
+      force
+    );
   }
   async addScaffolds(scaffolds: Record<string, CradovaScreenType>) {
     let i = 0,

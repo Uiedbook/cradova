@@ -449,7 +449,7 @@ export class RefList {
     }
     if (!this.parentElement) {
       throw new Error(
-        "✘  Cradova err :  cannot update list parent element is no where to be found"
+        "✘  Cradova err :  cannot update list, the RefList was never rendered!"
       );
     }
     const elements: Node[] = [];
@@ -461,7 +461,13 @@ export class RefList {
     try {
       // @ts-ignore
       this.parentElement.replaceChildren(...elements);
-    } catch (error) {}
+    } catch (err) {
+      console.error(err);
+      throw new Error(" ✘  Cradova err:  an error occured");
+    }
+  }
+  remove() {
+    dispatch(this.stateID, { remove: true });
   }
 }
 
@@ -490,7 +496,7 @@ export class Ref {
    * ---
    * returns html with cradova reference
    * @param data
-   * @returns html
+   * @returns () => HTMLElement
    */
   render(...data: any) {
     if (data) {
@@ -525,6 +531,12 @@ export class Ref {
     }
     return () => element;
   }
+  /**
+   * Cradova Ref
+   * ---
+   * runs on every state update
+   *
+   */
   onStateUpdate(cb: any) {
     this.upcb = cb;
   }
