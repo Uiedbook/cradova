@@ -4,7 +4,7 @@ import _, { Screen } from "../../dist/src";
 import sm from "../index";
 // import about from "./about";
 // import home from "./info";
-Screen;
+// Screen
 function header(this: any, data: number) {
   data = data || 0;
   this.effect(() => {

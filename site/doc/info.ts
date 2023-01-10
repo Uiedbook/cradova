@@ -1,5 +1,5 @@
 // @ts-ignore
-import _, { Screen, frag } from "../../dist/src/src";
+import _, { Screen, frag } from "../../dist/src";
 
 import sm from "../index";
 // reusable  elements
@@ -20,6 +20,7 @@ const p = _("p.paragraph");
 const code = (code: string, type = "js") =>
   _(
     "pre",
+    // @ts-ignore
     { class: "language-" + type, tabindex: 0 },
     _("code", { class: "language-" + type }, code)
   );
@@ -56,6 +57,7 @@ const body = _(
     style: {
       borderBottom: "2px black solid",
       width: "fit-content",
+      paddingTop: "590px",
     },
     onclick() {
       sm.push("home");
@@ -115,7 +117,9 @@ const body = _(
     p(
       `Static elements don't require any state update in the way they are constructed, they have an unchanged life cycle in the app, examples are .`
     ),
-    code(`_("p")   // creates a p tag only`),
+    code(`_("p")   // creates a p tag only`)({
+      style: { paddingTop: "590px" },
+    }),
     code(`_("p.paragraph") // with class`),
     code(`_("p#paragraph") // with id`),
     code(`_("p.paragraph#paragraph") // with both`),

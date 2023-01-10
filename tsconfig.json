@@ -16,5 +16,5 @@
     "useDefineForClassFields": false,
     "isolatedModules": true
   },
-  "exclude": ["node_modules", "site/workers"]
+  "exclude": ["node_modules", "site"]
 }

@@ -1,9 +1,11 @@
-/node_modules
-node_modules
 dist
 .parcel-cache
+.npmignore
 .cache
 **/.eslintrc.js
 **/.eslintignore
-**/.github/README.md
 coverage
+**/.github/README.md
+
+node_modules/
+dist/

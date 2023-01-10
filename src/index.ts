@@ -294,11 +294,19 @@ const _: any = (...element_initials: any) => {
       for (const prop in properties) {
         if (prop === "style" && typeof properties[prop] === "object") {
           for (const [k, v] of Object.entries(properties[prop])) {
-            if (element.style[k] === "" && k !== "src") {
+            if (
+              (element.style[k] === "" && k !== "src") ||
+              typeof element.style[k] === "string"
+            ) {
               element.style[k] = v;
             } else {
+              console.error(element);
               throw new Error(
-                "✘  Cradova err :  " + k + " is not a valid css style property"
+                "✘  Cradova err :  " +
+                  element +
+                  " does not have " +
+                  k +
+                  " as a valid css style property"
               );
             }
           }

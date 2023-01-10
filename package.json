@@ -2,19 +2,23 @@
   "name": "cradova",
   "version": "1.0.9",
   "description": "Web framework for building web apps and PWAs",
-  "main": "dist/src/index.js",
-  "module": "dist/src/module.js",
+  "main": "dist/index.js",
+  "module": "dist/module.js",
   "source": "src/index.ts",
+  "type": "module",
+  "targets": {
+    "main": false
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/FridayCandour/cradova.git"
   },
   "scripts": {
-    "cp": "cp site/index.html dist/site && cp -r site/assets dist/site && cp -r site/styles dist/site && cp -r site/prism dist/site",
     "produce:static": "parcel build",
-    "produce:build": "rm -rf dist && tsc && npm run cp",
-    "build": "npm run produce:build && npm run produce:static",
-    "serve": "parcel dist/site/index.html",
+    "produce:build": "rm -rf dist && tsc",
+    "build": "npm run produce:build && npm run produce:static && rm -rf dist/site",
+    "serve": "parcel site/index.html",
+    "dev": "parcel watch",
     "lint": "eslint . --fix"
   },
   "keywords": [
@@ -32,15 +36,26 @@
     "linux",
     "mac"
   ],
-  "author": "fridaycandour",
+  "author": "friday candour",
+  "funding": [
+    {
+      "type": "patreon",
+      "url": "https://www.patreon.com/FridayCandour"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "friday candour",
+      "email": "FridayCandours@gmail.com"
+    }
+  ],
   "license": "Apache-2.0",
-  "types": "dist/src/types.d.ts",
+  "types": "dist/module.d.ts",
   "bugs": {
     "url": "https://github.com/FridayCandour/cradova/issues"
   },
   "homepage": "https://github.com/FridayCandour/cradova#readme",
   "displayName": "cradova web framework",
-  "funding": "https://github.com/FridayCandour/cradova#readme",
   "typings": "typescript",
   "devDependencies": {
     "@parcel/packager-ts": "^2.8.2",
