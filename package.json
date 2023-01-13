@@ -5,8 +5,6 @@
   "main": "dist/index",
   "source": "lib/index.ts",
   "type": "module",
-  "isLibrary": true,
-  "optimize": true,
   "targets": {
     "main": false
   },
@@ -67,7 +65,6 @@
   },
   "homepage": "https://github.com/FridayCandour/cradova#readme",
   "displayName": "cradova web framework",
-  "typings": "typescript",
   "devDependencies": {
     "@types/jest": "^29.2.4",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
