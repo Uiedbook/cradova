@@ -254,13 +254,6 @@ export class Signal {
     this.callback = callback;
   }
   /**
-   * Cradova Signal
-   * ----
-   * get value */
-  get() {
-    return this.value;
-  }
-  /**
    *  Cradova Signal
    * ----
    * clear the history on local storage

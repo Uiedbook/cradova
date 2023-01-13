@@ -16,5 +16,6 @@
     "useDefineForClassFields": false,
     "isolatedModules": true
   },
-  "exclude": ["node_modules", "site"]
+  "exclude": ["node_modules", "lib/types"],
+  "include": ["lib"]
 }

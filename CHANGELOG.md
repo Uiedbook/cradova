@@ -42,3 +42,21 @@ and we went along with it.
 - bug fixes
 - big performance gain
 - battle testing green
+
+## 1.0.8
+
+- bug fixes
+- big performance gain
+- battle testing green
+
+## 1.0.10
+
+- bug fixes
+- battle testing green
+
+## 1.1.0
+
+- all bugs fixes
+- great performance gain
+- battle testing green
+- dripping build system

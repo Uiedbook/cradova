@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="80" height="72" xmlns="http://www.w3.org/2000/svg">
+  <g fill-rule="nonzero" fill="none">
+    <path d="M40 71.52L.48 25.6 17.6 2.4 40 0l22.4 2.4 17.12 23.2z" fill="#FFAE00"/>
+    <path d="M40 71.52L.48 25.6h79.04z" fill="#EC6C00"/>
+    <path d="M40 71.52L16.48 25.6h47.04z" fill="#FFAE00"/>
+    <path d="M40 0L16.48 25.6h47.04z" fill="#FFEFB4"/>
+    <path d="M17.6 2.4L8.8 14.08.48 25.6h16.16zM62.4 2.4l8.8 11.68 8.32 11.52H63.36z" fill="#FFAE00"/>
+    <path d="M17.6 2.4l-1.12 23.2L40 0zM62.4 2.4l1.12 23.2L40 0z" fill="#FED305"/>
+  </g>
+</svg>

@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 export function IsElementInView(element: HTMLElement) {
   const rect = element.getBoundingClientRect();
   return (

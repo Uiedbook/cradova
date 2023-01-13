@@ -53,12 +53,11 @@ export const controls = function () {
   }
 };
 
-export function uuid(num = 10) {
-  const Xxs = Array(num).fill("x");
+export function uuid() {
   let t = Date.now ? +Date.now() : +new Date();
-  return Xxs.join("").replace(/[x]/g, function (e) {
+  return "cradova-id-xxxxxxxxxx".replace(/[x]/g, function (e) {
     const r = (t + 16 * Math.random()) % 16 | 0;
-    return (t = Math.floor(t / 16)), ("x" === e ? r : (7 & r) | 8).toString(16);
+    return ("x" === e ? r : (7 & r) | 8).toString(16);
   });
 }
 
@@ -346,16 +345,40 @@ export function assertOr(
 
 export function RefElement(
   element_initials = "div",
-  props: Record<string, string> = {}
+  props: any = {},
+  ...other: any
 ) {
-  props.stateID = uuid();
-  const element = _(element_initials, props);
+  const stateID = uuid();
+  if (Object.prototype.toString.call(props) !== "[object Object]") {
+    other = props;
+    props = { stateID };
+  } else {
+    props["stateID"] = stateID;
+  }
+  const element = _(element_initials, props, other);
   return {
-    render(data: any) {
+    render(data?: any) {
       return element(data);
     },
+    r(data?: any) {
+      return element(data);
+    },
+    instance() {
+      return dispatch(stateID, {
+        cradovaDispatchTrackBreak: true,
+      });
+    },
+    i() {
+      return dispatch(stateID, {
+        cradovaDispatchTrackBreak: true,
+      });
+    },
     updateState(state: Record<string, any>) {
-      dispatch(props.stateID, state);
+      dispatch(stateID, state);
+    },
+    u(state: Record<string, any>) {
+      // console.log(stateID, state);
+      dispatch(stateID, state);
     },
   };
 }
@@ -403,6 +426,12 @@ export class RefList {
   stale(datas: any) {
     this.datas = datas;
   }
+  r(d?: any) {
+    return this.render(d);
+  }
+  u(d?: any) {
+    return this.updateState(d);
+  }
   render(datas?: any) {
     if (datas) {
       this.datas = datas;
@@ -421,9 +450,9 @@ export class RefList {
     const elements: any = [];
     const data = this.datas.length;
     for (let i = 0; i < data; i++) {
-      const chtml = this.component(this.datas[i], i);
-      const element = chtml({ stateID: this.stateID });
-      elements.push(element);
+      elements.push(
+        this.component(this.datas[i], i)({ stateID: this.stateID })
+      );
     }
     return elements;
   }
@@ -444,8 +473,8 @@ export class RefList {
     if (!this.parentElement) {
       // only for the first call
       this.parentElement = dispatch(this.stateID, {
-        cradovaDispatchtrackBreak: true,
-      })![0]?.parentElement;
+        cradovaDispatchTrackBreak: true,
+      })!?.parentElement;
     }
     if (!this.parentElement) {
       throw new Error(
@@ -454,9 +483,7 @@ export class RefList {
     }
     const elements: Node[] = [];
     for (let i = 0; i < datas.length; i++) {
-      const chtml = this.component(datas[i], i);
-      const element = chtml({ stateID: this.stateID });
-      elements.push(element);
+      elements.push(this.component(datas[i], i)({ stateID: this.stateID }));
     }
     try {
       // @ts-ignore
@@ -469,6 +496,16 @@ export class RefList {
   remove() {
     dispatch(this.stateID, { remove: true });
   }
+  instance() {
+    return dispatch(this.stateID, {
+      cradovaDispatchTrackBreak: true,
+    });
+  }
+  i() {
+    return dispatch(this.stateID, {
+      cradovaDispatchTrackBreak: true,
+    });
+  }
 }
 
 /**
@@ -479,18 +516,25 @@ export class RefList {
  */
 
 export class Ref {
-  private component: (...data: any) => any;
+  private component: (data?: any) => any;
   private stateID = uuid();
   private upcb: any;
   //  private parentElement: HTMLElement | null = null;
-  private data: any[] = [undefined];
+  private data: any = undefined;
 
   constructor(component: (...data: any) => any) {
     this.component = component.bind(this);
   }
-  stale(...data: any) {
+  stale(data: any) {
     this.data = data;
   }
+  r(d?: any) {
+    return this.render(d);
+  }
+  u(d?: any) {
+    return this.updateState(d);
+  }
+
   /**
    * Cradova Ref
    * ---
@@ -498,14 +542,14 @@ export class Ref {
    * @param data
    * @returns () => HTMLElement
    */
-  render(...data: any) {
+  render(data?: any) {
     if (data) {
       this.data = data;
     }
-    if (!this.data) {
-      throw new Error(" ✘  Cradova err : Ref cannot be rendered without input");
-    }
-    const chtml = this.component(...this.data);
+    // if (!this.data) {
+    //   throw new Error(" ✘  Cradova err : Ref cannot be rendered without input");
+    // }
+    const chtml = this.component(this.data);
     if (typeof chtml !== "function") {
       throw new Error(
         " ✘  Cradova err :  Invalid component type for cradova Ref, got  -  " +
@@ -531,6 +575,17 @@ export class Ref {
     }
     return () => element;
   }
+
+  instance() {
+    return dispatch(this.stateID, {
+      cradovaDispatchTrackBreak: true,
+    });
+  }
+  i() {
+    return dispatch(this.stateID, {
+      cradovaDispatchTrackBreak: true,
+    });
+  }
   /**
    * Cradova Ref
    * ---
@@ -547,7 +602,7 @@ export class Ref {
    * @param data
    * @returns void
    */
-  updateState(...data: any) {
+  updateState(data: any) {
     if (!data) {
       return;
     }
@@ -561,15 +616,15 @@ export class Ref {
     }
 
     const guy = dispatch(this.stateID, {
-      cradovaDispatchtrackBreak: true,
-    })![0];
+      cradovaDispatchTrackBreak: true,
+    });
     if (!guy) {
-      // console.log(this.component);
+      console.error(this.component);
       throw new Error(
         " ✘  Cradova err:  Ref is not rendered but updateState was called"
       );
     }
-    const chtml = this.component(...data);
+    const chtml = this.component(data);
     if (typeof chtml !== "function") {
       try {
         guy.parentNode!.replaceChild(chtml, guy);

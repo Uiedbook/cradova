@@ -7,6 +7,7 @@
  *
  * @param callback
  * @param touching?
+ * @param element?
  */
 export function swipe(
   callback: (swipe_data: Record<string, number>) => void,
@@ -108,18 +109,18 @@ export function swipe(
     // swipe event
     start() {
       if (touching) {
-        escapeTSError.addEventListener("touchmove", handleGesture);
+        escapeTSError?.addEventListener("touchmove", handleGesture);
       } else {
-        escapeTSError.addEventListener("touchstart", handleTouchStart);
-        escapeTSError.addEventListener("touchend", handleGesture);
+        escapeTSError?.addEventListener("touchstart", handleTouchStart);
+        escapeTSError?.addEventListener("touchend", handleGesture);
       }
     },
     stop() {
       if (touching) {
-        escapeTSError.removeEventListener("touchmove", handleGesture);
+        escapeTSError?.removeEventListener("touchmove", handleGesture);
       } else {
-        escapeTSError.removeEventListener("touchstart", handleTouchStart);
-        escapeTSError.removeEventListener("touchend", handleGesture);
+        escapeTSError?.removeEventListener("touchstart", handleTouchStart);
+        escapeTSError?.removeEventListener("touchend", handleGesture);
       }
     },
   };

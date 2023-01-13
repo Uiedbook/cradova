@@ -85,7 +85,9 @@ export class Screen {
       for (let fnIdex = 0; fnIdex < this.effects.length; fnIdex++) {
         const fn = this.effects[fnIdex];
         const data = await fn();
-        await this.Activate(data, true);
+        if (data) {
+          await this.Activate(data, true);
+        }
       }
     }
   }
@@ -143,10 +145,12 @@ export class Screen {
   //     screen.parentElement?.removeChild(screen);
   //   }
   // }
+
   deActivate() {
     // clearing the dom
-    this.rendered = false;
+    // this.rendered = false;
     this.template.parentElement?.removeChild(this.template);
+    // this.detach();
     // console.log("removed " + this.name);
   }
   async Activate(data?: any, force?: boolean) {
@@ -166,7 +170,9 @@ export class Screen {
 
     document.title = this.name;
     // this.detach();
-    document.getElementById("Cradova-app-wrapper")!.append(this.template);
+    document
+      .querySelector("[data-cra-id=cradova-app-wrapper]")!
+      .append(this.template);
     if (!this.persist) {
       this.packed = false;
     }

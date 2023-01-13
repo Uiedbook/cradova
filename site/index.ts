@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Scaffold } from "../dist/src/module.js";
+import { Scaffold } from "../dist";
 /**
  * import screens
  */

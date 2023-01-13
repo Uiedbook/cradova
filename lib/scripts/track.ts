@@ -1,16 +1,19 @@
 import { fullScreen } from "./fns";
 // the global dispatcher
 
-function cradovaDispatchtrack(nodes: any[], state?: Record<string, any>) {
+function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
   for (let i = 0; i < nodes.length; i++) {
     const element = nodes[i];
+    if (!element) {
+      continue;
+    }
     if (typeof state === "object") {
       // updating the element's state
       for (const key in state) {
         // updating element styling
         if (key === "style") {
           for (const [k, v] of Object.entries(state[key])) {
-            if (element.style[k] === "" && k !== "src") {
+            if (typeof element.style[k] !== "undefined" && k !== "src") {
               element.style[k] = v;
             } else {
               throw new Error(
@@ -20,12 +23,8 @@ function cradovaDispatchtrack(nodes: any[], state?: Record<string, any>) {
           }
           continue;
         }
-        if (element.style[key] && key !== "src") {
-          element.style[key] = state[key];
-          continue;
-        }
 
-        if (element.style[key] === "" && key !== "src") {
+        if (typeof element.style[key] !== "undefined" && key !== "src") {
           element.style[key] = state[key];
           continue;
         }
@@ -55,7 +54,6 @@ function cradovaDispatchtrack(nodes: any[], state?: Record<string, any>) {
               element.classList.add(classes[i]);
             }
           }
-          // console.log(element.className, "cl");
           continue;
         }
         // toggling element class
@@ -125,38 +123,25 @@ export function dispatch(
   stateID: string | Record<string, any>,
   state?: Record<string, any>
 ) {
-  const nodes: Node[] = [];
-  const updated: Node[] = [];
+  let updated = undefined;
   if (typeof state === "undefined" && typeof stateID === "object") {
     for (const [id, eachState] of Object.entries(stateID)) {
-      // filtering;
-      const elements = document.querySelectorAll(".cra_child_doc");
-      for (let i = 0; i < elements.length; i++) {
-        const element = elements[i] as any;
-        if (!element.stateID || element.stateID !== id) {
-          continue;
-        }
-        nodes.push(element);
-      }
-      cradovaDispatchtrack(nodes, eachState);
-      updated.push(...nodes);
+      const elements = document.querySelectorAll(
+        "[data-cra-id=" + id + "]"
+      ) as any;
+      cradovaDispatchTrack(elements, eachState);
     }
   } else {
     if (typeof stateID === "string") {
-      // filtering;
-      const elements = document.querySelectorAll(".cra_child_doc");
-      for (let i = 0; i < elements.length; i++) {
-        const element = elements[i] as any;
-        if (!element.stateID || element.stateID !== stateID) {
-          continue;
+      const elements = document.querySelectorAll(
+        "[data-cra-id=" + stateID + "]"
+      ) as any;
+      if (elements.length) {
+        if (state?.cradovaDispatchTrackBreak) {
+          updated = elements[0];
+        } else {
+          cradovaDispatchTrack(elements, state);
         }
-        nodes.push(element);
-      }
-      if (state?.cradovaDispatchtrackBreak) {
-        updated.push(...nodes);
-      } else {
-        cradovaDispatchtrack(nodes, state);
-        updated.push(...nodes);
       }
     }
   }

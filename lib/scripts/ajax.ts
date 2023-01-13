@@ -8,6 +8,7 @@
  * @param {{method: string;data;header;callbacks;}} opts
  * @returns any
  */
+
 export function Ajax(
   url: string | URL,
   opts:
@@ -56,13 +57,13 @@ export function Ajax(
       if (!navigator.onLine) {
         resolve(
           JSON.stringify({
-            message: `you are offline!`,
+            message: `the device is offline!`,
           })
         );
       } else {
         resolve(
           JSON.stringify({
-            message: `something went wrong please try again!`,
+            message: `problem with the action, please try again!`,
           })
         );
       }

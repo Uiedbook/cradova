@@ -1,8 +1,4 @@
-export type CradovaElementType = HTMLElement &
-  Record<string, any> & {
-    style: Record<string, unknown>;
-    stateID: string;
-  };
+export type CradovaElementType = Record<string, any>;
 // FIXME: This is too rough for use a type for cradova element type
 // replaced with any for
 
@@ -54,7 +50,7 @@ export type CradovaScreenType = {
   transition?: string;
   callBack?: (html?: any, data?: Record<string, any>) => void;
   persist?: boolean;
-  effect: (fn: () => any) => void;
+  effect?: (fn: () => any) => void;
 };
 
 export type RefType = {
@@ -72,6 +68,13 @@ export type RefType = {
    * runs on every state update
    *
    */
+  r: (data: any) => () => HTMLElement;
+  /**
+   * Cradova Ref
+   * ---
+   * runs on every state update
+   *
+   */
   onStateUpdate: (callback: () => void) => void;
   /**
    * Cradova Ref
@@ -81,6 +84,14 @@ export type RefType = {
    * @returns void
    */
   updateState: (data: any) => any;
+  /**
+   * Cradova Ref
+   * ---
+   * update ref component with new data and update the dom.
+   * @param data
+   * @returns void
+   */
+  u: (data: any) => any;
 };
 
 /**

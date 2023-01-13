@@ -74,11 +74,11 @@ Happy coding.
 ```html
 <!-- unpkg -->
 
-<script src="https://unpkg.com/cradova/dist/module.js"></script>
+<script src="https://unpkg.com/cradova/dist/index.js"></script>
 
-<!--    jsdeliver -->
+<!--    js deliver -->
 
-<script src="https://cdn.jsdelivr.net/npm/cradova/dist/module.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cradova/dist/index.js"></script>
 ```
 
 ### npm

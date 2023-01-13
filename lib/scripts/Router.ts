@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { RouterType, RouterRouteObject } from "../types.js";
 
 /**

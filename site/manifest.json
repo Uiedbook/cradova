@@ -1,0 +1,37 @@
+{
+  "name": "cradova PWA sample",
+  "short_name": "cradova app",
+  "description": "cradova PWA sample.",
+  "start_url": "./?utm_source=web_app_manifest",
+  "display": "standalone",
+  "id": "/",
+  "related_applications": ["apps"],
+"theme_color": "#27c8ff",
+    "background_color": "#fff",
+  "icons": [
+    {
+      "src": "assets/splash/manifest-icon-192.maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/splash/manifest-icon-192.maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/splash/manifest-icon-512.maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/splash/manifest-icon-512.maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
