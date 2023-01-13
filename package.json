@@ -12,7 +12,8 @@
     "url": "git+https://github.com/FridayCandour/cradova.git"
   },
   "scripts": {
-    "build": "tsup lib/index.ts && npm run ts",
+    "build": "tsup lib/index.ts && `npm run ts",
+    "buildts": "tsup lib/index.ts",
     "ts": "cp cradova.d.ts dist/index.d.ts",
     "lint": "eslint . --fix"
   },
@@ -39,12 +40,21 @@
     "type": "patreon",
     "url": "https://www.patreon.com/FridayCandour"
   },
-  "contributors": [],
+  "contributors": [
+    {
+      "name": "friday candour",
+      "url": "https://www.t.me/procal"
+    },
+    {
+      "name": "Thomas",
+      "url": "https://github.com/trgwii"
+    }
+  ],
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/FridayCandour/cradova/issues"
   },
-  "homepage": "https://github.com/FridayCandour/cradova#readme",
+  "homepage": "https://github.com/FridayCandour/cradova",
   "devDependencies": {
     "@types/jest": "^29.2.4",
     "@typescript-eslint/eslint-plugin": "^5.47.0",

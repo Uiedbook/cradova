@@ -2,7 +2,7 @@ import type { Options } from "tsup";
 
 const config: Options = {
   entry: ["lib/index.ts"],
-  // dts: true,
+  dts: true,
   clean: true,
   format: ["esm"],
   // format: ["cjs", "esm"],

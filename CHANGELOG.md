@@ -60,3 +60,4 @@ and we went along with it.
 - great performance gain
 - battle testing green
 - dripping build system
+- stable type system

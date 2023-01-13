@@ -16,7 +16,7 @@
 " -----------------------------------------------------------------------------
 " =============================================================================
 "   Cradova FrameWork
-"   @version 1.1.0
+"   @version 1.1.1
 " -----------------------------------------------------------------------------
 " License: Apache V2
 " -----------------------------------------------------------------------------
@@ -41,15 +41,16 @@
 
 // importing cradova helper scripts
 
-export { swipe } from "./sacho/swipe1";
-export { Signal as createSignal } from "./scripts/createSignal";
-export { Router } from "./scripts/Router";
 export { Screen } from "./scripts/Screen";
 export { Scaffold } from "./scripts/Scaffold";
+export { Router } from "./scripts/Router";
 export { dispatch } from "./scripts/track";
-export { Ajax } from "./scripts/ajax";
-export { IsElementInView } from "./scripts/utils";
+export { Signal as createSignal } from "./scripts/createSignal";
 export { simpleStore } from "./scripts/simplestore";
+export { Ajax } from "./scripts/ajax";
+export { swipe } from "./sacho/swipe1";
+export { loadCradovaUICss } from "./sacho/loadCss";
+export { IsElementInView } from "./scripts/utils";
 
 export {
   RefElement as $,
