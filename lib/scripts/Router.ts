@@ -8,14 +8,15 @@ import { RouterType, RouterRouteObject } from "../types.js";
  */
 
 export const Router: RouterType = {};
+const RouterBox: RouterType = {};
 
-Router["lastNavigatedRouteController"] = null;
-Router["nextRouteController"] = null;
-Router["lastNavigatedRoute"] = null;
-Router["pageShow"] = null;
-Router["pageHide"] = null;
-Router["params"] = {};
-Router["routes"] = {};
+RouterBox["lastNavigatedRouteController"] = null;
+RouterBox["nextRouteController"] = null;
+RouterBox["lastNavigatedRoute"] = null;
+RouterBox["pageShow"] = null;
+RouterBox["pageHide"] = null;
+RouterBox["params"] = {};
+RouterBox["routes"] = {};
 
 /**
  *
@@ -27,11 +28,11 @@ const checker = (
   url: string
 ): [RouterRouteObject, Record<string, any> | null] | [] => {
   // first strict check
-  if (Router.routes[url]) {
-    return [Router.routes[url], null];
+  if (RouterBox.routes[url]) {
+    return [RouterBox.routes[url], null];
   }
   // place holder check
-  for (const path in Router.routes) {
+  for (const path in RouterBox.routes) {
     if (!path.includes(":")) {
       continue;
     }
@@ -80,13 +81,14 @@ const checker = (
             routesParams[pathFixtures[i].split(":")[1]] = urlFixtures[i];
           }
         }
-        return [Router.routes[path], routesParams];
+        return [RouterBox.routes[path], routesParams];
       }
     }
   }
   return [];
 };
-/**
+/** cradova router
+ * ---
  * Registers a route.
  *
  * @param {string}   path     Route path.
@@ -97,7 +99,7 @@ Router.route = function (path = "/", screen: any) {
     console.error(" ✘  Cradova err:  not a valid screen  " + screen);
     throw new Error(" ✘  Cradova err:  Not a valid cradova screen component");
   }
-  Router.routes[path] = {
+  RouterBox.routes[path] = {
     controller: (params: any, force?: boolean) =>
       screen.Activate(params, force),
     packager: async (params: any) => await screen.package(params),
@@ -131,7 +133,7 @@ Router.navigate = function (
   let route = null,
     params,
     link = null;
-  if (href.includes(".")) {
+  if (href.includes("://")) {
     window.location.href = href;
   } else {
     if (href === window.location.pathname) {
@@ -139,15 +141,15 @@ Router.navigate = function (
     }
     [route, params] = checker(href);
     if (route) {
-      Router["nextRouteController"] = route;
-      Router.params.params = params || null;
-      Router.params.data = data || null;
+      RouterBox["nextRouteController"] = route;
+      RouterBox.params.params = params || null;
+      RouterBox.params.data = data || null;
       link = href;
-      Router["pageHide"] && Router["pageHide"](href + " :navigated");
+      RouterBox["pageHide"] && RouterBox["pageHide"](href + " :navigated");
       window.history.pushState({}, "", link);
       setTimeout(async () => {
         // INFO: this fixed a bug but isn't necessary
-        await Router.router(null, force);
+        await RouterBox.router(null, force);
       }, 0);
     }
   }
@@ -164,7 +166,7 @@ Router.navigate = function (
  * * Responds to popstate and load events and does it's job
  * @param {Event} e Click event | popstate event | load event.
  */
-Router.router = async function (e: any, force = false) {
+RouterBox.router = async function (e: any, force = false) {
   let Alink, url, route, params;
   if (e && e.target.tagName) {
     Alink = e.target;
@@ -186,23 +188,23 @@ Router.router = async function (e: any, force = false) {
     return;
   }
 
-  if (Router["nextRouteController"]) {
-    route = Router["nextRouteController"];
-    Router["nextRouteController"] = null;
-    params = Router.params.params;
+  if (RouterBox["nextRouteController"]) {
+    route = RouterBox["nextRouteController"];
+    RouterBox["nextRouteController"] = null;
+    params = RouterBox.params.params;
   } else {
     [route, params] = checker(url);
   }
   if (route) {
-    Router.params.event = e;
-    Router.params.params = params || null;
-    Router.params.data = Router.params.data || null;
-    Router["lastNavigatedRouteController"] &&
-      Router["lastNavigatedRouteController"].deactivate();
-    await route.controller(Router.params, force);
-    Router["pageShow"] && Router["pageShow"](url);
-    Router["lastNavigatedRoute"] = url;
-    Router["lastNavigatedRouteController"] = route;
+    RouterBox.params.event = e;
+    RouterBox.params.params = params || null;
+    RouterBox.params.data = RouterBox.params.data || null;
+    RouterBox["lastNavigatedRouteController"] &&
+      RouterBox["lastNavigatedRouteController"].deactivate();
+    await route.controller(RouterBox.params, force);
+    RouterBox["pageShow"] && RouterBox["pageShow"](url);
+    RouterBox["lastNavigatedRoute"] = url;
+    RouterBox["lastNavigatedRouteController"] = route;
     // click handlers
     Array.from(window.document.querySelectorAll("a")).forEach((a) => {
       a.addEventListener("click", (e) => {
@@ -212,14 +214,14 @@ Router.router = async function (e: any, force = false) {
     });
   } else {
     // or 404
-    if (Router.routes["/404"]) {
-      Router.routes["/404"].controller(Router.params);
+    if (RouterBox.routes["/404"]) {
+      RouterBox.routes["/404"].controller(RouterBox.params);
     } else {
       // or error
       console.error(
         " ✘  Cradova err: route '" +
           url +
-          "' does not exist and no /404 route given!"
+          "' does not exist and no '/404' route given!"
       );
     }
   }
@@ -231,7 +233,7 @@ Router["onPageShow"] =
    */
   function (callback: () => void) {
     if (typeof callback === "function") {
-      Router["pageShow"] = callback;
+      RouterBox["pageShow"] = callback;
     } else {
       throw new Error(
         " ✘  Cradova err:  callback for pageShow event is not a function"
@@ -240,14 +242,15 @@ Router["onPageShow"] =
   };
 Router["onPageHide"] = function (callback: () => void) {
   if (typeof callback === "function") {
-    Router["pageHide"] = callback;
+    RouterBox["pageHide"] = callback;
   } else {
     throw new Error(
       " ✘  Cradova err:  callback for pageHide event is not a function"
     );
   }
 };
-/**
+/** cradova router
+ * ---
  * get a screen ready before time.
  *
  * @param {string}   path     Route path.
@@ -260,8 +263,8 @@ Router.packageScreen = async function (path: string, data: any) {
   }
   await Router.routes[path].packager(data);
 };
-window.addEventListener("pageshow", Router.router);
+window.addEventListener("pageshow", RouterBox.router);
 window.addEventListener("popstate", (e) => {
   e.preventDefault();
-  Router.router(e);
+  RouterBox.router(e);
 });

@@ -45,7 +45,8 @@ export { Screen } from "./scripts/Screen";
 export { Scaffold } from "./scripts/Scaffold";
 export { Router } from "./scripts/Router";
 export { dispatch } from "./scripts/track";
-export { Signal as createSignal } from "./scripts/createSignal";
+import { dispatch } from "./scripts/track";
+export { createSignal } from "./scripts/createSignal";
 export { simpleStore } from "./scripts/simplestore";
 export { Ajax } from "./scripts/ajax";
 export { swipe } from "./sacho/swipe1";
@@ -64,12 +65,10 @@ export {
   ls,
   media,
   Ref,
-  RefElement,
   RefList,
   PromptBeforeLeave,
   uuid,
 } from "./scripts/fns";
-
 import { Init } from "./scripts/init";
 
 // importing types declarations
@@ -189,7 +188,8 @@ const _: any = (...element_initials: any) => {
     firstLevelChildren: any[] = [],
     beforeMount: (self: CradovaElementType) => void;
   if (
-    Object.prototype.toString.call(element_initials[1]) === "[object Object]"
+    typeof element_initials[1] === "object" &&
+    !Array.isArray(element_initials[1])
   ) {
     firstProps = element_initials[1];
     if (firstProps?.beforeMount) {
@@ -200,13 +200,7 @@ const _: any = (...element_initials: any) => {
       firstLevelChildren = element_initials.slice(2, element_initials.length);
     }
   } else {
-    if (
-      element_initials[1] instanceof HTMLElement ||
-      typeof element_initials[1] === "function" ||
-      typeof element_initials[1] === "string"
-    ) {
-      firstLevelChildren = element_initials.slice(1, element_initials.length);
-    }
+    firstLevelChildren = element_initials.slice(1, element_initials.length);
   }
 
   if (element_initials[0].raw) {
@@ -253,7 +247,7 @@ const _: any = (...element_initials: any) => {
         text;
 
       for (let i = 0; i < incoming.length; i++) {
-        if (Object.prototype.toString.call(incoming[i]) === "[object Object]") {
+        if (typeof incoming[i] === "object" && !Array.isArray(incoming[1])) {
           props = incoming[i];
           if (incoming[i].beforeMount) {
             beforeMount = incoming[i]["beforeMount"];
@@ -292,7 +286,6 @@ const _: any = (...element_initials: any) => {
       if (initials.className) {
         element.className = initials.className.trim();
       }
-
       if (initials.ID) {
         element.setAttribute("id", initials.ID.trim());
       }
@@ -326,12 +319,20 @@ const _: any = (...element_initials: any) => {
           continue;
         }
         // text content
-        if (prop === "text" && typeof props[prop] === "string") {
+        if (
+          prop === "text" &&
+          typeof props[prop] === "string" &&
+          props[prop] !== ""
+        ) {
           text = props[prop];
           continue;
         }
         // class name
-        if (prop === "class" && typeof props[prop] === "string") {
+        if (
+          prop === "class" &&
+          typeof props[prop] === "string" &&
+          props[prop] !== ""
+        ) {
           element.classList.add(props[prop]);
           continue;
         }
@@ -351,9 +352,25 @@ const _: any = (...element_initials: any) => {
           element.setAttribute("data-" + prop.split("$")[1], props[prop]);
           continue;
         }
+        // setting data attribute
+        if (prop === "shouldUpdate" && props[prop] === true) {
+          element.updateState = dispatch.bind(null, element);
+          continue;
+        }
         // trying to set other values
         try {
-          element[prop] = props[prop];
+          if (typeof element[prop] !== "undefined") {
+            element[prop] = props[prop];
+          } else {
+            element[prop] = props[prop];
+            if (
+              prop !== "afterMount" &&
+              prop !== "for" &&
+              !prop.includes("aria")
+            ) {
+              console.error(" ✘  Cradova err:  invalid html attribute " + prop);
+            }
+          }
         } catch (error) {
           console.error(" ✘  Cradova err:  ", error);
         }

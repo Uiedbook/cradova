@@ -12,7 +12,7 @@
     "url": "git+https://github.com/FridayCandour/cradova.git"
   },
   "scripts": {
-    "build": "tsup lib/index.ts && `npm run ts",
+    "build": "tsup lib/index.ts && npm run ts &&  cp lib/types.ts dist/types.ts ",
     "buildts": "tsup lib/index.ts",
     "ts": "cp cradova.d.ts dist/index.d.ts",
     "lint": "eslint . --fix"

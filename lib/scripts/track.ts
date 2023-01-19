@@ -7,7 +7,7 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
     if (!element) {
       continue;
     }
-    if (typeof state === "object") {
+    if (typeof state === "object" && !Array.isArray(state)) {
       // updating the element's state
       for (const key in state) {
         // updating element styling
@@ -47,7 +47,11 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
           continue;
         }
         // adding class name to element
-        if (key === "class" && typeof state[key] === "string") {
+        if (
+          key === "class" &&
+          typeof state[key] === "string" &&
+          state[key] !== ""
+        ) {
           const classes = state[key].split(" ");
           for (let i = 0; i < classes.length; i++) {
             if (classes[i]) {
@@ -57,13 +61,13 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
           continue;
         }
         // toggling element class
-        if (key === "toggleclass") {
+        if (key === "toggleclass" && state[key] !== "") {
           element.classList.toggle(state[key]);
           //          console.log(element.className, "tc");
           continue;
         }
         //removing element class
-        if (key === "removeclass") {
+        if (key === "removeclass" && state[key] !== "") {
           element.classList.remove(state[key]);
           //  console.log(element.className, "rm");
           continue;
@@ -71,6 +75,13 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
         //removing element element
         if (key === "remove") {
           element.parentElement?.removeChild(element);
+          continue;
+        }
+
+        //
+        // setting data attribute
+        if (key.includes("$")) {
+          element.setAttribute("data-" + key.split("$")[1], state[key]);
           continue;
         }
 
@@ -92,17 +103,15 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
 
           if (!(state[key] instanceof HTMLElement)) {
             console.error(
-              " ✘  Cradova err:   wrong element type: can't update element state on " +
+              " ✘  Cradova err:   wrong element type: can't update tree using " +
                 state[key]
             );
             throw new TypeError(
               " ✘  Cradova err:   invalid element, should be a html element from cradova"
             );
           }
-          // destroy the component tree
-          element.replaceChildren();
-          // rebuild the component tree
-          element.append(state[key]);
+          // replace the component tree
+          element.replaceChildren(state[key]);
           continue;
         }
         element[key] = state[key];
@@ -123,12 +132,17 @@ export function dispatch(
   stateID: string | Record<string, any>,
   state?: Record<string, any>
 ) {
+  let ele;
+  if (stateID instanceof HTMLElement) {
+    ele = stateID;
+  }
   let updated = undefined;
-  if (typeof state === "undefined" && typeof stateID === "object") {
+  if (typeof state === "undefined" && typeof stateID === "object" && !ele) {
     for (const [id, eachState] of Object.entries(stateID)) {
       const elements = document.querySelectorAll(
         "[data-cra-id=" + id + "]"
       ) as any;
+      updated = elements.length === 1 ? elements[0] : elements;
       cradovaDispatchTrack(elements, eachState);
     }
   } else {
@@ -137,12 +151,14 @@ export function dispatch(
         "[data-cra-id=" + stateID + "]"
       ) as any;
       if (elements.length) {
-        if (state?.cradovaDispatchTrackBreak) {
-          updated = elements[0];
-        } else {
+        updated = elements.length === 1 ? elements[0] : elements;
+        if (!state?.cradovaDispatchTrackBreak) {
           cradovaDispatchTrack(elements, state);
         }
       }
+    }
+    if (ele) {
+      cradovaDispatchTrack([ele] as any, state);
     }
   }
   return updated;

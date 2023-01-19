@@ -67,15 +67,6 @@ declare module "cradova" {
          * @param {any} screen the cradova document tree for the route.
          */
         route: (path: string, screen: CradovaScreenType) => void;
-        routes: Record<string, RouterRouteObject>;
-        lastNavigatedRoute: string | null;
-        lastNavigatedRouteController: RouterRouteObject | null;
-        nextRouteController: RouterRouteObject | null;
-        params: Record<string, any>;
-        /**
-         * n/a
-         */
-        router: (e: any, force?: boolean) => void;
         /**
          * get a screen ready before time.
          *
@@ -83,8 +74,6 @@ declare module "cradova" {
          * @param {any} data data for the screen.
          */
         packageScreen: (path: string, data?: any) => void;
-        pageShow: ((path: string) => void) | null;
-        pageHide: ((path: string) => void) | null;
         onPageShow: (callback: () => void) => void;
         onPageHide: (callback: () => void) => void;
         /**
@@ -198,7 +187,7 @@ declare module "cradova" {
    * - update a cradova Ref/RefList automatically
    * @constructor initial: any, props: {useHistory, persist}
    */
-  export class Signal {
+  export class createSignal {
     private callback;
     private persistName;
     private actions;
@@ -333,7 +322,7 @@ declare module "cradova" {
   export class simpleStore {
     private ref;
     value: any;
-    constructor(initial: unknown, ref: RefType);
+    constructor(initial: unknown, ref?: RefType);
     /**
      *  Cradova simpleStore
      * ----
@@ -491,10 +480,13 @@ _.animate("polarization",
     ifTrue: () => any,
     ifFalse: () => any
   ): () => any;
-  /**
+  /** @deprecated
+   *
    * Create element and get a callback to update their state
    * no need to manage stateIDs
    * ----------------------------------------------------------------
+   * please use element.updateState(state) instead in listeners and mount events
+   * ---
    *
    * @param element_initials
    * @param props

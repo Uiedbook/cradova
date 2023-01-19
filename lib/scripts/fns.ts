@@ -179,9 +179,24 @@ css(".btn:hover",
 
 */
 
-export function css(identifier: string, properties: Record<string, string>) {
+export function css(
+  identifier: string,
+  properties: Record<string, string> = {}
+) {
   /*This is for creating
  css styles using JavaScript*/
+  if (typeof identifier === "string" && typeof properties === "undefined") {
+    let styTag = document.querySelector("style");
+    if (styTag !== null) {
+      identifier += styTag.textContent!;
+      styTag.textContent = identifier;
+      return;
+    }
+    styTag = document.createElement("style");
+    styTag.textContent = identifier;
+    document.head.append(styTag);
+    return;
+  }
 
   const styS =
     "" +
@@ -333,10 +348,13 @@ export function assertOr(
   return ifFalse;
 }
 
-/**
+/** @deprecated
+ *
  * Create element and get a callback to update their state
  * no need to manage stateIDs
  * ----------------------------------------------------------------
+ * please use element.updateState(state) instead in listeners and mount events
+ * ---
  *
  * @param element_initials
  * @param props
@@ -349,7 +367,7 @@ export function RefElement(
   ...other: any
 ) {
   const stateID = uuid();
-  if (Object.prototype.toString.call(props) !== "[object Object]") {
+  if (typeof props === "object" && !Array.isArray(element_initials[1])) {
     other = props;
     props = { stateID };
   } else {
@@ -619,9 +637,10 @@ export class Ref {
       cradovaDispatchTrackBreak: true,
     });
     if (!guy) {
-      console.error(this.component);
       throw new Error(
-        " ✘  Cradova err:  Ref is not rendered but updateState was called"
+        " ✘  Cradova err:  Ref is not rendered but updateState was called",
+        // @ts-ignore
+        this.component
       );
     }
     const chtml = this.component(data);
@@ -665,16 +684,35 @@ export class Ref {
 
 type fragmentTYPE = () => (() => HTMLElement) | HTMLElement;
 
-export const frag = function (...children: fragmentTYPE[]) {
+export const frag = function (children: fragmentTYPE[]) {
   const par = document.createDocumentFragment();
   // building it's children tree.
   for (let i = 0; i < children.length; i++) {
-    const ch = children[i]();
-    if (typeof ch === "function") {
-      par.append(ch());
-    } else {
-      if (ch instanceof HTMLElement) {
-        par.append(ch);
+    if (typeof children[i] === "function") {
+      const a = children[i]() as any;
+      if (typeof a === "function") {
+        const b = a() as any;
+        if (b instanceof HTMLElement) {
+          par.append(b);
+        } else {
+          if (!(b instanceof HTMLElement)) {
+            console.error(" ✘  Cradova err:   wrong element type" + b);
+            throw new TypeError(
+              " ✘  Cradova err:   invalid element, should be a html element from cradova"
+            );
+          }
+        }
+      } else {
+        if (a instanceof HTMLElement) {
+          par.append(a);
+        } else {
+          if (!(a instanceof HTMLElement)) {
+            console.error(" ✘  Cradova err:   wrong element type" + a);
+            throw new TypeError(
+              " ✘  Cradova err:   invalid element, should be a html element from cradova"
+            );
+          }
+        }
       }
     }
   }

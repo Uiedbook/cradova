@@ -14,7 +14,7 @@
  * @constructor initial: any, props: {useHistory, persist}
  */
 
-export class Signal {
+export class createSignal {
   private callback: undefined | ((newValue: any) => void);
   private persistName: string | undefined = "";
   private actions: Record<string, any> = {};

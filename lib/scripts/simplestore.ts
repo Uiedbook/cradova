@@ -14,9 +14,11 @@ import { RefType } from "../types";
 export class simpleStore {
   private ref: any;
   value: any = null;
-  constructor(initial: unknown, ref: RefType) {
+  constructor(initial: unknown, ref?: RefType) {
     this.value = initial;
-    this.bindRef(ref);
+    if (ref) {
+      this.bindRef(ref);
+    }
   }
   /**
    *  Cradova simpleStore

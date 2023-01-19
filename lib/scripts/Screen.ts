@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-undef */
 import { CradovaScreenType } from "../types.js";
 /**
  * @param name
@@ -20,7 +18,7 @@ export class Screen {
   /**
    * used internally
    */
-  private template: HTMLElement;
+  private template: DocumentFragment;
   /**
    * this a set of two class names
    * one for the entry transition
@@ -54,23 +52,17 @@ export class Screen {
       cradova_screen_initials;
     if (typeof template !== "function") {
       throw new Error(
-        " ✘  Cradova err:   only functions that returns a cradova element is valid as screen"
+        " ✘  Cradova err: only functions that returns a cradova element is valid as screen"
       );
     }
     this.html = template.bind(this);
     this.name = name;
-    this.template = document.createElement("div");
-    // this.template.style.width = "100%";
-    // this.template.style.display = "flex";
-    // this.template.style.flexDirection = "column";
-    this.template.id = "cradova-screen-set";
+    this.template = document.createDocumentFragment();
+    // this.template.id = "cradova-screen-set";
     this.callBack = callBack;
     this.transition = transition;
-    if (typeof persist !== "undefined") {
-      this.persist = true;
-    }
-    if (persist === false) {
-      this.persist = false;
+    if (typeof persist === "boolean") {
+      this.persist = persist;
     }
   }
 
@@ -93,18 +85,18 @@ export class Screen {
   }
 
   async package(data?: any) {
-    // if (this.template.firstChild) {
-    //   this.template.replaceChildren();
-    // }
     if (typeof this.html === "function") {
-      let fuc = await this.html(data);
+      let fuc = (await this.html(data)) as any;
       if (typeof fuc === "function") {
-        fuc = fuc(data);
+        fuc = fuc();
         if (!(fuc instanceof HTMLElement)) {
           throw new Error(
             " ✘  Cradova err:   only parent with descendants is valid"
           );
         } else {
+          if (this.transition) {
+            fuc.classList.add("CRADOVA-UI-" + this.transition);
+          }
           this.template.replaceChildren(fuc);
         }
       }
@@ -114,7 +106,9 @@ export class Screen {
         " ✘  Cradova err:  no screen is rendered, may have been past wrongly, try ()=> screen; in cradova Router.route(name, screen)"
       );
     }
-    this.template.append(...this.secondaryChildren);
+    if (this.secondaryChildren.length) {
+      this.template.append(...this.secondaryChildren);
+    }
   }
 
   onActivate(cb: (data: any) => void) {
@@ -138,20 +132,21 @@ export class Screen {
   //     return;
   //   }
   //   for (let i = 0; i < screens.length; i++) {
-  //     const screen = screens[i];
   //     if (this.transition) {
-  //       screen.classList.remove("CRADOVA-UI-" + this.transition);
+  //       screens[i].classList.remove("CRADOVA-UI-" + this.transition);
   //     }
-  //     screen.parentElement?.removeChild(screen);
+  //     screens[i].parentElement?.removeChild(screens[i]);
   //   }
   // }
 
   deActivate() {
     // clearing the dom
-    // this.rendered = false;
     this.template.parentElement?.removeChild(this.template);
+    if (!this.persist) {
+      this.rendered = false;
+    }
+    // fail safe
     // this.detach();
-    // console.log("removed " + this.name);
   }
   async Activate(data?: any, force?: boolean) {
     if (!this.persist) {
@@ -166,25 +161,23 @@ export class Screen {
     if (force) {
       await this.package(data);
       this.packed = true;
+      this.rendered = false;
     }
 
     document.title = this.name;
-    // this.detach();
-    document
-      .querySelector("[data-cra-id=cradova-app-wrapper]")!
-      .append(this.template);
+    const doc = document.querySelector("[data-cra-id=cradova-app-wrapper]");
+    doc?.replaceChildren(this.template);
     if (!this.persist) {
       this.packed = false;
     }
     // running effects if any available
     await this.effector();
     //  @ts-ignore
-    if (this.template.firstChild.afterMount) {
+    if (doc?.firstChild?.afterMount) {
       //  @ts-ignore
-      this.template.firstChild!.afterMount();
-    }
-    if (this.transition) {
-      this.template?.classList.add("CRADOVA-UI-" + this.transition);
+      doc?.firstChild.afterMount();
+      //  @ts-ignore
+      doc.firstChild.afterMount = undefined;
     }
     if (this.callBack) {
       await this.callBack(data);
