@@ -1,5 +1,8 @@
 import { CradovaScreenType } from "../types.js";
 /**
+ *  Cradova Screen
+ * ---
+ * create instances of manageable pages and scaffolds
  * @param name
  * @param template
  * @param transitions
@@ -8,7 +11,7 @@ export class Screen {
   /**
    * this should be a cradova screen component
    */
-  private html: HTMLElement | Function;
+  private html: Function;
   /**
    * this is the name of the screen that appears as the title
    */
@@ -18,16 +21,14 @@ export class Screen {
   /**
    * used internally
    */
-  private template: DocumentFragment;
+  private template = document.createElement("div");
   /**
    * this a set of two class names
    * one for the entry transition
    * and one for the exit transition
    */
   private transition: string | undefined;
-  private callBack:
-    | ((data?: Record<string, any>) => void | undefined)
-    | undefined;
+  private callBack: ((data?: Record<string, any>) => Promise<void>) | undefined;
   // SCREEN ANIMATION CLASSES
   static SCALE_IN = "SCALE-IN";
   static SCALE_OUT = "SCALE-OUT";
@@ -57,8 +58,7 @@ export class Screen {
     }
     this.html = template.bind(this);
     this.name = name;
-    this.template = document.createDocumentFragment();
-    // this.template.id = "cradova-screen-set";
+    this.template.id = "cradova-screen-set";
     this.callBack = callBack;
     this.transition = transition;
     if (typeof persist === "boolean") {
@@ -73,7 +73,6 @@ export class Screen {
   }
   async effector() {
     if (!this.rendered) {
-      this.rendered = true;
       for (let fnIdex = 0; fnIdex < this.effects.length; fnIdex++) {
         const fn = this.effects[fnIdex];
         const data = await fn();
@@ -81,6 +80,7 @@ export class Screen {
           await this.Activate(data, true);
         }
       }
+      this.rendered = true;
     }
   }
 
@@ -111,7 +111,7 @@ export class Screen {
     }
   }
 
-  onActivate(cb: (data: any) => void) {
+  onActivate(cb: (data: any) => Promise<void>) {
     this.callBack = cb;
   }
   addChild(...addOns: any[]) {
@@ -125,28 +125,12 @@ export class Screen {
     }
   }
 
-  // detach() {
-  //   // clearing the dom
-  //   const screens = document.querySelectorAll("#cradova-screen-set");
-  //   if (!screens.length) {
-  //     return;
-  //   }
-  //   for (let i = 0; i < screens.length; i++) {
-  //     if (this.transition) {
-  //       screens[i].classList.remove("CRADOVA-UI-" + this.transition);
-  //     }
-  //     screens[i].parentElement?.removeChild(screens[i]);
-  //   }
-  // }
-
   deActivate() {
-    // clearing the dom
-    this.template.parentElement?.removeChild(this.template);
+    // fail safe
+    // this.template.parentElement?.removeChild(this.template);
     if (!this.persist) {
       this.rendered = false;
     }
-    // fail safe
-    // this.detach();
   }
   async Activate(data?: any, force?: boolean) {
     if (!this.persist) {
@@ -163,15 +147,24 @@ export class Screen {
       this.packed = true;
       this.rendered = false;
     }
-
     document.title = this.name;
     const doc = document.querySelector("[data-cra-id=cradova-app-wrapper]");
-    doc?.replaceChildren(this.template);
+    if (!doc)
+      throw new Error(
+        " ✘  Cradova err: Unable to render, cannot find cradova root [data-cra-id=cradova-app-wrapper]"
+      );
+    if (this.persist) {
+      doc.replaceChildren(this.template.cloneNode(true));
+    } else {
+      doc?.replaceChildren(this.template);
+    }
     if (!this.persist) {
       this.packed = false;
     }
     // running effects if any available
-    await this.effector();
+    if (this.effects.length) {
+      await this.effector();
+    }
     //  @ts-ignore
     if (doc?.firstChild?.afterMount) {
       //  @ts-ignore

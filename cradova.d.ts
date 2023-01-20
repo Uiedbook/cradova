@@ -91,6 +91,9 @@ declare module "cradova" {
     | Record<string, any>;
 
   /**
+   *  Cradova Screen
+   * ---
+   * create instances of manageable pages and scaffolds
    * @param name
    * @param template
    * @param transitions

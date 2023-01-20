@@ -147,10 +147,13 @@ Router.navigate = function (
       link = href;
       RouterBox["pageHide"] && RouterBox["pageHide"](href + " :navigated");
       window.history.pushState({}, "", link);
-      setTimeout(async () => {
-        // INFO: this fixed a bug but isn't necessary
+      (async () => {
         await RouterBox.router(null, force);
-      }, 0);
+      })();
+      // setTimeout(async () => {
+      //   // INFO: this fixed a bug but isn't necessary
+      //   await RouterBox.router(null, force);
+      // }, 0);
     }
   }
 };
@@ -166,6 +169,7 @@ Router.navigate = function (
  * * Responds to popstate and load events and does it's job
  * @param {Event} e Click event | popstate event | load event.
  */
+
 RouterBox.router = async function (e: any, force = false) {
   let Alink, url, route, params;
   if (e && e.target.tagName) {
@@ -257,11 +261,11 @@ Router["onPageHide"] = function (callback: () => void) {
  * @param {any} data data for the screen.
  */
 Router.packageScreen = async function (path: string, data: any) {
-  if (!Router.routes[path]) {
+  if (!RouterBox.routes[path]) {
     console.error(" ✘  Cradova err:  no screen with path " + path);
     throw new Error(" ✘  Cradova err:  cradova err: Not a defined screen path");
   }
-  await Router.routes[path].packager(data);
+  await RouterBox.routes[path].packager(data);
 };
 window.addEventListener("pageshow", RouterBox.router);
 window.addEventListener("popstate", (e) => {

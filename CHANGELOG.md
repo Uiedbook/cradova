@@ -61,3 +61,11 @@ and we went along with it.
 - battle testing green
 - dripping build system
 - stable type system
+
+## 1.2.0
+
+- bugs fixes
+- new performance gain unlocked
+- battle testing green
+- new apis for element level
+- fixed all know abnormal behaviors

@@ -366,6 +366,7 @@ const _: any = (...element_initials: any) => {
             if (
               prop !== "afterMount" &&
               prop !== "for" &&
+              prop !== "text" &&
               !prop.includes("aria")
             ) {
               console.error(" ✘  Cradova err:  invalid html attribute " + prop);

@@ -48,7 +48,7 @@ export type CradovaScreenType = {
   name: string;
   template: Function | HTMLElement;
   transition?: string;
-  callBack?: (html?: any, data?: Record<string, any>) => void;
+  callBack?: (html?: any, data?: Record<string, any>) => Promise<void>;
   persist?: boolean;
   effect?: (fn: () => any) => void;
 };
