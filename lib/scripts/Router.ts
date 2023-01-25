@@ -119,16 +119,16 @@ Router.navigate = function (
   data: Record<string, any> | null = null,
   force = false
 ) {
-  if (typeof data === "boolean") {
-    force = true;
-    data = null;
-  }
   if (typeof href !== "string") {
     throw new TypeError(
       " ✘  Cradova err:  href must be a defined path but got " +
         href +
         " instead"
     );
+  }
+  if (typeof data === "boolean") {
+    force = true;
+    data = null;
   }
   let route = null,
     params,
@@ -150,10 +150,6 @@ Router.navigate = function (
       (async () => {
         await RouterBox.router(null, force);
       })();
-      // setTimeout(async () => {
-      //   // INFO: this fixed a bug but isn't necessary
-      //   await RouterBox.router(null, force);
-      // }, 0);
     }
   }
 };

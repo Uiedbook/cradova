@@ -97,13 +97,13 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
 
           if (Array.isArray(state[key])) {
             throw new TypeError(
-              " ✘  Cradova err:   invalid tree element type, should be a single element or parent element from cradova"
+              " ✘  Cradova err: invalid tree element type, should be a single element or parent element from cradova"
             );
           }
 
           if (!(state[key] instanceof HTMLElement)) {
             console.error(
-              " ✘  Cradova err:   wrong element type: can't update tree using " +
+              " ✘  Cradova err:  wrong element type: can't update tree using " +
                 state[key]
             );
             throw new TypeError(
@@ -114,8 +114,29 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
           element.replaceChildren(state[key]);
           continue;
         }
-        element[key] = state[key];
+        // trying to set other values
+        try {
+          if (typeof element[key] !== "undefined") {
+            element[key] = state[key];
+          } else {
+            element[key] = state[key];
+            if (
+              key !== "afterMount" &&
+              key !== "for" &&
+              key !== "text" &&
+              key !== "class" &&
+              !key.includes("aria")
+            ) {
+              console.error(" ✘  Cradova err:  invalid html attribute " + key);
+            }
+          }
+        } catch (error) {
+          console.error(" ✘  Cradova err: Cradova got ", state);
+          console.error(" ✘  Cradova err:  ", error);
+        }
       }
+    } else {
+      throw new TypeError(" ✘  Cradova err:   invalid state object" + state);
     }
   }
 }

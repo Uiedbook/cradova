@@ -1,12 +1,41 @@
 declare module "cradova" {
-  type CradovaScreenType = {
+  type CradovaScreenTyping = {
     name: string;
     template: Function | HTMLElement;
     transition?: string;
-    callBack?: (html?: any, data?: Record<string, any>) => void;
     persist?: boolean;
-    effect?: (fn: () => any) => void;
+    /**
+     * Cradova screen
+     * ---
+     * runs once after first render
+     *
+     */
   };
+
+  type CradovaScreenType = {
+    /**
+     * Cradova screen
+     * ---
+     * runs once after first render
+     *
+     */
+    effect?(fn: () => void | Promise<void>): void;
+    /**
+     * Cradova screen
+     * ---
+     * runs on first render.
+     * @param data
+     * @returns void
+     *
+     *
+     * .
+     *
+     */
+    updateState: (data: any) => any;
+  };
+
+  type CradovaElementType = Record<string, any>;
+
   type RefType = {
     /**
      * Cradova Ref
@@ -26,10 +55,10 @@ declare module "cradova" {
     /**
      * Cradova Ref
      * ---
-     * runs on every state update
+     * runs on render and every state update
      *
      */
-    onStateUpdate: (callback: () => void) => void;
+    effect(fn: (data: unknown) => Promise<void> | void): void;
     /**
      * Cradova Ref
      * ---
@@ -99,27 +128,6 @@ declare module "cradova" {
    * @param transitions
    */
   export class Screen {
-    /**
-     * this should be a cradova screen component
-     */
-    private html;
-    /**
-     * this is the name of the screen that appears as the title
-     */
-    name: string;
-    private packed;
-    secondaryChildren: Array<any>;
-    /**
-     * used internally
-     */
-    private template;
-    /**
-     * this a set of two class names
-     * one for the entry transition
-     * and one for the exit transition
-     */
-    private transition;
-    private callBack;
     static SCALE_IN: string;
     static SCALE_OUT: string;
     static CIRCLE_IN: string;
@@ -131,15 +139,21 @@ declare module "cradova" {
     static SLIDE_LEFT: string;
     static SLIDE_RIGHT: string;
     /**
-     * this tells cradova to persist state on the screen or not
-     * persisting is better
+     *  Cradova Screen
+     * ---
+     * create instances of manageable pages and scaffolds
+     * @param name
+     * @param template
+     * @param transitions
      */
-    persist: boolean;
-    rendered: boolean;
-    effects: (() => unknown | Promise<unknown>)[];
-    constructor(cradova_screen_initials: CradovaScreenType);
-    effect(fn: () => unknown | Promise<unknown>): void;
-    effector(): Promise<void>;
+    constructor(cradova_screen_initials: CradovaScreenTyping);
+    /**
+     * Cradova Screen
+     * ---
+     * runs once after first render
+     *
+     */
+    effect(fn: () => void | Promise<void>): void;
     package(data?: any): Promise<void>;
     onActivate(cb: (data: any) => void): void;
     addChild(...addOns: any[]): void;
@@ -325,7 +339,7 @@ declare module "cradova" {
   export class simpleStore {
     private ref;
     value: any;
-    constructor(initial: unknown, ref?: RefType);
+    constructor(initial: unknown);
     /**
      *  Cradova simpleStore
      * ----
@@ -351,7 +365,17 @@ declare module "cradova" {
      * @param Ref component to bind to.
      * @param path a property in the object to send to attached ref
      */
-    bindRef(Ref: any): void;
+    bindRef(Ref: any, prop?: string): void;
+    /**
+     *  Cradova simpleStore
+     * ---
+     * is used to bind store data to any element
+     *
+     * @param prop
+     * @returns something
+     */
+
+    bind(prop: string): void;
   }
 
   /**
@@ -444,7 +468,7 @@ css(".btn:hover",
 */
   export function css(
     identifier: string,
-    properties: Record<string, string>
+    properties?: Record<string, string>
   ): void;
   /**
 Write animation value in javascript
@@ -483,13 +507,10 @@ _.animate("polarization",
     ifTrue: () => any,
     ifFalse: () => any
   ): () => any;
-  /** @deprecated
-   *
+  /**
    * Create element and get a callback to update their state
    * no need to manage stateIDs
    * ----------------------------------------------------------------
-   * please use element.updateState(state) instead in listeners and mount events
-   * ---
    *
    * @param element_initials
    * @param props
@@ -516,11 +537,8 @@ _.animate("polarization",
     private component;
     private stateID;
     private parentElement;
-    private datas;
     constructor(component: (...data: any) => any);
-    stale(datas: any): void;
     r(d?: any): any;
-    u(d?: any): void;
     render(datas?: any): any;
     updateState(datas: any[]): void;
     remove(): void;
@@ -537,11 +555,8 @@ _.animate("polarization",
     private component;
     private stateID;
     private upcb;
-    private data;
     constructor(component: (...data: any) => any);
-    stale(data: any): void;
     r(d?: any): () => any;
-    u(d?: any): void;
     /**
      * Cradova Ref
      * ---
@@ -555,19 +570,19 @@ _.animate("polarization",
     /**
      * Cradova Ref
      * ---
-     * runs on every state update
-     *
-     */
-    onStateUpdate(cb: any): void;
-    /**
-     * Cradova Ref
-     * ---
      * update ref component with new data and update the dom.
      * @param data
      * @returns void
      */
     updateState(data: any): void;
     remove(): void;
+    /**
+     * Cradova Ref
+     * ---
+     * runs on render and every state update
+     *
+     */
+    effect(fn: (data: unknown) => Promise<void> | void): void;
   }
   /**
    * Document fragment
@@ -576,77 +591,57 @@ _.animate("polarization",
    */
   type fragmentTYPE = () => (() => HTMLElement) | HTMLElement;
   export const frag: (...children: fragmentTYPE[]) => DocumentFragment;
+
   /**
+   * Cradova
+   * ---
    * Creates new cradova HTML element
    *  @example
-   * _("p") // or _("p.class") or _("p#id") or _("p.class#id")
-   * using inline props
+   * // using template
+   * const p = _("p");
+   * _("p.class");
+   * _("p#id");
+   * _("p.class#id");
+   * _("p.foo.bar#poo.loo");
+   *
+   * // using inline props
+   *
    * _("p",{
    * text: "am a p tag",
    * style: {
    * color: "blue"
    * }
-   * )
-   * adding children
-   * _("p",
-   * _("span",{text:" am a span tag like so",
-   *  {style: {color: "brown"}
    * })
-   * )
-   *
-   * props and children
-   * _("p",
-   * // props first
-   * {
+   * // or no style props it works!
+   * _("p",{
    * text: "am a p tag",
-   * style: {
    * color: "blue"
-   * },
-   * // all children goes after
-   * _("span",{text:" am a span tag like so",
-   *  {style: {color: "brown"}
    * })
+   *
+   * // props and children
+   * _("p", // template first
+   *  // property next if wanted
+   *  {style: {color: "brown"}, // optional
+   *  // the rest should be children or text
+   * _("span", " am a span tag text like so"),
+   * ...
    * )
    *
-   * @param  {...any} element_initials
+   * // list of children
+   * _("p",
+   * // all children goes after
+   * _("span",
+   * {
+   * text:" am a span tag like so",
+   *  color: "brown",
+   * }),
+   * ...
+   * )
+   *
+   * @param  {...any[]} element_initials
    * @returns function - cradova element
    */
 
-  /**
-   * Creates new cradova HTML element
-   *  @example
-   * _("p") // or _("p.class") or _("p#id") or _("p.class#id")
-   * using inline props
-   * _("p",{
-   * text: "am a p tag",
-   * style: {
-   * color: "blue"
-   * }
-   * )
-   * adding children
-   * _("p",
-   * _("span",{text:" am a span tag like so",
-   *  {style: {color: "brown"}
-   * })
-   * )
-   *
-   * props and children
-   * _("p",
-   * // props first
-   * {
-   * text: "am a p tag",
-   * style: {
-   * color: "blue"
-   * },
-   * // all children goes after
-   * _("span",{text:" am a span tag like so",
-   *  {style: {color: "brown"}
-   * })
-   * )
-   *
-   * @param  {...any} element_initials
-   * @returns function - cradova element
-   */
   const _: any;
   export default _;
 }

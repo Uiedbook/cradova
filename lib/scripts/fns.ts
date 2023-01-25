@@ -179,10 +179,7 @@ css(".btn:hover",
 
 */
 
-export function css(
-  identifier: string,
-  properties: Record<string, string> = {}
-) {
+export function css(identifier: string, properties?: Record<string, string>) {
   /*This is for creating
  css styles using JavaScript*/
   if (typeof identifier === "string" && typeof properties === "undefined") {
@@ -195,6 +192,10 @@ export function css(
     styTag = document.createElement("style");
     styTag.textContent = identifier;
     document.head.append(styTag);
+    return;
+  }
+
+  if (!properties) {
     return;
   }
 
@@ -211,7 +212,7 @@ export function css(
 `;
   let style = "",
     totalStyle = "";
-  for (const [k, v] of Object.entries(properties)) {
+  for (const [k, v] of Object.entries(properties!)) {
     style +=
       "" +
       k +
@@ -348,13 +349,11 @@ export function assertOr(
   return ifFalse;
 }
 
-/** @deprecated
+/**
  *
  * Create element and get a callback to update their state
  * no need to manage stateIDs
  * ----------------------------------------------------------------
- * please use element.updateState(state) instead in listeners and mount events
- * ---
  *
  * @param element_initials
  * @param props
@@ -433,49 +432,71 @@ export function fullScreen(e: Element) {
   };
 }
 
+type RefProps<T> = Record<string, T> | T;
+
+/**
+ * Cradova RefList
+ * ---
+ * Create a list of automatically managed elements
+ *
+ *
+ * .
+ */
+
 export class RefList {
-  private component: (data: any, index: number) => any;
+  //
+  //! needs fix automatic update which is poorly done at the moment
+  // to make it more efficient
+  // that means only updating what needs to change
+  // and remove whats no longer necessary
+  // then introduce updateIndex(index, state);
+
+  private component: (
+    data: RefProps<
+      string | number | Record<string, unknown> | undefined | null
+    >,
+    index: number
+  ) => any;
   private stateID = uuid();
   private parentElement: HTMLElement | null = null;
-  private datas: any[] = [];
   constructor(component: (...data: any) => any) {
     this.component = component.bind(this);
-  }
-  stale(datas: any) {
-    this.datas = datas;
   }
   r(d?: any) {
     return this.render(d);
   }
-  u(d?: any) {
-    return this.updateState(d);
-  }
-  render(datas?: any) {
-    if (datas) {
-      this.datas = datas;
-    }
-
-    if (!this.datas) {
-      throw new Error(
-        " ✘  Cradova err:  RefList cannot be rendered without input"
-      );
-    }
-    if (!Array.isArray(this.datas)) {
+  render(
+    datas: RefProps<
+      string | number | Record<string, unknown> | undefined | null
+    >[] = []
+  ) {
+    // if (!datas ) {
+    //   throw new Error(
+    //     " ✘  Cradova err:  RefList cannot be rendered without input"
+    //   );
+    // }
+    if (!Array.isArray(datas)) {
       throw new Error(
         " ✘  Cradova err:  RefList cannot render non-array input"
       );
     }
+
     const elements: any = [];
-    const data = this.datas.length;
+    const data = datas.length;
     for (let i = 0; i < data; i++) {
-      elements.push(
-        this.component(this.datas[i], i)({ stateID: this.stateID })
-      );
+      elements.push(this.component(datas[i], i)({ stateID: this.stateID }));
     }
-    return elements;
+    if (elements.length) {
+      return elements;
+    }
+    return _("div")({ stateID: this.stateID });
   }
 
-  updateState(datas: any[]) {
+  updateState(
+    datas: RefProps<
+      string | number | Record<string, unknown> | undefined | null
+    >[]
+  ) {
     if (!datas) {
       throw new Error(" ✘  Cradova err:  Ref cannot be rendered without input");
     }
@@ -531,21 +552,29 @@ export class RefList {
  * -------
  * create dynamic components
  *
+ *
+ *
+ * .
  */
 
 export class Ref {
-  private component: (data?: any) => any;
+  private component: (
+    data?: RefProps<
+      string | number | Record<string, unknown> | undefined | null
+    >
+  ) => any;
   private stateID = uuid();
-  private upcb: any;
-  //  private parentElement: HTMLElement | null = null;
-  private data: any = undefined;
-
+  private upcb:
+    | ((
+        data: RefProps<
+          string | number | Record<string, unknown> | undefined | null
+        >
+      ) => void)
+    | undefined;
   constructor(component: (...data: any) => any) {
     this.component = component.bind(this);
   }
-  stale(data: any) {
-    this.data = data;
-  }
+
   r(d?: any) {
     return this.render(d);
   }
@@ -560,14 +589,12 @@ export class Ref {
    * @param data
    * @returns () => HTMLElement
    */
-  render(data?: any) {
-    if (data) {
-      this.data = data;
-    }
-    // if (!this.data) {
-    //   throw new Error(" ✘  Cradova err : Ref cannot be rendered without input");
-    // }
-    const chtml = this.component(this.data);
+  render(
+    data?: RefProps<
+      string | number | Record<string, unknown> | undefined | null
+    >
+  ) {
+    const chtml = this.component(data);
     if (typeof chtml !== "function") {
       throw new Error(
         " ✘  Cradova err :  Invalid component type for cradova Ref, got  -  " +
@@ -591,6 +618,19 @@ export class Ref {
         `Cradova can't render component make sure it's a valid component`
       );
     }
+
+    if (typeof this.upcb !== "undefined" && element.afterMount) {
+      const afterMount = element.afterMount as Function;
+      const upcb = this.upcb.bind(null, data);
+      element.afterMount = () => {
+        upcb();
+        afterMount();
+      };
+    } else {
+      if (this.upcb) {
+        element.afterMount = this.upcb.bind(null, data);
+      }
+    }
     return () => element;
   }
 
@@ -610,7 +650,7 @@ export class Ref {
    * runs on every state update
    *
    */
-  onStateUpdate(cb: any) {
+  effect(cb: any) {
     this.upcb = cb;
   }
   /**
@@ -665,7 +705,7 @@ export class Ref {
         fn(element, data);
       }
     } catch (e0) {
-      console.log(e0);
+      console.warn(e0);
     }
     if (this.upcb) {
       this.upcb(data);
@@ -684,7 +724,7 @@ export class Ref {
 
 type fragmentTYPE = () => (() => HTMLElement) | HTMLElement;
 
-export const frag = function (children: fragmentTYPE[]) {
+export const frag = function (...children: fragmentTYPE[]) {
   const par = document.createDocumentFragment();
   // building it's children tree.
   for (let i = 0; i < children.length; i++) {

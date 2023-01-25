@@ -45,12 +45,90 @@ export type CradovaHTMLElementType = (
   | ((...element_initials: any[]) => HTMLElement | undefined);
 
 export type CradovaScreenType = {
+  /**
+   * Cradova screen
+   * ---
+   * title of the page
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   *
+   */
   name: string;
+  /**
+   * Cradova screen
+   * ---
+   * The component for the screen
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   *
+   */
   template: Function | HTMLElement;
+  /**
+   * Cradova screen
+   * ---
+   * Screen transition from the screen class
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   *
+   */
   transition?: string;
-  callBack?: (html?: any, data?: Record<string, any>) => Promise<void>;
+  /**
+   * Cradova screen
+   * ---
+   * gets called when the the screen is displayed
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   *
+   */
+  onActivate: (fn: (data: any) => void) => Promise<void>;
+  /**
+   * Cradova screen
+   * ---
+   * Should this screen be cached after first render?
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   *
+   */
   persist?: boolean;
-  effect?: (fn: () => any) => void;
+  /**
+   * Cradova screen
+   * ---
+   * run once on first render and update the screen immediately.
+   * @param fn () => void
+   * @returns void
+   *
+   *
+   * .
+   *
+   */
+  effect(fn: () => void | Promise<void>): void;
+  /**
+   * Cradova screen
+   * ---
+   * runs on first render.
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   *
+   */
+  updateState: (data: any) => any;
 };
 
 export type RefType = {
@@ -60,38 +138,33 @@ export type RefType = {
    * returns html with cradova reference
    * @param data
    * @returns html
+   *
+   *
+   * .
+   *
    */
   render: (data: any) => () => HTMLElement;
   /**
    * Cradova Ref
    * ---
-   * runs on every state update
-   *
-   */
-  r: (data: any) => () => HTMLElement;
-  /**
-   * Cradova Ref
-   * ---
-   * runs on every state update
-   *
-   */
-  onStateUpdate: (callback: () => void) => void;
-  /**
-   * Cradova Ref
-   * ---
    * update ref component with new data and update the dom.
    * @param data
    * @returns void
+   *
+   *
+   * .
+   *
    */
   updateState: (data: any) => any;
   /**
    * Cradova Ref
    * ---
-   * update ref component with new data and update the dom.
-   * @param data
+   * runs on first render and every update.
    * @returns void
+   *
+   * .
    */
-  u: (data: any) => any;
+  effect: (fn: () => any) => void;
 };
 
 /**
@@ -126,6 +199,10 @@ export type SignalType = {
    *  set signal value
    * @param value - signal value
    * @returns void
+   *
+   *
+   * .
+   *
    */
   set: (value: unknown, shouldRefRender?: boolean) => void;
 
@@ -136,6 +213,10 @@ export type SignalType = {
    * @param name - name of the key
    * @param value - value of the key
    * @returns void
+   *
+   *
+   * .
+   *
    */
 
   setKey: (name: string, value: any, shouldRefRender?: boolean) => void;
@@ -147,6 +228,10 @@ export type SignalType = {
    * @param name - prop of the key object
    * @param value - value of the name
    * @returns void
+   *
+   *
+   * .
+   *
    */
 
   setPath: (
@@ -163,6 +248,10 @@ export type SignalType = {
    * @param index - index of the key object
    * @param value - value of the index
    * @returns void
+   *
+   *
+   * .
+   *
    */
   setIndex: (
     key: string,
@@ -204,6 +293,10 @@ export type SignalType = {
    * ----
    *  set signal value to a future one
    * @returns void
+   *
+   *
+   * .
+   *
    */
   forward: (data: any) => any;
   /**
@@ -211,6 +304,10 @@ export type SignalType = {
    * ----
    *  set signal value to a old past one
    * @returns void
+   *
+   *
+   * .
+   *
    */
   backward: () => void;
   /**

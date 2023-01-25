@@ -15,9 +15,9 @@ export class Screen {
   /**
    * this is the name of the screen that appears as the title
    */
-  public name: string;
+  private name: string;
   private packed = false;
-  secondaryChildren: Array<any> = [];
+  private secondaryChildren: Array<Node | string> = [];
   /**
    * used internally
    */
@@ -44,13 +44,13 @@ export class Screen {
    * this tells cradova to persist state on the screen or not
    * persisting is better
    */
-  persist = true;
-  rendered = false;
-  effects: (() => unknown | Promise<unknown>)[] = [];
+  private persist = true;
+  private rendered = false;
+  private pushed = false;
+  private effects: Promise<unknown>[] = [];
 
   constructor(cradova_screen_initials: CradovaScreenType) {
-    const { template, name, callBack, transition, persist } =
-      cradova_screen_initials;
+    const { template, name, transition, persist } = cradova_screen_initials;
     if (typeof template !== "function") {
       throw new Error(
         " ✘  Cradova err: only functions that returns a cradova element is valid as screen"
@@ -59,7 +59,6 @@ export class Screen {
     this.html = template.bind(this);
     this.name = name;
     this.template.id = "cradova-screen-set";
-    this.callBack = callBack;
     this.transition = transition;
     if (typeof persist === "boolean") {
       this.persist = persist;
@@ -67,20 +66,28 @@ export class Screen {
   }
 
   effect(fn: () => unknown | Promise<unknown>) {
-    if (!this.rendered) {
-      this.effects.push(fn);
+    if (!this.rendered && !this.pushed) {
+      this.effects.push(
+        new Promise(async (res, rej) => {
+          try {
+            res(await fn());
+          } catch (error) {
+            rej(error);
+          }
+        })
+      );
     }
   }
-  async effector() {
-    if (!this.rendered) {
-      for (let fnIdex = 0; fnIdex < this.effects.length; fnIdex++) {
-        const fn = this.effects[fnIdex];
-        const data = await fn();
-        if (data) {
-          await this.Activate(data, true);
-        }
-      }
-      this.rendered = true;
+
+  private async effector() {
+    if (this.rendered) {
+      await Promise.allSettled(this.effects);
+    }
+  }
+
+  async updateState(data: any) {
+    if (this.rendered) {
+      await this.Activate(data, true);
     }
   }
 
@@ -107,7 +114,8 @@ export class Screen {
       );
     }
     if (this.secondaryChildren.length) {
-      this.template.append(...this.secondaryChildren);
+      // @ts-ignore
+      this.template.append(this.secondaryChildren);
     }
   }
 
@@ -120,14 +128,21 @@ export class Screen {
         this.secondaryChildren.push(addOns[i]);
       }
       if (addOns[i] && typeof addOns[i] === "function") {
-        this.secondaryChildren.push(addOns[i]());
+        let a = addOns[i]();
+        if (a && a instanceof HTMLElement) {
+          this.secondaryChildren.push(a);
+        }
+        if (addOns[i] && typeof addOns[i] === "function") {
+          a = a();
+          if (a && a instanceof HTMLElement) {
+            this.secondaryChildren.push(a);
+          }
+        }
       }
     }
   }
 
   deActivate() {
-    // fail safe
-    // this.template.parentElement?.removeChild(this.template);
     if (!this.persist) {
       this.rendered = false;
     }
@@ -142,35 +157,41 @@ export class Screen {
         this.packed = true;
       }
     }
-    if (force) {
+    if (this.persist && force) {
       await this.package(data);
       this.packed = true;
       this.rendered = false;
     }
+    if (!this.pushed) {
+      this.pushed = true;
+    }
+
     document.title = this.name;
+
     const doc = document.querySelector("[data-cra-id=cradova-app-wrapper]");
-    if (!doc)
+    if (!doc) {
       throw new Error(
         " ✘  Cradova err: Unable to render, cannot find cradova root [data-cra-id=cradova-app-wrapper]"
       );
-    if (this.persist) {
-      doc.replaceChildren(this.template.cloneNode(true));
-    } else {
-      doc?.replaceChildren(this.template);
     }
+    doc?.replaceChildren(this.template);
     if (!this.persist) {
       this.packed = false;
     }
     // running effects if any available
     if (this.effects.length) {
       await this.effector();
+      // needed by updateState and effector
+      this.rendered = true;
     }
+
     //  @ts-ignore
-    if (doc?.firstChild?.afterMount) {
+    if (doc?.firstChild?.firstChild?.afterMount) {
+      const c = doc?.firstChild;
       //  @ts-ignore
-      doc?.firstChild.afterMount();
+      c?.firstChild.afterMount();
       //  @ts-ignore
-      doc.firstChild.afterMount = undefined;
+      // c?.firstChild.afterMount = undefined;
     }
     if (this.callBack) {
       await this.callBack(data);

@@ -69,3 +69,9 @@ and we went along with it.
 - battle testing green
 - new apis for element level
 - fixed all know abnormal behaviors
+
+## 1.3.0
+
+- new very interesting feature to unlock more speed
+- battle testing green
+- new apis for element level
