@@ -1,41 +1,18 @@
-# Cradova
+<a><img src="cradova.png" alt="logo" width="80" height="80" align="right"></a>
 
-<center>
-<img src="cradova.png" width="100px">
-
-Cradova is a JavaScript framework for building Single Page Applications and PWAs.
-
-</center>
-<br>
-<p>
-	<a href="https://www.npmjs.com/package/cradova">
-		<img src="https://img.shields.io/npm/v/cradova.svg" alt="npm Version" />
-	</a>&nbsp;
-	<a href="https://github.com/cradova/cradova.js/blob/next/LICENSE">
-		<img src="https://img.shields.io/npm/l/cradova.svg" alt="License" />
-	</a>&nbsp;
-	<a href="https://www.npmjs.com/package/cradova">
-		<img src="https://img.shields.io/npm/dm/cradova.svg" alt="npm Downloads">
-	</a>&nbsp;
-	<a href="https://www.npmjs.com/package/cradova">
-		<img src="https://img.shields.io/travis/cradova/cradova.js/next.svg?colorB=brightgreen" alt="Build Status">
-	</a>
-    &nbsp;
-	<a href="https://opencollective.com/cradova">
-		<img src="https://img.shields.io/opencollective/all/cradova.svg?colorB=brightgreen" alt="Donate at OpenCollective">
-	</a>&nbsp;
-	
-</p>
-
+# Cradova.js
+[![npm Version](https://img.shields.io/npm/v/cradova.svg)](https://www.npmjs.com/package/cradova)
+[![License](https://img.shields.io/npm/l/cradova.svg)](https://github.com/cradova/cradova.js/blob/next/LICENSE)
+[![npm Downloads](https://img.shields.io/npm/dm/cradova.svg)](https://www.npmjs.com/package/cradova)
+[![Build Status](https://img.shields.io/travis/cradova/cradova.js/next.svg?colorB=brightgreen)](https://www.npmjs.com/package/cradova)
+[![Donate at OpenCollective](https://img.shields.io/opencollective/all/cradova.svg?colorB=brightgreen)](https://opencollective.com/cradova)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cradova/cradova.js/blob/next/contributing.md)
 
-  <br>
-  <br>
   
 ## Contents
 
-- [What is cradova.js?](#what-is-cradova?)
-- [Why we built cradova?](#the-?)
+- [What is Cradova](#what-is-cradovajs)
+- [Why did we build Cradova?](#whats-the-benefit)
 - [Installation](#installation)
 - [Examples](#examples)
 - [Documentation](#documentation)
@@ -44,27 +21,17 @@ Cradova is a JavaScript framework for building Single Page Applications and PWAs
 
 ## What is cradova.js?
 
-cradova is a JavaScript framework for building Single Page Applications and PWAs.
+Cradova is a JavaScript framework for building Single Page Applications and PWAs.
 
 It's small, fast and provides state management, routing and XHR utilities out of the box.
 
-# Whats the benefit?
+## What's the benefit?
+We aim to be fast and simple with and no hidden abstractions whatsoever.
+We don't use visual DOM or any diff algorithms to manage the DOM.
 
-Javascript is a powerful language.
-our aim is not to limit what you can achieve but rather make your make them limitless.
+Cradova has been used in production and we will update this README to reflect our lessons as we go.
 
-we made Cradova to give you more power at no cost.
-extra speed, ease and security.
-
-we don't use visual DOM or diff algorithms to manage the DOM, we rather do it the natural way.
-
-which is fast and simple, with all the benefits and no abstracts whatsoever.
-
-cradova has been used in production and we will update this README to reflect them as ASAP.
-
-It's time to change gears.
-
-# Installation
+## Installation
 
 ### CDN sources
 
@@ -84,13 +51,11 @@ It's time to change gears.
 npm i cradova
 ```
 
-# Examples
 
-Before you confirm these below, please know that they are many cool parts about cradova not described here but will be on a later time. and eventually when we get a frontend hosting.
+## Examples
+Many aspects of Cradova are not reflected in the following example. More functionality will be entailed in future docs.
 
-You can get deeper insights from the [telegram community](https://t.me/cradovaframework) for the moment.
-
-Here's an example of create a basic component in cradova:
+Here's an example of create a basic component in Cradova:
 
 ```js
 import _, { frag } from "cradova";
@@ -106,8 +71,7 @@ const html = frag(Hello("peter"), Hello("joe"));
 document.body.append(html);
 ```
 
-## using screen
-
+## Using Screen
 ```js
 import _, { Screen, Router } from "cradova";
 
@@ -137,7 +101,7 @@ Router.route("/", home);
 
 ```
 
-# State management
+## State management
 
 ```js
 // we have
@@ -204,17 +168,14 @@ const home = new Screen({
 Router.route("/", home);
 ```
 
-# Documentation
+## Documentation
+We are currently building cradova's documentation and we have only a few hands, if you're interested in helping you can join the community, learn first hand, and support cradova's progress.
 
-We are currently working building cradova's documentation and we have only a few hands, if you are interested you can join the community and learn first hand and also support cradova's progress.
+## Getting Help
+To get further insights and help on Cradova, visit our new [Telegram Community Chat](https://t.me/cradovaframework).
 
-# getting help
-
-To get help visit our new [telegram community](https://t.me/cradovaframework)
-
-# contributing
-
-we are currently working to set up.
+## Contributing
+We are currently working to set up:
 
 - Cradova Documentation Website
 - UI component libraries for cradova
@@ -222,14 +183,8 @@ we are currently working to set up.
 - maintenance and promotion
 - building cradova CLI
 
-community [telegram](https://t.me/cradovaframework)
 
-# Sponsor
-
-It's a general aim to have a development tool
-with great developer experience and speed and that what
-cradova gives, "low abstraction with great speed".
-
-it's measurable, to take cradova further your support is needed.
-
-Sponsorships can be done via [Patreon](https://www.patreon.com/FridayCandour). Both monthly-recurring sponsorships and one-time donations are accepted. Recurring sponsorships will be entitled to logo placements in Tiers.
+## Sponsor
+Your support is appriciated and needed to advance Cradova further into the future.\
+Sponsorships can be done via [Patreon](https://www.patreon.com/FridayCandour).\
+Both monthly-recurring sponsorships and one-time donations are accepted. Recurring sponsorships will be entitled to logo placements in Tiers.
