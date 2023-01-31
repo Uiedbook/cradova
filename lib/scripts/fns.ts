@@ -11,152 +11,12 @@ export const err = function (errors: string[], err: string, type?: string) {
   }
 };
 
-export const controls = function () {
-  const svg = `<svg width="20" height="20" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
- <path d="M4.49975 5.625C4.3402 5.6242 4.18282 5.58788 4.03904 5.5187C3.89526 5.44951 3.76869 5.34919 3.6685 5.225L1.03725 2.0375C0.8835 1.84561 0.786745 1.61438 0.758014 1.37017C0.729283 1.12596 0.769733 0.878589 0.874753 0.65625C0.959928 0.463017 1.09892 0.298383 1.27514 0.182014C1.45136 0.0656449 1.65734 0.00245816 1.8685 0H7.131C7.34216 0.00245816 7.54815 0.0656449 7.72437 0.182014C7.90058 0.298383 8.03958 0.463017 8.12475 0.65625C8.22977 0.878589 8.27023 1.12596 8.24149 1.37017C8.21276 1.61438 8.11601 1.84561 7.96226 2.0375L5.331 5.225C5.23082 5.34919 5.10424 5.44951 4.96047 5.5187C4.81669 5.58788 4.65931 5.6242 4.49975 5.625Z" fill="#2c3e50"/>
-</svg>
-`;
-  const icon = (styles: any) => _("div", { ...styles, innerHTML: svg });
-
-  const constr = _(
-    "div",
-    {
-      display: "flex",
-      position: "fixed",
-      alignContent: "center",
-      justifyContent: "space-around",
-      flexDirection: "row",
-      width: "80px",
-      top: "4px",
-      right: "4px",
-      backgroundColor: "#fff",
-      transform: "rotate(0deg)",
-      border: "aqua 2px solid",
-      borderRadius: "6px",
-    },
-    icon({
-      transform: "rotate(90deg)",
-      /* border: "red 2px solid", */ onclick() {
-        window.history.back();
-      },
-    }),
-    icon({
-      transform: "rotate(270deg)",
-      /* border: "red 2px solid", */ onclick() {
-        window.history.forward();
-      },
-    })
-  );
-  const cont = constr();
-  if (cont) {
-    document.body.append(cont);
-  }
-};
-
 export function uuid() {
   let t = Date.now ? +Date.now() : +new Date();
   return "cradova-id-xxxxxxxxxx".replace(/[x]/g, function (e) {
     const r = (t + 16 * Math.random()) % 16 | 0;
     return ("x" === e ? r : (7 & r) | 8).toString(16);
   });
-}
-
-export function PromptBeforeLeave(callback?: (e: any) => void) {
-  window.history.pushState(
-    "forward",
-    "",
-    window.location.pathname + "#forward"
-  );
-  window.addEventListener("popstate", (e) => {
-    if (callback) {
-      callback(e);
-    } else {
-      alert("Are you sure, you want to go back?");
-    }
-  });
-}
-
-/**
-Write CSS media in javascript
-
-@example
-
-_.media("min-width: 790px",
-["#container",
-{
-    width: "100%",
-    height: "100%",
-    "background-color": "#0000"
-}],
-
-["#header",
-{
-    width: "100%",
-    height: "20%",
-    "background-color": "#fff"
-}]
-)
-*/
-export function media(value: string, ...properties: any[]) {
-  /* This is for creating css  
- @media styles using javascript*/
-  const styS =
-      "@media only screen and (" +
-      value +
-      ") " +
-      "{" +
-      `
-`,
-    styE =
-      "}" +
-      `
-`;
-  let style = "  ",
-    aniSty = " ";
-  const proplen = properties.length;
-  let totalAnimation,
-    Animation = "  ";
-
-  const animationStep = (num: number) => {
-    style = "  ";
-    for (const [k, v] of Object.entries(properties[num][1])) {
-      style +=
-        "" +
-        k +
-        ": " +
-        v +
-        ";" +
-        `
-`;
-    }
-    aniSty +=
-      "" +
-      properties[num][0] +
-      "{" +
-      `
-` +
-      style +
-      "}" +
-      `
-`;
-    return aniSty;
-  };
-  for (let i = 0; i < proplen; i++) {
-    Animation += animationStep(i);
-  }
-  let aniStyleTag = document.querySelector("style");
-  if (aniStyleTag === null) {
-    aniStyleTag = document.createElement("style");
-  }
-  aniStyleTag.media = "screen";
-  totalAnimation =
-    aniStyleTag.innerHTML +
-    `
-
-`;
-  totalAnimation += styS + Animation + styE;
-  aniStyleTag.innerHTML = totalAnimation;
-  document.head.append(aniStyleTag);
 }
 
 /**
@@ -241,92 +101,6 @@ export function css(identifier: string, properties?: Record<string, string>) {
 }
 
 /**
-Write animation value in javascript 
-
-@example
-
-_.animate("polarization",
-["from",
-{
-    transform: "scale3D(2)" ,
-    height: "10%",
-    "background-color": "#0000"
-}],
-
-["to",
-{
-    transform: "scale3D(1)" ,
-    height: "100%",
-    "background-color": "#ff9800"
-}]
-)
-
-*/
-
-export function animate(identifier: string, ...properties: any[]) {
-  /*This is for creating css  
- animations  using JavaScript*/
-  const styS =
-      "@keyframes " +
-      identifier +
-      " " +
-      "{" +
-      `
-`,
-    styE =
-      "}" +
-      `
-`,
-    proplen = properties.length;
-
-  let style = " ",
-    aniSty = " ",
-    Animation = "  ",
-    totalAnimation = null;
-
-  const animationStep = (num: number) => {
-    style = "  ";
-    for (const [k, v] of Object.entries(properties[num][1])) {
-      style +=
-        "" +
-        k +
-        ": " +
-        v +
-        ";" +
-        `
-`;
-    }
-    aniSty +=
-      "" +
-      properties[num][0] +
-      "{" +
-      `
-` +
-      style +
-      "}" +
-      `
-`;
-    return aniSty;
-  };
-  for (let i = 0; i < proplen; i++) {
-    Animation += animationStep(i);
-  }
-  let aniStyleTag = document.querySelector("style");
-  if (aniStyleTag === null) {
-    aniStyleTag = document.createElement("style");
-  }
-  aniStyleTag.media = "screen";
-  totalAnimation =
-    aniStyleTag.innerHTML +
-    `
-
-`;
-  totalAnimation += styS + Animation + styE;
-  aniStyleTag.innerHTML = totalAnimation;
-  document.head.append(aniStyleTag);
-}
-
-/**
  *
  * @param {expression} condition
  * @param {function} callback
@@ -394,7 +168,6 @@ export function RefElement(
       dispatch(stateID, state);
     },
     u(state: Record<string, any>) {
-      // console.log(stateID, state);
       dispatch(stateID, state);
     },
   };
@@ -435,126 +208,9 @@ export function fullScreen(e: Element) {
 type RefProps<T> = Record<string, T> | T;
 
 /**
- * Cradova RefList
- * ---
- * Create a list of automatically managed elements
- *
- *
- * .
- */
-
-export class RefList {
-  //
-  //! needs fix automatic update which is poorly done at the moment
-  // to make it more efficient
-  // that means only updating what needs to change
-  // and remove whats no longer necessary
-  // then introduce updateIndex(index, state);
-
-  private component: (
-    data: RefProps<
-      string | number | Record<string, unknown> | undefined | null
-    >,
-    index: number
-  ) => any;
-  private stateID = uuid();
-  private parentElement: HTMLElement | null = null;
-  constructor(component: (...data: any) => any) {
-    this.component = component.bind(this);
-  }
-  r(d?: any) {
-    return this.render(d);
-  }
-  render(
-    datas: RefProps<
-      string | number | Record<string, unknown> | undefined | null
-    >[] = []
-  ) {
-    // if (!datas ) {
-    //   throw new Error(
-    //     " ✘  Cradova err:  RefList cannot be rendered without input"
-    //   );
-    // }
-    if (!Array.isArray(datas)) {
-      throw new Error(
-        " ✘  Cradova err:  RefList cannot render non-array input"
-      );
-    }
-
-    const elements: any = [];
-    const data = datas.length;
-    for (let i = 0; i < data; i++) {
-      elements.push(this.component(datas[i], i)({ stateID: this.stateID }));
-    }
-    if (elements.length) {
-      return elements;
-    }
-    return _("div")({ stateID: this.stateID });
-  }
-
-  updateState(
-    datas: RefProps<
-      string | number | Record<string, unknown> | undefined | null
-    >[]
-  ) {
-    if (!datas) {
-      throw new Error(" ✘  Cradova err:  Ref cannot be rendered without input");
-    }
-    if (!Array.isArray(datas)) {
-      throw new Error(
-        " ✘  Cradova err:  RefList cannot render non-array input"
-      );
-    }
-    if (!datas[0]) {
-      return;
-    }
-
-    if (!this.parentElement) {
-      // only for the first call
-      this.parentElement = dispatch(this.stateID, {
-        cradovaDispatchTrackBreak: true,
-      })!?.parentElement;
-    }
-    if (!this.parentElement) {
-      throw new Error(
-        "✘  Cradova err :  cannot update list, the RefList was never rendered!"
-      );
-    }
-    const elements: Node[] = [];
-    for (let i = 0; i < datas.length; i++) {
-      elements.push(this.component(datas[i], i)({ stateID: this.stateID }));
-    }
-    try {
-      // @ts-ignore
-      this.parentElement.replaceChildren(...elements);
-    } catch (err) {
-      console.error(err);
-      throw new Error(" ✘  Cradova err:  an error occured");
-    }
-  }
-  remove() {
-    dispatch(this.stateID, { remove: true });
-  }
-  instance() {
-    return dispatch(this.stateID, {
-      cradovaDispatchTrackBreak: true,
-    });
-  }
-  i() {
-    return dispatch(this.stateID, {
-      cradovaDispatchTrackBreak: true,
-    });
-  }
-}
-
-/**
  * Cradova Ref
  * -------
  * create dynamic components
- *
- *
- *
- * .
  */
 
 export class Ref {
@@ -564,24 +220,14 @@ export class Ref {
     >
   ) => any;
   private stateID = uuid();
-  private upcb:
-    | ((
-        data: RefProps<
-          string | number | Record<string, unknown> | undefined | null
-        >
-      ) => void)
-    | undefined;
+  private rendered = false;
+  private effects: Promise<unknown>[] = [];
+  private effectuate: (() => unknown) | null = null;
+  private hasFirstStateUpdateRun = false;
+
   constructor(component: (...data: any) => any) {
     this.component = component.bind(this);
   }
-
-  r(d?: any) {
-    return this.render(d);
-  }
-  u(d?: any) {
-    return this.updateState(d);
-  }
-
   /**
    * Cradova Ref
    * ---
@@ -611,24 +257,23 @@ export class Ref {
       
       to track and debug this element add a
       beforeMount or afterMount prop to the element
-      then you can compare the parsed element and stateID
-
-     element stateID: \x1b[4m \x1b[33m ${this.stateID} \x1b[33m \x1b[4m`,
+      `,
         ],
         `Cradova can't render component make sure it's a valid component`
       );
     }
 
-    if (typeof this.upcb !== "undefined" && element.afterMount) {
+    if (typeof element.afterMount === "function") {
+      this.effector = this.effector.bind(this);
       const afterMount = element.afterMount as Function;
-      const upcb = this.upcb.bind(null, data);
-      element.afterMount = () => {
-        upcb();
-        afterMount();
+      element.afterMount = async () => {
+        await this.effector();
+        await afterMount();
       };
+      element.afterMount = element.afterMount.bind(this);
     } else {
-      if (this.upcb) {
-        element.afterMount = this.upcb.bind(null, data);
+      if (typeof element.afterMount !== "function") {
+        element.afterMount = this.effector.bind(this);
       }
     }
     return () => element;
@@ -639,76 +284,100 @@ export class Ref {
       cradovaDispatchTrackBreak: true,
     });
   }
-  i() {
-    return dispatch(this.stateID, {
-      cradovaDispatchTrackBreak: true,
-    });
-  }
+
   /**
    * Cradova Ref
    * ---
    * runs on every state update
    *
    */
-  effect(cb: any) {
-    this.upcb = cb;
+  effect(fn: () => unknown | Promise<unknown>) {
+    if (this.rendered) {
+      return;
+    }
+    fn = fn.bind(this);
+    this.effects.push(
+      new Promise(async (res, rej) => {
+        try {
+          await fn();
+          if (!this.hasFirstStateUpdateRun && this.effectuate) {
+            this.hasFirstStateUpdateRun = true;
+            await this.effectuate();
+          }
+          res(undefined);
+        } catch (error) {
+          rej(error);
+        }
+      })
+    );
   }
+  private async effector() {
+    await Promise.allSettled(this.effects);
+    this.rendered = true;
+  }
+
   /**
    * Cradova Ref
    * ---
    * update ref component with new data and update the dom.
    * @param data
    * @returns void
+   *
+   *
+   * .
    */
-  updateState(data: any) {
+
+  updateState(data: unknown) {
+    if (!this.rendered) {
+      this.rendered = true;
+      async function updateState(this: any, data: any) {
+        if (this.instance()) {
+          await this.Activate(data);
+        } else {
+          setTimeout(updateState.bind(this, data), 4);
+        }
+      }
+      this.effectuate = updateState.bind(this, data);
+    } else {
+      (async () => {
+        await this.Activate(data);
+      }).bind(this)();
+    }
+  }
+
+  private async Activate(data: any) {
     if (!data) {
       return;
     }
     if (!this) {
       console.error(
-        " ✘  Cradova err:  update has been passed wrongly please send the ref where you want to call it"
+        " ✘  Cradova err:  Ref.updateState has is passed out of scope"
       );
-      console.error(
-        " ✘  Cradova err: Then call as ref.updateState({ your new data }) = ui state"
-      );
+      return;
     }
 
-    const guy = dispatch(this.stateID, {
+    const guy: HTMLElement = dispatch(this.stateID, {
       cradovaDispatchTrackBreak: true,
     });
     if (!guy) {
-      throw new Error(
-        " ✘  Cradova err:  Ref is not rendered but updateState was called",
-        // @ts-ignore
-        this.component
-      );
+      return;
     }
     const chtml = this.component(data);
-    if (typeof chtml !== "function") {
-      try {
-        guy.parentNode!.replaceChild(chtml, guy);
-      } catch (e) {
-        console.error(" ✘  Cradova err:  ", e);
-        throw new Error(
-          " ✘  Cradova err:   Ref got an invalid datatype for ref updateSate call  got >>>  ' " +
-            chtml +
-            "';"
-        );
-      }
+    let element;
+    if (chtml instanceof HTMLElement) {
+      chtml.setAttribute("data-cra-id", this.stateID);
+      element = chtml;
+    } else {
+      element = chtml({ stateID: this.stateID });
     }
-    const element = chtml({ stateID: this.stateID });
-    const fn = element.afterMount;
-    element.afterMount = undefined;
     try {
       guy.parentNode!.replaceChild(element, guy);
-      if (typeof fn === "function") {
-        fn(element, data);
+      if (this.effects.length) {
+        delete element.afterMount;
+        await this.effector();
       }
     } catch (e0) {
-      console.warn(e0);
-    }
-    if (this.upcb) {
-      this.upcb(data);
+      console.error(e0);
     }
   }
   remove() {

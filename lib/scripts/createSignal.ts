@@ -7,7 +7,7 @@
  * - create actions and fire them
  * - bind a Ref or RefList
  * - listen to changes
- * -  persist changes to localStorage
+ * - persist changes to localStorage
  * - go back and forward in value history
  * - set keys instead of all values
  * - update a cradova Ref/RefList automatically
@@ -210,9 +210,9 @@ export class createSignal {
       this.ref = Ref;
       if (typeof path === "string") {
         this.path = path;
-        Ref.stale(this.value[path]);
+        Ref.render = Ref.render.bind(Ref, this.value[path]);
       } else {
-        Ref.stale(this.value);
+        Ref.render = Ref.render.bind(Ref, this.value);
       }
     } else {
       throw new Error("✘  Cradova err :  Invalid ref component" + Ref);
@@ -257,10 +257,13 @@ export class createSignal {
    *  Cradova Signal
    * ----
    * clear the history on local storage
+   *
+   *
+   * .
    */
   clearPersist() {
     if (this.persistName) {
-      localStorage.setItem(this.persistName, JSON.stringify(""));
+      localStorage.setItem(this.persistName, "");
     }
   }
 }

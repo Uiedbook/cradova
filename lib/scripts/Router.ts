@@ -108,6 +108,7 @@ Router.route = function (path = "/", screen: any) {
     },
   };
 };
+
 /**
  * Cradova Router
  * ------
@@ -197,20 +198,22 @@ RouterBox.router = async function (e: any, force = false) {
   }
   if (route) {
     RouterBox.params.event = e;
-    RouterBox.params.params = params || null;
+    RouterBox.params.params = params || RouterBox.params.params || null;
     RouterBox.params.data = RouterBox.params.data || null;
     RouterBox["lastNavigatedRouteController"] &&
       RouterBox["lastNavigatedRouteController"].deactivate();
-    await route.controller(RouterBox.params, force);
+    await route.controller(force);
     RouterBox["pageShow"] && RouterBox["pageShow"](url);
     RouterBox["lastNavigatedRoute"] = url;
     RouterBox["lastNavigatedRouteController"] = route;
     // click handlers
     Array.from(window.document.querySelectorAll("a")).forEach((a) => {
-      a.addEventListener("click", (e) => {
-        e.preventDefault();
-        Router.navigate(a.pathname);
-      });
+      if (a.href.includes(window.location.origin)) {
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          Router.navigate(a.pathname);
+        });
+      }
     });
   } else {
     // or 404
@@ -262,6 +265,19 @@ Router.packageScreen = async function (path: string, data: any) {
     throw new Error(" ✘  Cradova err:  cradova err: Not a defined screen path");
   }
   await RouterBox.routes[path].packager(data);
+};
+
+/**
+ * Cradova Router
+ * ------
+ *
+ * return last set router params
+ *
+ * .
+ */
+
+Router.getParams = function () {
+  return RouterBox["params"];
 };
 window.addEventListener("pageshow", RouterBox.router);
 window.addEventListener("popstate", (e) => {

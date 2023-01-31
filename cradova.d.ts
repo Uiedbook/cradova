@@ -21,17 +21,18 @@ declare module "cradova" {
      */
     effect?(fn: () => void | Promise<void>): void;
     /**
-     * Cradova screen
+     * Cradova Screen
      * ---
-     * runs on first render.
-     * @param data
-     * @returns void
+     * re-renders the screen -
      *
+     * first level call will only be called once
+     * lower level calls will be continuously called
+     * @param data .
      *
-     * .
-     *
+     * *
      */
-    updateState: (data: any) => any;
+
+    updateState(data: unknown): void;
   };
 
   type CradovaElementType = Record<string, any>;
@@ -42,44 +43,40 @@ declare module "cradova" {
      * ---
      * returns html with cradova reference
      * @param data
-     * @returns html
+     * @returns HTMLElement
      */
-    render: (data: any) => () => HTMLElement;
+    render(data?: any): () => any;
     /**
      * Cradova Ref
      * ---
-     * runs on every state update
-     *
+     * checks if element is in the dom and returns it.
+     * @param data
+     * @return HTMLElement
      */
-    r: (data: any) => () => HTMLElement;
+    instance(): HTMLElement | null;
     /**
      * Cradova Ref
      * ---
-     * runs on render and every state update
+     * update ref component with new data and update the dom.
+     * @param data
+     * @returns void
+     */
+    updateState(data: any): void;
+    /**
+     * Cradova Ref
+     * ---
+     * remove element from the dom
+     * @param data
+     * @returns () => HTMLElement
+     */
+    remove(): void;
+    /**
+     * Cradova Ref
+     * ---
+     * runs once on render
      *
      */
     effect(fn: (data: unknown) => Promise<void> | void): void;
-    /**
-     * Cradova Ref
-     * ---
-     * update ref component with new data and update the dom.
-     * @param data
-     * @returns void
-     */
-    updateState: (data: any) => any;
-    /**
-     * Cradova Ref
-     * ---
-     * update ref component with new data and update the dom.
-     * @param data
-     * @returns void
-     */
-    u: (data: any) => any;
-  };
-  type RouterRouteObject = {
-    controller: (params: object, force?: boolean) => any;
-    deactivate: (params: object) => any;
-    packager: (params: any) => void;
   };
   /**
    * Cradova Router
@@ -105,6 +102,15 @@ declare module "cradova" {
         packageScreen: (path: string, data?: any) => void;
         onPageShow: (callback: () => void) => void;
         onPageHide: (callback: () => void) => void;
+        /**
+         * Cradova Router
+         * ------
+         *
+         * return last set router params
+         *
+         * .
+         */
+        getParams: () => unknown;
         /**
          * Cradova Router
          * ------
@@ -159,6 +165,19 @@ declare module "cradova" {
     addChild(...addOns: any[]): void;
     deActivate(): void;
     Activate(data?: any, force?: boolean): Promise<void>;
+    /**
+     * Cradova Screen
+     * ---
+     * re-renders the screen -
+     *
+     * first level call will only be called once
+     * lower level calls will be continuously called
+     * @param data .
+     *
+     * *
+     */
+
+    updateState(data: unknown): void;
   }
 
   export class Scaffold {
@@ -359,15 +378,6 @@ declare module "cradova" {
     setKey(name: string, value: any, shouldRefRender?: boolean): void;
     /**
      *  Cradova simpleStore
-     * ----
-     *  set a auto - rendering component for this store
-     *
-     * @param Ref component to bind to.
-     * @param path a property in the object to send to attached ref
-     */
-    bindRef(Ref: any, prop?: string): void;
-    /**
-     *  Cradova simpleStore
      * ---
      * is used to bind store data to any element
      *
@@ -419,34 +429,10 @@ declare module "cradova" {
   };
 
   export function loadCradovaUICss(seconds?: number): void;
-
-  export function IsElementInView(element: HTMLElement): boolean;
-
   export const controls: () => void;
   export function uuid(): string;
   export function PromptBeforeLeave(callback?: (e: any) => void): void;
-  /**
-Write CSS media in javascript
 
-@example
-
-_.media("min-width: 790px",
-["#container",
-{
-    width: "100%",
-    height: "100%",
-    "background-color": "#0000"
-}],
-
-["#header",
-{
-    width: "100%",
-    height: "20%",
-    "background-color": "#fff"
-}]
-)
-*/
-  export function media(value: string, ...properties: any[]): void;
   /**
 Write CSS styles in Javascript
 @example
@@ -470,29 +456,6 @@ css(".btn:hover",
     identifier: string,
     properties?: Record<string, string>
   ): void;
-  /**
-Write animation value in javascript
-
-@example
-
-_.animate("polarization",
-["from",
-{
-    transform: "scale3D(2)" ,
-    height: "10%",
-    "background-color": "#0000"
-}],
-
-["to",
-{
-    transform: "scale3D(1)" ,
-    height: "100%",
-    "background-color": "#ff9800"
-}]
-)
-
-*/
-  export function animate(identifier: string, ...properties: any[]): void;
   /**
    *
    * @param {expression} condition
@@ -533,18 +496,7 @@ _.animate("polarization",
     set(): void;
     exist(): void;
   };
-  export class RefList {
-    private component;
-    private stateID;
-    private parentElement;
-    constructor(component: (...data: any) => any);
-    r(d?: any): any;
-    render(datas?: any): any;
-    updateState(datas: any[]): void;
-    remove(): void;
-    instance(): any;
-    i(): any;
-  }
+
   /**
    * Cradova Ref
    * -------
@@ -552,21 +504,23 @@ _.animate("polarization",
    *
    */
   export class Ref {
-    private component;
-    private stateID;
-    private upcb;
     constructor(component: (...data: any) => any);
-    r(d?: any): () => any;
     /**
      * Cradova Ref
      * ---
      * returns html with cradova reference
      * @param data
-     * @returns () => HTMLElement
+     * @returns HTMLElement
      */
     render(data?: any): () => any;
-    instance(): any;
-    i(): any;
+    /**
+     * Cradova Ref
+     * ---
+     * checks if element is in the dom and returns it.
+     * @param data
+     * @return HTMLElement
+     */
+    instance(): HTMLElement | null;
     /**
      * Cradova Ref
      * ---
@@ -575,22 +529,22 @@ _.animate("polarization",
      * @returns void
      */
     updateState(data: any): void;
+    /**
+     * Cradova Ref
+     * ---
+     * remove element from the dom
+     * @param data
+     * @returns () => HTMLElement
+     */
     remove(): void;
     /**
      * Cradova Ref
      * ---
-     * runs on render and every state update
+     * runs once on render
      *
      */
     effect(fn: (data: unknown) => Promise<void> | void): void;
   }
-  /**
-   * Document fragment
-   * @param children
-   * @returns
-   */
-  type fragmentTYPE = () => (() => HTMLElement) | HTMLElement;
-  export const frag: (...children: fragmentTYPE[]) => DocumentFragment;
 
   /**
    * Cradova

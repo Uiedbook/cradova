@@ -148,9 +148,7 @@ Router.route("/", home);
 
 // Ref components (global and local)
 
-// RefList components (global and local)
-
-// state can be bind to a store when using createSignal or simpleStores
+// state can be managed from a store when using createSignal or simpleStores
 
 import _, { Ref } from "cradova";
 

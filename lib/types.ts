@@ -118,17 +118,18 @@ export type CradovaScreenType = {
    */
   effect(fn: () => void | Promise<void>): void;
   /**
-   * Cradova screen
+   * Cradova Screen
    * ---
-   * runs on first render.
-   * @param data
-   * @returns void
+   * re-renders the screen -
    *
+   * first level call will only be called once
+   * lower level calls will be continuously called
+   * @param data .
    *
-   * .
-   *
+   * *
    */
-  updateState: (data: any) => any;
+
+  updateState(data: unknown): void;
 };
 
 export type RefType = {
@@ -137,34 +138,40 @@ export type RefType = {
    * ---
    * returns html with cradova reference
    * @param data
-   * @returns html
-   *
-   *
-   * .
-   *
+   * @returns HTMLElement
    */
-  render: (data: any) => () => HTMLElement;
+  render(data?: any): () => any;
+  /**
+   * Cradova Ref
+   * ---
+   * checks if element is in the dom and returns it.
+   * @param data
+   * @return HTMLElement
+   */
+  instance(): HTMLElement | null;
   /**
    * Cradova Ref
    * ---
    * update ref component with new data and update the dom.
    * @param data
    * @returns void
-   *
-   *
-   * .
-   *
    */
-  updateState: (data: any) => any;
+  updateState(data: any): void;
   /**
    * Cradova Ref
    * ---
-   * runs on first render and every update.
-   * @returns void
-   *
-   * .
+   * remove element from the dom
+   * @param data
+   * @returns () => HTMLElement
    */
-  effect: (fn: () => any) => void;
+  remove(): void;
+  /**
+   * Cradova Ref
+   * ---
+   * runs once on render
+   *
+   */
+  effect(fn: (data: unknown) => Promise<void> | void): void;
 };
 
 /**
@@ -357,6 +364,15 @@ export type RouterType =
       lastNavigatedRouteController: RouterRouteObject | null;
       nextRouteController: RouterRouteObject | null;
       params: Record<string, any>;
+      /**
+       * Cradova Router
+       * ------
+       *
+       * return last set router params
+       *
+       * .
+       */
+      getParams: () => unknown;
       /**
        * n/a
        */

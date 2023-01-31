@@ -36,7 +36,7 @@
 
 // importing cradova scripts
 export { Screen } from "./scripts/Screen";
-export { Scaffold } from "./scripts/Scaffold";
+// export { Scaffold } from "./scripts/Scaffold";
 export { Router } from "./scripts/Router";
 export { dispatch } from "./scripts/track";
 import { dispatch } from "./scripts/track";
@@ -46,23 +46,16 @@ import { simpleStore } from "./scripts/simplestore";
 export { Ajax } from "./scripts/ajax";
 export { swipe } from "./sacho/swipe1";
 export { loadCradovaUICss } from "./sacho/loadCss";
-export { IsElementInView } from "./scripts/utils";
+// export { IsElementInView } from "./scripts/utils";
 
 export {
   RefElement as $,
-  animate,
   assert,
   assertOr,
-  controls,
   css,
   frag,
-  fullScreen,
   ls,
-  media,
   Ref,
-  RefList,
-  PromptBeforeLeave,
-  uuid,
 } from "./scripts/fns";
 import { Init } from "./scripts/init";
 

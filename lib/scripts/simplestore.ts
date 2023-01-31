@@ -64,7 +64,7 @@ export class simpleStore {
     } else {
       for (let i = 0; i < this.ref.length; i++) {
         const entry = this.ref[i] as any;
-        entry.ref.updateState({ [entry.prop]: this.value[entry.prop] });
+        entry.ref.updateState({ [entry.key]: this.value[entry.prop] });
       }
     }
   }
