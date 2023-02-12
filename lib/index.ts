@@ -36,26 +36,24 @@
 
 // importing cradova scripts
 export { Screen } from "./scripts/Screen";
-// export { Scaffold } from "./scripts/Scaffold";
 export { Router } from "./scripts/Router";
 export { dispatch } from "./scripts/track";
 import { dispatch } from "./scripts/track";
 export { createSignal } from "./scripts/createSignal";
-export { simpleStore } from "./scripts/simplestore";
+export { simpleStore as $ } from "./scripts/simplestore";
 import { simpleStore } from "./scripts/simplestore";
 export { Ajax } from "./scripts/ajax";
-export { swipe } from "./sacho/swipe1";
 export { loadCradovaUICss } from "./sacho/loadCss";
 // export { IsElementInView } from "./scripts/utils";
 
 export {
-  RefElement as $,
   assert,
   assertOr,
   css,
   frag,
   ls,
   Ref,
+  cradovaAftermountEvent,
 } from "./scripts/fns";
 import { Init } from "./scripts/init";
 
@@ -195,7 +193,7 @@ const _: any = (...element_initials: any[]) => {
     console.error(" ✘  Cradova err: NO TEMPLATE STRING PROVIDED");
     return () => " ✘ NO TEMPLATE STRING PROVIDED";
   }
-  let beforeMount: ((self: CradovaElementType) => void) | null = null,
+  let beforeMount: ((this: CradovaElementType) => void) | null = null,
     firstLevelChildren: any[] = [];
   if (element_initials.length > 1) {
     firstLevelChildren = element_initials.splice(1);
@@ -261,7 +259,6 @@ const _: any = (...element_initials: any[]) => {
     if (initials.innerValue) {
       element.innerText = initials.innerValue;
     }
-    //
     // getting children ready
     if (secondLevelChildren.length) {
       for (let i = 0; i < secondLevelChildren.length; i++) {
@@ -276,11 +273,7 @@ const _: any = (...element_initials: any[]) => {
               child instanceof HTMLElement ||
               child instanceof DocumentFragment
             ) {
-              element.append(child);
-            }
-            if (child && child.afterMount) {
-              child.afterMount(child);
-              child.afterMount = undefined;
+              element.appendChild(child);
             }
           } catch (error) {
             console.error(" ✘  Cradova err:  ", error);
@@ -301,7 +294,7 @@ const _: any = (...element_initials: any[]) => {
           secondLevelChildren[i] instanceof HTMLElement ||
           secondLevelChildren[i] instanceof DocumentFragment
         ) {
-          element.append(secondLevelChildren[i]);
+          element.appendChild(secondLevelChildren[i]);
           continue;
         }
         // children array
@@ -332,14 +325,7 @@ const _: any = (...element_initials: any[]) => {
         }
         const child = secondLevelChildren[i];
         if (child instanceof HTMLElement || child instanceof DocumentFragment) {
-          element.append(child);
-          // @ts-ignore
-          if (child.afterMount) {
-            // @ts-ignore
-            child.afterMount(child);
-            // @ts-ignore
-            child.afterMount = undefined;
-          }
+          element.appendChild(child);
         } else {
           // getting props
           if (
@@ -381,7 +367,7 @@ const _: any = (...element_initials: any[]) => {
     if (props) {
       if (props.beforeMount) {
         beforeMount = props["beforeMount"];
-        props["beforeMount"] = undefined;
+        // props["beforeMount"] = undefined;
       }
       // adding attributes
       for (const prop in props) {
@@ -425,7 +411,6 @@ const _: any = (...element_initials: any[]) => {
         // before mount event
         if (prop === "beforeMount") {
           beforeMount = props["beforeMount"];
-          props["beforeMount"] = undefined;
           continue;
         }
         // setting state id
@@ -451,6 +436,19 @@ const _: any = (...element_initials: any[]) => {
           element.updateState = dispatch.bind(null, element);
           continue;
         }
+
+        // setting afterMount event;
+        if (
+          prop === "afterMount" &&
+          typeof props["afterMount"] === "function"
+        ) {
+          const av = () => {
+            props!["afterMount"].apply(element);
+            window.removeEventListener("cradova-aftermount", av);
+          };
+          window.addEventListener("cradova-aftermount", av);
+          continue;
+        }
         // trying to set other values
         try {
           if (typeof element[prop] !== "undefined") {
@@ -459,7 +457,6 @@ const _: any = (...element_initials: any[]) => {
             element[prop] = props[prop];
 
             if (
-              prop !== "afterMount" &&
               prop !== "for" &&
               prop !== "text" &&
               prop !== "class" &&
@@ -478,8 +475,8 @@ const _: any = (...element_initials: any[]) => {
     if (text) {
       element.innerText = text;
     }
-    if (beforeMount) {
-      beforeMount(element);
+    if (typeof beforeMount === "function") {
+      beforeMount.apply(element);
     }
     return element;
   };

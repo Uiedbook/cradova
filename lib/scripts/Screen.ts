@@ -1,4 +1,6 @@
 import { CradovaScreenType } from "../types.js";
+import { cradovaAftermountEvent, frag } from "./fns.js";
+
 /**
  *  Cradova Screen
  * ---
@@ -7,6 +9,7 @@ import { CradovaScreenType } from "../types.js";
  * @param template
  * @param transitions
  */
+
 export class Screen {
   /**
    * this should be a cradova screen component
@@ -128,9 +131,11 @@ export class Screen {
           );
         } else {
           if (this.transition) {
-            fuc.classList.add("CRADOVA-UI-" + this.transition);
+            this.template.classList.add("CRADOVA-UI-" + this.transition);
           }
-          this.template.replaceChildren(fuc);
+          this.template.innerHTML = "";
+          this.template.appendChild(fuc);
+          // this.template.replaceChildren(fuc);
         }
       }
     }
@@ -144,31 +149,16 @@ export class Screen {
       this.template.append(this.secondaryChildren);
     }
   }
-
   onActivate(cb: (data: any) => Promise<void>) {
     this.callBack = cb;
   }
   addChild(...addOns: any[]) {
-    for (let i = 0; i < addOns.length; i++) {
-      if (addOns[i] && addOns[i] instanceof HTMLElement) {
-        this.secondaryChildren.push(addOns[i]);
-      }
-      if (addOns[i] && typeof addOns[i] === "function") {
-        let a = addOns[i]();
-        if (a && a instanceof HTMLElement) {
-          this.secondaryChildren.push(a);
-        }
-        if (addOns[i] && typeof addOns[i] === "function") {
-          a = a();
-          if (a && a instanceof HTMLElement) {
-            this.secondaryChildren.push(a);
-          }
-        }
-      }
-    }
+    this.secondaryChildren.push(frag(...addOns));
   }
-
   deActivate() {
+    if (this.transition) {
+      this.template.classList.remove("CRADOVA-UI-" + this.transition);
+    }
     if (!this.persist) {
       this.rendered = false;
     }
@@ -196,11 +186,13 @@ export class Screen {
         " ✘  Cradova err: Unable to render, cannot find cradova root [data-cra-id=cradova-app-wrapper]"
       );
     }
-    doc?.replaceChildren(this.template);
+    doc.innerHTML = "";
+    doc.appendChild(this.template);
+    // doc?.replaceChildren(this.template);
     if (!this.persist) {
       this.packed = false;
     }
-    // needed by updateState and effector
+
     //  @ts-ignore
     if (doc?.firstChild?.firstChild?.afterMount) {
       const c = doc?.firstChild;
@@ -209,12 +201,15 @@ export class Screen {
       //  @ts-ignore
       delete c?.firstChild.afterMount;
     }
+    window.dispatchEvent(cradovaAftermountEvent);
+
+    // needed by updateState and effector
+    // this.rendered = true;
+    await this.effector();
+
     if (this.callBack) {
       await this.callBack();
     }
-    this.rendered = true;
     window.scrollTo(0, 0);
-    // running effects if any available
-    await this.effector();
   }
 }

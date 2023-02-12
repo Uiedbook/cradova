@@ -84,51 +84,71 @@ declare module "cradova" {
    * Facilitates navigation within the application and initializes
    * page views based on the matched routes.
    */
-  type RouterType =
-    | {
-        /**
-         * Registers a route.
-         *
-         * @param {string}   path     Route path.
-         * @param {any} screen the cradova document tree for the route.
-         */
-        route: (path: string, screen: CradovaScreenType) => void;
-        /**
-         * get a screen ready before time.
-         *
-         * @param {string}   path     Route path.
-         * @param {any} data data for the screen.
-         */
-        packageScreen: (path: string, data?: any) => void;
-        onPageShow: (callback: () => void) => void;
-        onPageHide: (callback: () => void) => void;
-        /**
-         * Cradova Router
-         * ------
-         *
-         * return last set router params
-         *
-         * .
-         */
-        getParams: () => unknown;
-        /**
-         * Cradova Router
-         * ------
-         *
-         * Navigates to a designated screen in your app
-         */
-        navigate: (
-          href: string,
-          data?: Record<string, any> | null,
-          force?: boolean
-        ) => void;
-      }
-    | Record<string, any>;
+  type RouterType = {
+    /**
+     * Registers a route.
+     *
+     * @param {string}   path     Route path.
+     * @param {any} screen the cradova document tree for the route.
+     */
+    route: (path: string, screen: CradovaScreenType) => void;
+    /**
+     * get a screen ready before time.
+     *
+     * @param {string}   path     Route path.
+     * @param {any} data data for the screen.
+     */
+    packageScreen: (path: string, data?: any) => void;
+    onPageShow: (callback: () => void) => void;
+    onPageHide: (callback: () => void) => void;
+    /**
+     * Cradova Router
+     * ------
+     *
+     * return last set router params
+     *
+     * .
+     */
+    getParams: () => unknown;
+    /**
+     * Cradova Router
+     * ------
+     *
+     * Navigates to a designated screen in your app
+     */
+    navigate: (
+      href: string,
+      data?: Record<string, any> | null,
+      force?: boolean
+    ) => void;
+
+    /**
+     * Cradova
+     * ---
+     * Error Handler for your app
+     *
+     * @param callback
+     * @param path? page path
+     */
+
+    addErrorHandler: (callback: (error: string) => void, path?: string) => void;
+  };
+
+  /**
+   * Cradova
+   * ---
+   * Cradova afterMount event
+   *
+   * dispatch this manually if you are not using a cradova screen object
+   *
+   */
+
+  export const cradovaAftermountEvent: CustomEvent<string>;
 
   /**
    *  Cradova Screen
    * ---
-   * create instances of manageable pages and scaffolds
+   * create instances of manageable pages
    * @param name
    * @param template
    * @param transitions
@@ -147,7 +167,7 @@ declare module "cradova" {
     /**
      *  Cradova Screen
      * ---
-     * create instances of manageable pages and scaffolds
+     * create instances of manageable pages
      * @param name
      * @param template
      * @param transitions
@@ -180,14 +200,6 @@ declare module "cradova" {
     updateState(data: unknown): void;
   }
 
-  export class Scaffold {
-    private history;
-    private Scaffolds;
-    push(label: string, data?: unknown, force?: boolean): Promise<void>;
-    pop(data?: unknown, force?: boolean): Promise<void>;
-    addScaffolds(scaffolds: Record<string, CradovaScreenType>): Promise<void>;
-  }
-
   /**
    * Cradova Router
    * ---
@@ -215,12 +227,12 @@ declare module "cradova" {
    * ability to:
    * - create a store
    * - create actions and fire them
-   * - bind a Ref or RefList
+   * - bind a Ref
    * - listen to changes
    * -  persist changes to localStorage
    * - go back and forward in value history
    * - set keys instead of all values
-   * - update a cradova Ref/RefList automatically
+   * - update a cradova Ref automatically
    * @constructor initial: any, props: {useHistory, persist}
    */
   export class createSignal {
@@ -351,11 +363,11 @@ declare module "cradova" {
    * ability to:
    * - create a store
    * - set keys instead of all values
-   * - update a cradova Ref/RefList/RefElement automatically
-   * @constructor initial: any, Ref/RefList/RefElement: any
+   * - update a cradova Ref automatically
+   * @constructor initial: any, Ref: any
    */
 
-  export class simpleStore {
+  export class $ {
     private ref;
     value: any;
     constructor(initial: unknown);
@@ -410,28 +422,8 @@ declare module "cradova" {
       | any
   ): Promise<unknown>;
 
-  /**
-   * swipe
-   * ---
-   * Now you can detect swipes the best way possible
-   *
-   * @param callback
-   * @param touching?
-   * @param element?
-   */
-  export function swipe(
-    callback: (swipe_data: Record<string, number>) => void,
-    touching?: boolean,
-    element?: HTMLElement
-  ): {
-    start(): void;
-    stop(): void;
-  };
-
   export function loadCradovaUICss(seconds?: number): void;
-  export const controls: () => void;
   export function uuid(): string;
-  export function PromptBeforeLeave(callback?: (e: any) => void): void;
 
   /**
 Write CSS styles in Javascript
@@ -479,23 +471,8 @@ css(".btn:hover",
    * @param props
    * @returns
    */
-  export function RefElement(
-    element_initials?: string,
-    props?: any,
-    ...other: any
-  ): {
-    render(data?: any): any;
-    r(data?: any): any;
-    instance(): any;
-    i(): any;
-    updateState(state: Record<string, any>): void;
-    u(state: Record<string, any>): void;
-  };
+
   export const ls: Record<string, Function>;
-  export function fullScreen(e: Element): {
-    set(): void;
-    exist(): void;
-  };
 
   /**
    * Cradova Ref

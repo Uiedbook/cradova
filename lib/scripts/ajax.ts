@@ -1,5 +1,3 @@
-
-
 /**
  *
  * Cradova Ajax
@@ -25,7 +23,7 @@ export function Ajax(
   // getting params
   const { method, data, header, callbacks } = opts;
   if (typeof url !== "string") {
-    throw new Error("✘  Cradova err : little Axios invalid url " + url);
+    throw new Error("✘  Cradova err : Ajax invalid url " + url);
   }
   // promisified xhr function
   return new Promise(function (resolve) {
@@ -54,8 +52,11 @@ export function Ajax(
       }
     }
 
-    ajax.addEventListener("error", (e: any) => {
-      console.error("✘  Cradova Ajax err : ", e);
+    ajax.addEventListener("error", () => {
+      console.error(
+        "✘  Cradova Ajax err : ",
+        ajax.response || "ERR_INTERNET_DISCONNECTED"
+      );
       if (!navigator.onLine) {
         resolve(
           JSON.stringify({

@@ -1,5 +1,12 @@
 import { dispatch } from "./track";
 import _ from "../index";
+
+/**
+ * Cradova afterMount event
+ */
+
+export const cradovaAftermountEvent = new CustomEvent("cradova-aftermount");
+
 export const err = function (errors: string[], err: string, type?: string) {
   for (let er = 0; er < errors.length; er++) {
     console.error(" ✘  Cradova err:  ", errors[er]);
@@ -123,56 +130,6 @@ export function assertOr(
   return ifFalse;
 }
 
-/**
- *
- * Create element and get a callback to update their state
- * no need to manage stateIDs
- * ----------------------------------------------------------------
- *
- * @param element_initials
- * @param props
- * @returns
- */
-
-export function RefElement(
-  element_initials = "div",
-  props: any = {},
-  ...other: any
-) {
-  const stateID = uuid();
-  if (typeof props === "object" && !Array.isArray(element_initials[1])) {
-    other = props;
-    props = { stateID };
-  } else {
-    props["stateID"] = stateID;
-  }
-  const element = _(element_initials, props, other);
-  return {
-    render(data?: any) {
-      return element(data);
-    },
-    r(data?: any) {
-      return element(data);
-    },
-    instance() {
-      return dispatch(stateID, {
-        cradovaDispatchTrackBreak: true,
-      });
-    },
-    i() {
-      return dispatch(stateID, {
-        cradovaDispatchTrackBreak: true,
-      });
-    },
-    updateState(state: Record<string, any>) {
-      dispatch(stateID, state);
-    },
-    u(state: Record<string, any>) {
-      dispatch(stateID, state);
-    },
-  };
-}
-
 export const ls: Record<string, Function> = {};
 ls.store = (name: string, value: any) => {
   localStorage.setItem(name, JSON.stringify(value));
@@ -262,20 +219,11 @@ export class Ref {
         `Cradova can't render component make sure it's a valid component`
       );
     }
-
-    if (typeof element.afterMount === "function") {
-      this.effector = this.effector.bind(this);
-      const afterMount = element.afterMount as Function;
-      element.afterMount = async () => {
-        await this.effector();
-        await afterMount();
-      };
-      element.afterMount = element.afterMount.bind(this);
-    } else {
-      if (typeof element.afterMount !== "function") {
-        element.afterMount = this.effector.bind(this);
-      }
-    }
+    const av = () => {
+      this.effector.apply(this);
+      window.removeEventListener("cradova-aftermount", av);
+    };
+    window.addEventListener("cradova-aftermount", av);
     return () => element;
   }
 
@@ -314,6 +262,7 @@ export class Ref {
   private async effector() {
     await Promise.allSettled(this.effects);
     this.rendered = true;
+    this.hasFirstStateUpdateRun = true;
   }
 
   /**
@@ -355,7 +304,6 @@ export class Ref {
       );
       return;
     }
-
     const guy: HTMLElement = dispatch(this.stateID, {
       cradovaDispatchTrackBreak: true,
     });
@@ -371,10 +319,11 @@ export class Ref {
       element = chtml({ stateID: this.stateID });
     }
     try {
-      guy.parentNode!.replaceChild(element, guy);
-      if (this.effects.length) {
-        delete element.afterMount;
-        await this.effector();
+      guy.insertAdjacentElement("beforebegin", element);
+      if (guy.parentElement) {
+        guy.parentElement.removeChild(guy);
+      } else {
+        guy.remove();
       }
     } catch (e0) {
       console.error(e0);
@@ -406,9 +355,7 @@ export const frag = function (...children: fragmentTYPE[]) {
         } else {
           if (!(b instanceof HTMLElement)) {
             console.error(" ✘  Cradova err:   wrong element type" + b);
-            throw new TypeError(
-              " ✘  Cradova err:   invalid element, should be a html element from cradova"
-            );
+            throw new TypeError(" ✘  Cradova err:   invalid element");
           }
         }
       } else {
@@ -417,12 +364,13 @@ export const frag = function (...children: fragmentTYPE[]) {
         } else {
           if (!(a instanceof HTMLElement)) {
             console.error(" ✘  Cradova err:   wrong element type" + a);
-            throw new TypeError(
-              " ✘  Cradova err:   invalid element, should be a html element from cradova"
-            );
+            throw new TypeError(" ✘  Cradova err:   invalid element");
           }
         }
       }
+    } else {
+      console.error(" ✘  Cradova err:   wrong element type" + children[i]);
+      throw new TypeError(" ✘  Cradova err:   invalid element");
     }
   }
   return par;

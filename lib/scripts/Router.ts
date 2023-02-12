@@ -15,6 +15,7 @@ RouterBox["nextRouteController"] = null;
 RouterBox["lastNavigatedRoute"] = null;
 RouterBox["pageShow"] = null;
 RouterBox["pageHide"] = null;
+RouterBox["errorHandler"] = {};
 RouterBox["params"] = {};
 RouterBox["routes"] = {};
 
@@ -81,6 +82,7 @@ const checker = (
             routesParams[pathFixtures[i].split(":")[1]] = urlFixtures[i];
           }
         }
+        routesParams.path = path;
         return [RouterBox.routes[path], routesParams];
       }
     }
@@ -168,19 +170,17 @@ Router.navigate = function (
  */
 
 RouterBox.router = async function (e: any, force = false) {
-  let Alink, url, route, params;
-  if (e && e.target.tagName) {
-    Alink = e.target;
-    if (Alink && Alink.href.includes("#")) {
+  let url, route, params;
+  const Alink = e && e.target.tagName === "A" && e.target;
+  if (Alink) {
+    if (Alink.href.includes("#")) {
       return;
     }
-    if (Alink && Alink.href.includes("javascript")) {
+    if (Alink.href.includes("javascript")) {
       return;
     }
     e.preventDefault();
-    if (Alink) {
-      url = new URL(Alink.href).pathname;
-    }
+    url = new URL(Alink.href).pathname;
   }
   if (!url) {
     url = window.location.pathname;
@@ -188,44 +188,60 @@ RouterBox.router = async function (e: any, force = false) {
   if (url === Router["lastNavigatedRoute"]) {
     return;
   }
-
   if (RouterBox["nextRouteController"]) {
     route = RouterBox["nextRouteController"];
     RouterBox["nextRouteController"] = null;
     params = RouterBox.params.params;
+    RouterBox.params.params = null;
   } else {
     [route, params] = checker(url);
   }
   if (route) {
-    RouterBox.params.event = e;
-    RouterBox.params.params = params || RouterBox.params.params || null;
-    RouterBox.params.data = RouterBox.params.data || null;
-    RouterBox["lastNavigatedRouteController"] &&
-      RouterBox["lastNavigatedRouteController"].deactivate();
-    await route.controller(force);
-    RouterBox["pageShow"] && RouterBox["pageShow"](url);
-    RouterBox["lastNavigatedRoute"] = url;
-    RouterBox["lastNavigatedRouteController"] = route;
-    // click handlers
-    Array.from(window.document.querySelectorAll("a")).forEach((a) => {
-      if (a.href.includes(window.location.origin)) {
-        a.addEventListener("click", (e) => {
-          e.preventDefault();
-          Router.navigate(a.pathname);
-        });
+    try {
+      RouterBox.params.event = e;
+      RouterBox.params.params = params || RouterBox.params.params || null;
+      RouterBox.params.data = RouterBox.params.data || null;
+      RouterBox["lastNavigatedRouteController"] &&
+        RouterBox["lastNavigatedRouteController"].deactivate();
+      await route.controller(force);
+      RouterBox["pageShow"] && RouterBox["pageShow"](url);
+      RouterBox["lastNavigatedRoute"] = url;
+      RouterBox["lastNavigatedRouteController"] = route;
+      RouterBox.params.params = null;
+      // click handlers
+      // Array.from(window.document.querySelectorAll("a")).forEach((a) => {
+      //   if (a.href.includes(window.location.origin)) {
+      //     a.addEventListener("click", (e) => {
+      //       e.preventDefault();
+      //       Router.navigate(a.pathname);
+      //     });
+      //   }
+      // });
+    } catch (error) {
+      const errorHandler = RouterBox.errorHandler[params.path || "all"];
+      if (errorHandler) {
+        errorHandler(error);
       }
-    });
+    }
   } else {
     // or 404
     if (RouterBox.routes["/404"]) {
       RouterBox.routes["/404"].controller(RouterBox.params);
     } else {
-      // or error
-      console.error(
-        " ✘  Cradova err: route '" +
-          url +
-          "' does not exist and no '/404' route given!"
-      );
+      const errorHandler = RouterBox.errorHandler[params.path || "all"];
+      if (errorHandler) {
+        errorHandler(
+          " ✘  Cradova err: route '" +
+            url +
+            "' does not exist and no '/404' route given!"
+        );
+      } else {
+        console.error(
+          " ✘  Cradova err: route '" +
+            url +
+            "' does not exist and no '/404' route given!"
+        );
+      }
     }
   }
 };
@@ -279,8 +295,28 @@ Router.packageScreen = async function (path: string, data: any) {
 Router.getParams = function () {
   return RouterBox["params"];
 };
+
+/**
+ * Cradova
+ * ---
+ * Error Handler for your app
+ *
+ * @param callback
+ * @param path? page path
+ */
+
+Router["addErrorHandler"] = function (callback: () => void, path?: string) {
+  if (typeof callback === "function") {
+    RouterBox["errorHandler"][path || "all"] = callback;
+  } else {
+    throw new Error(
+      " ✘  Cradova err:  callback for ever event event is not a function"
+    );
+  }
+};
+
 window.addEventListener("pageshow", RouterBox.router);
 window.addEventListener("popstate", (e) => {
   e.preventDefault();
-  RouterBox.router(e);
+  RouterBox.router();
 });

@@ -74,7 +74,11 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
         }
         //removing element element
         if (key === "remove") {
-          element.parentElement?.removeChild(element);
+          if (element.parentElement) {
+            element.parentElement?.removeChild(element);
+          } else {
+            element.remove();
+          }
           continue;
         }
 
@@ -89,6 +93,10 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
         if (key === "tree") {
           if (typeof state[key] === "function") {
             state[key] = state[key]();
+          } else {
+            throw new TypeError(
+              " ✘  Cradova err: invalid tree element type, should be a single parent cradova element tree"
+            );
           }
 
           if (typeof state[key] === "function") {
@@ -97,7 +105,7 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
 
           if (Array.isArray(state[key])) {
             throw new TypeError(
-              " ✘  Cradova err: invalid tree element type, should be a single element or parent element from cradova"
+              " ✘  Cradova err: invalid tree element type, should be a single parent cradova element tree"
             );
           }
 
@@ -107,11 +115,12 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
                 state[key]
             );
             throw new TypeError(
-              " ✘  Cradova err:   invalid element, should be a html element from cradova"
+              " ✘  Cradova err: invalid tree element type, should be a single parent cradova element tree"
             );
           }
           // replace the component tree
-          element.replaceChildren(state[key]);
+          element.innerHTML = "";
+          element.appendChild(state[key]);
           continue;
         }
         // trying to set other values
@@ -121,7 +130,6 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
           } else {
             element[key] = state[key];
             if (
-              key !== "afterMount" &&
               key !== "for" &&
               key !== "text" &&
               key !== "class" &&
