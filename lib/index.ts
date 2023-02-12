@@ -35,31 +35,33 @@
 */
 
 // importing cradova scripts
-export { Screen } from "./scripts/Screen";
-export { Router } from "./scripts/Router";
-export { dispatch } from "./scripts/track";
-import { dispatch } from "./scripts/track";
-export { createSignal } from "./scripts/createSignal";
-export { simpleStore as $ } from "./scripts/simplestore";
-import { simpleStore } from "./scripts/simplestore";
 export { Ajax } from "./scripts/ajax";
+export { createSignal } from "./scripts/createSignal";
+export { dispatch } from "./scripts/track";
 export { loadCradovaUICss } from "./sacho/loadCss";
+export { Router } from "./scripts/Router";
+export { Screen } from "./scripts/Screen";
+export { simpleStore as $ } from "./scripts/simplestore";
 // export { IsElementInView } from "./scripts/utils";
 
 export {
   assert,
   assertOr,
+  cradovaAftermountEvent,
   css,
+  Ref,
   frag,
   ls,
-  Ref,
-  cradovaAftermountEvent,
 } from "./scripts/fns";
+
+// used here
+
 import { Init } from "./scripts/init";
+import { dispatch } from "./scripts/track";
+import { simpleStore } from "./scripts/simplestore";
+import { CradovaElementType } from "./types";
 
 // importing types declarations
-
-import { CradovaElementType } from "./types";
 
 ("use strict");
 
