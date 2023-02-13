@@ -209,14 +209,14 @@ RouterBox.router = async function (e: any, force = false) {
       RouterBox["lastNavigatedRouteController"] = route;
       RouterBox.params.params = null;
       // click handlers
-      // Array.from(window.document.querySelectorAll("a")).forEach((a) => {
-      //   if (a.href.includes(window.location.origin)) {
-      //     a.addEventListener("click", (e) => {
-      //       e.preventDefault();
-      //       Router.navigate(a.pathname);
-      //     });
-      //   }
-      // });
+      Array.from(window.document.querySelectorAll("a")).forEach((a) => {
+        if (a.href.includes(window.location.origin)) {
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            Router.navigate(a.pathname);
+          });
+        }
+      });
     } catch (error) {
       const errorHandler = RouterBox.errorHandler[params.path || "all"];
       if (errorHandler) {

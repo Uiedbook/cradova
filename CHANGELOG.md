@@ -75,3 +75,14 @@ and we went along with it.
 - new very interesting feature to unlock more speed
 - battle testing green
 - new apis for element level
+
+## 1.4.0
+
+- unlocked more speed by reducing work done by router
+- battle testing green
+- added error boundary
+- Ref working perfectly as wanted
+
+# 1.4.1
+
+- fix effect on cradova screens

@@ -26,9 +26,8 @@ export class Screen {
    */
   private template = document.createElement("div");
   /**
-   * this a set of two class names
-   * one for the entry transition
-   * and one for the exit transition
+   * this a set of class names
+   * for the entry transitions
    */
   private transition: string | undefined;
   private callBack: ((data?: Record<string, any>) => Promise<void>) | undefined;
@@ -50,7 +49,7 @@ export class Screen {
   private persist = true;
   private rendered = false;
   private hasFirstStateUpdateRun = false;
-  private effects: Promise<unknown>[] = [];
+  private effects: (() => Promise<unknown>)[] = [];
   private data: unknown;
   private effectuate: (() => unknown) | null = null;
 
@@ -70,27 +69,23 @@ export class Screen {
     }
   }
 
-  effect(fn: () => unknown | Promise<unknown>) {
+  effect(fn: () => Promise<unknown>) {
     if (!this.rendered) {
-      this.effects.push(
-        new Promise(async (res, rej) => {
-          try {
-            res(await fn());
-          } catch (error) {
-            rej(error);
-          }
-        })
-      );
+      this.effects.push(fn);
     }
   }
 
   private async effector() {
-    this.rendered = true;
-    await Promise.allSettled(this.effects);
+    if (!this.rendered) {
+      for (const effect of this.effects) {
+        await effect.apply(this);
+      }
+    }
     if (!this.hasFirstStateUpdateRun && this.effectuate) {
       this.hasFirstStateUpdateRun = true;
       await this.effectuate();
     }
+    this.rendered = true;
   }
 
   /**
@@ -135,7 +130,6 @@ export class Screen {
           }
           this.template.innerHTML = "";
           this.template.appendChild(fuc);
-          // this.template.replaceChildren(fuc);
         }
       }
     }
@@ -183,33 +177,19 @@ export class Screen {
     const doc = document.querySelector("[data-cra-id=cradova-app-wrapper]");
     if (!doc) {
       throw new Error(
-        " ✘  Cradova err: Unable to render, cannot find cradova root [data-cra-id=cradova-app-wrapper]"
+        " ✘  Cradova err: Unable to render, cannot find cradova root <div data-cra-id='cradova-app-wrapper'> ... </div>"
       );
     }
     doc.innerHTML = "";
     doc.appendChild(this.template);
-    // doc?.replaceChildren(this.template);
     if (!this.persist) {
       this.packed = false;
     }
-
-    //  @ts-ignore
-    if (doc?.firstChild?.firstChild?.afterMount) {
-      const c = doc?.firstChild;
-      //  @ts-ignore
-      await c?.firstChild.afterMount();
-      //  @ts-ignore
-      delete c?.firstChild.afterMount;
-    }
-    window.dispatchEvent(cradovaAftermountEvent);
-
-    // needed by updateState and effector
-    // this.rendered = true;
     await this.effector();
-
     if (this.callBack) {
       await this.callBack();
     }
+    window.dispatchEvent(cradovaAftermountEvent);
     window.scrollTo(0, 0);
   }
 }
