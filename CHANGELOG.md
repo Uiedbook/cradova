@@ -86,3 +86,7 @@ and we went along with it.
 # 1.4.1
 
 - fix effect on cradova screens
+
+# 1.5.0
+
+- made cradova effect to be re-runnable on component state change

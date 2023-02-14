@@ -218,7 +218,8 @@ RouterBox.router = async function (e: any, force = false) {
         }
       });
     } catch (error) {
-      const errorHandler = RouterBox.errorHandler[params.path || "all"];
+      const errorHandler =
+        RouterBox.errorHandler[(params && params.path) || "all"];
       if (errorHandler) {
         errorHandler(error);
       }
@@ -228,7 +229,8 @@ RouterBox.router = async function (e: any, force = false) {
     if (RouterBox.routes["/404"]) {
       RouterBox.routes["/404"].controller(RouterBox.params);
     } else {
-      const errorHandler = RouterBox.errorHandler[params.path || "all"];
+      const errorHandler =
+        RouterBox.errorHandler[(params && params.path) || "all"];
       if (errorHandler) {
         errorHandler(
           " ✘  Cradova err: route '" +

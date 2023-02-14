@@ -178,7 +178,7 @@ export class Ref {
   ) => any;
   private stateID = uuid();
   private rendered = false;
-  private effects: Promise<unknown>[] = [];
+  private effects: (() => Promise<unknown>)[] = [];
   private effectuate: (() => unknown) | null = null;
   private hasFirstStateUpdateRun = false;
 
@@ -244,23 +244,20 @@ export class Ref {
       return;
     }
     fn = fn.bind(this);
-    this.effects.push(
-      new Promise(async (res, rej) => {
-        try {
-          await fn();
-          if (!this.hasFirstStateUpdateRun && this.effectuate) {
-            this.hasFirstStateUpdateRun = true;
-            await this.effectuate();
-          }
-          res(undefined);
-        } catch (error) {
-          rej(error);
-        }
-      })
-    );
+    this.effects.push(async () => {
+      await fn();
+      if (!this.hasFirstStateUpdateRun && this.effectuate) {
+        this.hasFirstStateUpdateRun = true;
+        await this.effectuate();
+      }
+    });
   }
   private async effector() {
-    await Promise.allSettled(this.effects);
+    if (!this.rendered) {
+      for (const effect of this.effects) {
+        await effect.apply(this);
+      }
+    }
     this.rendered = true;
     this.hasFirstStateUpdateRun = true;
   }
