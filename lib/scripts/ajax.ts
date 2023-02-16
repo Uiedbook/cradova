@@ -13,9 +13,9 @@ export function Ajax(
   url: string | URL,
   opts:
     | {
-        method?: string;
+        method?: "GET" | "POST";
         data?: Record<string, any>;
-        header?: Record<string, any>;
+        header?: { "content-type": string } & Record<string, any>;
         callbacks?: Record<string, (arg: any) => void>;
       }
     | any = {}

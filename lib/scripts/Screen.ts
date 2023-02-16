@@ -1,4 +1,3 @@
-import { CradovaScreenType } from "../types.js";
 import { cradovaAftermountEvent, frag } from "./fns.js";
 
 /**
@@ -71,7 +70,7 @@ export class Screen {
 
   effect(fn: () => Promise<unknown>) {
     if (!this.rendered) {
-      this.effects.push(fn);
+      this.effects.push(fn.bind(this));
     }
   }
 
@@ -80,11 +79,11 @@ export class Screen {
       for (const effect of this.effects) {
         await effect.apply(this);
       }
+      if (!this.hasFirstStateUpdateRun && this.effectuate) {
+        await this.effectuate();
+      }
     }
-    if (!this.hasFirstStateUpdateRun && this.effectuate) {
-      this.hasFirstStateUpdateRun = true;
-      await this.effectuate();
-    }
+    this.hasFirstStateUpdateRun = true;
     this.rendered = true;
   }
 
@@ -102,11 +101,12 @@ export class Screen {
 
   updateState(data: unknown) {
     if (!this.rendered) {
-      async function updateState(this: any, data: any) {
+      // @ts-ignore
+      async function effectuate(this: any, data: any) {
         this.data = data;
         await this.Activate(true);
       }
-      this.effectuate = updateState.bind(this, data);
+      this.effectuate = effectuate.bind(this, data);
     } else {
       (async () => {
         this.data = data;
@@ -139,8 +139,10 @@ export class Screen {
       );
     }
     if (this.secondaryChildren.length) {
-      // @ts-ignore
-      this.template.append(this.secondaryChildren);
+      for (const child of this.secondaryChildren) {
+        // @ts-ignore
+        this.template.appendChild(child);
+      }
     }
   }
   onActivate(cb: (data: any) => Promise<void>) {
@@ -193,3 +195,91 @@ export class Screen {
     window.scrollTo(0, 0);
   }
 }
+
+export type CradovaScreenType = {
+  /**
+   * Cradova screen
+   * ---
+   * title of the page
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   *
+   */
+  name: string;
+  /**
+   * Cradova screen
+   * ---
+   * The component for the screen
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   *
+   */
+  template: Function | HTMLElement;
+  /**
+   * Cradova screen
+   * ---
+   * Screen transition from the screen class
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   *
+   */
+  transition?: string;
+  /**
+   * Cradova screen
+   * ---
+   * gets called when the the screen is displayed
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   *
+   */
+  onActivate: (fn: (data: any) => void) => Promise<void>;
+  /**
+   * Cradova screen
+   * ---
+   * Should this screen be cached after first render?
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   *
+   */
+  persist?: boolean;
+  /**
+   * Cradova screen
+   * ---
+   * run once on first render and update the screen immediately.
+   * @param fn () => void
+   * @returns void
+   *
+   *
+   * .
+   *
+   */
+  effect(fn: () => void | Promise<void>): void;
+  /**
+   * Cradova Screen
+   * ---
+   * re-renders the screen -
+   *
+   * first level call will only be called once
+   * lower level calls will be continuously called
+   * @param data .
+   *
+   * *
+   */
+
+  updateState(data: unknown): void;
+};

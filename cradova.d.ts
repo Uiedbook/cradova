@@ -35,9 +35,7 @@ declare module "cradova" {
     updateState(data: unknown): void;
   };
 
-  type CradovaElementType = Record<string, any>;
-
-  type RefType = {
+  export type RefType<D> = {
     /**
      * Cradova Ref
      * ---
@@ -45,7 +43,7 @@ declare module "cradova" {
      * @param data
      * @returns HTMLElement
      */
-    render(data?: any): () => any;
+    render(data?: D): () => any;
     /**
      * Cradova Ref
      * ---
@@ -61,7 +59,7 @@ declare module "cradova" {
      * @param data
      * @returns void
      */
-    updateState(data: any): void;
+    updateState(data: D, stash?: boolean): void;
     /**
      * Cradova Ref
      * ---
@@ -77,7 +75,15 @@ declare module "cradova" {
      *
      */
     effect(fn: (data: unknown) => Promise<void> | void): void;
+    /**
+     * Cradova Ref
+     * ---
+     * returns last set stashed Ref data
+     *
+     */
+    stash: D;
   };
+
   /**
    * Cradova Router
    * ---
@@ -235,7 +241,7 @@ declare module "cradova" {
    * - update a cradova Ref automatically
    * @constructor initial: any, props: {useHistory, persist}
    */
-  export class createSignal {
+  export class createSignal<Type> {
     private callback;
     private persistName;
     private actions;
@@ -246,7 +252,7 @@ declare module "cradova" {
     private path;
     value: any;
     constructor(
-      initial: unknown,
+      initial: Type,
       props?: {
         useHistory?: boolean;
         persistName?: string | undefined;
@@ -259,7 +265,7 @@ declare module "cradova" {
      * @param value - signal value
      * @returns void
      */
-    set(value: unknown, shouldRefRender?: boolean): void;
+    set(value: Type, shouldRefRender?: boolean): void;
     /**
      *  Cradova Signal
      * ----
@@ -268,7 +274,7 @@ declare module "cradova" {
      * @param value - value of the key
      * @returns void
      */
-    setKey(name: string, value: any, shouldRefRender?: boolean): void;
+    setKey(name: string, value: unknown, shouldRefRender?: boolean): void;
     /**
      *  Cradova Signal
      * ----
@@ -281,7 +287,7 @@ declare module "cradova" {
     setPath(
       key: string,
       name: string,
-      value: any,
+      value: unknown,
       shouldRefRender?: boolean
     ): void;
     /**
@@ -296,7 +302,7 @@ declare module "cradova" {
     setIndex(
       key: string,
       index: number,
-      value: any,
+      value: unknown,
       shouldRefRender?: boolean
     ): void;
     /**
@@ -307,8 +313,8 @@ declare module "cradova" {
      * @param action function to execute
      */
     createAction(
-      name: string | Record<string, (self?: any, data?: any) => void>,
-      action?: (self?: any, data?: any) => void
+      name: string | Record<string, (self?: this, data?: Type) => void>,
+      action?: (self?: this, data?: any) => void
     ): void;
     /**
      *  Cradova Signal
@@ -317,7 +323,7 @@ declare module "cradova" {
      * @param name - string name of the action
      * @param data - data for the action
      */
-    fireAction(name: string, data?: any): void;
+    fireAction(name: string, data?: Type): void;
     /**
      *  Cradova Signal
      * ----
@@ -347,7 +353,7 @@ declare module "cradova" {
      *  set a update listener on value changes
      * @param callback
      */
-    listen(callback: (a: any) => void): void;
+    listen(callback: (data: Type) => void): void;
     /**
      *  Cradova Signal
      * ----
@@ -367,10 +373,10 @@ declare module "cradova" {
    * @constructor initial: any, Ref: any
    */
 
-  export class $ {
+  export class $<Type> {
     private ref;
     value: any;
-    constructor(initial: unknown);
+    constructor(initial: Type);
     /**
      *  Cradova simpleStore
      * ----
@@ -378,7 +384,7 @@ declare module "cradova" {
      * @param value - simpleStore value
      * @returns void
      */
-    set(value: unknown, shouldRefRender?: boolean): void;
+    set(value: Type, shouldRefRender?: boolean): void;
     /**
      *  Cradova simpleStore
      * ----
@@ -387,7 +393,7 @@ declare module "cradova" {
      * @param value - value of the key
      * @returns void
      */
-    setKey(name: string, value: any, shouldRefRender?: boolean): void;
+    setKey(name: string, value: unknown, shouldRefRender?: boolean): void;
     /**
      *  Cradova simpleStore
      * ---
@@ -414,9 +420,9 @@ declare module "cradova" {
     url: string | URL,
     opts?:
       | {
-          method?: string;
+          method?: "GET" | "POST";
           data?: Record<string, any>;
-          header?: Record<string, any>;
+          header?: { "content-type": string } & Record<string, any>;
           callbacks?: Record<string, (arg: any) => void>;
         }
       | any
@@ -480,8 +486,8 @@ css(".btn:hover",
    * create dynamic components
    *
    */
-  export class Ref {
-    constructor(component: (...data: any) => any);
+  export class Ref<D> {
+    constructor(component: (data: D) => any);
     /**
      * Cradova Ref
      * ---
@@ -489,7 +495,7 @@ css(".btn:hover",
      * @param data
      * @returns HTMLElement
      */
-    render(data?: any): () => any;
+    render(data?: D, stash?: boolean): () => any;
     /**
      * Cradova Ref
      * ---
@@ -505,7 +511,7 @@ css(".btn:hover",
      * @param data
      * @returns void
      */
-    updateState(data: any): void;
+    updateState(data: D, stashed?: boolean): void;
     /**
      * Cradova Ref
      * ---
@@ -521,6 +527,13 @@ css(".btn:hover",
      *
      */
     effect(fn: (data: unknown) => Promise<void> | void): void;
+    /**
+     * Cradova Ref
+     * ---
+     * returns last set stashed Ref data
+     *
+     */
+    stash: D;
   }
 
   /**

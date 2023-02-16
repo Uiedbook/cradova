@@ -4,5 +4,5 @@ export const Init = function () {
   }
   const Wrapper: any = document.createElement("div");
   Wrapper.setAttribute("data-cra-id", "cradova-app-wrapper");
-  document.body.append(Wrapper);
+  document.body.appendChild(Wrapper);
 };

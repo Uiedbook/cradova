@@ -45,77 +45,6 @@ export type CradovaHTMLElementType = (
   | ((...element_initials: any[]) => HTMLElement | undefined);
 
 export type CradovaScreenType = {
-  /**
-   * Cradova screen
-   * ---
-   * title of the page
-   * @param data
-   * @returns void
-   *
-   *
-   * .
-   *
-   */
-  name: string;
-  /**
-   * Cradova screen
-   * ---
-   * The component for the screen
-   * @param data
-   * @returns void
-   *
-   *
-   * .
-   *
-   */
-  template: Function | HTMLElement;
-  /**
-   * Cradova screen
-   * ---
-   * Screen transition from the screen class
-   * @param data
-   * @returns void
-   *
-   *
-   * .
-   *
-   */
-  transition?: string;
-  /**
-   * Cradova screen
-   * ---
-   * gets called when the the screen is displayed
-   * @param data
-   * @returns void
-   *
-   *
-   * .
-   *
-   */
-  onActivate: (fn: (data: any) => void) => Promise<void>;
-  /**
-   * Cradova screen
-   * ---
-   * Should this screen be cached after first render?
-   * @param data
-   * @returns void
-   *
-   *
-   * .
-   *
-   */
-  persist?: boolean;
-  /**
-   * Cradova screen
-   * ---
-   * run once on first render and update the screen immediately.
-   * @param fn () => void
-   * @returns void
-   *
-   *
-   * .
-   *
-   */
   effect(fn: () => void | Promise<void>): void;
   /**
    * Cradova Screen
@@ -128,11 +57,10 @@ export type CradovaScreenType = {
    *
    * *
    */
-
-  updateState(data: unknown): void;
+  updateState(data: unknown, stash?: unknown): void;
 };
 
-export type RefType = {
+export type RefType<D> = {
   /**
    * Cradova Ref
    * ---
@@ -140,7 +68,7 @@ export type RefType = {
    * @param data
    * @returns HTMLElement
    */
-  render(data?: any): () => any;
+  render(data?: D): () => any;
   /**
    * Cradova Ref
    * ---
@@ -156,7 +84,7 @@ export type RefType = {
    * @param data
    * @returns void
    */
-  updateState(data: any): void;
+  updateState(data: D, stash?: boolean): void;
   /**
    * Cradova Ref
    * ---
@@ -172,6 +100,13 @@ export type RefType = {
    *
    */
   effect(fn: (data: unknown) => Promise<void> | void): void;
+  /**
+   * Cradova Ref
+   * ---
+   * returns last set stashed Ref data
+   *
+   */
+  stash: D;
 };
 
 /**

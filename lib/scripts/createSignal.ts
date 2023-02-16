@@ -14,19 +14,19 @@
  * @constructor initial: any, props: {useHistory, persist}
  */
 
-export class createSignal {
-  private callback: undefined | ((newValue: any) => void);
+export class createSignal<Type> {
+  private callback: undefined | ((newValue: Type) => void);
   private persistName: string | undefined = "";
   private actions: Record<string, any> = {};
   private useHistory = false;
-  private history: unknown[] = [];
+  private history: Type[] = [];
   private ref: any;
   private index = 0;
   private path: null | string = null;
   value: any = null;
 
   constructor(
-    initial: unknown,
+    initial: Type,
     props?: { useHistory?: boolean; persistName?: string | undefined }
   ) {
     this.value = initial;
@@ -49,7 +49,7 @@ export class createSignal {
    * @param value - signal value
    * @returns void
    */
-  set(value: unknown, shouldRefRender?: boolean) {
+  set(value: Type, shouldRefRender?: boolean) {
     if (typeof value === "function") {
       this.value = value(this.value);
     } else {
@@ -82,7 +82,7 @@ export class createSignal {
    * @returns void
    */
 
-  setKey(name: string, value: any, shouldRefRender?: boolean) {
+  setKey(name: string, value: unknown, shouldRefRender?: boolean) {
     if (typeof this.value === "object" && !Array.isArray(this.value)) {
       this.value[name] = value;
       if (this.persistName) {
@@ -113,7 +113,12 @@ export class createSignal {
    * @returns void
    */
 
-  setPath(key: string, name: string, value: any, shouldRefRender?: boolean) {
+  setPath(
+    key: string,
+    name: string,
+    value: unknown,
+    shouldRefRender?: boolean
+  ) {
     if (this.value[key]) {
       this.value[key][name] = value;
     } else {
@@ -136,7 +141,12 @@ export class createSignal {
    * @param value - value of the index
    * @returns void
    */
-  setIndex(key: string, index: number, value: any, shouldRefRender?: boolean) {
+  setIndex(
+    key: string,
+    index: number,
+    value: unknown,
+    shouldRefRender?: boolean
+  ) {
     if (Array.isArray(this.value[key])) {
       this.value[key][index] = value;
     } else {
@@ -160,8 +170,8 @@ export class createSignal {
    * @param action function to execute
    */
   createAction(
-    name: string | Record<string, (self?: any, data?: any) => void>,
-    action?: (self?: any, data?: any) => void
+    name: string | Record<string, (self?: this, data?: Type) => void>,
+    action?: (self?: this, data?: Type) => void
   ) {
     if (typeof name === "string" && typeof action === "function") {
       this.actions[name] = action;
@@ -186,7 +196,7 @@ export class createSignal {
    * @param name - string name of the action
    * @param data - data for the action
    */
-  fireAction(name: string, data?: any) {
+  fireAction(name: string, data?: Type) {
     try {
       if (!(typeof name === "string" && this.actions[name])) {
         throw Error("");
@@ -263,7 +273,7 @@ export class createSignal {
    */
   clearPersist() {
     if (this.persistName) {
-      localStorage.setItem(this.persistName, "");
+      localStorage.removeItem(this.persistName);
     }
   }
 }

@@ -58,7 +58,7 @@ export function css(identifier: string, properties?: Record<string, string>) {
     }
     styTag = document.createElement("style");
     styTag.textContent = identifier;
-    document.head.append(styTag);
+    document.head.appendChild(styTag);
     return;
   }
 
@@ -104,7 +104,7 @@ export function css(identifier: string, properties?: Record<string, string>) {
 `;
   totalStyle += styS + style + styE;
   styleTag.innerHTML = totalStyle;
-  document.head.append(styleTag);
+  document.head.appendChild(styleTag);
 }
 
 /**
@@ -162,27 +162,25 @@ export function fullScreen(e: Element) {
   };
 }
 
-type RefProps<T> = Record<string, T> | T;
-
+// type RefProps<T> = Record<string, T> | T;
+// RefProps<string | number | Record<string, unknown> | undefined | null>;
 /**
  * Cradova Ref
  * -------
  * create dynamic components
  */
 
-export class Ref {
-  private component: (
-    data?: RefProps<
-      string | number | Record<string, unknown> | undefined | null
-    >
-  ) => any;
+export class Ref<D> {
+  private component: (data?: D) => any;
   private stateID = uuid();
   private rendered = false;
   private effects: (() => Promise<unknown>)[] = [];
   private effectuate: (() => unknown) | null = null;
   private hasFirstStateUpdateRun = false;
+  public testName = null;
+  public stash: D | undefined;
 
-  constructor(component: (...data: any) => any) {
+  constructor(component: (data?: D) => any) {
     this.component = component.bind(this);
   }
   /**
@@ -192,11 +190,7 @@ export class Ref {
    * @param data
    * @returns () => HTMLElement
    */
-  render(
-    data?: RefProps<
-      string | number | Record<string, unknown> | undefined | null
-    >
-  ) {
+  render(data?: D, stash?: boolean) {
     const chtml = this.component(data);
     if (typeof chtml !== "function") {
       throw new Error(
@@ -219,6 +213,9 @@ export class Ref {
         `Cradova can't render component make sure it's a valid component`
       );
     }
+    if (stash) {
+      this.stash = data;
+    }
     const av = () => {
       this.effector.apply(this);
       window.removeEventListener("cradova-aftermount", av);
@@ -236,26 +233,25 @@ export class Ref {
   /**
    * Cradova Ref
    * ---
-   * runs on every state update
+   * runs on first state update
    *
    */
-  effect(fn: () => unknown | Promise<unknown>) {
-    if (this.rendered) {
-      return;
-    }
-    fn = fn.bind(this);
-    this.effects.push(async () => {
-      await fn();
-      if (!this.hasFirstStateUpdateRun && this.effectuate) {
-        this.hasFirstStateUpdateRun = true;
-        await this.effectuate();
-      }
-    });
-  }
-  private async effector() {
+  effect(fn: () => Promise<unknown>) {
     if (!this.rendered) {
+      this.effects.push(fn.bind(this));
+    }
+  }
+
+  private async effector() {
+    // ? tested
+    if (!this.rendered) {
+      // effects
       for (const effect of this.effects) {
         await effect.apply(this);
+      }
+      // first update
+      if (!this.hasFirstStateUpdateRun && this.effectuate) {
+        await this.effectuate();
       }
     }
     this.rendered = true;
@@ -273,11 +269,11 @@ export class Ref {
    * .
    */
 
-  updateState(data: unknown) {
+  updateState(data: D, stash: boolean) {
     if (!this.rendered) {
-      this.rendered = true;
-      async function updateState(this: any, data: any) {
-        if (this.instance()) {
+      // @ts-ignore
+      async function updateState(this, data: any) {
+        if (this.rendered) {
           await this.Activate(data);
         } else {
           setTimeout(updateState.bind(this, data), 4);
@@ -287,7 +283,10 @@ export class Ref {
     } else {
       (async () => {
         await this.Activate(data);
-      }).bind(this)();
+      })();
+    }
+    if (stash) {
+      this.stash = data;
     }
   }
 
@@ -322,9 +321,11 @@ export class Ref {
       } else {
         guy.remove();
       }
+      // window.dispatchEvent(cradovaAftermountEvent);
     } catch (e0) {
       console.error(e0);
     }
+    //
   }
   remove() {
     dispatch(this.stateID, { remove: true });
@@ -348,7 +349,7 @@ export const frag = function (...children: fragmentTYPE[]) {
       if (typeof a === "function") {
         const b = a() as any;
         if (b instanceof HTMLElement) {
-          par.append(b);
+          par.appendChild(b);
         } else {
           if (!(b instanceof HTMLElement)) {
             console.error(" ✘  Cradova err:   wrong element type" + b);
@@ -357,7 +358,7 @@ export const frag = function (...children: fragmentTYPE[]) {
         }
       } else {
         if (a instanceof HTMLElement) {
-          par.append(a);
+          par.appendChild(a);
         } else {
           if (!(a instanceof HTMLElement)) {
             console.error(" ✘  Cradova err:   wrong element type" + a);

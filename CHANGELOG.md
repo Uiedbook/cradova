@@ -89,4 +89,5 @@ and we went along with it.
 
 # 1.5.0
 
-- made cradova effect to be re-runnable on component state change
+- made cradova Ref to have Stash hold component state change
+- very stable Ref effect and updateState compliant to the spec
