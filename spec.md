@@ -75,7 +75,7 @@ VJS("label", { for: "bar" });
 VJS("div", (style: { $age: "bar" })); // data-age
 ```
 
-### JSX Children
+### VJS Children
 
 Syntax
 
@@ -98,7 +98,7 @@ VJS(
 );
 ```
 
-### JSX Components
+### VJS Components
 
 Syntax
 
@@ -108,7 +108,7 @@ function Hello(name) {
 }
 ```
 
-### JSX Fragment
+### VJS Fragment
 
 Syntax
 
