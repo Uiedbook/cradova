@@ -154,6 +154,7 @@ export type SignalType = {
    *  set a key value if it's an object
    * @param name - name of the key
    * @param value - value of the key
+   * @param shouldRefRender? boolean
    * @returns void
    *
    *
@@ -162,45 +163,6 @@ export type SignalType = {
    */
 
   setKey: (name: string, value: any, shouldRefRender?: boolean) => void;
-  /**
-   *  Cradova Signal
-   * ----
-   *  set a prop value inside an object prop of the store
-   * @param key - a prop of the store - object value
-   * @param name - prop of the key object
-   * @param value - value of the name
-   * @returns void
-   *
-   *
-   * .
-   *
-   */
-
-  setPath: (
-    key: string,
-    name: string,
-    value: any,
-    shouldRefRender?: boolean
-  ) => void;
-  /**
-   *  Cradova Signal
-   * ----
-   *  set a prop value inside an array prop of the store
-   * @param key - a prop of the store - object value
-   * @param index - index of the key object
-   * @param value - value of the index
-   * @returns void
-   *
-   *
-   * .
-   *
-   */
-  setIndex: (
-    key: string,
-    index: number,
-    value: any,
-    shouldRefRender?: boolean
-  ) => void;
   /**
    *  Cradova Signal
    * ----

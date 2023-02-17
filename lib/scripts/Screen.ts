@@ -79,9 +79,9 @@ export class Screen {
       for (const effect of this.effects) {
         await effect.apply(this);
       }
-      if (!this.hasFirstStateUpdateRun && this.effectuate) {
-        await this.effectuate();
-      }
+    }
+    if (!this.hasFirstStateUpdateRun && this.effectuate) {
+      await this.effectuate();
     }
     this.hasFirstStateUpdateRun = true;
     this.rendered = true;
@@ -149,9 +149,11 @@ export class Screen {
     this.callBack = cb;
   }
   addChild(...addOns: any[]) {
-    this.secondaryChildren.push(frag(...addOns));
+    this.secondaryChildren.push(frag(addOns));
   }
   deActivate() {
+    this.rendered = false;
+    this.hasFirstStateUpdateRun = false;
     if (this.transition) {
       this.template.classList.remove("CRADOVA-UI-" + this.transition);
     }

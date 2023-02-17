@@ -9,10 +9,10 @@
  * @constructor initial: any, Ref/RefList/RefElement: any
  */
 
-export class simpleStore {
+export class simpleStore<Type extends Record<string, unknown>> {
   private ref: { prop: string; ref: HTMLElement; key: string }[] = [];
-  value: any = null;
-  constructor(initial: unknown) {
+  value: Type;
+  constructor(initial: Type) {
     this.value = initial;
   }
   /**
@@ -22,7 +22,7 @@ export class simpleStore {
    * @param value - simpleStore value
    * @returns void
    */
-  set(value: unknown, shouldRefRender?: boolean) {
+  set(value: Type | ((value: Type) => Type), shouldRefRender?: boolean) {
     if (typeof value === "function") {
       this.value = value(this.value);
     } else {
@@ -55,7 +55,7 @@ export class simpleStore {
     }
   }
 
-  private updateState(name?: string) {
+  private updateState(name?: any) {
     if (name) {
       const entry = this.ref.find((ent) => ent.prop === name) as any;
       if (entry) {
@@ -78,7 +78,7 @@ export class simpleStore {
    * @returns void
    */
 
-  setKey(name: string, value: any, shouldRefRender?: boolean) {
+  setKey<k extends keyof Type>(name: k, value: any, shouldRefRender?: boolean) {
     if (typeof this.value === "object" && !Array.isArray(this.value)) {
       if (typeof value === "function") {
         this.value[name] = value(this.value);

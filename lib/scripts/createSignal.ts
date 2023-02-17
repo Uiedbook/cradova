@@ -14,7 +14,7 @@
  * @constructor initial: any, props: {useHistory, persist}
  */
 
-export class createSignal<Type> {
+export class createSignal<Type extends Record<string, unknown>> {
   private callback: undefined | ((newValue: Type) => void);
   private persistName: string | undefined = "";
   private actions: Record<string, any> = {};
@@ -23,7 +23,7 @@ export class createSignal<Type> {
   private ref: any;
   private index = 0;
   private path: null | string = null;
-  value: any = null;
+  value: Type;
 
   constructor(
     initial: Type,
@@ -49,7 +49,7 @@ export class createSignal<Type> {
    * @param value - signal value
    * @returns void
    */
-  set(value: Type, shouldRefRender?: boolean) {
+  set(value: Type | ((value: Type) => Type), shouldRefRender?: boolean) {
     if (typeof value === "function") {
       this.value = value(this.value);
     } else {
@@ -70,7 +70,7 @@ export class createSignal<Type> {
     }
     if (!this.useHistory) return;
     this.index += 1;
-    this.history.push(value);
+    this.history.push(this.value);
   }
 
   /**
@@ -82,7 +82,7 @@ export class createSignal<Type> {
    * @returns void
    */
 
-  setKey(name: string, value: unknown, shouldRefRender?: boolean) {
+  setKey<k extends keyof Type>(name: k, value: any, shouldRefRender?: boolean) {
     if (typeof this.value === "object" && !Array.isArray(this.value)) {
       this.value[name] = value;
       if (this.persistName) {
@@ -101,65 +101,12 @@ export class createSignal<Type> {
       if (!this.useHistory) return;
       this.history.push(this.value);
       this.index += 1;
-    }
-  }
-  /**
-   *  Cradova Signal
-   * ----
-   *  set a prop value inside an object prop of the store
-   * @param key - a prop of the store - object value
-   * @param name - prop of the key object
-   * @param value - value of the name
-   * @returns void
-   */
-
-  setPath(
-    key: string,
-    name: string,
-    value: unknown,
-    shouldRefRender?: boolean
-  ) {
-    if (this.value[key]) {
-      this.value[key][name] = value;
-    } else {
-      this.value[key] = { [name]: [value] };
-    }
-    if (this.ref && shouldRefRender !== false) {
-      if (this.path) {
-        this.ref.updateState(this.value[this.path]);
-      } else {
-        this.ref.updateState(this.value);
-      }
-    }
-  }
-  /**
-   *  Cradova Signal
-   * ----
-   *  set a prop value inside an array prop of the store
-   * @param key - a prop of the store - object value
-   * @param index - index of the key object
-   * @param value - value of the index
-   * @returns void
-   */
-  setIndex(
-    key: string,
-    index: number,
-    value: unknown,
-    shouldRefRender?: boolean
-  ) {
-    if (Array.isArray(this.value[key])) {
-      this.value[key][index] = value;
     } else {
       throw new Error(
-        "✘  Cradova err :  " + this.value[key] + "  is not an array "
+        `✘  Cradova err : can't set key ${String(
+          name
+        )} . store value is not a javascript object`
       );
-    }
-    if (this.ref && shouldRefRender !== false) {
-      if (this.path) {
-        this.ref.updateState(this.value[this.path]);
-      } else {
-        this.ref.updateState(this.value);
-      }
     }
   }
   /**

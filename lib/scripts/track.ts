@@ -1,6 +1,6 @@
-import { fullScreen } from "./fns";
-// the global dispatcher
+import { frag } from "./fns";
 
+// the global dispatcher
 function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
   for (let i = 0; i < nodes.length; i++) {
     const element = nodes[i];
@@ -29,21 +29,12 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
           continue;
         }
         if (typeof element[key] === "function") {
-          element[key](element);
+          element[key].apply(element);
           continue;
         }
         // updating element's inner text
         if (key === "text") {
           element.innerText = state[key];
-          continue;
-        }
-        // setting element dimension to full screen
-        if (key === "fullscreen") {
-          if (state[key]) {
-            fullScreen(element).set();
-          } else {
-            fullScreen(element).exist();
-          }
           continue;
         }
         // adding class name to element
@@ -60,18 +51,6 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
           }
           continue;
         }
-        // toggling element class
-        if (key === "toggleclass" && state[key] !== "") {
-          element.classList.toggle(state[key]);
-          //          console.log(element.className, "tc");
-          continue;
-        }
-        //removing element class
-        if (key === "removeclass" && state[key] !== "") {
-          element.classList.remove(state[key]);
-          //  console.log(element.className, "rm");
-          continue;
-        }
         //removing element element
         if (key === "remove") {
           if (element.parentElement) {
@@ -82,7 +61,6 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
           continue;
         }
 
-        //
         // setting data attribute
         if (key.includes("$")) {
           element.setAttribute("data-" + key.split("$")[1], state[key]);
@@ -91,36 +69,9 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
 
         // changing the element children tree
         if (key === "tree") {
-          if (typeof state[key] === "function") {
-            state[key] = state[key]();
-          } else {
-            throw new TypeError(
-              " ✘  Cradova err: invalid tree element type, should be a single parent cradova element tree"
-            );
-          }
-
-          if (typeof state[key] === "function") {
-            state[key] = state[key]();
-          }
-
-          if (Array.isArray(state[key])) {
-            throw new TypeError(
-              " ✘  Cradova err: invalid tree element type, should be a single parent cradova element tree"
-            );
-          }
-
-          if (!(state[key] instanceof HTMLElement)) {
-            console.error(
-              " ✘  Cradova err:  wrong element type: can't update tree using " +
-                state[key]
-            );
-            throw new TypeError(
-              " ✘  Cradova err: invalid tree element type, should be a single parent cradova element tree"
-            );
-          }
           // replace the component tree
           element.innerHTML = "";
-          element.appendChild(state[key]);
+          element.appendChild(frag(state[key]));
           continue;
         }
         // trying to set other values

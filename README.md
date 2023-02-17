@@ -1,6 +1,12 @@
-<a><img src="cradova.png" alt="logo" width="80" height="80" align="right"></a>
+<div style="display: flex; align-items:center; justify-content: space-around; width: 100%;">
+<h1 style="border: none"> Cradova</h1>
+<a><img src="cradova.png" alt="cradova logo" width="100" height="100"></a>
+</div>
+<br>
+<hr>
+<br>
+<br>
 
-# Cradova.js
 [![npm Version](https://img.shields.io/npm/v/cradova.svg)](https://www.npmjs.com/package/cradova)
 [![License](https://img.shields.io/npm/l/cradova.svg)](https://github.com/cradova/cradova.js/blob/next/LICENSE)
 [![npm Downloads](https://img.shields.io/npm/dm/cradova.svg)](https://www.npmjs.com/package/cradova)
@@ -8,28 +14,33 @@
 [![Donate at OpenCollective](https://img.shields.io/opencollective/all/cradova.svg?colorB=brightgreen)](https://opencollective.com/cradova)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cradova/cradova.js/blob/next/contributing.md)
 
-  
 ## Contents
 
-- [What is Cradova](#what-is-cradovajs)
-- [Why did we build Cradova?](#whats-the-benefit)
+- [What is Cradova](#what-is-cradova)
+- [Why Cradova?](#whats-the-benefit)
 - [Installation](#installation)
 - [Examples](#examples)
 - [Documentation](#documentation)
 - [Getting Help](#getting-help)
 - [Contributing](#contributing)
 
-## What is cradova.js?
+## What is Cradova?
 
 Cradova is a JavaScript framework for building Single Page Applications and PWAs.
 
-It's small, fast and provides state management, routing and XHR utilities out of the box.
+It's small, fast and provides state management, routing and a rest API utility out of the box.
+
+Cradova follows the [VJS specification](https://github.com/fridaycandour/cradova/blob/main/spec.md)
 
 ## What's the benefit?
-We aim to be fast and simple with and no hidden abstractions whatsoever.
-We don't use visual DOM or any diff algorithms to manage the DOM.
 
-Cradova has been used in production and we will update this README to reflect our lessons as we go.
+Cradova is aimed to be fast and simple with and fewer abstractions and yet easily composable.
+
+We don't use visual DOM or diff algorithms to manage the DOM.
+
+State management is done more elegantly with the predictive model, manually and easily with all the speed.
+
+Cradova has been used on a couple of projects in production and we will update this page to reflect our progress as we keep improving.
 
 ## Installation
 
@@ -51,36 +62,38 @@ Cradova has been used in production and we will update this README to reflect ou
 npm i cradova
 ```
 
-
 ## Examples
+
 Many aspects of Cradova are not reflected in the following example. More functionality will be entailed in future docs.
 
 Here's an example of create a basic component in Cradova:
 
 ```js
-import _, { frag } from "cradova";
+import _ from "cradova";
 
 function Hello(name) {
   return _("h1", "Hello " + name);
 }
 
-// calling Hello returns the HTML
-const html = Hello("peter")(); // or
-// using frag
-const html = frag(Hello("peter"), Hello("joe"));
+// document fragment empty cradova call _()
+
+const html = _(Hello("peter"), Hello("joe"));
+
 document.body.append(html);
 ```
 
 ## Using Screen
+
 ```js
 import _, { Screen, Router } from "cradova";
 
 function HelloMessage(name) {
   // an effect run once after screen renders
   this.effect(() => {
-    return new Promise((res) => {
+   const name = new Promise((res) => {
       res("friday");
     });
+    this.updateState(await name)
   });
   // effects can be used to make api calls needed for the page
   return _("div", "Hello  " + name);
@@ -129,10 +142,21 @@ function counter() {
   });
 }
 
-function HelloMessage(name) {
+function dataCounter() {
+  return _("h1| 0", {
+    shouldUpdate: true,
+    $num: "0", // data-num
+    onclick() {
+     const num = Number(this.getAttribute("data-num")) + 1;
+      this.updateState({ text: num, $num: num });
+    },
+  });
+}
+
+function HelloMessage(name = "no name") {
   return _("div.foo#bar", {
     shouldUpdate: true,
-    text: "hello  " + (name || "no name"),
+    text: "hello  " + name,
     onclick() {
       const name = prompt("what are your names");
       this.updateState({ text: "hello " + name });
@@ -140,13 +164,13 @@ function HelloMessage(name) {
   });
 }
 
-const nameRef = new Ref(function ({ name }) {
+const nameRef = new Ref(function ( name ) {
   const self = this;
   return _("div.foo#bar", {
     text: "hello" + (name || "no name"),
     onclick() {
       const name = prompt();
-      self.updateState({ name });
+      self.updateState(name);
     },
   });
 });
@@ -154,8 +178,9 @@ const nameRef = new Ref(function ({ name }) {
 function Home() {
   return _("div.foo#bar",
    counter,
+   dataCounter,
    HelloMessage,
-   nameRef.render({ name: "no name" })
+   nameRef.render( "no name" )
   );
 }
 
@@ -169,22 +194,27 @@ Router.route("/", home);
 ```
 
 ## Documentation
+
 We are currently building cradova's documentation and we have only a few hands, if you're interested in helping you can join the community, learn first hand, and support cradova's progress.
 
 ## Getting Help
+
 To get further insights and help on Cradova, visit our new [Telegram Community Chat](https://t.me/cradovaframework).
 
 ## Contributing
-We are currently working to set up:
 
+We are currently working to [set](https://github.com/fridaycandour/cradova/blob/main/contributing.md) up the following:
+
+- building cradova CLI (in progress)
 - Cradova Documentation Website
 - UI component libraries for cradova
 - Sample projects
 - maintenance and promotion
-- building cradova CLI
-
 
 ## Sponsor
-Your support is appriciated and needed to advance Cradova further into the future.\
-Sponsorships can be done via [Patreon](https://www.patreon.com/FridayCandour).\
-Both monthly-recurring sponsorships and one-time donations are accepted. Recurring sponsorships will be entitled to logo placements in Tiers.
+
+Your support is appreciated and needed to advance Cradova for more performance and improvements.
+
+Sponsorships can be done via [Patreon](https://www.patreon.com/FridayCandour) and [KO-FI](https://www.ko-fi.com/fridaycandour).
+
+Both monthly-recurring sponsorships and one-time donations are accepted.

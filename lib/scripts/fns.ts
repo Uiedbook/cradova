@@ -141,26 +141,6 @@ ls.retrieve = (name: string) => {
 ls.remove = (name: string) => {
   localStorage.removeItem(name);
 };
-ls.getKey = (index: number) => {
-  return window.localStorage.key(index);
-};
-ls.clear = () => {
-  localStorage.clear();
-};
-
-// for making the dom elements fullscreen
-export function fullScreen(e: Element) {
-  return {
-    set() {
-      e.requestFullscreen().catch((err: any) => {
-        throw err;
-      });
-    },
-    exist() {
-      document.exitFullscreen();
-    },
-  };
-}
 
 // type RefProps<T> = Record<string, T> | T;
 // RefProps<string | number | Record<string, unknown> | undefined | null>;
@@ -173,9 +153,10 @@ export function fullScreen(e: Element) {
 export class Ref<D> {
   private component: (data?: D) => any;
   private stateID = uuid();
-  private rendered = false;
   private effects: (() => Promise<unknown>)[] = [];
   private effectuate: (() => unknown) | null = null;
+  private rendered = false;
+  private published = false;
   private hasFirstStateUpdateRun = false;
   public testName = null;
   public stash: D | undefined;
@@ -191,6 +172,12 @@ export class Ref<D> {
    * @returns () => HTMLElement
    */
   render(data?: D, stash?: boolean) {
+    // if (this.testName) {
+    //   console.log("boohoo 1", this.rendered, this.hasFirstStateUpdateRun);
+    // }
+    this.rendered = false;
+    this.hasFirstStateUpdateRun = false;
+
     const chtml = this.component(data);
     if (typeof chtml !== "function") {
       throw new Error(
@@ -207,7 +194,7 @@ export class Ref<D> {
      \x1b[35m Exception: ref only  a function that returns cradova element or cradova element tree. \x1b[35m
       
       to track and debug this element add a
-      beforeMount or afterMount prop to the element
+      beforeMount or afterMount property to the element
       `,
         ],
         `Cradova can't render component make sure it's a valid component`
@@ -216,14 +203,18 @@ export class Ref<D> {
     if (stash) {
       this.stash = data;
     }
-    const av = () => {
-      this.effector.apply(this);
+    const av = async () => {
+      await this.effector.apply(this);
       window.removeEventListener("cradova-aftermount", av);
     };
-    window.addEventListener("cradova-aftermount", av);
+    if (!this.published) {
+      this.published = true;
+      window.addEventListener("cradova-aftermount", av);
+    } else {
+      this.effector();
+    }
     return () => element;
   }
-
   instance() {
     return dispatch(this.stateID, {
       cradovaDispatchTrackBreak: true,
@@ -249,10 +240,10 @@ export class Ref<D> {
       for (const effect of this.effects) {
         await effect.apply(this);
       }
-      // first update
-      if (!this.hasFirstStateUpdateRun && this.effectuate) {
-        await this.effectuate();
-      }
+    }
+    // first update
+    if (!this.hasFirstStateUpdateRun && this.effectuate) {
+      await this.effectuate();
     }
     this.rendered = true;
     this.hasFirstStateUpdateRun = true;
@@ -272,9 +263,11 @@ export class Ref<D> {
   updateState(data: D, stash: boolean) {
     if (!this.rendered) {
       // @ts-ignore
-      async function updateState(this, data: any) {
+      async function updateState(this: any, data: any) {
         if (this.rendered) {
           await this.Activate(data);
+          this.rendered = true;
+          this.hasFirstStateUpdateRun = true;
         } else {
           setTimeout(updateState.bind(this, data), 4);
         }
@@ -321,11 +314,9 @@ export class Ref<D> {
       } else {
         guy.remove();
       }
-      // window.dispatchEvent(cradovaAftermountEvent);
     } catch (e0) {
       console.error(e0);
     }
-    //
   }
   remove() {
     dispatch(this.stateID, { remove: true });
@@ -340,7 +331,7 @@ export class Ref<D> {
 
 type fragmentTYPE = () => (() => HTMLElement) | HTMLElement;
 
-export const frag = function (...children: fragmentTYPE[]) {
+export const frag = function (children: fragmentTYPE[]) {
   const par = document.createDocumentFragment();
   // building it's children tree.
   for (let i = 0; i < children.length; i++) {

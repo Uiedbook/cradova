@@ -42,24 +42,21 @@ export { loadCradovaUICss } from "./sacho/loadCss";
 export { Router } from "./scripts/Router";
 export { Screen } from "./scripts/Screen";
 export { simpleStore as $ } from "./scripts/simplestore";
-// export { IsElementInView } from "./scripts/utils";
 
 export {
+  cradovaAftermountEvent,
   assert,
   assertOr,
-  cradovaAftermountEvent,
   css,
   Ref,
-  frag,
   ls,
 } from "./scripts/fns";
-
-// used here
 
 import { Init } from "./scripts/init";
 import { dispatch } from "./scripts/track";
 import { simpleStore } from "./scripts/simplestore";
 import { CradovaElementType } from "./types";
+import { frag } from "./scripts/fns";
 
 // importing types declarations
 
@@ -187,13 +184,14 @@ const make = function (txx: any) {
 
 const _: any = (...element_initials: any[]) => {
   //
+  if (typeof element_initials[0] !== "string") {
+    return frag(element_initials);
+  }
+  // @ts-ignore
   if (element_initials[0].raw) {
     // getting the value of static cradova calls
+    // @ts-ignore
     element_initials[0] = element_initials[0]["raw"][0];
-  }
-  if (typeof element_initials[0] !== "string") {
-    console.error(" ✘  Cradova err: NO TEMPLATE STRING PROVIDED");
-    return () => " ✘ NO TEMPLATE STRING PROVIDED";
   }
   let beforeMount: ((this: CradovaElementType) => void) | null = null,
     firstLevelChildren: any[] = [];
