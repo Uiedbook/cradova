@@ -91,3 +91,11 @@ and we went along with it.
 
 - made cradova Ref to have Stash hold component state change
 - very stable Ref effect and updateState compliant to the spec
+
+# 2.0.0
+
+- hybrid server side rendering
+- export all html tags prebuilt and fully typed for more performance gain
+- removed effect and updateState from cradova screen class
+- remove unnecessary useHistory option from createSignal
+- removed ability to add styles that appears as normal props

@@ -13,34 +13,36 @@
     "url": "git+https://github.com/FridayCandour/cradova.git"
   },
   "scripts": {
-    "build": "tsup lib/index.ts && npm run ts &&  cp lib/types.ts dist/types.ts ",
-    "buildts": "tsup lib/index.ts",
-    "ts": "cp cradova.d.ts dist/index.d.ts",
+    "build": "tsup lib/index.ts && npm run cp:typedef && npm run cp:types",
+    "build:ts": "tsup lib/index.ts &&  node ./dist/index.js",
+    "cp:typedef": "cp cradova.d.ts dist/index.d.ts",
+    "cp:types": "cp lib/types.ts dist/types.ts",
     "lint": "eslint . --fix"
   },
   "keywords": [
-    "PWA",
-    "framework",
-    "frontend",
     "javascript",
     "typescript",
+    "frontend",
+    "framework",
+    "PWA",
     "web",
     "app",
-    "mobile",
-    "android",
-    "IOS",
-    "windows",
-    "linux",
-    "mac"
+    "mobile"
   ],
   "author": {
     "name": "friday candour",
     "email": "FridayCandours@gmail.com"
   },
-  "funding": {
-    "type": "patreon",
-    "url": "https://www.patreon.com/FridayCandour"
-  },
+  "funding": [
+    {
+      "type": "patreon",
+      "url": "https://www.patreon.com/FridayCandour"
+    },
+    {
+      "type": "ko-fi",
+      "url": "https://www.ko-fi.com/fridaycandour"
+    }
+  ],
   "contributors": [
     {
       "name": "friday candour",

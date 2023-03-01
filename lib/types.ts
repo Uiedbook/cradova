@@ -1,6 +1,20 @@
-export type CradovaElementType = Record<string, any>;
-// FIXME: This is too rough for use a type for cradova element type
-// replaced with any for
+export type ElementType<T> = (
+  ...VJS: (
+    | string
+    | undefined
+    | Partial<T>
+    | HTMLElement
+    | (() => HTMLElement)
+    | {
+        style?: Partial<CSSStyleDeclaration>;
+        beforeMount?: () => void;
+        afterMount?: () => void;
+        text?: string;
+        stateID?: string;
+        shouldUpdate?: boolean;
+      }
+  )[]
+) => T;
 
 /**
  * Creates new cradova HTML element
@@ -43,22 +57,6 @@ export type CradovaHTMLElementType = (
 ) =>
   | ((...element_initials: any[]) => "NO TEMPLATE STRING PROVIDED")
   | ((...element_initials: any[]) => HTMLElement | undefined);
-
-export type CradovaScreenType = {
-  effect(fn: () => void | Promise<void>): void;
-  /**
-   * Cradova Screen
-   * ---
-   * re-renders the screen -
-   *
-   * first level call will only be called once
-   * lower level calls will be continuously called
-   * @param data .
-   *
-   * *
-   */
-  updateState(data: unknown, stash?: unknown): void;
-};
 
 export type RefType<D> = {
   /**
@@ -195,28 +193,6 @@ export type SignalType = {
   /**
    *  Cradova Signal
    * ----
-   *  set signal value to a future one
-   * @returns void
-   *
-   *
-   * .
-   *
-   */
-  forward: (data: any) => any;
-  /**
-   *  Cradova Signal
-   * ----
-   *  set signal value to a old past one
-   * @returns void
-   *
-   *
-   * .
-   *
-   */
-  backward: () => void;
-  /**
-   *  Cradova Signal
-   * ----
    *  set a update listener on value changes
    * @param callback
    */
@@ -224,7 +200,7 @@ export type SignalType = {
   /**
    * Cradova Signal
    * ----
-   * get value */
+   * get value */ addErrorHandler: (callback: () => void) => void;
   get: () => any;
   /**
    *  Cradova Signal
@@ -235,9 +211,72 @@ export type SignalType = {
 };
 
 export type RouterRouteObject = {
+  html(): any;
   controller: (params: object, force?: boolean) => any;
   deactivate: (params: object) => any;
   packager: (params: any) => void;
+};
+
+/**
+ *
+ */
+
+export type CradovaScreenType = {
+  /**
+   * Cradova screen
+   * ---
+   * title of the page
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   */
+  name: string;
+  /**
+   * Cradova screen
+   * ---
+   * The component for the screen
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   */
+  template: Function | HTMLElement;
+  /**
+   * Cradova screen
+   * ---
+   * Screen transition from the screen class
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   */
+  transition?: string;
+  /**
+   * Cradova screen
+   * ---
+   * gets called when the the screen is displayed
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   */
+  // onActivate: (fn: (data: any) => void) => Promise<void>;
+  /**
+   * Cradova screen
+   * ---
+   * Should this screen be cached after first render?
+   * @param data
+   * @returns void
+   *
+   *
+   * .
+   */
+  persist?: boolean;
 };
 
 /**
@@ -247,59 +286,52 @@ export type RouterRouteObject = {
  * page views based on the matched routes.
  */
 
-export type RouterType =
-  | {
-      /**
-       * Registers a route.
-       *
-       * @param {string}   path     Route path.
-       * @param {any} screen the cradova document tree for the route.
-       */
-      route: (path: string, screen: CradovaScreenType) => void;
-      routes: Record<string, RouterRouteObject>;
-      lastNavigatedRoute: string | null;
-      lastNavigatedRouteController: RouterRouteObject | null;
-      nextRouteController: RouterRouteObject | null;
-      params: Record<string, any>;
-      /**
-       * Cradova Router
-       * ------
-       *
-       * return last set router params
-       *
-       * .
-       */
-      getParams: () => unknown;
-      /**
-       * n/a
-       */
-      router: (e: any, force?: boolean) => void;
-      /**
-       * get a screen ready before time.
-       *
-       * @param {string}   path     Route path.
-       * @param {any} data data for the screen.
-       */
-      packageScreen: (path: string, data?: any) => void;
-      pageShow: ((path: string) => void) | null;
-      pageHide: ((path: string) => void) | null;
-      onPageShow: (callback: () => void) => void;
-      onPageHide: (callback: () => void) => void;
-      /**
-       * Cradova Router
-       * ------
-       *
-       * Navigates to a designated screen in your app
-       */
-      navigate: (
-        href: string,
-        data?: Record<string, any> | null,
-        force?: boolean
-      ) => void;
-    }
-  | Record<string, any>;
-
-export type fragmentTYPE = () => (() => HTMLElement) | HTMLElement;
+export type RouterType = {
+  /**
+   * Registers a route.
+   *
+   * @param {string}   path     Route path.
+   * @param {any} screen the cradova document tree for the route.
+   */
+  route: (path: string, screen: CradovaScreenType) => void;
+  routes: Record<string, RouterRouteObject>;
+  lastNavigatedRoute: string | null;
+  lastNavigatedRouteController: RouterRouteObject | null;
+  nextRouteController: RouterRouteObject | null;
+  params: Record<string, any>;
+  /**
+   * Cradova Router
+   * ------
+   *
+   * return last set router params
+   *
+   * .
+   */
+  getParams: () => unknown;
+  /**
+   * get a screen ready before time.
+   *
+   * @param {string}   path     Route path.
+   * @param {any} data data for the screen.
+   */
+  packageScreen: (path: string, data?: any) => Promise<void>;
+  pageShow: ((path: string) => void) | null;
+  pageHide: ((path: string) => void) | null;
+  onPageShow: (callback: () => void) => void;
+  onPageHide: (callback: () => void) => void;
+  addErrorHandler: (callback: () => void) => void;
+  /**
+   * Cradova Router
+   * ------
+   *
+   * Navigates to a designated screen in your app
+   */
+  navigate: (
+    href: string,
+    data?: Record<string, any> | null,
+    force?: boolean
+  ) => void;
+};
 
 /**
  *

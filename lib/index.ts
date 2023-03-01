@@ -12,7 +12,7 @@
 =============================================================================
   
   Cradova FrameWork
-  @version 1.3.0
+  @version 2.0.0
   License: Apache V2
   
   -----------------------------------------------------------------------------
@@ -35,28 +35,12 @@
 */
 
 // importing cradova scripts
-export { Ajax } from "./scripts/ajax";
-export { createSignal } from "./scripts/createSignal";
-export { dispatch } from "./scripts/track";
-export { loadCradovaUICss } from "./sacho/loadCss";
-export { Router } from "./scripts/Router";
-export { Screen } from "./scripts/Screen";
-export { simpleStore as $ } from "./scripts/simplestore";
-
-export {
-  cradovaAftermountEvent,
-  assert,
-  assertOr,
-  css,
-  Ref,
-  ls,
-} from "./scripts/fns";
-
-import { Init } from "./scripts/init";
-import { dispatch } from "./scripts/track";
-import { simpleStore } from "./scripts/simplestore";
-import { CradovaElementType } from "./types";
-import { frag } from "./scripts/fns";
+import { Init } from "./utils/init";
+import { dispatch } from "./utils/track";
+import { simpleStore } from "./utils/simplestore";
+import { frag, isNode } from "./utils/fns";
+import { ElementType } from "./types";
+import Element from "./utils/document";
 
 // importing types declarations
 
@@ -188,12 +172,12 @@ const _: any = (...element_initials: any[]) => {
     return frag(element_initials);
   }
   // @ts-ignore
-  if (element_initials[0].raw) {
+  if (element_initials.raw) {
     // getting the value of static cradova calls
     // @ts-ignore
-    element_initials[0] = element_initials[0]["raw"][0];
+    element_initials[0] = element_initials["raw"][0];
   }
-  let beforeMount: ((this: CradovaElementType) => void) | null = null,
+  let beforeMount: ((this: any) => void) | null = null,
     firstLevelChildren: any[] = [];
   if (element_initials.length > 1) {
     firstLevelChildren = element_initials.splice(1);
@@ -203,61 +187,53 @@ const _: any = (...element_initials: any[]) => {
     element_initials = [element_initials];
   }
 
-  /**
-   *
-   * --- Cradova Element Initials  ---
-   * --------------------------------
-   *
-   * Note: this element has not been initialized!
-   *
-   * add to a parent element or call this return function
-   *
-   * .
-   */
-  return (...incoming: any) => {
-    // TODO: tag debugger
+  return (...ElementChildrenAndPropertyList: ElementType<HTMLElement>[]) => {
     const initials = make(element_initials[0]);
-    /*
-     *
-     * --- Cradova Element Initials  ---
-     * --------------------------------
-     *
-     * Note: this element has not been initialized!
-     *
-     * add to a parent element or call this return function
-     *
-     * .
-     */
     let secondLevelChildren = [],
       props: Record<string, any> | null = null,
       text: string | number | null = null;
 
     if (firstLevelChildren.length) {
-      // ! performance cost here maybe
       secondLevelChildren.push(...firstLevelChildren);
     }
 
-    if (incoming.length) {
-      // ! performance cost here maybe
-      secondLevelChildren.push(...incoming);
+    if (ElementChildrenAndPropertyList.length) {
+      secondLevelChildren.push(...ElementChildrenAndPropertyList);
     }
 
-    let element: CradovaElementType;
+    let element: Record<string, any>;
     try {
-      element = document.createElement(initials.tag!.trim());
+      element = globalThis.document
+        ? document.createElement(initials.tag!.trim())
+        : new Element(initials.tag!.trim());
     } catch (error) {
       throw new TypeError(
         " ✘  Cradova err:  invalid tag given  " + initials.tag
       );
     }
     if (initials.className) {
-      element.className = initials.className.trim();
+      if (props) {
+        // @ts-ignore js knows
+        props["className"] = initials.className.trim();
+      } else {
+        props = { className: initials.className.trim() };
+      }
     }
     if (initials.ID) {
-      element.setAttribute("id", initials.ID.trim());
+      if (props) {
+        // @ts-ignore js knows
+        props["id"] = initials.ID.trim();
+      } else {
+        props = { id: initials.ID.trim() };
+      }
     }
     if (initials.innerValue) {
-      element.innerText = initials.innerValue;
+      if (props) {
+        // @ts-ignore js knows
+        props["innerText"] = initials.innerValue;
+      } else {
+        props = { innerText: initials.innerValue };
+      }
     }
     // getting children ready
     if (secondLevelChildren.length) {
@@ -269,15 +245,47 @@ const _: any = (...element_initials: any[]) => {
             child = child();
           }
           try {
-            if (
-              child instanceof HTMLElement ||
-              child instanceof DocumentFragment
-            ) {
-              element.appendChild(child);
+            if (isNode(child)) {
+              if (child.nodeC) {
+                element.appendChild(child.html);
+              } else {
+                element.appendChild(child);
+              }
+            } else {
+              throw new Error(
+                "  ✘  Cradova err:  invalid child type: " +
+                  child +
+                  " (" +
+                  typeof child +
+                  ")"
+              );
             }
           } catch (error) {
-            console.error(" ✘  Cradova err:  ", error);
-            if (!(child instanceof HTMLElement)) {
+            console.error(error);
+          }
+          continue;
+        }
+        // html child
+        if (isNode(secondLevelChildren[i])) {
+          element.appendChild(secondLevelChildren[i]);
+          continue;
+        }
+        // children array
+        if (Array.isArray(secondLevelChildren[i])) {
+          const arrCX = secondLevelChildren[i];
+          const arrCXLength = arrCX.length;
+          for (let p = 0; p < arrCXLength; p++) {
+            let child = arrCX[p];
+            if (typeof child === "function") {
+              child = child();
+            }
+            if (isNode(child)) {
+              if (child.nodeC) {
+                element.appendChild(child.html);
+              } else {
+                element.appendChild(child);
+              }
+            } else {
               throw new Error(
                 "  ✘  Cradova err:  invalid child type: " +
                   child +
@@ -289,49 +297,15 @@ const _: any = (...element_initials: any[]) => {
           }
           continue;
         }
-        // html child
-        if (
-          secondLevelChildren[i] instanceof HTMLElement ||
-          secondLevelChildren[i] instanceof DocumentFragment
-        ) {
-          element.appendChild(secondLevelChildren[i]);
-          continue;
-        }
-        // children array
-        if (Array.isArray(secondLevelChildren[i])) {
-          const arrCX: HTMLElement[] | Function[] = secondLevelChildren[i];
-          const arrCXLength = arrCX.length;
-          const arrSET = [];
-          for (let p = 0; p < arrCXLength; p++) {
-            if (
-              !(arrCX[p] instanceof HTMLElement) &&
-              typeof arrCX[p] !== "function" &&
-              !Array.isArray(arrCX[p])
-            ) {
-              console.error(" ✘  Cradova err:  ", arrCX[p]);
-              throw new TypeError(
-                " ✘  Cradova err: invalid tag type or template literal, cradova was enable to create this element show above ⇑"
-              );
-            }
-            arrSET.push(arrCX[p]);
-          }
-          //
-          secondLevelChildren = [
-            ...secondLevelChildren.slice(0, i + 1),
-            ...arrSET,
-            ...secondLevelChildren.slice(i + 1, secondLevelChildren.length),
-          ];
-          continue;
-        }
         const child = secondLevelChildren[i];
-        if (child instanceof HTMLElement || child instanceof DocumentFragment) {
+        if (isNode(child)) {
           element.appendChild(child);
         } else {
           // getting props
           if (
             typeof child === "object" &&
             !Array.isArray(child) &&
-            !(child instanceof HTMLElement)
+            !isNode(child)
           ) {
             if (!props) {
               props = child;
@@ -367,7 +341,6 @@ const _: any = (...element_initials: any[]) => {
     if (props) {
       if (props.beforeMount) {
         beforeMount = props["beforeMount"];
-        // props["beforeMount"] = undefined;
       }
       // adding attributes
       for (const prop in props) {
@@ -384,16 +357,10 @@ const _: any = (...element_initials: any[]) => {
           }
           continue;
         }
-        // adding styles that appears as normal props
-        if (typeof element.style[prop] !== "undefined" && prop !== "src") {
-          element.style[prop] = props[prop];
-          continue;
-        }
         // text content
         if (
           prop === "text" &&
-          (typeof props[prop] === "string" ||
-            typeof props[prop] === "number") &&
+          typeof props[prop] === "string" &&
           props[prop] !== ""
         ) {
           text = props[prop];
@@ -405,7 +372,11 @@ const _: any = (...element_initials: any[]) => {
           typeof props[prop] === "string" &&
           props[prop] !== ""
         ) {
-          element.classList.add(props[prop]);
+          if (globalThis.document) {
+            element.classList.add(props[prop]);
+          } else {
+            element.setAttribute("class", props[prop]);
+          }
           continue;
         }
         // before mount event
@@ -442,20 +413,38 @@ const _: any = (...element_initials: any[]) => {
           prop === "afterMount" &&
           typeof props["afterMount"] === "function"
         ) {
-          const av = () => {
-            props!["afterMount"].apply(element);
-            window.removeEventListener("cradova-aftermount", av);
-          };
-          window.addEventListener("cradova-aftermount", av);
+          if (globalThis.document) {
+            const av = () => {
+              props!["afterMount"].apply(element);
+              window.removeEventListener("cradova-aftermount", av);
+            };
+            window.addEventListener("cradova-aftermount", av);
+          }
           continue;
         }
         // trying to set other values
         try {
           if (typeof element[prop] !== "undefined") {
-            element[prop] = props[prop];
+            if (globalThis.document) {
+              element[prop] = props[prop];
+            } else {
+              if (typeof props[prop] === "function") {
+                element.setAttribute(prop, ["(", props[prop], ")()"].join(""));
+              } else {
+                if (element[prop]) {
+                  element[prop] = props[prop];
+                } else {
+                  element.setAttribute(prop, props[prop]);
+                }
+              }
+            }
           } else {
-            element[prop] = props[prop];
-
+            if (globalThis.document) {
+              element[prop] = props[prop];
+            } else {
+              element.setAttribute(prop, props[prop]);
+              continue;
+            }
             if (
               prop !== "for" &&
               prop !== "text" &&
@@ -471,15 +460,34 @@ const _: any = (...element_initials: any[]) => {
         }
       }
     }
-    //
     if (text) {
       element.innerText = text;
     }
-    if (typeof beforeMount === "function") {
+    if (globalThis.document && typeof beforeMount === "function") {
       beforeMount.apply(element);
+    }
+    if (globalThis.document) {
+      return element;
     }
     return element;
   };
 };
 Init();
+export { Ajax } from "./utils/ajax";
+export { createSignal } from "./utils/createSignal";
+export { dispatch } from "./utils/track";
+export { Router } from "./utils/Router";
+export { Screen } from "./utils/Screen";
+export { simpleStore as $ } from "./utils/simplestore";
+// 
+// export * as tag from "./utils/tags";
+
+export {
+  cradovaAftermountEvent,
+  assert,
+  assertOr,
+  css,
+  Ref,
+} from "./utils/fns";
+
 export default _;

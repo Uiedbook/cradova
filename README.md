@@ -69,13 +69,33 @@ Many aspects of Cradova are not reflected in the following example. More functio
 Here's an example of create a basic component in Cradova:
 
 ```js
+// cradova v2.0.0 comes with all html tags prebuilt and fully typed
+// this gives your app more performance gain.
+import _, { h1 } from "cradova";
+
+function Hello(name) {
+  return h1("Hello " + name, {
+    className: "title",
+    style: {
+      color: "grey",
+    },
+  });
+}
+
+// document fragment empty cradova call _()
+
+const html = _(Hello("peter"), Hello("joe"));
+
+document.body.append(html);
+```
+
+```js
+// regular example
 import _ from "cradova";
 
 function Hello(name) {
   return _("h1", "Hello " + name);
 }
-
-// document fragment empty cradova call _()
 
 const html = _(Hello("peter"), Hello("joe"));
 

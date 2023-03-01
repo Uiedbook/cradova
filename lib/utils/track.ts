@@ -100,6 +100,16 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
   }
 }
 
+type stateType =
+  | Partial<HTMLElement>
+  | {
+      class?: string;
+      text?: string;
+      style?: Partial<CSSStyleDeclaration>;
+      tree?: Function | HTMLElement;
+      remove?: boolean;
+    };
+
 /**
  * Send a new state to specified element with stateID
  *
@@ -109,8 +119,8 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
  */
 
 export function dispatch(
-  stateID: string | Record<string, any>,
-  state?: Record<string, any>
+  stateID: string | Record<string, stateType>,
+  state?: stateType
 ) {
   let ele;
   if (stateID instanceof HTMLElement) {
@@ -132,6 +142,7 @@ export function dispatch(
       ) as any;
       if (elements.length) {
         updated = elements.length === 1 ? elements[0] : elements;
+        // @ts-ignore
         if (!state?.cradovaDispatchTrackBreak) {
           cradovaDispatchTrack(elements, state);
         }

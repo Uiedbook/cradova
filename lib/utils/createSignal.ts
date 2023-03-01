@@ -8,7 +8,6 @@
  * - bind a Ref or RefList
  * - listen to changes
  * - persist changes to localStorage
- * - go back and forward in value history
  * - set keys instead of all values
  * - update a cradova Ref/RefList automatically
  * @constructor initial: any, props: {useHistory, persist}
@@ -18,28 +17,18 @@ export class createSignal<Type extends Record<string, unknown>> {
   private callback: undefined | ((newValue: Type) => void);
   private persistName: string | undefined = "";
   private actions: Record<string, any> = {};
-  private useHistory = false;
-  private history: Type[] = [];
   private ref: any;
-  private index = 0;
   private path: null | string = null;
   value: Type;
 
-  constructor(
-    initial: Type,
-    props?: { useHistory?: boolean; persistName?: string | undefined }
-  ) {
+  constructor(initial: Type, props?: { persistName?: string | undefined }) {
     this.value = initial;
     if (props && props.persistName) {
       this.persistName = props.persistName;
-      const name = localStorage.getItem(props.persistName);
-      if (name && name !== "undefined") {
-        this.value = JSON.parse(name);
+      const key = localStorage.getItem(props.persistName);
+      if (key && key !== "undefined") {
+        this.value = JSON.parse(key);
       }
-    }
-    if (props && props.useHistory) {
-      this.useHistory = props.useHistory;
-      this.history.push(initial);
     }
   }
   /**
@@ -68,23 +57,19 @@ export class createSignal<Type extends Record<string, unknown>> {
     if (this.callback) {
       this.callback(this.value);
     }
-    if (!this.useHistory) return;
-    this.index += 1;
-    this.history.push(this.value);
   }
-
   /**
    *  Cradova Signal
    * ----
    *  set a key value if it's an object
-   * @param name - name of the key
+   * @param key - key of the key
    * @param value - value of the key
    * @returns void
    */
 
-  setKey<k extends keyof Type>(name: k, value: any, shouldRefRender?: boolean) {
+  setKey<k extends keyof Type>(key: k, value: any, shouldRefRender?: boolean) {
     if (typeof this.value === "object" && !Array.isArray(this.value)) {
-      this.value[name] = value;
+      this.value[key] = value;
       if (this.persistName) {
         localStorage.setItem(this.persistName, JSON.stringify(this.value));
       }
@@ -98,13 +83,10 @@ export class createSignal<Type extends Record<string, unknown>> {
       if (this.callback) {
         this.callback(this.value);
       }
-      if (!this.useHistory) return;
-      this.history.push(this.value);
-      this.index += 1;
     } else {
       throw new Error(
         `✘  Cradova err : can't set key ${String(
-          name
+          key
         )} . store value is not a javascript object`
       );
     }
@@ -113,18 +95,18 @@ export class createSignal<Type extends Record<string, unknown>> {
    *  Cradova Signal
    * ----
    *  set a key to signal an action
-   * @param name - name of the action
+   * @param key - key of the action
    * @param action function to execute
    */
   createAction(
-    name: string | Record<string, (self?: this, data?: Type) => void>,
+    key: string | Record<string, (self?: this, data?: Type) => void>,
     action?: (self?: this, data?: Type) => void
   ) {
-    if (typeof name === "string" && typeof action === "function") {
-      this.actions[name] = action;
+    if (typeof key === "string" && typeof action === "function") {
+      this.actions[key] = action;
     } else {
-      if (typeof name === "object" && !action) {
-        for (const [nam, action] of Object.entries(name)) {
+      if (typeof key === "object" && !action) {
+        for (const [nam, action] of Object.entries(key)) {
           if (typeof nam === "string" && typeof action === "function") {
             this.actions[nam] = action;
           } else {
@@ -132,7 +114,7 @@ export class createSignal<Type extends Record<string, unknown>> {
           }
         }
       } else {
-        throw new Error(`✘  Cradova err : can't create action ${name}`);
+        throw new Error(`✘  Cradova err : can't create action ${key}`);
       }
     }
   }
@@ -140,18 +122,18 @@ export class createSignal<Type extends Record<string, unknown>> {
    *  Cradova Signal
    * ----
    *  fires an action if available
-   * @param name - string name of the action
+   * @param key - string key of the action
    * @param data - data for the action
    */
-  fireAction(name: string, data?: Type) {
+  fireAction(key: string, data?: Type) {
     try {
-      if (!(typeof name === "string" && this.actions[name])) {
+      if (!(typeof key === "string" && this.actions[key])) {
         throw Error("");
       }
     } catch (_e) {
-      throw Error("✘  Cradova err : action " + name + "  does not exist!");
+      throw Error("✘  Cradova err : action " + key + "  does not exist!");
     }
-    this.actions[name](this, data);
+    this.actions[key](this, data);
   }
 
   /**
@@ -175,32 +157,7 @@ export class createSignal<Type extends Record<string, unknown>> {
       throw new Error("✘  Cradova err :  Invalid ref component" + Ref);
     }
   }
-  /**
-   *  Cradova Signal
-   * ----
-   *  set signal value to a future one
-   * @returns void
-   */
-  forward() {
-    if (this.history.length > this.index + 1) {
-      if (!this.useHistory) return;
-      this.value = this.history[this.index + 1];
-      this.index += 1;
-    }
-  }
-  /**
-   *  Cradova Signal
-   * ----
-   *  set signal value to a old past one
-   * @returns void
-   */
-  backward() {
-    if (this.history.length > 0 && this.index > 0) {
-      if (!this.useHistory) return;
-      this.set(this.history[this.index + 1]);
-      this.index -= 1;
-    }
-  }
+
   /**
    *  Cradova Signal
    * ----

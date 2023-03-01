@@ -1,39 +1,33 @@
 declare module "cradova" {
   type CradovaScreenTyping = {
+    /*
+    name of the page
+    */
     name: string;
+    /*
+   content to render
+   */
     template: Function | HTMLElement;
-    transition?: string;
     persist?: boolean;
-    /**
-     * Cradova screen
-     * ---
-     * runs once after first render
-     *
-     */
   };
 
-  type CradovaScreenType = {
-    /**
-     * Cradova screen
-     * ---
-     * runs once after first render
-     *
-     */
-    effect?(fn: () => void | Promise<void>): void;
-    /**
-     * Cradova Screen
-     * ---
-     * re-renders the screen -
-     *
-     * first level call will only be called once
-     * lower level calls will be continuously called
-     * @param data .
-     *
-     * *
-     */
-
-    updateState(data: unknown): void;
-  };
+  type ElementType<T> = (
+    ...VJS: (
+      | string
+      | undefined
+      | Partial<T>
+      | HTMLElement
+      | (() => HTMLElement)
+      | {
+          style?: Partial<CSSStyleDeclaration>;
+          beforeMount?: () => void;
+          afterMount?: () => void;
+          text?: string;
+          stateID?: string;
+          shouldUpdate?: boolean;
+        }
+    )[]
+  ) => T;
 
   export type RefType<D> = {
     /**
@@ -97,14 +91,14 @@ declare module "cradova" {
      * @param {string}   path     Route path.
      * @param {any} screen the cradova document tree for the route.
      */
-    route: (path: string, screen: CradovaScreenType) => void;
+    route: (path: string, screen: Screen) => void;
     /**
      * get a screen ready before time.
      *
      * @param {string}   path     Route path.
      * @param {any} data data for the screen.
      */
-    packageScreen: (path: string, data?: any) => void;
+    packageScreen: (path: string, data?: any) => Promise<void>;
     onPageShow: (callback: () => void) => void;
     onPageHide: (callback: () => void) => void;
     /**
@@ -157,26 +151,14 @@ declare module "cradova" {
    * create instances of manageable pages
    * @param name
    * @param template
-   * @param transitions
    */
   export class Screen {
-    static SCALE_IN: string;
-    static SCALE_OUT: string;
-    static CIRCLE_IN: string;
-    static CIRCLE_OUT: string;
-    static FADE_OUT: string;
-    static FADE_IN: string;
-    static SLIDE_UP: string;
-    static SLIDE_DOWN: string;
-    static SLIDE_LEFT: string;
-    static SLIDE_RIGHT: string;
     /**
      *  Cradova Screen
      * ---
      * create instances of manageable pages
      * @param name
      * @param template
-     * @param transitions
      */
     constructor(cradova_screen_initials: CradovaScreenTyping);
     /**
@@ -245,10 +227,7 @@ declare module "cradova" {
     private callback;
     private persistName;
     private actions;
-    private useHistory;
-    private history;
     private ref;
-    private index;
     private path;
     value: any;
     constructor(
@@ -308,20 +287,6 @@ declare module "cradova" {
      * @param path a property in the object to send to attached ref
      */
     bindRef(Ref: any, path?: string): void;
-    /**
-     *  Cradova Signal
-     * ----
-     *  set signal value to a future one
-     * @returns void
-     */
-    forward(): void;
-    /**
-     *  Cradova Signal
-     * ----
-     *  set signal value to a old past one
-     * @returns void
-     */
-    backward(): void;
     /**
      *  Cradova Signal
      * ----
@@ -452,8 +417,7 @@ css(".btn:hover",
    * @param props
    * @returns
    */
-
-  export const ls: Record<string, Function>;
+  type RefProps<D> = D | unknown;
 
   /**
    * Cradova Ref
@@ -462,7 +426,7 @@ css(".btn:hover",
    *
    */
   export class Ref<D> {
-    constructor(component: (data: D) => any);
+    constructor(component: (data: RefProps<D>) => any);
     /**
      * Cradova Ref
      * ---
@@ -510,6 +474,120 @@ css(".btn:hover",
      */
     stash: D;
   }
+
+  export const a: ElementType<HTMLAnchorElement>;
+  export const address: ElementType<HTMLElement>;
+  export const abbr: ElementType<HTMLElement>;
+  export const article: ElementType<HTMLElement>;
+  export const area: ElementType<HTMLAreaElement>;
+  export const audio: ElementType<HTMLAudioElement>;
+  export const aside: ElementType<HTMLElement>;
+  export const base: ElementType<HTMLBaseElement>;
+  export const b: ElementType<HTMLElement>;
+  export const bdo: ElementType<HTMLElement>;
+  export const bdi: ElementType<HTMLElement>;
+  export const body: ElementType<HTMLBodyElement>;
+  export const blockquote: ElementType<HTMLElement>;
+  export const button: ElementType<HTMLButtonElement>;
+  export const br: ElementType<HTMLBRElement>;
+  export const caption: ElementType<HTMLTableCaptionElement>;
+  export const canvas: ElementType<HTMLCanvasElement>;
+  export const code: ElementType<HTMLElement>;
+  export const cite: ElementType<HTMLElement>;
+  export const colgroup: ElementType<HTMLElement>;
+  export const col: ElementType<HTMLTableColElement>;
+  export const datalist: ElementType<HTMLDataListElement>;
+  export const data: ElementType<HTMLDataElement>;
+  export const del: ElementType<HTMLElement>;
+  export const dd: ElementType<HTMLElement>;
+  export const dfn: ElementType<HTMLElement>;
+  export const details: ElementType<HTMLDetailsElement>;
+  export const div: ElementType<HTMLDivElement>;
+  export const dialog: ElementType<HTMLDialogElement>;
+  export const dt: ElementType<HTMLElement>;
+  export const dl: ElementType<HTMLElement>;
+  export const embed: ElementType<HTMLEmbedElement>;
+  export const em: ElementType<HTMLElement>;
+  export const figcaption: ElementType<HTMLElement>;
+  export const fieldset: ElementType<HTMLFieldSetElement>;
+  export const footer: ElementType<HTMLElement>;
+  export const figure: ElementType<HTMLElement>;
+  export const h1: ElementType<HTMLHeadingElement>;
+  export const form: ElementType<HTMLFormElement>;
+  export const h3: ElementType<HTMLHeadingElement>;
+  export const h2: ElementType<HTMLHeadingElement>;
+  export const h5: ElementType<HTMLHeadingElement>;
+  export const h4: ElementType<HTMLHeadingElement>;
+  export const head: ElementType<HTMLHeadElement>;
+  export const h6: ElementType<HTMLHeadingElement>;
+  export const hr: ElementType<HTMLHRElement>;
+  export const header: ElementType<HTMLElement>;
+  export const i: ElementType<HTMLElement>;
+  export const html: ElementType<HTMLHtmlElement>;
+  export const img: ElementType<HTMLImageElement>;
+  export const iframe: ElementType<HTMLIFrameElement>;
+  export const ins: ElementType<HTMLElement>;
+  export const input: ElementType<HTMLInputElement>;
+  export const label: ElementType<HTMLLabelElement>;
+  export const kbd: ElementType<HTMLElement>;
+  export const li: ElementType<HTMLLIElement>;
+  export const legend: ElementType<HTMLLegendElement>;
+  export const main: ElementType<HTMLElement>;
+  export const link: ElementType<HTMLLinkElement>;
+  export const mark: ElementType<HTMLElement>;
+  export const map: ElementType<HTMLMapElement>;
+  export const menu: ElementType<HTMLMenuElement>;
+  export const math: ElementType<HTMLElement>;
+  export const meter: ElementType<HTMLMeterElement>;
+  export const meta: ElementType<HTMLMetaElement>;
+  export const noscript: ElementType<HTMLElement>;
+  export const nav: ElementType<HTMLElement>;
+  export const ol: ElementType<HTMLOListElement>;
+  export const object: ElementType<HTMLObjectElement>;
+  export const option: ElementType<HTMLOptionElement>;
+  export const optgroup: ElementType<HTMLOptGroupElement>;
+  export const p: ElementType<HTMLParagraphElement>;
+  export const output: ElementType<HTMLOutputElement>;
+  export const portal: ElementType<HTMLElement>;
+  export const picture: ElementType<HTMLPictureElement>;
+  export const progress: ElementType<HTMLProgressElement>;
+  export const pre: ElementType<HTMLPreElement>;
+  export const rp: ElementType<HTMLElement>;
+  export const q: ElementType<HTMLQuoteElement>;
+  export const ruby: ElementType<HTMLElement>;
+  export const rt: ElementType<HTMLElement>;
+  export const samp: ElementType<HTMLElement>;
+  export const s: ElementType<HTMLElement>;
+  export const section: ElementType<HTMLElement>;
+  export const script: ElementType<HTMLScriptElement>;
+  export const slot: ElementType<HTMLSlotElement>;
+  export const select: ElementType<HTMLSelectElement>;
+  export const source: ElementType<HTMLSourceElement>;
+  export const small: ElementType<HTMLElement>;
+  export const strong: ElementType<HTMLElement>;
+  export const span: ElementType<HTMLSpanElement>;
+  export const sub: ElementType<HTMLElement>;
+  export const style: ElementType<HTMLStyleElement>;
+  export const sup: ElementType<HTMLElement>;
+  export const summary: ElementType<HTMLElement>;
+  export const table: ElementType<HTMLTableElement>;
+  export const svg: ElementType<HTMLOrSVGElement>;
+  export const td: ElementType<HTMLTableCellElement>;
+  export const tbody: ElementType<HTMLTableColElement>;
+  export const textarea: ElementType<HTMLTextAreaElement>;
+  export const template: ElementType<HTMLTemplateElement>;
+  export const th: ElementType<HTMLTableSectionElement>;
+  export const tfoot: ElementType<HTMLElement>;
+  export const time: ElementType<HTMLTimeElement>;
+  export const thead: ElementType<HTMLTableSectionElement>;
+  export const tr: ElementType<HTMLTableRowElement>;
+  export const title: ElementType<HTMLTitleElement>;
+  export const u: ElementType<HTMLElement>;
+  export const track: ElementType<HTMLTrackElement>;
+  export const val: ElementType<HTMLElement>;
+  export const ul: ElementType<HTMLUListElement>;
+  export const wbr: ElementType<HTMLElement>;
+  export const video: ElementType<HTMLVideoElement>;
 
   /**
    * Cradova
