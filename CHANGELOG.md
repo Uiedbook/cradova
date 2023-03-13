@@ -6,7 +6,7 @@
 
 ## 1.0.1
 
-- improved performance score
+- improved performance
 
 ## 1.0.2
 
@@ -24,7 +24,7 @@ and we went along with it.
 
 ## 1.0.5
 
-- big performance gain
+- more performance
 - improved state management
 - battle testing and production readiness
 
@@ -34,22 +34,22 @@ and we went along with it.
   without url manipulation.
   this brings app experience
 - bug fixes
-- big performance gain
+- more performance
 - battle testing green
 
 ## 1.0.7
 
 - bug fixes
-- big performance gain
+- more performance
 - battle testing green
 
 ## 1.0.8
 
 - bug fixes
-- big performance gain
+- more performance
 - battle testing green
 
-## 1.0.10
+## 1.0.1
 
 - bug fixes
 - battle testing green
@@ -72,16 +72,16 @@ and we went along with it.
 
 ## 1.3.0
 
-- new very interesting feature to unlock more speed
+- new very feature to unlock more speed
 - battle testing green
-- new apis for element level
+- new apis at element level
 
 ## 1.4.0
 
 - unlocked more speed by reducing work done by router
 - battle testing green
 - added error boundary
-- Ref working perfectly as wanted
+- Ref working as wanted
 
 # 1.4.1
 
@@ -90,12 +90,17 @@ and we went along with it.
 # 1.5.0
 
 - made cradova Ref to have Stash hold component state change
-- very stable Ref effect and updateState compliant to the spec
+- stable Ref effect and updateState compliant to the spec
 
 # 2.0.0
 
-- hybrid server side rendering
-- export all html tags prebuilt and fully typed for more performance gain
+- export all html tags prebuilt and fully typed for more performance
 - removed effect and updateState from cradova screen class
 - remove unnecessary useHistory option from createSignal
 - removed ability to add styles that appears as normal props
+- removed event object from router params
+- added pre-rendering capability to Ref components
+- fixed effect bug on Ref
+- added assert to cradova elements
+- fixed error boundary bug
+- setup hybrid server side rendering test using vite ssr

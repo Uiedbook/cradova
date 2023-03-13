@@ -1,6 +1,5 @@
 import _ from "../index.js";
 import { RouterRouteObject } from "../types.js";
-// import { Screen } from "./Screen.js";
 
 /**
  * Cradova Router
@@ -32,7 +31,7 @@ const checker = (
 ): [RouterRouteObject, Record<string, any> | null] | [] => {
   // first strict check
   if (RouterBox.routes[url]) {
-    return [RouterBox.routes[url], null];
+    return [RouterBox.routes[url], { path: url }];
   }
   // place holder check
   for (const path in RouterBox.routes) {
@@ -100,7 +99,7 @@ const checker = (
  */
 Router.route = function (path = "/", screen: any) {
   if (!screen.Activate && screen.name) {
-    console.error(" ✘  Cradova err:  not a valid screen  " + screen);
+    console.error(" ✘  Cradova err:  not a valid screen  ", screen);
     throw new Error(" ✘  Cradova err:  Not a valid cradova screen component");
   }
   RouterBox.routes[path] = {
@@ -110,8 +109,10 @@ Router.route = function (path = "/", screen: any) {
     deactivate: () => {
       screen.deActivate();
     },
-    html: screen.getHtml.bind(screen),
   };
+  if (typeof screen.errorHandler === "function") {
+    RouterBox["errorHandler"][path] = screen.errorHandler;
+  }
 };
 
 /**
@@ -148,15 +149,15 @@ Router.navigate = function (
     [route, params] = checker(href);
     if (route) {
       RouterBox["nextRouteController"] = route;
-      RouterBox.params.params = params || null;
+      RouterBox.params.params = params;
       RouterBox.params.data = data || null;
       link = href;
       RouterBox["pageHide"] && RouterBox["pageHide"](href + " :navigated");
       window.history.pushState({}, "", link);
-      (async () => {
-        await RouterBox.router(null, force);
-      })();
     }
+    (async () => {
+      await RouterBox.router(null, force);
+    })();
   }
 };
 
@@ -194,35 +195,33 @@ RouterBox.router = async function (e: any, force = false) {
   if (RouterBox["nextRouteController"]) {
     route = RouterBox["nextRouteController"];
     RouterBox["nextRouteController"] = null;
-    params = RouterBox.params.params;
-    RouterBox.params.params = null;
   } else {
     [route, params] = checker(url);
   }
   if (route) {
     try {
-      RouterBox.params.event = e;
-      RouterBox.params.params = params || RouterBox.params.params || null;
-      RouterBox.params.data = RouterBox.params.data || null;
+      if (params) {
+        RouterBox.params.params = params;
+      }
       RouterBox["lastNavigatedRouteController"] &&
         RouterBox["lastNavigatedRouteController"].deactivate();
       await route.controller(force);
-      RouterBox["pageShow"] && RouterBox["pageShow"](url);
       RouterBox["lastNavigatedRoute"] = url;
       RouterBox["lastNavigatedRouteController"] = route;
-      RouterBox.params.params = null;
+      RouterBox["pageShow"] && RouterBox["pageShow"](url);
       // click handlers
-      Array.from(window.document.querySelectorAll("a")).forEach((a) => {
+      for (const a of document.querySelectorAll("a")) {
         if (a.href.includes(window.location.origin)) {
           a.addEventListener("click", (e) => {
             e.preventDefault();
             Router.navigate(a.pathname);
           });
         }
-      });
+      }
     } catch (error) {
       const errorHandler =
-        RouterBox.errorHandler[(params && params.path) || "all"];
+        RouterBox.errorHandler["all"] ||
+        RouterBox.errorHandler[RouterBox.params.params.path];
       if (errorHandler) {
         errorHandler(error);
       }
@@ -230,17 +229,9 @@ RouterBox.router = async function (e: any, force = false) {
   } else {
     // or 404
     if (RouterBox.routes["/404"]) {
-      RouterBox.routes["/404"].controller(RouterBox.params);
+      RouterBox.routes["/404"].controller();
     } else {
-      const errorHandler =
-        RouterBox.errorHandler[(params && params.path) || "all"];
-      if (errorHandler) {
-        errorHandler(
-          " ✘  Cradova err: route '" +
-            url +
-            "' does not exist and no '/404' route given!"
-        );
-      } else {
+      if (Object.keys(RouterBox.routes).length > 0) {
         console.error(
           " ✘  Cradova err: route '" +
             url +
@@ -264,6 +255,7 @@ Router["onPageShow"] =
       );
     }
   };
+
 Router["onPageHide"] = function (callback: () => void) {
   if (typeof callback === "function") {
     RouterBox["pageHide"] = callback;
@@ -320,13 +312,13 @@ Router["addErrorHandler"] = function (callback: () => void, path?: string) {
   }
 };
 
-if (globalThis.document) {
-  window.addEventListener("pageshow", RouterBox.router);
-  window.addEventListener("popstate", (e) => {
-    e.preventDefault();
-    RouterBox.router();
-  });
-}
+// if (globalThis.document) {
+window.addEventListener("pageshow", RouterBox.router);
+window.addEventListener("popstate", (e) => {
+  e.preventDefault();
+  RouterBox.router();
+});
+// }
 
 // Router.route(
 //   "/",
@@ -354,74 +346,74 @@ if (globalThis.document) {
 // );
 
 // @ts-ignore
-Router["serve"] = async function (option: {
-  port?: number;
-  path?: string;
-  debug?: boolean;
-}) {
-  let fileURLToPath, _dirname;
-  const { readFile } = await import("fs/promises");
-  const dr = await import("path");
-  const fp = await import("url");
-  fileURLToPath = fp.fileURLToPath;
-  _dirname = dr
-    .dirname(fileURLToPath(import.meta.url))
-    .split("node_modules")[0];
-  let html: string;
-  try {
-    html = await readFile(dr.join(_dirname, "index.html"), "utf-8");
-  } catch (error) {
-    console.log(error);
-    throw new Error("cradova err: index.html not found in serving dir");
-  }
-  if (option.port) {
-    const { createServer } = await import("http");
-    createServer(handler).listen(option.port, start_callback);
-    function start_callback() {
-      console.log(
-        "\x1B[32m Running Cradova on port " + option.port + " \x1B[39m"
-      );
-    }
-    async function handler(req: any, res: any) {
-      if (option.debug) {
-        const clientIP = req.connection.remoteAddress;
-        const connectUsing = req.connection.encrypted ? "SSL" : "HTTP";
-        console.log(
-          "Request received: " + connectUsing + " " + req.method + " " + req.url
-        );
-        console.log("Client IP: " + clientIP);
-      }
-      const [route, params] = checker(req.url);
-      console.log(route, params);
-      res.writeHead(200, "OK", { "Content-Type": "text/html" });
-      if (route) {
-        // @ts-ignore
-        res.end(await route.html());
-      } else {
-        if (RouterBox.routes["/404"]) {
-          res.end(await RouterBox.routes["/404"].html());
-        } else {
-          console.error(
-            " ✘  Cradova err: route '" +
-              req.url +
-              "' does not exist and no '/404' route given!"
-          );
-        }
-      }
-      return;
-    }
-  } else {
-    if (option.path) {
-      // const [route, params] = checker(option.path);
-      // console.log(route, params);
-      return html;
-    } else {
-      console.log(
-        "\x1B[32m Cradova did not serve! - no port or path provided \x1B[39m"
-      );
-    }
-  }
-};
+// Router["serve"] = async function (option: {
+//   port?: number;
+//   path?: string;
+//   debug?: boolean;
+// }) {
+//   let fileURLToPath, _dirname;
+//   const { readFile } = await import("fs/promises");
+//   const dr = await import("path");
+//   const fp = await import("url");
+//   fileURLToPath = fp.fileURLToPath;
+//   _dirname = dr
+//     .dirname(fileURLToPath(import.meta.url))
+//     .split("node_modules")[0];
+//   let html: string;
+//   try {
+//     html = await readFile(dr.join(_dirname, "index.html"), "utf-8");
+//   } catch (error) {
+//     console.log(error);
+//     throw new Error("cradova err: index.html not found in serving dir");
+//   }
+//   if (option.port) {
+//     const { createServer } = await import("http");
+//     createServer(handler).listen(option.port, start_callback);
+//     function start_callback() {
+//       console.log(
+//         "\x1B[32m Running Cradova on port " + option.port + " \x1B[39m"
+//       );
+//     }
+//     async function handler(req: any, res: any) {
+//       if (option.debug) {
+//         const clientIP = req.connection.remoteAddress;
+//         const connectUsing = req.connection.encrypted ? "SSL" : "HTTP";
+//         console.log(
+//           "Request received: " + connectUsing + " " + req.method + " " + req.url
+//         );
+//         console.log("Client IP: " + clientIP);
+//       }
+//       const [route, params] = checker(req.url);
+//       console.log(route, params);
+//       res.writeHead(200, "OK", { "Content-Type": "text/html" });
+//       if (route) {
+//         // @ts-ignore
+//         res.end(await route.html());
+//       } else {
+//         if (RouterBox.routes["/404"]) {
+//           res.end(await RouterBox.routes["/404"].html());
+//         } else {
+//           console.error(
+//             " ✘  Cradova err: route '" +
+//               req.url +
+//               "' does not exist and no '/404' route given!"
+//           );
+//         }
+//       }
+//       return;
+//     }
+//   } else {
+//     if (option.path) {
+//       // const [route, params] = checker(option.path);
+//       // console.log(route, params);
+//       return html;
+//     } else {
+//       console.log(
+//         "\x1B[32m Cradova did not serve! - no port or path provided \x1B[39m"
+//       );
+//     }
+//   }
+// };
 // Router.serve({ port: 3000 });
 
 // ! building the server side middleware and basic sever

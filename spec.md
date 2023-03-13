@@ -26,6 +26,11 @@ Syntax
 
 ```
 VJS( => template, => props, => ...children)
+
+// VJS tags
+
+TAG( => props, => ...children)
+
 ```
 
 ### The VJS template
@@ -36,7 +41,8 @@ Syntax
 // template may include tag, classes, a tag and interText
 
 VJS(template);
-
+// VJS tags
+DIV();
 // examples
 
 // classes
@@ -69,7 +75,12 @@ Syntax
 VJS("div", { foo: "bar" }); //should throws error
 VJS("div", (style: { foo: "bar" })); // should throw error
 
+// VJS tags
+
+DIV( { style: { foo: "bar" }} ) // should throw and error
+
 VJS("div", { id: "bar" }); // valid
+DIV( { { id: "bar" }} ) // valid
 VJS("div", { style: { backgroundColor: "aqua" } }); // valid
 VJS("label", { for: "bar" });
 VJS("div", (style: { $age: "bar" })); // data-age
@@ -88,6 +99,8 @@ VJS(
   VJS("p", "chemistry is the study ...")
 );
 
+DIV(P("history is a ..."), P("chemistry is the study ..."));
+
 // looping
 
 const names = ["john", "paul"];
@@ -96,6 +109,8 @@ VJS(
   "div",
   names.map((name) => VJS("p", "hello " + name))
 );
+
+DIV(names.map((name) => P("hello " + name)));
 ```
 
 ### VJS Components
@@ -105,6 +120,10 @@ Syntax
 ```js
 function Hello(name) {
   return VJS("h1", "Hello " + name);
+}
+
+function Hello(name) {
+  return H1("Hello " + name);
 }
 ```
 

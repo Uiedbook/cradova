@@ -1,5 +1,4 @@
 import { CradovaScreenType } from "../types.js";
-import Element from "./document.js";
 import { cradovaAftermountEvent, frag, isNode } from "./fns.js";
 
 /**
@@ -25,13 +24,12 @@ export class Screen {
   /**
    * used internally
    */
-  private template = globalThis.document
-    ? document.createElement("div")
-    : new Element("div");
+  private template = document.createElement("div");
   private callBack: (() => Promise<void>) | undefined;
   private deCallBack:
     | ((data?: Record<string, any>) => Promise<void>)
     | undefined;
+  public errorHandler: (() => void) | null = null;
   /**
    * this tells cradova to persist state on the screen or not
    * persisting is better
@@ -53,20 +51,23 @@ export class Screen {
       this.persist = persist;
     }
   }
-
+  setErrorHandler(errorHandler: () => void) {
+    this.errorHandler = errorHandler;
+  }
   async package() {
     if (typeof this.html === "function") {
       let fuc = (await this.html(this.data)) as any;
       if (typeof fuc === "function") {
         fuc = fuc();
-
-        if (!isNode(fuc) && typeof fuc !== "string") {
+        if (fuc && !isNode(fuc) && typeof fuc !== "string") {
           throw new Error(
             " ✘  Cradova err: only parent with descendants is valid"
           );
         } else {
-          this.template.innerHTML = "";
-          this.template.appendChild(fuc as any);
+          if (fuc) {
+            this.template.innerHTML = "";
+            this.template.appendChild(fuc);
+          }
         }
       } else {
         if (!isNode(fuc) && typeof fuc !== "string") {
@@ -75,7 +76,7 @@ export class Screen {
           );
         } else {
           this.template.innerHTML = "";
-          this.template.appendChild(fuc as any);
+          this.template.appendChild(fuc);
         }
       }
     }
@@ -106,13 +107,6 @@ export class Screen {
     }
     //
   }
-  async getHtml() {
-    await this.package();
-    return (
-      // @ts-ignore
-      '<div data-cra-id="cradova-app-wrapper" >' + this.template.html + "</div>"
-    );
-  }
   async Activate(force?: boolean) {
     if (!this.persist) {
       await this.package();
@@ -128,8 +122,6 @@ export class Screen {
       this.packed = true;
     }
 
-    document.title = this.name;
-
     const doc = document.querySelector("[data-cra-id=cradova-app-wrapper]");
     if (!doc) {
       throw new Error(
@@ -138,13 +130,14 @@ export class Screen {
     }
     doc.innerHTML = "";
     doc.appendChild(this.template as any);
+    document.title = this.name;
     if (!this.persist) {
       this.packed = false;
     }
     if (this.callBack) {
       await this.callBack();
     }
-    window.dispatchEvent(cradovaAftermountEvent as any);
+    window.dispatchEvent(cradovaAftermountEvent);
     window.scrollTo(0, 0);
   }
 }

@@ -40,7 +40,7 @@ import { dispatch } from "./utils/track";
 import { simpleStore } from "./utils/simplestore";
 import { frag, isNode } from "./utils/fns";
 import { ElementType } from "./types";
-import Element from "./utils/document";
+// import doc from "./utils/document";
 
 // importing types declarations
 
@@ -189,23 +189,16 @@ const _: any = (...element_initials: any[]) => {
 
   return (...ElementChildrenAndPropertyList: ElementType<HTMLElement>[]) => {
     const initials = make(element_initials[0]);
-    let secondLevelChildren = [],
-      props: Record<string, any> | null = null,
+    let props: Record<string, any> | null = null,
       text: string | number | null = null;
 
     if (firstLevelChildren.length) {
-      secondLevelChildren.push(...firstLevelChildren);
-    }
-
-    if (ElementChildrenAndPropertyList.length) {
-      secondLevelChildren.push(...ElementChildrenAndPropertyList);
+      ElementChildrenAndPropertyList.push(...firstLevelChildren);
     }
 
     let element: Record<string, any>;
     try {
-      element = globalThis.document
-        ? document.createElement(initials.tag!.trim())
-        : new Element(initials.tag!.trim());
+      element = document.createElement(initials.tag!.trim());
     } catch (error) {
       throw new TypeError(
         " ✘  Cradova err:  invalid tag given  " + initials.tag
@@ -235,113 +228,76 @@ const _: any = (...element_initials: any[]) => {
         props = { innerText: initials.innerValue };
       }
     }
-    // getting children ready
-    if (secondLevelChildren.length) {
-      for (let i = 0; i < secondLevelChildren.length; i++) {
+
+    //? getting children ready
+    if (ElementChildrenAndPropertyList.length) {
+      for (let i = 0; i < ElementChildrenAndPropertyList.length; i++) {
+        let child = ElementChildrenAndPropertyList[i] as any;
         // single child lane
-        if (typeof secondLevelChildren[i] === "function") {
-          let child = secondLevelChildren[i]();
+        if (typeof child === "function") {
+          child = child() as any;
           if (typeof child === "function") {
-            child = child();
+            child = child() as any;
           }
-          try {
-            if (isNode(child)) {
-              if (child.nodeC) {
-                element.appendChild(child.html);
-              } else {
-                element.appendChild(child);
-              }
-            } else {
-              throw new Error(
-                "  ✘  Cradova err:  invalid child type: " +
-                  child +
-                  " (" +
-                  typeof child +
-                  ")"
-              );
-            }
-          } catch (error) {
-            console.error(error);
-          }
-          continue;
         }
-        // html child
-        if (isNode(secondLevelChildren[i])) {
-          element.appendChild(secondLevelChildren[i]);
+        // appending child
+        if (isNode(child)) {
+          element.appendChild(child);
           continue;
         }
         // children array
-        if (Array.isArray(secondLevelChildren[i])) {
-          const arrCX = secondLevelChildren[i];
-          const arrCXLength = arrCX.length;
+        if (Array.isArray(child)) {
+          const arrCXLength = child.length;
           for (let p = 0; p < arrCXLength; p++) {
-            let child = arrCX[p];
-            if (typeof child === "function") {
-              child = child();
+            let childly = child[p];
+            if (typeof childly === "function") {
+              childly = childly();
             }
-            if (isNode(child)) {
-              if (child.nodeC) {
-                element.appendChild(child.html);
-              } else {
-                element.appendChild(child);
-              }
+            if (typeof childly === "function") {
+              childly = childly();
+            }
+            if (isNode(childly)) {
+              element.appendChild(childly);
             } else {
-              throw new Error(
-                "  ✘  Cradova err:  invalid child type: " +
-                  child +
-                  " (" +
-                  typeof child +
-                  ")"
-              );
+              if (typeof childly !== "undefined") {
+                throw new Error(
+                  "  ✘  Cradova err:  invalid child type: " +
+                    childly +
+                    " (" +
+                    typeof childly +
+                    ")"
+                );
+              }
             }
           }
           continue;
         }
-        const child = secondLevelChildren[i];
-        if (isNode(child)) {
-          element.appendChild(child);
-        } else {
-          // getting props
-          if (
-            typeof child === "object" &&
-            !Array.isArray(child) &&
-            !isNode(child)
-          ) {
-            if (!props) {
-              props = child;
-            } else {
-              const po = child as any;
-              for (const p in po) {
-                props[p] = po[p];
-              }
-            }
-            continue;
-          }
-          //
-          if (typeof child === "string") {
-            text = child;
-            continue;
-          }
-
-          if (typeof child === "string" || typeof child === "number") {
-            text = child;
+        // getting innerText
+        if (typeof child === "string" || typeof child === "number") {
+          text = child;
+          continue;
+        }
+        // getting props
+        if (typeof child === "object" && !Array.isArray(child)) {
+          if (!props) {
+            props = child;
           } else {
-            console.error(" ✘  Cradova err:   got", child);
-            throw new Error(
-              "  ✘  Cradova err:  invalid child type: " +
-                "(" +
-                typeof child +
-                ")"
-            );
+            props = Object.assign(props, child);
           }
+          continue;
+        }
+        if (typeof child !== "undefined") {
+          // throw an error
+          console.error(" ✘  Cradova err:   got", { child });
+          throw new Error(
+            "  ✘  Cradova err:  invalid child type: " + "(" + typeof child + ")"
+          );
         }
       }
     }
 
-    if (props) {
-      if (props.beforeMount) {
-        beforeMount = props["beforeMount"];
-      }
+    //? adding props
+    if (typeof props === "object" && element) {
       // adding attributes
       for (const prop in props) {
         // adding styles
@@ -355,6 +311,11 @@ const _: any = (...element_initials: any[]) => {
               );
             }
           }
+          continue;
+        }
+        // for compatibility
+        if (typeof element.style[prop] !== "undefined" && prop !== "src") {
+          element.style[prop] = props[prop];
           continue;
         }
         // text content
@@ -372,11 +333,7 @@ const _: any = (...element_initials: any[]) => {
           typeof props[prop] === "string" &&
           props[prop] !== ""
         ) {
-          if (globalThis.document) {
-            element.classList.add(props[prop]);
-          } else {
-            element.setAttribute("class", props[prop]);
-          }
+          element.classList.add(props[prop]);
           continue;
         }
         // before mount event
@@ -413,49 +370,32 @@ const _: any = (...element_initials: any[]) => {
           prop === "afterMount" &&
           typeof props["afterMount"] === "function"
         ) {
-          if (globalThis.document) {
-            const av = () => {
-              props!["afterMount"].apply(element);
-              window.removeEventListener("cradova-aftermount", av);
-            };
-            window.addEventListener("cradova-aftermount", av);
-          }
+          const av = () => {
+            props!["afterMount"].apply(element);
+            window.removeEventListener("cradova-aftermount", av);
+          };
+          window.addEventListener("cradova-aftermount", av);
           continue;
         }
         // trying to set other values
         try {
           if (typeof element[prop] !== "undefined") {
-            if (globalThis.document) {
-              element[prop] = props[prop];
-            } else {
-              if (typeof props[prop] === "function") {
-                element.setAttribute(prop, ["(", props[prop], ")()"].join(""));
-              } else {
-                if (element[prop]) {
-                  element[prop] = props[prop];
-                } else {
-                  element.setAttribute(prop, props[prop]);
-                }
-              }
-            }
+            element[prop] = props[prop];
           } else {
-            if (globalThis.document) {
-              element[prop] = props[prop];
-            } else {
-              element.setAttribute(prop, props[prop]);
-              continue;
-            }
+            element[prop] = props[prop];
             if (
               prop !== "for" &&
               prop !== "text" &&
               prop !== "class" &&
               !prop.includes("aria")
             ) {
-              console.error(" ✘  Cradova err:  invalid html attribute " + prop);
+              console.error(" ✘  Cradova err:  invalid html attribute ", {
+                prop,
+              });
             }
           }
         } catch (error) {
-          console.error(" ✘  Cradova err: Cradova got ", props);
+          console.error(" ✘  Cradova err: invalid html attribute ", { props });
           console.error(" ✘  Cradova err:  ", error);
         }
       }
@@ -463,11 +403,8 @@ const _: any = (...element_initials: any[]) => {
     if (text) {
       element.innerText = text;
     }
-    if (globalThis.document && typeof beforeMount === "function") {
+    if (typeof beforeMount === "function") {
       beforeMount.apply(element);
-    }
-    if (globalThis.document) {
-      return element;
     }
     return element;
   };
@@ -479,8 +416,8 @@ export { dispatch } from "./utils/track";
 export { Router } from "./utils/Router";
 export { Screen } from "./utils/Screen";
 export { simpleStore as $ } from "./utils/simplestore";
-// 
-// export * as tag from "./utils/tags";
+//
+export * from "./utils/tags";
 
 export {
   cradovaAftermountEvent,

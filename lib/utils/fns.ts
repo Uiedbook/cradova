@@ -1,32 +1,12 @@
 import { dispatch } from "./track";
-import _ from "../index";
-import Element from "./document";
-
 export const isNode = (node: any) =>
-  typeof node === "object" && typeof node.nodeType !== "undefined";
+  typeof node === "object" && typeof node.nodeType === "number";
 
 /**
  * Cradova afterMount event
  */
 
-export let cradovaAftermountEvent = globalThis.document
-  ? new CustomEvent("cradova-aftermount")
-  : {};
-// if (cradovaAftermountEvent) {
-//   cradovaAftermountEvent = ;
-// }
-
-export const err = function (errors: string[], err: string, type?: string) {
-  for (let er = 0; er < errors.length; er++) {
-    console.error(" ✘  Cradova err:  ", errors[er]);
-  }
-  if (!type) {
-    throw new Error(" ✘  Cradova err:  " + err);
-  } else {
-    throw new TypeError(" ✘  Cradova err:  " + err);
-  }
-};
-
+export let cradovaAftermountEvent = new CustomEvent("cradova-aftermount");
 export function uuid() {
   let t = Date.now ? +Date.now() : +new Date();
   return "cradova-id-xxxxxxxxxx".replace(/[x]/g, function (e) {
@@ -128,8 +108,9 @@ export function assert(condition: any, ...callback: (() => any)[]) {
   }
   return "";
 }
+
 export function assertOr(
-  condition: any,
+  condition: boolean,
   ifTrue: () => any,
   ifFalse: () => any
 ) {
@@ -147,22 +128,47 @@ export function assertOr(
  * create dynamic components
  */
 
-type RefProps<D> = D | unknown;
+type RefProps<D> = D | any;
 
 export class Ref<D> {
-  private component: (data?: RefProps<D>) => any;
+  private component: (
+    data?: RefProps<D>
+  ) => HTMLElement | ((data?: D) => HTMLElement);
   private stateID = uuid();
   private effects: (() => Promise<unknown>)[] = [];
   private effectuate: (() => unknown) | null = null;
   private rendered = false;
   private published = false;
   private hasFirstStateUpdateRun = false;
-  public testName = null;
+  private preRendered: HTMLElement | null = null;
+  // public testName = null;
   public stash: D | undefined;
 
   constructor(component: (data?: RefProps<D>) => any) {
     this.component = component.bind(this);
   }
+
+  preRender(data?: RefProps<D>) {
+    // parking
+    const chtml = this.component(data);
+    if (chtml instanceof HTMLElement) {
+      chtml.setAttribute("data-cra-id", this.stateID);
+      this.preRendered = chtml;
+    } else {
+      this.preRendered = chtml({ stateID: this.stateID } as any);
+    }
+    // @ts-ignore
+    if (typeof this.preRendered === "undefined") {
+      throw new Error(
+        " ✘  Cradova err :  Invalid component type for cradova Ref, got  -  " +
+          this.preRendered
+      );
+    }
+  }
+  destroyPreRendered() {
+    this.preRendered = null;
+  }
+
   /**
    * Cradova Ref
    * ---
@@ -174,47 +180,44 @@ export class Ref<D> {
     // if (this.testName) {
     //   console.log("boohoo 1", this.rendered, this.hasFirstStateUpdateRun);
     // }
+    this.effects = [];
     this.rendered = false;
     this.hasFirstStateUpdateRun = false;
-
-    const chtml = this.component(data);
-    if (typeof chtml !== "function") {
-      throw new Error(
-        " ✘  Cradova err :  Invalid component type for cradova Ref, got  -  " +
-          chtml
-      );
-    }
-
-    const element = chtml({ stateID: this.stateID });
-    if (!(element instanceof HTMLElement)) {
-      err(
-        [
-          `
-     \x1b[35m Exception: ref only  a function that returns cradova element or cradova element tree. \x1b[35m
-      
-      to track and debug this element add a
-      beforeMount or afterMount property to the element
-      `,
-        ],
-        `Cradova can't render component make sure it's a valid component`
-      );
+    let element: HTMLElement | null = null;
+    if (!this.preRendered) {
+      // parking
+      const chtml = this.component(data);
+      if (chtml instanceof HTMLElement) {
+        chtml.setAttribute("data-cra-id", this.stateID);
+        element = chtml;
+      } else {
+        element = chtml({ stateID: this.stateID } as any);
+      }
+      // @ts-ignore
+      if (typeof element === "undefined") {
+        throw new Error(
+          " ✘  Cradova err :  Invalid component type for cradova Ref, got  -  " +
+            element
+        );
+      }
     }
     if (stash) {
       this.stash = data;
     }
-    if (window) {
-      const av = async () => {
-        await this.effector.apply(this);
-        window.removeEventListener("cradova-aftermount", av);
-      };
-      if (!this.published) {
-        this.published = true;
-        window.addEventListener("cradova-aftermount", av);
-      } else {
-        this.effector();
-      }
+    const av = async () => {
+      await this.effector.apply(this);
+      window.removeEventListener("cradova-aftermount", av);
+    };
+    if (!this.published) {
+      this.published = true;
+      window.addEventListener("cradova-aftermount", av);
+    } else {
+      this.effector();
     }
-    return () => element;
+    if (!element) {
+      element = this.preRendered;
+    }
+    return element;
   }
   instance() {
     return dispatch(this.stateID, {
@@ -262,17 +265,16 @@ export class Ref<D> {
    * .
    */
 
-  updateState(data: D, stash: boolean) {
+  updateState(data: D, stash?: boolean) {
+    if (!this) {
+      console.error(
+        " ✘  Cradova err:  Ref.updateState has is passed out of scope"
+      );
+      return;
+    }
     if (!this.rendered) {
-      // @ts-ignore
       async function updateState(this: any, data: any) {
-        if (this.rendered) {
-          await this.Activate(data);
-          this.rendered = true;
-          this.hasFirstStateUpdateRun = true;
-        } else {
-          setTimeout(updateState.bind(this, data), 4);
-        }
+        await this.Activate(data);
       }
       this.effectuate = updateState.bind(this, data);
     } else {
@@ -285,16 +287,12 @@ export class Ref<D> {
     }
   }
 
+  // @ts-ignore
   private async Activate(data: any) {
     if (!data) {
       return;
     }
-    if (!this) {
-      console.error(
-        " ✘  Cradova err:  Ref.updateState has is passed out of scope"
-      );
-      return;
-    }
+
     const guy: HTMLElement = dispatch(this.stateID, {
       // @ts-ignore
       cradovaDispatchTrackBreak: true,
@@ -308,7 +306,7 @@ export class Ref<D> {
       chtml.setAttribute("data-cra-id", this.stateID);
       element = chtml;
     } else {
-      element = chtml({ stateID: this.stateID });
+      element = chtml({ stateID: this.stateID } as any);
     }
     try {
       guy.insertAdjacentElement("beforebegin", element);
@@ -333,9 +331,7 @@ export class Ref<D> {
  */
 
 export const frag = function (children: any) {
-  const par = globalThis.document
-    ? document.createDocumentFragment()
-    : new Element("div");
+  const par = document.createDocumentFragment();
   // building it's children tree.
   for (let i = 0; i < children.length; i++) {
     let a = children[i];
@@ -353,9 +349,9 @@ export const frag = function (children: any) {
       }
     }
   }
-  if (document) {
-    return par;
-  }
+  // if (document) {
+  return par;
+  // }
   // @ts-ignore
-  return par.html;
+  // return par.html;
 };

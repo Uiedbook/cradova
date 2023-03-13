@@ -1,116 +1,297 @@
-import _ from "..";
 import { ElementType } from "../types";
+import { dispatch } from "./track";
+import { simpleStore } from "./simplestore";
+import { isNode } from "./fns";
 
-export const a: ElementType<HTMLAnchorElement> = _("a");
-export const abbr: ElementType<HTMLElement> = _("abbr");
-export const address: ElementType<HTMLElement> = _("address");
-export const area: ElementType<HTMLAreaElement> = _("area");
-export const article: ElementType<HTMLElement> = _("article");
-export const aside: ElementType<HTMLElement> = _("aside");
-export const audio: ElementType<HTMLAudioElement> = _("audio");
-export const b: ElementType<HTMLElement> = _("b");
-export const base: ElementType<HTMLBaseElement> = _("base");
-export const bdi: ElementType<HTMLElement> = _("bdi");
-export const bdo: ElementType<HTMLElement> = _("bdo");
-export const blockquote: ElementType<HTMLElement> = _("blockquote");
-export const body: ElementType<HTMLBodyElement> = _("body");
-export const br: ElementType<HTMLBRElement> = _("br");
-export const button: ElementType<HTMLButtonElement> = _("button");
-export const canvas: ElementType<HTMLCanvasElement> = _("canvas");
-export const caption: ElementType<HTMLTableCaptionElement> = _("caption");
-export const cite: ElementType<HTMLElement> = _("cite");
-export const code: ElementType<HTMLElement> = _("code");
-export const col: ElementType<HTMLTableColElement> = _("col");
-export const colgroup: ElementType<HTMLElement> = _("colgroup");
-export const data: ElementType<HTMLDataElement> = _("data");
-export const datalist: ElementType<HTMLDataListElement> = _("datalist");
-export const dd: ElementType<HTMLElement> = _("dd");
-export const del: ElementType<HTMLElement> = _("del");
-export const details: ElementType<HTMLDetailsElement> = _("details");
-export const dfn: ElementType<HTMLElement> = _("dfn");
-export const dialog: ElementType<HTMLDialogElement> = _("dialog");
-export const div: ElementType<HTMLDivElement> = _("div");
-export const dl: ElementType<HTMLElement> = _("dl");
-export const dt: ElementType<HTMLElement> = _("dt");
-export const em: ElementType<HTMLElement> = _("em");
-export const embed: ElementType<HTMLEmbedElement> = _("embed");
-export const fieldset: ElementType<HTMLFieldSetElement> = _("fieldset");
-export const figcaption: ElementType<HTMLElement> = _("figcaption");
-export const figure: ElementType<HTMLElement> = _("figure");
-export const footer: ElementType<HTMLElement> = _("footer");
-export const form: ElementType<HTMLFormElement> = _("form");
-export const h1: ElementType<HTMLHeadingElement> = _("h1");
-export const h2: ElementType<HTMLHeadingElement> = _("h2");
-export const h3: ElementType<HTMLHeadingElement> = _("h3");
-export const h4: ElementType<HTMLHeadingElement> = _("h4");
-export const h5: ElementType<HTMLHeadingElement> = _("h5");
-export const h6: ElementType<HTMLHeadingElement> = _("h6");
-export const head: ElementType<HTMLHeadElement> = _("head");
-export const header: ElementType<HTMLElement> = _("header");
-export const hr: ElementType<HTMLHRElement> = _("hr");
-export const html: ElementType<HTMLHtmlElement> = _("html");
-export const i: ElementType<HTMLElement> = _("i");
-export const iframe: ElementType<HTMLIFrameElement> = _("iframe");
-export const img: ElementType<HTMLImageElement> = _("img");
-export const input: ElementType<HTMLInputElement> = _("input");
-export const ins: ElementType<HTMLElement> = _("ins");
-export const kbd: ElementType<HTMLElement> = _("kbd");
-export const label: ElementType<HTMLLabelElement> = _("label");
-export const legend: ElementType<HTMLLegendElement> = _("legend");
-export const li: ElementType<HTMLLIElement> = _("li");
-export const link: ElementType<HTMLLinkElement> = _("link");
-export const main: ElementType<HTMLElement> = _("main");
-export const map: ElementType<HTMLMapElement> = _("map");
-export const mark: ElementType<HTMLElement> = _("mark");
-export const math: ElementType<HTMLElement> = _("math");
-export const menu: ElementType<HTMLMenuElement> = _("menu");
-export const meta: ElementType<HTMLMetaElement> = _("meta");
-export const meter: ElementType<HTMLMeterElement> = _("meter");
-export const nav: ElementType<HTMLElement> = _("nav");
-export const noscript: ElementType<HTMLElement> = _("noscript");
-export const object: ElementType<HTMLObjectElement> = _("object");
-export const ol: ElementType<HTMLOListElement> = _("ol");
-export const optgroup: ElementType<HTMLOptGroupElement> = _("optgroup");
-export const option: ElementType<HTMLOptionElement> = _("option");
-export const output: ElementType<HTMLOutputElement> = _("output");
-export const p: ElementType<HTMLParagraphElement> = _("p");
-export const picture: ElementType<HTMLPictureElement> = _("picture");
-export const portal: ElementType<HTMLElement> = _("portal");
-export const pre: ElementType<HTMLPreElement> = _("pre");
-export const progress: ElementType<HTMLProgressElement> = _("progress");
-export const q: ElementType<HTMLQuoteElement> = _("q");
-export const rp: ElementType<HTMLElement> = _("rp");
-export const rt: ElementType<HTMLElement> = _("rt");
-export const ruby: ElementType<HTMLElement> = _("ruby");
-export const s: ElementType<HTMLElement> = _("s");
-export const samp: ElementType<HTMLElement> = _("samp");
-export const script: ElementType<HTMLScriptElement> = _("script");
-export const section: ElementType<HTMLElement> = _("section");
-export const select: ElementType<HTMLSelectElement> = _("select");
-export const slot: ElementType<HTMLSlotElement> = _("slot");
-export const small: ElementType<HTMLElement> = _("small");
-export const source: ElementType<HTMLSourceElement> = _("source");
-export const span: ElementType<HTMLSpanElement> = _("span");
-export const strong: ElementType<HTMLElement> = _("strong");
-export const style: ElementType<HTMLStyleElement> = _("style");
-export const sub: ElementType<HTMLElement> = _("sub");
-export const summary: ElementType<HTMLElement> = _("summary");
-export const sup: ElementType<HTMLElement> = _("sup");
-export const svg: ElementType<HTMLOrSVGElement> = _("svg");
-export const table: ElementType<HTMLTableElement> = _("table");
-export const tbody: ElementType<HTMLTableColElement> = _("tbody");
-export const td: ElementType<HTMLTableCellElement> = _("td");
-export const template: ElementType<HTMLTemplateElement> = _("template");
-export const textarea: ElementType<HTMLTextAreaElement> = _("textarea");
-export const tfoot: ElementType<HTMLElement> = _("tfoot");
-export const th: ElementType<HTMLTableSectionElement> = _("th");
-export const thead: ElementType<HTMLTableSectionElement> = _("thead");
-export const time: ElementType<HTMLTimeElement> = _("time");
-export const title: ElementType<HTMLTitleElement> = _("title");
-export const tr: ElementType<HTMLTableRowElement> = _("tr");
-export const track: ElementType<HTMLTrackElement> = _("track");
-export const u: ElementType<HTMLElement> = _("u");
-export const ul: ElementType<HTMLUListElement> = _("ul");
-export const val: ElementType<HTMLElement> = _("val");
-export const video: ElementType<HTMLVideoElement> = _("video");
-export const wbr: ElementType<HTMLElement> = _("wbr");
+const cra: any = (element_initials: string) => {
+  return (...ElementChildrenAndPropertyList: ElementType<HTMLElement>[]) => {
+    let beforeMount: ((this: any) => void) | null = null;
+    let props: Record<string, any> | null = null,
+      text: string | number | null = null;
+    let element: Record<string, any>;
+    element = document.createElement(element_initials);
+
+    //? getting children ready
+    if (ElementChildrenAndPropertyList.length) {
+      for (let i = 0; i < ElementChildrenAndPropertyList.length; i++) {
+        let child = ElementChildrenAndPropertyList[i] as any;
+        // single child lane
+        if (typeof child === "function") {
+          child = child() as any;
+          if (typeof child === "function") {
+            child = child() as any;
+          }
+        }
+        // appending child
+        if (isNode(child)) {
+          element.appendChild(child);
+          continue;
+        }
+        // children array
+        if (Array.isArray(child)) {
+          const arrCXLength = child.length;
+          for (let p = 0; p < arrCXLength; p++) {
+            let childly = child[p];
+            if (typeof childly === "function") {
+              childly = childly();
+            }
+            if (typeof childly === "function") {
+              childly = childly();
+            }
+            if (isNode(childly)) {
+              element.appendChild(childly);
+            } else {
+              throw new Error(
+                "  ✘  Cradova err:  invalid child type: " +
+                  childly +
+                  " (" +
+                  typeof childly +
+                  ")"
+              );
+            }
+          }
+          continue;
+        }
+        // getting innerText
+        if (typeof child === "string" || typeof child === "number") {
+          text = child;
+          continue;
+        }
+        // getting props
+        if (typeof child === "object" && !Array.isArray(child)) {
+          if (!props) {
+            props = child;
+          } else {
+            props = Object.assign(props, child);
+          }
+          continue;
+        }
+        // throw an error
+        console.error(" ✘  Cradova err:   got", { child });
+        throw new Error(
+          "  ✘  Cradova err:  invalid child type: " + "(" + typeof child + ")"
+        );
+      }
+    }
+
+    //? adding props
+    if (typeof props === "object") {
+      // adding attributes
+      for (const prop in props) {
+        // adding styles
+        if (prop === "style" && typeof props[prop] === "object") {
+          for (const [k, v] of Object.entries(props[prop])) {
+            if (typeof element.style[k] !== "undefined" && k !== "src") {
+              element.style[k] = v;
+            } else {
+              throw new Error(
+                "✘  Cradova err :  " + k + " is not a valid css style property"
+              );
+            }
+          }
+          continue;
+        }
+        // text content
+        if (
+          prop === "text" &&
+          typeof props[prop] === "string" &&
+          props[prop] !== ""
+        ) {
+          text = props[prop];
+          continue;
+        }
+        // class name
+        if (
+          prop === "class" &&
+          typeof props[prop] === "string" &&
+          props[prop] !== ""
+        ) {
+          element.classList.add(props[prop]);
+          continue;
+        }
+        // before mount event
+        if (prop === "beforeMount") {
+          beforeMount = props["beforeMount"];
+          continue;
+        }
+        // setting state id
+        if (prop === "stateID") {
+          element.setAttribute("data-cra-id", props[prop]);
+          continue;
+        }
+        // setting data attribute
+        if (prop.includes("$")) {
+          element.setAttribute("data-" + prop.split("$")[1], props[prop]);
+          continue;
+        }
+        if (
+          Array.isArray(props[prop]) &&
+          props[prop][0] instanceof simpleStore
+        ) {
+          element.updateState = dispatch.bind(null, element);
+          props[prop][0].bindRef(element, prop, props[prop][1]);
+          continue;
+        }
+        // setting should update state key;
+        if (prop === "shouldUpdate" && props[prop] === true) {
+          element.updateState = dispatch.bind(null, element);
+          continue;
+        }
+
+        // setting afterMount event;
+        if (
+          prop === "afterMount" &&
+          typeof props["afterMount"] === "function"
+        ) {
+          const av = () => {
+            props!["afterMount"].apply(element);
+            window.removeEventListener("cradova-aftermount", av);
+          };
+          window.addEventListener("cradova-aftermount", av);
+          continue;
+        }
+        // trying to set other values
+        try {
+          if (typeof element[prop] !== "undefined") {
+            element[prop] = props[prop];
+          } else {
+            element[prop] = props[prop];
+            if (
+              prop !== "for" &&
+              prop !== "text" &&
+              prop !== "class" &&
+              !prop.includes("aria")
+            ) {
+              console.error(" ✘  Cradova err:  invalid html attribute ", {
+                prop,
+              });
+            }
+          }
+        } catch (error) {
+          console.error(" ✘  Cradova err: invalid html attribute ", { props });
+          console.error(" ✘  Cradova err:  ", error);
+        }
+      }
+    }
+    if (text) {
+      element.innerText = text;
+    }
+    if (typeof beforeMount === "function") {
+      beforeMount.apply(element);
+    }
+    return element;
+  };
+};
+export const a: ElementType<HTMLAnchorElement> = cra("a");
+export const abbr: ElementType<HTMLElement> = cra("abbr");
+export const address: ElementType<HTMLElement> = cra("address");
+export const area: ElementType<HTMLAreaElement> = cra("area");
+export const article: ElementType<HTMLElement> = cra("article");
+export const aside: ElementType<HTMLElement> = cra("aside");
+export const audio: ElementType<HTMLAudioElement> = cra("audio");
+export const b: ElementType<HTMLElement> = cra("b");
+export const base: ElementType<HTMLBaseElement> = cra("base");
+export const bdi: ElementType<HTMLElement> = cra("bdi");
+export const bdo: ElementType<HTMLElement> = cra("bdo");
+export const blockquote: ElementType<HTMLElement> = cra("blockquote");
+export const body: ElementType<HTMLBodyElement> = cra("body");
+export const br: ElementType<HTMLBRElement> = cra("br");
+export const button: ElementType<HTMLButtonElement> = cra("button");
+export const canvas: ElementType<HTMLCanvasElement> = cra("canvas");
+export const caption: ElementType<HTMLTableCaptionElement> = cra("caption");
+export const cite: ElementType<HTMLElement> = cra("cite");
+export const code: ElementType<HTMLElement> = cra("code");
+export const col: ElementType<HTMLTableColElement> = cra("col");
+export const colgroup: ElementType<HTMLElement> = cra("colgroup");
+export const data: ElementType<HTMLDataElement> = cra("data");
+export const datalist: ElementType<HTMLDataListElement> = cra("datalist");
+export const dd: ElementType<HTMLElement> = cra("dd");
+export const del: ElementType<HTMLElement> = cra("del");
+export const details: ElementType<HTMLDetailsElement> = cra("details");
+export const dfn: ElementType<HTMLElement> = cra("dfn");
+export const dialog: ElementType<HTMLDialogElement> = cra("dialog");
+export const div: ElementType<HTMLDivElement> = cra("div");
+export const dl: ElementType<HTMLElement> = cra("dl");
+export const dt: ElementType<HTMLElement> = cra("dt");
+export const em: ElementType<HTMLElement> = cra("em");
+export const embed: ElementType<HTMLEmbedElement> = cra("embed");
+export const fieldset: ElementType<HTMLFieldSetElement> = cra("fieldset");
+export const figcaption: ElementType<HTMLElement> = cra("figcaption");
+export const figure: ElementType<HTMLElement> = cra("figure");
+export const footer: ElementType<HTMLElement> = cra("footer");
+export const form: ElementType<HTMLFormElement> = cra("form");
+export const h1: ElementType<HTMLHeadingElement> = cra("h1");
+export const h2: ElementType<HTMLHeadingElement> = cra("h2");
+export const h3: ElementType<HTMLHeadingElement> = cra("h3");
+export const h4: ElementType<HTMLHeadingElement> = cra("h4");
+export const h5: ElementType<HTMLHeadingElement> = cra("h5");
+export const h6: ElementType<HTMLHeadingElement> = cra("h6");
+export const head: ElementType<HTMLHeadElement> = cra("head");
+export const header: ElementType<HTMLElement> = cra("header");
+export const hr: ElementType<HTMLHRElement> = cra("hr");
+export const html: ElementType<HTMLHtmlElement> = cra("html");
+export const i: ElementType<HTMLElement> = cra("i");
+export const iframe: ElementType<HTMLIFrameElement> = cra("iframe");
+export const img: ElementType<HTMLImageElement> = cra("img");
+export const input: ElementType<HTMLInputElement> = cra("input");
+export const ins: ElementType<HTMLElement> = cra("ins");
+export const kbd: ElementType<HTMLElement> = cra("kbd");
+export const label: ElementType<HTMLLabelElement> = cra("label");
+export const legend: ElementType<HTMLLegendElement> = cra("legend");
+export const li: ElementType<HTMLLIElement> = cra("li");
+export const link: ElementType<HTMLLinkElement> = cra("link");
+export const main: ElementType<HTMLElement> = cra("main");
+export const map: ElementType<HTMLMapElement> = cra("map");
+export const mark: ElementType<HTMLElement> = cra("mark");
+export const math: ElementType<HTMLElement> = cra("math");
+export const menu: ElementType<HTMLMenuElement> = cra("menu");
+export const meta: ElementType<HTMLMetaElement> = cra("meta");
+export const meter: ElementType<HTMLMeterElement> = cra("meter");
+export const nav: ElementType<HTMLElement> = cra("nav");
+export const noscript: ElementType<HTMLElement> = cra("noscript");
+export const object: ElementType<HTMLObjectElement> = cra("object");
+export const ol: ElementType<HTMLOListElement> = cra("ol");
+export const optgroup: ElementType<HTMLOptGroupElement> = cra("optgroup");
+export const option: ElementType<HTMLOptionElement> = cra("option");
+export const output: ElementType<HTMLOutputElement> = cra("output");
+export const p: ElementType<HTMLParagraphElement> = cra("p");
+export const picture: ElementType<HTMLPictureElement> = cra("picture");
+export const portal: ElementType<HTMLElement> = cra("portal");
+export const pre: ElementType<HTMLPreElement> = cra("pre");
+export const progress: ElementType<HTMLProgressElement> = cra("progress");
+export const q: ElementType<HTMLQuoteElement> = cra("q");
+export const rp: ElementType<HTMLElement> = cra("rp");
+export const rt: ElementType<HTMLElement> = cra("rt");
+export const ruby: ElementType<HTMLElement> = cra("ruby");
+export const s: ElementType<HTMLElement> = cra("s");
+export const samp: ElementType<HTMLElement> = cra("samp");
+export const script: ElementType<HTMLScriptElement> = cra("script");
+export const section: ElementType<HTMLElement> = cra("section");
+export const select: ElementType<HTMLSelectElement> = cra("select");
+export const slot: ElementType<HTMLSlotElement> = cra("slot");
+export const small: ElementType<HTMLElement> = cra("small");
+export const source: ElementType<HTMLSourceElement> = cra("source");
+export const span: ElementType<HTMLSpanElement> = cra("span");
+export const strong: ElementType<HTMLElement> = cra("strong");
+export const style: ElementType<HTMLStyleElement> = cra("style");
+export const sub: ElementType<HTMLElement> = cra("sub");
+export const summary: ElementType<HTMLElement> = cra("summary");
+export const sup: ElementType<HTMLElement> = cra("sup");
+export const svg: ElementType<HTMLOrSVGElement> = cra("svg");
+export const table: ElementType<HTMLTableElement> = cra("table");
+export const tbody: ElementType<HTMLTableColElement> = cra("tbody");
+export const td: ElementType<HTMLTableCellElement> = cra("td");
+export const template: ElementType<HTMLTemplateElement> = cra("template");
+export const textarea: ElementType<HTMLTextAreaElement> = cra("textarea");
+export const tfoot: ElementType<HTMLElement> = cra("tfoot");
+export const th: ElementType<HTMLTableSectionElement> = cra("th");
+export const thead: ElementType<HTMLTableSectionElement> = cra("thead");
+export const time: ElementType<HTMLTimeElement> = cra("time");
+export const title: ElementType<HTMLTitleElement> = cra("title");
+export const tr: ElementType<HTMLTableRowElement> = cra("tr");
+export const track: ElementType<HTMLTrackElement> = cra("track");
+export const u: ElementType<HTMLElement> = cra("u");
+export const ul: ElementType<HTMLUListElement> = cra("ul");
+export const val: ElementType<HTMLElement> = cra("val");
+export const video: ElementType<HTMLVideoElement> = cra("video");
+export const wbr: ElementType<HTMLElement> = cra("wbr");

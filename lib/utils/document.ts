@@ -1,15 +1,12 @@
 import { cssProps } from "./css";
-
 class Element {
   tagName: string;
   properties: Record<string, any> = {};
   children: string[] = [];
   nodeType = 1;
-  nodeC = true;
   style: Record<string, string> = cssProps();
   constructor(tagName: string) {
     this.tagName = tagName;
-    console.log("boohoo");
   }
   setAttribute(key: string, value: string) {
     if (key.includes("class")) {
@@ -63,7 +60,9 @@ class Element {
       this.children.push(child);
     }
   }
-
+  querySelectorAll() {}
+  getElementsByTagName() {}
+  addEventListener() {}
   get firstChild() {
     return this.children[0];
   }
@@ -96,5 +95,43 @@ class Element {
     );
   }
 }
+const doc = {
+  isNode: globalThis.document ? true : false,
+  querySelectorAll() {
+    return [];
+  },
+  getElementsByTagName() {
+    return [];
+  },
+  addEventListener() {},
+  createDocumentFragment() {
+    if (globalThis.document) {
+      return document.createDocumentFragment();
+    }
+    return new Element("div");
+  },
+  createElement(tag: string) {
+    if (globalThis.document) {
+      return document.createElement(tag);
+    }
+    return new Element(tag);
+  },
+  head: {
+    appendChild(child: HTMLElement) {
+      if (globalThis.document) {
+        return document.head.appendChild(child);
+      }
+      return;
+    },
+  },
+  body: {
+    appendChild(child: HTMLElement) {
+      if (globalThis.document) {
+        return document.body.appendChild(child);
+      }
+      return;
+    },
+  },
+};
 
-export default Element;
+export default doc;

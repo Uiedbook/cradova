@@ -110,6 +110,8 @@ type stateType =
       remove?: boolean;
     };
 
+type stateID = string;
+
 /**
  * Send a new state to specified element with stateID
  *
@@ -119,7 +121,7 @@ type stateType =
  */
 
 export function dispatch(
-  stateID: string | Record<string, stateType>,
+  stateID: stateID | Record<stateID, stateType>,
   state?: stateType
 ) {
   let ele;

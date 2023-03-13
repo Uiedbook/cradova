@@ -1,20 +1,33 @@
-<div style="display: flex; align-items:center; justify-content: space-around; width: 100%;">
-<h1 style="border: none"> Cradova</h1>
-<a><img src="cradova.png" alt="cradova logo" width="100" height="100"></a>
-</div>
-<br>
-<hr>
-<br>
-<br>
+<br/>
+<p align="center">
+  <a href="https://github.com/fridaycandour/cradova">
+    <img src="cradova.png" alt="Logo" width="80" height="80">
+  </a>
 
+  <h1 align="center">Cradova</h1>
+
+  <p align="center">
+    Cradova is a JavaScript framework for building Single Page Applications and PWAs.
+    <br/>
+    <br/>
+    <a href="https://github.com/fridaycandour/cradova#examples"><strong>Explore the docs »</strong></a>
+    <br/>
+    <br/>
+    <a href="https://t.me/cradovaframework">Join Community</a>
+    .
+    <a href="https://github.com/fridaycandour/cradova/issues">Report Bug</a>
+    .
+    <a href="https://github.com/fridaycandour/cradova/issues">Request Feature</a>
+  </p>
+</p>
+
+![Contributors](https://img.shields.io/github/contributors/fridaycandour/cradova?color=dark-green) ![Issues](https://img.shields.io/github/issues/fridaycandour/cradova) ![License](https://img.shields.io/github/license/fridaycandour/cradova)
 [![npm Version](https://img.shields.io/npm/v/cradova.svg)](https://www.npmjs.com/package/cradova)
 [![License](https://img.shields.io/npm/l/cradova.svg)](https://github.com/cradova/cradova.js/blob/next/LICENSE)
 [![npm Downloads](https://img.shields.io/npm/dm/cradova.svg)](https://www.npmjs.com/package/cradova)
-[![Build Status](https://img.shields.io/travis/cradova/cradova.js/next.svg?colorB=brightgreen)](https://www.npmjs.com/package/cradova)
-[![Donate at OpenCollective](https://img.shields.io/opencollective/all/cradova.svg?colorB=brightgreen)](https://opencollective.com/cradova)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cradova/cradova.js/blob/next/contributing.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cradova/cradova.js/blob/next/contributing.md)![Forks](https://img.shields.io/github/forks/fridaycandour/cradova?style=social) ![Stargazers](https://img.shields.io/github/stars/fridaycandour/cradova?style=social)
 
-## Contents
+# Contents
 
 - [What is Cradova](#what-is-cradova)
 - [Why Cradova?](#whats-the-benefit)
@@ -128,24 +141,25 @@ const home = new Screen({
 Router.route("/", home);
 
 // navigates to that page
-// Router.navigate("/home");
+// Router.navigate("/home", data, force);
 // get the page ready in the background
 // Router.packageScreen("/home");
+// get route params for this page
+// Router.getParams();
 
 ```
 
 ## State management
 
 ```js
-// we have
-
 // dispatch - global (element) requires state ID
 
 // element can have this.updateState when shouldUpdate is true
 
-// Ref components (global and local)
+// Ref components
 
 // state can be managed from a store when using createSignal or simpleStores
+// this method is not yet documented
 
 import _, { Ref } from "cradova";
 
