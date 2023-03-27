@@ -108,6 +108,12 @@ export function assert(condition: any, ...callback: (() => any)[]) {
   }
   return "";
 }
+export function loop(
+  datalist: any,
+  component: (value: any, index?: number, array?: any[]) => HTMLElement
+) {
+  return Array.isArray(datalist) && datalist.map(component);
+}
 
 export function assertOr(
   condition: boolean,
@@ -354,4 +360,29 @@ export const frag = function (children: any) {
   // }
   // @ts-ignore
   // return par.html;
+};
+
+export const svgNS = (
+  type: string,
+  props: Record<string, any>,
+  ...children: any
+) => {
+  const sc = document.createElementNS(
+    props.xmlns || "http://www.w3.org/2000/svg",
+    type
+  );
+  delete props.xmlns;
+  for (const p in props) {
+    sc.setAttributeNS(null, p, props[p]);
+  }
+  for (let ch of children) {
+    if (typeof ch === "function") {
+      ch = ch();
+    }
+    if (typeof ch === "function") {
+      ch = ch();
+    }
+    sc.appendChild(ch);
+  }
+  return sc;
 };

@@ -104,3 +104,12 @@ and we went along with it.
 - added assert to cradova elements
 - fixed error boundary bug
 - setup hybrid server side rendering test using vite ssr
+
+# 2.1.0
+
+- added loop
+- allow custom mount point
+- fixed data-prop attributes
+- fixed type for screens
+- writing tests for more speed improvement index
+- fixed createAction callback type

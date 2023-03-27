@@ -79,8 +79,8 @@ declare module "cradova" {
      * @param action function to execute
      */
     createAction(
-      key: string | Record<string, (self?: this, data?: Type) => void>,
-      action?: (self?: this, data?: Type) => void
+      key: string | Record<string, (data?: Type) => void>,
+      action?: (data?: Type) => void
     ): void;
     /**
      *  Cradova Signal
@@ -317,8 +317,8 @@ declare module "cradova" {
     constructor(cradova_screen_initials: CradovaScreenType);
     setErrorHandler(errorHandler: () => void): void;
     package(): Promise<void>;
-    onActivate(cb: (data: any) => Promise<void>): void;
-    onDeactivate(cb: (data: any) => Promise<void>): void;
+    onActivate(cb: () => Promise<void> | void): void;
+    onDeactivate(cb: () => Promise<void> | void): void;
     addChild(...addOns: any[]): void;
     deActivate(): void;
     Activate(force?: boolean): Promise<void>;
@@ -475,7 +475,6 @@ declare module "cradova" {
   export const sub: ElementType<HTMLElement>;
   export const summary: ElementType<HTMLElement>;
   export const sup: ElementType<HTMLElement>;
-  export const svg: ElementType<HTMLOrSVGElement>;
   export const table: ElementType<HTMLTableElement>;
   export const tbody: ElementType<HTMLTableColElement>;
   export const td: ElementType<HTMLTableCellElement>;
@@ -530,6 +529,18 @@ css(".btn:hover",
     condition: any,
     ...callback: (() => any)[]
   ): "" | (() => any)[];
+
+  export function loop(
+    datalist: any[],
+    component: (value: any, index?: number, array?: any[]) => HTMLElement
+  ): any;
+
+  export function svgNS(
+    type: string,
+    props: Record<string, any>,
+    ...children: any
+  ): HTMLElement;
+
   export function assertOr(
     condition: boolean,
     ifTrue: () => any,

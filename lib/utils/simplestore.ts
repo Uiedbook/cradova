@@ -6,7 +6,7 @@
  * - create a store
  * - set keys instead of all values
  * - able to update state on any element as a property value
- * @constructor initial: any, Ref/RefList/RefElement: any
+ * @constructor initial: any, Ref: any
  */
 
 export class simpleStore<Type extends Record<string, unknown>> {
@@ -98,7 +98,7 @@ export class simpleStore<Type extends Record<string, unknown>> {
    * @param Ref component to bind to.
    * @param path a property in the object to send to attached ref
    */
-  bindRef(ref: any, key: string, prop: string) {
+  _bindRef(ref: any, key: string, prop: string) {
     if (ref && ref.updateState && prop) {
       this.ref.push({ prop, ref, key });
       if (ref.reader) {

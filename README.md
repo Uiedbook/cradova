@@ -132,6 +132,19 @@ function HelloMessage(name) {
   return _("div", "Hello  " + name);
 }
 
+
+/*
+
+when using router and screens
+
+cradova will create a div with data-cra-id=cradova-app-wrapper
+
+if it already exist cradova will use it instead
+
+so if you want to use your own mount point then create a div with data-cra-id="cradova-app-wrapper"
+
+*/
+
 const home = new Screen({
   name: "hello page", // page title
   template: HelloMessage,
@@ -152,9 +165,9 @@ Router.route("/", home);
 ## State management
 
 ```js
-// dispatch - global (element) requires state ID
 
-// element can have this.updateState when shouldUpdate is true
+
+ // element can have this.updateState when the shouldUpdate props is true
 
 // Ref components
 
@@ -209,6 +222,15 @@ const nameRef = new Ref(function ( name ) {
   });
 });
 
+/*
+cradova Ref are component objects
+with methods for rendering, pre-rendering, and updating a it dom elements.
+
+Ref also has the feature to stash input values need by the components
+
+*/
+
+
 function Home() {
   return _("div.foo#bar",
    counter,
@@ -223,6 +245,28 @@ const home = new Screen({
   template: Home,
   ...
 });
+
+/*
+
+Nice things about cradova screens
+
+screens are rendered once by default to hack
+responsiveness making your app work fast as user navigates.
+
+this behavior can be override
+by passing
+prerender: false
+in the constructor
+
+
+Cradova screens has
+onActivate() and
+onDeactivate() methods
+
+these allow you manage rendering
+circle for each in your app
+
+*/
 
 Router.route("/", home);
 ```

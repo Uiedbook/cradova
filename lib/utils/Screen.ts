@@ -25,10 +25,9 @@ export class Screen {
    * used internally
    */
   private template = document.createElement("div");
-  private callBack: (() => Promise<void>) | undefined;
-  private deCallBack:
-    | ((data?: Record<string, any>) => Promise<void>)
-    | undefined;
+  private callBack: (() => Promise<void> | void) | undefined;
+  private deCallBack: (() => Promise<void> | void) | undefined;
+
   public errorHandler: (() => void) | null = null;
   /**
    * this tells cradova to persist state on the screen or not
@@ -92,10 +91,10 @@ export class Screen {
       }
     }
   }
-  onActivate(cb: (data: any) => Promise<void>) {
+  onActivate(cb: () => Promise<void> | void) {
     this.callBack = cb as any;
   }
-  onDeactivate(cb: (data: any) => Promise<void>) {
+  onDeactivate(cb: () => Promise<void> | void) {
     this.deCallBack = cb;
   }
   addChild(...addOns: any[]) {

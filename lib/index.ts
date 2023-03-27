@@ -12,7 +12,7 @@
 =============================================================================
   
   Cradova FrameWork
-  @version 2.0.0
+  @version 2.1.0
   License: Apache V2
   
   -----------------------------------------------------------------------------
@@ -351,12 +351,13 @@ const _: any = (...element_initials: any[]) => {
           element.setAttribute("data-" + prop.split("$")[1], props[prop]);
           continue;
         }
+
         if (
           Array.isArray(props[prop]) &&
           props[prop][0] instanceof simpleStore
         ) {
           element.updateState = dispatch.bind(null, element);
-          props[prop][0].bindRef(element, prop, props[prop][1]);
+          props[prop][0]._bindRef(element, prop, props[prop][1]);
           continue;
         }
         // setting should update state key;
@@ -382,16 +383,23 @@ const _: any = (...element_initials: any[]) => {
           if (typeof element[prop] !== "undefined") {
             element[prop] = props[prop];
           } else {
+            if (prop.includes("data-")) {
+              element.setAttribute(prop, props[prop]);
+              continue;
+            }
             element[prop] = props[prop];
             if (
               prop !== "for" &&
               prop !== "text" &&
               prop !== "class" &&
+              prop !== "tabindex" &&
               !prop.includes("aria")
             ) {
               console.error(" ✘  Cradova err:  invalid html attribute ", {
                 prop,
               });
+            } else {
+              continue;
             }
           }
         } catch (error) {
@@ -401,7 +409,7 @@ const _: any = (...element_initials: any[]) => {
       }
     }
     if (text) {
-      element.innerText = text;
+      element.appendChild(document.createTextNode(text as string));
     }
     if (typeof beforeMount === "function") {
       beforeMount.apply(element);
@@ -425,6 +433,8 @@ export {
   assertOr,
   css,
   Ref,
+  svgNS,
+  loop,
 } from "./utils/fns";
 
 export default _;

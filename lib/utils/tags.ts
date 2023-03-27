@@ -75,7 +75,7 @@ const cra: any = (element_initials: string) => {
     }
 
     //? adding props
-    if (typeof props === "object") {
+    if (typeof props === "object" && element) {
       // adding attributes
       for (const prop in props) {
         // adding styles
@@ -89,6 +89,11 @@ const cra: any = (element_initials: string) => {
               );
             }
           }
+          continue;
+        }
+        // for compatibility
+        if (typeof element.style[prop] !== "undefined" && prop !== "src") {
+          element.style[prop] = props[prop];
           continue;
         }
         // text content
@@ -124,12 +129,13 @@ const cra: any = (element_initials: string) => {
           element.setAttribute("data-" + prop.split("$")[1], props[prop]);
           continue;
         }
+
         if (
           Array.isArray(props[prop]) &&
           props[prop][0] instanceof simpleStore
         ) {
           element.updateState = dispatch.bind(null, element);
-          props[prop][0].bindRef(element, prop, props[prop][1]);
+          props[prop][0]._bindRef(element, prop, props[prop][1]);
           continue;
         }
         // setting should update state key;
@@ -155,16 +161,23 @@ const cra: any = (element_initials: string) => {
           if (typeof element[prop] !== "undefined") {
             element[prop] = props[prop];
           } else {
+            if (prop.includes("data-")) {
+              element.setAttribute(prop, props[prop]);
+              continue;
+            }
             element[prop] = props[prop];
             if (
               prop !== "for" &&
               prop !== "text" &&
               prop !== "class" &&
+              prop !== "tabindex" &&
               !prop.includes("aria")
             ) {
               console.error(" ✘  Cradova err:  invalid html attribute ", {
                 prop,
               });
+            } else {
+              continue;
             }
           }
         } catch (error) {
@@ -174,7 +187,7 @@ const cra: any = (element_initials: string) => {
       }
     }
     if (text) {
-      element.innerText = text;
+      element.appendChild(document.createTextNode(text as string));
     }
     if (typeof beforeMount === "function") {
       beforeMount.apply(element);
@@ -277,7 +290,6 @@ export const style: ElementType<HTMLStyleElement> = cra("style");
 export const sub: ElementType<HTMLElement> = cra("sub");
 export const summary: ElementType<HTMLElement> = cra("summary");
 export const sup: ElementType<HTMLElement> = cra("sup");
-export const svg: ElementType<HTMLOrSVGElement> = cra("svg");
 export const table: ElementType<HTMLTableElement> = cra("table");
 export const tbody: ElementType<HTMLTableColElement> = cra("tbody");
 export const td: ElementType<HTMLTableCellElement> = cra("td");

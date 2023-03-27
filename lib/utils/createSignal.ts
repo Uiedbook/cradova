@@ -4,23 +4,23 @@
  *  create stateful data store.
  * ability to:
  * - create a store
+ * - create a global store system
  * - create actions and fire them
- * - bind a Ref or RefList
+ * - bind a Ref
  * - listen to changes
  * - persist changes to localStorage
  * - set keys instead of all values
- * - update a cradova Ref/RefList automatically
+ * - update a cradova Ref automatically
  * @constructor initial: any, props: {useHistory, persist}
  */
 
-export class createSignal<Type extends Record<string, unknown>> {
+export class createSignal<Type extends Record<string, any>> {
   private callback: undefined | ((newValue: Type) => void);
   private persistName: string | undefined = "";
   private actions: Record<string, any> = {};
   private ref: any;
   private path: null | string = null;
   value: Type;
-
   constructor(initial: Type, props?: { persistName?: string | undefined }) {
     this.value = initial;
     if (props && props.persistName) {
@@ -87,7 +87,7 @@ export class createSignal<Type extends Record<string, unknown>> {
       throw new Error(
         `✘  Cradova err : can't set key ${String(
           key
-        )} . store value is not a javascript object`
+        )} . store.value is not a javascript object`
       );
     }
   }
@@ -99,8 +99,8 @@ export class createSignal<Type extends Record<string, unknown>> {
    * @param action function to execute
    */
   createAction(
-    key: string | Record<string, (self?: this, data?: Type) => void>,
-    action?: (self?: this, data?: Type) => void
+    key: string | Record<string, (data?: Type) => void>,
+    action?: (data?: Type) => void
   ) {
     if (typeof key === "string" && typeof action === "function") {
       this.actions[key] = action;
