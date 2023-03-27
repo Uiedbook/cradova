@@ -247,6 +247,23 @@ const _: any = (...element_initials: any[]) => {
         }
         // children array
         if (Array.isArray(child)) {
+          function rload(l: any[]) {
+            const fg = new DocumentFragment();
+            for (let ch of l) {
+              if (Array.isArray(ch)) {
+                fg.appendChild(rload(ch));
+              } else {
+                if (typeof ch === "function") {
+                  ch = ch();
+                }
+                if (typeof ch === "function") {
+                  ch = ch();
+                }
+                fg.appendChild(ch);
+              }
+            }
+            return fg;
+          }
           const arrCXLength = child.length;
           for (let p = 0; p < arrCXLength; p++) {
             let childly = child[p];
@@ -255,6 +272,9 @@ const _: any = (...element_initials: any[]) => {
             }
             if (typeof childly === "function") {
               childly = childly();
+            }
+            if (Array.isArray(childly)) {
+              childly = rload(childly);
             }
             if (isNode(childly)) {
               element.appendChild(childly);

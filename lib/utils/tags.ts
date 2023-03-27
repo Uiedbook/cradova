@@ -29,6 +29,23 @@ const cra: any = (element_initials: string) => {
         }
         // children array
         if (Array.isArray(child)) {
+          function rload(l: any[]) {
+            const fg = new DocumentFragment();
+            for (let ch of l) {
+              if (Array.isArray(ch)) {
+                fg.appendChild(rload(ch));
+              } else {
+                if (typeof ch === "function") {
+                  ch = ch();
+                }
+                if (typeof ch === "function") {
+                  ch = ch();
+                }
+                fg.appendChild(ch);
+              }
+            }
+            return fg;
+          }
           const arrCXLength = child.length;
           for (let p = 0; p < arrCXLength; p++) {
             let childly = child[p];
@@ -37,6 +54,9 @@ const cra: any = (element_initials: string) => {
             }
             if (typeof childly === "function") {
               childly = childly();
+            }
+            if (Array.isArray(childly)) {
+              childly = rload(childly);
             }
             if (isNode(childly)) {
               element.appendChild(childly);

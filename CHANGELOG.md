@@ -113,3 +113,7 @@ and we went along with it.
 - fixed type for screens
 - writing tests for more speed improvement index
 - fixed createAction callback type
+
+# 2.1.1
+
+- increased child dept to four
