@@ -116,4 +116,9 @@ and we went along with it.
 
 # 2.1.1
 
-- increased child dept to four
+- increased child dept to ~
+
+# 2.1.2
+
+- fixed child array recursion of the Rhoda function
+- fixed types

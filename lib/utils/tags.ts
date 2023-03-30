@@ -1,7 +1,7 @@
 import { ElementType } from "../types";
 import { dispatch } from "./track";
 import { simpleStore } from "./simplestore";
-import { isNode } from "./fns";
+import { isNode, Rhoda } from "./fns";
 
 const cra: any = (element_initials: string) => {
   return (...ElementChildrenAndPropertyList: ElementType<HTMLElement>[]) => {
@@ -29,47 +29,7 @@ const cra: any = (element_initials: string) => {
         }
         // children array
         if (Array.isArray(child)) {
-          function rload(l: any[]) {
-            const fg = new DocumentFragment();
-            for (let ch of l) {
-              if (Array.isArray(ch)) {
-                fg.appendChild(rload(ch));
-              } else {
-                if (typeof ch === "function") {
-                  ch = ch();
-                }
-                if (typeof ch === "function") {
-                  ch = ch();
-                }
-                fg.appendChild(ch);
-              }
-            }
-            return fg;
-          }
-          const arrCXLength = child.length;
-          for (let p = 0; p < arrCXLength; p++) {
-            let childly = child[p];
-            if (typeof childly === "function") {
-              childly = childly();
-            }
-            if (typeof childly === "function") {
-              childly = childly();
-            }
-            if (Array.isArray(childly)) {
-              childly = rload(childly);
-            }
-            if (isNode(childly)) {
-              element.appendChild(childly);
-            } else {
-              throw new Error(
-                "  ✘  Cradova err:  invalid child type: " +
-                  childly +
-                  " (" +
-                  typeof childly +
-                  ")"
-              );
-            }
-          }
+          element.appendChild(Rhoda(child));
           continue;
         }
         // getting innerText
@@ -78,7 +38,7 @@ const cra: any = (element_initials: string) => {
           continue;
         }
         // getting props
-        if (typeof child === "object" && !Array.isArray(child)) {
+        if (typeof child === "object") {
           if (!props) {
             props = child;
           } else {
@@ -87,10 +47,13 @@ const cra: any = (element_initials: string) => {
           continue;
         }
         // throw an error
-        console.error(" ✘  Cradova err:   got", { child });
-        throw new Error(
-          "  ✘  Cradova err:  invalid child type: " + "(" + typeof child + ")"
-        );
+        if (typeof child !== "undefined") {
+          // throw an error
+          console.error(" ✘  Cradova err:   got", { child });
+          throw new Error(
+            "  ✘  Cradova err:  invalid child type: " + "(" + typeof child + ")"
+          );
+        }
       }
     }
 

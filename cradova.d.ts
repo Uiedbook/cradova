@@ -153,7 +153,6 @@ declare module "cradova" {
           text?: string;
           stateID?: string;
           shouldUpdate?: boolean;
-          assert?: any;
         }
     )[]
   ) => T;
@@ -525,10 +524,7 @@ css(".btn:hover",
    * @param {expression} condition
    * @param {function} callback
    */
-  export function assert(
-    condition: any,
-    ...callback: (() => any)[]
-  ): "" | (() => any)[];
+  export function assert(condition: any, ...elements: any): undefined | any;
 
   export function loop(
     datalist: any[],

@@ -15,6 +15,39 @@ export function uuid() {
   });
 }
 
+export function Rhoda(l: any[]) {
+  const fg = new DocumentFragment();
+  for (let ch of l) {
+    if (Array.isArray(ch)) {
+      fg.appendChild(Rhoda(ch));
+    } else {
+      if (typeof ch === "function") {
+        ch = ch();
+      }
+      if (typeof ch === "function") {
+        ch = ch();
+      }
+      if (typeof ch === "string" || typeof ch === "number") {
+        fg.appendChild(document.createTextNode(ch as string));
+        continue;
+      }
+      if (isNode(ch)) {
+        fg.appendChild(ch);
+      } else {
+        if (typeof ch !== "undefined") {
+          throw new Error(
+            "  ✘  Cradova err:  invalid child type: " +
+              ch +
+              " (" +
+              typeof ch +
+              ")"
+          );
+        }
+      }
+    }
+  }
+  return fg;
+}
 /**
 Write CSS styles in Javascript
 @example
@@ -99,20 +132,25 @@ export function css(identifier: string, properties?: Record<string, string>) {
 /**
  *
  * @param {expression} condition
- * @param {function} callback
+ * @param {function} elements[]
  */
 
-export function assert(condition: any, ...callback: (() => any)[]) {
+export function assert(condition: any, ...elements: any) {
   if (condition) {
-    return callback;
+    return elements;
   }
-  return "";
+  return undefined;
 }
 export function loop(
   datalist: any,
   component: (value: any, index?: number, array?: any[]) => HTMLElement
 ) {
-  return Array.isArray(datalist) && datalist.map(component);
+  if (typeof component !== "function") {
+    throw new Error(
+      " ✘  Cradova err :  Invalid component type, must be a function that returns html  "
+    );
+  }
+  return Array.isArray(datalist) ? datalist.map(component) : undefined;
 }
 
 export function assertOr(

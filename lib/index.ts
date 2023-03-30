@@ -38,7 +38,7 @@
 import { Init } from "./utils/init";
 import { dispatch } from "./utils/track";
 import { simpleStore } from "./utils/simplestore";
-import { frag, isNode } from "./utils/fns";
+import { frag, isNode, Rhoda } from "./utils/fns";
 import { ElementType } from "./types";
 // import doc from "./utils/document";
 
@@ -236,60 +236,18 @@ const _: any = (...element_initials: any[]) => {
         // single child lane
         if (typeof child === "function") {
           child = child() as any;
-          if (typeof child === "function") {
-            child = child() as any;
-          }
+        }
+        if (typeof child === "function") {
+          child = child() as any;
         }
         // appending child
         if (isNode(child)) {
           element.appendChild(child);
           continue;
         }
-        // children array
+        // appending children array through the Rhoda function
         if (Array.isArray(child)) {
-          function rload(l: any[]) {
-            const fg = new DocumentFragment();
-            for (let ch of l) {
-              if (Array.isArray(ch)) {
-                fg.appendChild(rload(ch));
-              } else {
-                if (typeof ch === "function") {
-                  ch = ch();
-                }
-                if (typeof ch === "function") {
-                  ch = ch();
-                }
-                fg.appendChild(ch);
-              }
-            }
-            return fg;
-          }
-          const arrCXLength = child.length;
-          for (let p = 0; p < arrCXLength; p++) {
-            let childly = child[p];
-            if (typeof childly === "function") {
-              childly = childly();
-            }
-            if (typeof childly === "function") {
-              childly = childly();
-            }
-            if (Array.isArray(childly)) {
-              childly = rload(childly);
-            }
-            if (isNode(childly)) {
-              element.appendChild(childly);
-            } else {
-              if (typeof childly !== "undefined") {
-                throw new Error(
-                  "  ✘  Cradova err:  invalid child type: " +
-                    childly +
-                    " (" +
-                    typeof childly +
-                    ")"
-                );
-              }
-            }
-          }
+          element.appendChild(Rhoda(child));
           continue;
         }
         // getting innerText
@@ -298,14 +256,14 @@ const _: any = (...element_initials: any[]) => {
           continue;
         }
         // getting props
-        if (typeof child === "object" && !Array.isArray(child)) {
+        if (typeof child === "object") {
           if (!props) {
             props = child;
           } else {
             props = Object.assign(props, child);
           }
           continue;
-        }
+        } 
         if (typeof child !== "undefined") {
           // throw an error
           console.error(" ✘  Cradova err:   got", { child });
