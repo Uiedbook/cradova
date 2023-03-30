@@ -122,3 +122,4 @@ and we went along with it.
 
 - fixed child array recursion of the Rhoda function
 - fixed types
+- fixed errors on child type not caught by typescript
