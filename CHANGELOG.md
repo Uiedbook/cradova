@@ -123,3 +123,7 @@ and we went along with it.
 - fixed child array recursion of the Rhoda function
 - fixed types
 - fixed errors on child type not caught by typescript
+
+# 2.1.3
+
+- redefining what global dispatcher can do.

@@ -24,12 +24,16 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
           continue;
         }
 
-        if (typeof element.style[key] !== "undefined" && key !== "src") {
-          element.style[key] = state[key];
-          continue;
-        }
+        // if (typeof element.style[key] !== "undefined" && key !== "src") {
+        //   element.style[key] = state[key];
+        //   continue;
+        // }
         if (typeof element[key] === "function") {
-          element[key].apply(element);
+          if (key.startsWith("on")) {
+            element[key] = state[key];
+          } else {
+            element[key].apply(element);
+          }
           continue;
         }
         // updating element's inner text
@@ -37,20 +41,20 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
           element.innerText = state[key];
           continue;
         }
-        // adding class name to element
-        if (
-          key === "class" &&
-          typeof state[key] === "string" &&
-          state[key] !== ""
-        ) {
-          const classes = state[key].split(" ");
-          for (let i = 0; i < classes.length; i++) {
-            if (classes[i]) {
-              element.classList.add(classes[i]);
-            }
-          }
-          continue;
-        }
+        // // adding class name to element
+        // if (
+        //   key === "class" &&
+        //   typeof state[key] === "string" &&
+        //   state[key] !== ""
+        // ) {
+        //   const classes = state[key].split(" ");
+        //   for (let i = 0; i < classes.length; i++) {
+        //     if (classes[i]) {
+        //       element.classList.add(classes[i]);
+        //     }
+        //   }
+        //   continue;
+        // }
         //removing element element
         if (key === "remove") {
           if (element.parentElement) {
