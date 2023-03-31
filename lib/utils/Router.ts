@@ -1,4 +1,4 @@
-import _ from "../index.js";
+import _, { Screen } from "../index.js";
 import { RouterRouteObject } from "../types.js";
 
 /**
@@ -33,48 +33,47 @@ const checker = (
   if (RouterBox.routes[url]) {
     return [RouterBox.routes[url], { path: url }];
   }
-  // place holder check
+  // check for extra / in the route
+  if (RouterBox.routes[url + "/"]) {
+    return [RouterBox.routes[url], { path: url }];
+  }
+  // place holder route check
   for (const path in RouterBox.routes) {
     if (!path.includes(":")) {
       continue;
     }
-    //
+    // check for extra / in the route by normalize before checking
+    if (url.endsWith("/")) {
+      url = url.slice(0, path.length - 2);
+    }
     const urlFixtures = url.split("/");
     const pathFixtures = path.split("/");
-    // length check
+    // remove empty string after split operation
+    urlFixtures.shift();
+    pathFixtures.shift();
+    // length check of / (backslash)
     if (pathFixtures.length === urlFixtures.length) {
-      urlFixtures.shift();
-      pathFixtures.shift();
-      let isIt = true;
+      let isIt = false;
       const routesParams: Record<string, any> = {};
       for (let i = 0; i < pathFixtures.length; i++) {
-        // loosely item checking by N indexes & includes
-        // FIXME: may be problematic but works faster than any other solutions
-        // NO regex :)
-        // this is faster and better
+        console.log(
+          urlFixtures[i],
+          pathFixtures.indexOf(urlFixtures[i]),
+          pathFixtures.lastIndexOf(urlFixtures[i]),
+          //
+          path.includes(urlFixtures[i] + "/") &&
+            pathFixtures.indexOf(urlFixtures[i]) ===
+              pathFixtures.lastIndexOf(urlFixtures[i]),
+          path.includes(urlFixtures[i] + "/")
+        );
         if (
-          !pathFixtures[i].includes(":") &&
           path.includes(urlFixtures[i] + "/") &&
           pathFixtures.indexOf(urlFixtures[i]) ===
             pathFixtures.lastIndexOf(urlFixtures[i])
         ) {
+          //! not pure but effective
+          //! fail safe XD
           if (!isIt) isIt = true;
-        } else {
-          if (pathFixtures[i].includes(":")) {
-            continue;
-          }
-          isIt = false;
-        }
-
-        if (
-          !(
-            pathFixtures.indexOf(urlFixtures[i]) ===
-            pathFixtures.lastIndexOf(urlFixtures[i])
-          )
-        ) {
-          throw new Error(
-            " ✘  Cradova err:  cradova router doesn't allow paths with multiple names"
-          );
         }
       }
       if (isIt) {
@@ -98,16 +97,44 @@ const checker = (
  * @param {any} screen the cradova document tree for the route.
  */
 Router.route = function (path = "/", screen: any) {
-  if (!screen.Activate && screen.name) {
+  if (!screen.Activate) {
     console.error(" ✘  Cradova err:  not a valid screen  ", screen);
     throw new Error(" ✘  Cradova err:  Not a valid cradova screen component");
   }
   RouterBox.routes[path] = {
-    controller: (params: any, force?: boolean) =>
-      screen.Activate(params, force),
+    controller: async (params: any, force?: boolean) =>
+      await screen.Activate(params, force),
     packager: async (params: any) => await screen.package(params),
-    deactivate: () => {
-      screen.deActivate();
+    deactivate: async () => {
+      await screen.deActivate();
+    },
+    delegatedRoutes: (data: any) => {
+      screen.delegatedRoutes = data;
+    },
+    paramData: (data: any) => {
+      screen.paramData = data;
+    },
+    delegate: screen.delegatedRoutes ? screen : null,
+  };
+  if (typeof screen.errorHandler === "function") {
+    RouterBox["errorHandler"][path] = screen.errorHandler;
+  }
+};
+
+//-
+Router.delegateScreen = function (path = "/", screen: any) {
+  //
+  // const scr = new Screen({name: "", });
+  //
+  RouterBox.routes[path] = {
+    controller: async (params: any, force?: boolean) =>
+      await screen.Activate(params, force),
+    packager: async (params: any) => await screen.package(params),
+    deactivate: async () => {
+      await screen.deActivate();
+    },
+    paramData: (data: any) => {
+      screen.paramData = data;
     },
   };
   if (typeof screen.errorHandler === "function") {
@@ -203,12 +230,12 @@ RouterBox.router = async function (e: any, force = false) {
       if (params) {
         RouterBox.params.params = params;
       }
-      RouterBox["lastNavigatedRouteController"] &&
-        RouterBox["lastNavigatedRouteController"].deactivate();
       await route.controller(force);
+      RouterBox["lastNavigatedRouteController"] &&
+        (await RouterBox["lastNavigatedRouteController"].deactivate());
       RouterBox["lastNavigatedRoute"] = url;
       RouterBox["lastNavigatedRouteController"] = route;
-      RouterBox["pageShow"] && RouterBox["pageShow"](url);
+      RouterBox["pageShow"] && (await RouterBox["pageShow"](url));
       // click handlers
       for (const a of document.querySelectorAll("a")) {
         if (a.href.includes(window.location.origin)) {
@@ -220,10 +247,10 @@ RouterBox.router = async function (e: any, force = false) {
       }
     } catch (error) {
       const errorHandler =
-        RouterBox.errorHandler["all"] ||
-        RouterBox.errorHandler[RouterBox.params.params.path];
+        RouterBox.errorHandler[RouterBox.params.params.path] ||
+        RouterBox.errorHandler["all"];
       if (errorHandler) {
-        errorHandler(error);
+        await errorHandler(error);
       }
     }
   } else {
@@ -269,7 +296,7 @@ Router["onPageHide"] = function (callback: () => void) {
  * ---
  * get a screen ready before time.
  *
- * @param {string}   path     Route path.
+ * @param {string}   path Route path.
  * @param {any} data data for the screen.
  */
 Router.packageScreen = async function (path: string, data: any) {

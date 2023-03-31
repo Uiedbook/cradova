@@ -48,8 +48,6 @@ export type CradovaScreenType = {
    * Cradova screen
    * ---
    * title of the page
-   * @param data
-   * @returns void
    *
    *
    * .
@@ -69,20 +67,19 @@ export type CradovaScreenType = {
   /**
    * Cradova screen
    * ---
-   * Screen transition from the screen class
-   * @param data
-   * @returns void
+   * Allows this screen render in parallel for unique routes
+   *
+   * limit is 1000
+   *
    *
    *
    * .
    */
-  transition?: string;
+  renderInParallel?: boolean;
   /**
    * Cradova screen
    * ---
    * gets called when the the screen is displayed
-   * @param data
-   * @returns void
    *
    *
    * .
@@ -92,9 +89,7 @@ export type CradovaScreenType = {
    * Cradova screen
    * ---
    * Should this screen be cached after first render?
-   * @param data
-   * @returns void
-   *
+   * you can use Route.navigate(url, null, true) to force later
    *
    * .
    */

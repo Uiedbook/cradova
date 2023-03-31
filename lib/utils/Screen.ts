@@ -18,9 +18,9 @@ export class Screen {
   /**
    * this is the name of the screen that appears as the title
    */
-  private name: string;
+  name: string;
   private packed = false;
-  private secondaryChildren: Array<Node | string> = [];
+  private secondaryChildren: Array<Node> = [];
   /**
    * used internally
    */
@@ -30,14 +30,20 @@ export class Screen {
 
   public errorHandler: (() => void) | null = null;
   /**
-   * this tells cradova to persist state on the screen or not
+   * this tells cradova to persist state on the screen or not.
+   *
    * persisting is better
    */
   private persist = true;
   private data: unknown;
+  public params: Record<string, any> | null = null;
+
+  // ! routes
+  private delegatedRoutesCount: number | null = null;
 
   constructor(cradova_screen_initials: CradovaScreenType) {
-    const { template, name, persist } = cradova_screen_initials;
+    const { template, name, persist, renderInParallel } =
+      cradova_screen_initials;
     if (typeof template !== "function") {
       throw new Error(
         " ✘  Cradova err: only functions that returns a cradova element is valid as screen"
@@ -46,10 +52,35 @@ export class Screen {
     this.html = template.bind(this);
     this.name = name;
     this.template.setAttribute("id", "cradova-screen-set");
-    if (typeof persist === "boolean") {
-      this.persist = persist;
+    if (renderInParallel === true) {
+      this.delegatedRoutesCount = 1;
+    } else {
+      if (typeof persist === "boolean") {
+        this.persist = persist;
+      }
     }
   }
+
+  get delegatedRoutes(): boolean {
+    return this.delegatedRoutesCount as unknown as boolean;
+  }
+
+  get paramData(): typeof this.params {
+    return this.params;
+  }
+
+  set delegatedRoutes(count: boolean) {
+    if (count) {
+      this.delegatedRoutesCount = 1;
+    }
+  }
+
+  set paramData(params: typeof this.params) {
+    if (params) {
+      this.params = params;
+    }
+  }
+
   setErrorHandler(errorHandler: () => void) {
     this.errorHandler = errorHandler;
   }
@@ -58,7 +89,7 @@ export class Screen {
       let fuc = (await this.html(this.data)) as any;
       if (typeof fuc === "function") {
         fuc = fuc();
-        if (fuc && !isNode(fuc) && typeof fuc !== "string") {
+        if (!isNode(fuc)) {
           throw new Error(
             " ✘  Cradova err: only parent with descendants is valid"
           );
@@ -100,9 +131,9 @@ export class Screen {
   addChild(...addOns: any[]) {
     this.secondaryChildren.push(frag(addOns));
   }
-  deActivate() {
+  async deActivate() {
     if (this.deCallBack) {
-      this.deCallBack();
+      await this.deCallBack();
     }
     //
   }
