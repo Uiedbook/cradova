@@ -19,7 +19,6 @@ RouterBox["pageHide"] = null;
 RouterBox["errorHandler"] = {};
 RouterBox["params"] = {};
 RouterBox["routes"] = {};
-RouterBox["wrapmode"] = false;
 
 /**
  *
@@ -57,16 +56,6 @@ const checker = (
       let isIt = false;
       const routesParams: Record<string, any> = {};
       for (let i = 0; i < pathFixtures.length; i++) {
-        console.log(
-          urlFixtures[i],
-          pathFixtures.indexOf(urlFixtures[i]),
-          pathFixtures.lastIndexOf(urlFixtures[i]),
-          //
-          path.includes(urlFixtures[i] + "/") &&
-            pathFixtures.indexOf(urlFixtures[i]) ===
-              pathFixtures.lastIndexOf(urlFixtures[i]),
-          path.includes(urlFixtures[i] + "/")
-        );
         if (
           path.includes(urlFixtures[i] + "/") &&
           pathFixtures.indexOf(urlFixtures[i]) ===
@@ -84,6 +73,15 @@ const checker = (
           }
         }
         routesParams.path = path;
+        if (typeof RouterBox.routes[path] === "function") {
+          return [
+            // @ts-ignore
+            (async () => {
+              await RouterBox.routes[path]();
+            })(),
+            routesParams,
+          ];
+        }
         return [RouterBox.routes[path], routesParams];
       }
     }
@@ -125,8 +123,10 @@ RouterBox.loadRoute = (path: string, screen: any) => {
  */
 Router.route = function (path = "/", screen: any) {
   if (screen.catch) {
-    //
-    // ()();
+    RouterBox["routes"][path] = async () => {
+      screen = await screen;
+      RouterBox.loadRoute(path, screen.default);
+    };
   } else {
     RouterBox.loadRoute(path, screen);
   }
