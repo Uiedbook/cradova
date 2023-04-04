@@ -381,23 +381,25 @@ export const frag = function (children: any) {
     let a = children[i];
     if (typeof a === "function") {
       a = a() as any;
-      if (typeof a === "function") {
-        a = a() as any;
-      }
-      if (isNode(a) || a instanceof String) {
-        // @ts-ignore
-        par.appendChild(a);
-      } else {
-        console.error(" ✘  Cradova err:   wrong element type" + a);
-        throw new TypeError(" ✘  Cradova err:   invalid element");
-      }
+    }
+    if (typeof a === "function") {
+      a = a() as any;
+    }
+    if (isNode(a)) {
+      // @ts-ignore
+      par.appendChild(a);
+      continue;
+    }
+    if (a instanceof String) {
+      par.appendChild(document.createTextNode(a as string));
+      continue;
+    }
+    {
+      console.error(" ✘  Cradova err:   wrong element type" + a);
+      throw new TypeError(" ✘  Cradova err:   invalid element");
     }
   }
-  // if (document) {
   return par;
-  // }
-  // @ts-ignore
-  // return par.html;
 };
 
 export const svgNS = (

@@ -1,4 +1,4 @@
-import _, { Screen } from "../index.js";
+import _, { Screen as _screen } from "../index.js";
 import { RouterRouteObject } from "../types.js";
 
 /**
@@ -19,6 +19,7 @@ RouterBox["pageHide"] = null;
 RouterBox["errorHandler"] = {};
 RouterBox["params"] = {};
 RouterBox["routes"] = {};
+RouterBox["wrapmode"] = false;
 
 /**
  *
@@ -89,15 +90,9 @@ const checker = (
   }
   return [];
 };
-/** cradova router
- * ---
- * Registers a route.
- *
- * @param {string}   path     Route path.
- * @param {any} screen the cradova document tree for the route.
- */
-Router.route = function (path = "/", screen: any) {
-  if (!screen.Activate) {
+
+RouterBox.loadRoute = (path: string, screen: any) => {
+  if (!screen || !screen.Activate) {
     console.error(" ✘  Cradova err:  not a valid screen  ", screen);
     throw new Error(" ✘  Cradova err:  Not a valid cradova screen component");
   }
@@ -119,6 +114,29 @@ Router.route = function (path = "/", screen: any) {
   if (typeof screen.errorHandler === "function") {
     RouterBox["errorHandler"][path] = screen.errorHandler;
   }
+};
+
+/** cradova router
+ * ---
+ * Registers a route.
+ *
+ * @param {string}   path     Route path.
+ * @param {any} screen the cradova document tree for the route.
+ */
+Router.route = function (path = "/", screen: any) {
+  if (screen.catch) {
+    //
+    // ()();
+  } else {
+    RouterBox.loadRoute(path, screen);
+  }
+};
+
+Router.BrowserRoutes = function (obj: Record<string, any>) {
+  for (const path in obj) {
+    Router.route(path, obj[path]);
+  }
+  Router.mount();
 };
 
 //-
@@ -201,7 +219,7 @@ Router.navigate = function (
  */
 
 RouterBox.router = async function (e: any, force = false) {
-  let url, route, params;
+  let url, route: any, params;
   const Alink = e && e.target.tagName === "A" && e.target;
   if (Alink) {
     if (Alink.href.includes("#")) {
@@ -224,6 +242,12 @@ RouterBox.router = async function (e: any, force = false) {
     RouterBox["nextRouteController"] = null;
   } else {
     [route, params] = checker(url);
+  }
+  if (!RouterBox["start"] && !route) {
+    setTimeout(() => {
+      console.log({ route }, "Router");
+      RouterBox.router(e, force);
+    }, 50);
   }
   if (route) {
     try {
@@ -339,12 +363,16 @@ Router["addErrorHandler"] = function (callback: () => void, path?: string) {
   }
 };
 
+Router.mount = () => {
+  window.addEventListener("pageshow", RouterBox.router);
+  window.addEventListener("popstate", (e) => {
+    e.preventDefault();
+    RouterBox.router();
+  });
+};
+
 // if (globalThis.document) {
-window.addEventListener("pageshow", RouterBox.router);
-window.addEventListener("popstate", (e) => {
-  e.preventDefault();
-  RouterBox.router();
-});
+
 // }
 
 // Router.route(

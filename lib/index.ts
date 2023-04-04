@@ -12,7 +12,7 @@
 =============================================================================
   
   Cradova FrameWork
-  @version 2.1.0
+  @version  2.1.2
   License: Apache V2
   
   -----------------------------------------------------------------------------
@@ -263,7 +263,7 @@ const _: any = (...element_initials: any[]) => {
             props = Object.assign(props, child);
           }
           continue;
-        } 
+        }
         if (typeof child !== "undefined") {
           // throw an error
           console.error(" ✘  Cradova err:   got", { child });
