@@ -73,15 +73,6 @@ const checker = (
           }
         }
         routesParams.path = path;
-        if (typeof RouterBox.routes[path] === "function") {
-          return [
-            // @ts-ignore
-            (async () => {
-              await RouterBox.routes[path]();
-            })(),
-            routesParams,
-          ];
-        }
         return [RouterBox.routes[path], routesParams];
       }
     }
@@ -112,6 +103,7 @@ RouterBox.loadRoute = (path: string, screen: any) => {
   if (typeof screen.errorHandler === "function") {
     RouterBox["errorHandler"][path] = screen.errorHandler;
   }
+  return RouterBox.routes[path];
 };
 
 /** cradova router
@@ -121,11 +113,12 @@ RouterBox.loadRoute = (path: string, screen: any) => {
  * @param {string}   path     Route path.
  * @param {any} screen the cradova document tree for the route.
  */
-Router.route = function (path = "/", screen: any) {
-  if (screen.catch) {
+Router.route = function (path: string, screen: any) {
+  if (screen.catch || typeof screen === "function") {
     RouterBox["routes"][path] = async () => {
-      screen = await screen;
-      RouterBox.loadRoute(path, screen.default);
+      screen = await screen();
+      // screen = await screen;
+      return RouterBox.loadRoute(path, screen.default);
     };
   } else {
     RouterBox.loadRoute(path, screen);
@@ -243,16 +236,15 @@ RouterBox.router = async function (e: any, force = false) {
   } else {
     [route, params] = checker(url);
   }
-  if (!RouterBox["start"] && !route) {
-    setTimeout(() => {
-      console.log({ route }, "Router");
-      RouterBox.router(e, force);
-    }, 50);
-  }
+
   if (route) {
     try {
       if (params) {
         RouterBox.params.params = params;
+      }
+      if (!route.controller) {
+        route = await route();
+        console.log("fetched for ===> ", route);
       }
       await route.controller(force);
       RouterBox["lastNavigatedRouteController"] &&

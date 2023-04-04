@@ -181,6 +181,13 @@ declare module "cradova" {
     onPageShow: (callback: () => void) => void;
     onPageHide: (callback: () => void) => void;
     /**
+     * Registers lazy loaded routes.
+     *
+     * @param {{path: string, screen: any}}   routes  {path: string, screen: any, ...}   Route path.
+     */
+
+    BrowserRoutes: (routes: Record<string, any>) => void;
+    /**
      * Cradova Router
      * ------
      *
