@@ -286,6 +286,18 @@ declare module "cradova" {
      * .
      */
     persist?: boolean;
+    /**
+     * Cradova screen
+     * ---
+     * Allows this screen render in parallel for unique routes
+     *
+     * limit is 1000
+     *
+     *
+     *
+     * .
+     */
+    renderInParallel?: boolean;
   };
 
   /**
@@ -598,6 +610,11 @@ css(".btn:hover",
     updateState(data: D, stash?: boolean): void;
     private Activate;
     remove(): void;
+  }
+  export class lazy {
+    constructor(cb: () => Promise<any>);
+    load: () => Promise<any>;
+    content: any;
   }
 
   /**

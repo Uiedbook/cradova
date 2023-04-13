@@ -22,41 +22,44 @@ const checker = (url) => {
     }
     const urlFixtures = url.split("/");
     const pathFixtures = path.split("/");
+    let fixturesX = 0;
+    let fixturesY = 0;
     // remove empty string after split operation
     urlFixtures.shift();
     pathFixtures.shift();
     // length check of / (backslash)
     if (pathFixtures.length === urlFixtures.length) {
-      let isIt = false;
       const routesParams = {};
       for (let i = 0; i < pathFixtures.length; i++) {
+        // let's jump place holders in the path since we can't determine from them
+        // we increment that we skipped a position because we need later
+        if (pathFixtures[i].includes(":")) {
+          fixturesY += 1;
+          continue;
+        }
         console.log(
           urlFixtures[i],
-          pathFixtures.indexOf(urlFixtures[i]),
-          pathFixtures.lastIndexOf(urlFixtures[i]),
-          //
-          path.includes(urlFixtures[i] + "/") &&
-            pathFixtures.indexOf(urlFixtures[i]) ===
-              pathFixtures.lastIndexOf(urlFixtures[i]),
-          path.includes(urlFixtures[i] + "/")
+          pathFixtures[i],
+          urlFixtures[i] === pathFixtures[i]
         );
+        // if this is part of the path then let increment a value for it
+        // we will need it later
         if (
-          path.includes(urlFixtures[i] + "/") &&
+          urlFixtures[i] === pathFixtures[i] &&
           pathFixtures.indexOf(urlFixtures[i]) ===
             pathFixtures.lastIndexOf(urlFixtures[i])
         ) {
-          //! not pure but effective
-          //! fail safe XD
-          if (!isIt) isIt = true;
+          fixturesX += 1;
         }
       }
-      if (isIt) {
+      // if after the checks it all our count are equal then we got it correctly
+      if (fixturesX + fixturesY === pathFixtures.length) {
         for (let i = 0; i < pathFixtures.length; i++) {
           if (pathFixtures[i].includes(":")) {
             routesParams[pathFixtures[i].split(":")[1]] = urlFixtures[i];
           }
         }
-        routesParams.path = path;
+        routesParams._path = path;
         return [RouterBox.routes[path], routesParams];
       }
     }
@@ -64,8 +67,9 @@ const checker = (url) => {
   return [];
 };
 
-const url = "/:lol/wow";
-RouterBox.routes[url] = {};
+// const url = "/:lol/wow";
+// RouterBox.routes[url] = {};
+RouterBox.routes["/people/:poop/yoy/:foo/ayh"] = {};
 RouterBox.routes["/people/:poop/dah/:foo/ayh"] = {};
-console.log(checker(url.split(":").join("")));
-console.log(checker("/people/yoyp/dah/xxx/ayh"));
+// console.log(checker(url.split(":").join("")));
+console.log(checker("/people/yoyp/yoy/xxx/ayh"));

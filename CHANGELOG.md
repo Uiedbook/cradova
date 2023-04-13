@@ -124,6 +124,11 @@ and we went along with it.
 - fixed types
 - fixed errors on child type not caught by typescript
 
-# 2.1.3
+# 2.2.0
 
+- added lazy loading to cradova routes
+- added the lazy class to load components when needed
+- added parallel rendering to cradova screens
 - redefining what global dispatcher can do.
+- fix routing bug
+- proof tests

@@ -1,4 +1,4 @@
-import _, { Screen as _screen } from "../index.js";
+import _, { Screen as _cradovaScreen } from "../index.js";
 import { RouterRouteObject } from "../types.js";
 
 /**
@@ -16,7 +16,7 @@ RouterBox["nextRouteController"] = null;
 RouterBox["lastNavigatedRoute"] = null;
 RouterBox["pageShow"] = null;
 RouterBox["pageHide"] = null;
-RouterBox["errorHandler"] = {};
+RouterBox["errorHandler"] = null;
 RouterBox["params"] = {};
 RouterBox["routes"] = {};
 
@@ -26,9 +26,7 @@ RouterBox["routes"] = {};
  * @returns
  */
 
-const checker = (
-  url: string
-): [RouterRouteObject, Record<string, any> | null] | [] => {
+const checker = (url: string) => {
   // first strict check
   if (RouterBox.routes[url]) {
     return [RouterBox.routes[url], { path: url }];
@@ -48,31 +46,45 @@ const checker = (
     }
     const urlFixtures = url.split("/");
     const pathFixtures = path.split("/");
+    let fixturesX = 0;
+    let fixturesY = 0;
     // remove empty string after split operation
     urlFixtures.shift();
     pathFixtures.shift();
     // length check of / (backslash)
     if (pathFixtures.length === urlFixtures.length) {
-      let isIt = false;
-      const routesParams: Record<string, any> = {};
+      const routesParams = { _path: "" };
       for (let i = 0; i < pathFixtures.length; i++) {
+        // let's jump place holders in the path since we can't determine from them
+        // we increment that we skipped a position because we need later
+        if (pathFixtures[i].includes(":")) {
+          fixturesY += 1;
+          continue;
+        }
+        console.log(
+          urlFixtures[i],
+          pathFixtures[i],
+          urlFixtures[i] === pathFixtures[i]
+        );
+        // if this is part of the path then let increment a value for it
+        // we will need it later
         if (
-          path.includes(urlFixtures[i] + "/") &&
+          urlFixtures[i] === pathFixtures[i] &&
           pathFixtures.indexOf(urlFixtures[i]) ===
             pathFixtures.lastIndexOf(urlFixtures[i])
         ) {
-          //! not pure but effective
-          //! fail safe XD
-          if (!isIt) isIt = true;
+          fixturesX += 1;
         }
       }
-      if (isIt) {
+      // if after the checks it all our count are equal then we got it correctly
+      if (fixturesX + fixturesY === pathFixtures.length) {
         for (let i = 0; i < pathFixtures.length; i++) {
           if (pathFixtures[i].includes(":")) {
+            // @ts-ignore
             routesParams[pathFixtures[i].split(":")[1]] = urlFixtures[i];
           }
         }
-        routesParams.path = path;
+        routesParams._path = path;
         return [RouterBox.routes[path], routesParams];
       }
     }
@@ -80,29 +92,12 @@ const checker = (
   return [];
 };
 
-RouterBox.loadRoute = (path: string, screen: any) => {
-  if (!screen || !screen.Activate) {
+RouterBox.route = (path: string, screen: any) => {
+  if (!screen || !screen._Activate) {
     console.error(" ✘  Cradova err:  not a valid screen  ", screen);
     throw new Error(" ✘  Cradova err:  Not a valid cradova screen component");
   }
-  RouterBox.routes[path] = {
-    controller: async (params: any, force?: boolean) =>
-      await screen.Activate(params, force),
-    packager: async (params: any) => await screen.package(params),
-    deactivate: async () => {
-      await screen.deActivate();
-    },
-    delegatedRoutes: (data: any) => {
-      screen.delegatedRoutes = data;
-    },
-    paramData: (data: any) => {
-      screen.paramData = data;
-    },
-    delegate: screen.delegatedRoutes ? screen : null,
-  };
-  if (typeof screen.errorHandler === "function") {
-    RouterBox["errorHandler"][path] = screen.errorHandler;
-  }
+  RouterBox.routes[path] = screen;
   return RouterBox.routes[path];
 };
 
@@ -113,21 +108,22 @@ RouterBox.loadRoute = (path: string, screen: any) => {
  * @param {string}   path     Route path.
  * @param {any} screen the cradova document tree for the route.
  */
-Router.route = function (path: string, screen: any) {
-  if (screen.catch || typeof screen === "function") {
-    RouterBox["routes"][path] = async () => {
-      screen = await screen();
-      // screen = await screen;
-      return RouterBox.loadRoute(path, screen.default);
-    };
-  } else {
-    RouterBox.loadRoute(path, screen);
-  }
-};
 
 Router.BrowserRoutes = function (obj: Record<string, any>) {
   for (const path in obj) {
-    Router.route(path, obj[path]);
+    let screen = obj[path];
+    if (screen.catch || typeof screen === "function") {
+      RouterBox["routes"][path] = async () => {
+        if (typeof screen === "function") {
+          screen = await screen();
+        } else {
+          screen = await screen;
+        }
+        return RouterBox.route(path, screen.default);
+      };
+    } else {
+      RouterBox.route(path, screen);
+    }
   }
   Router.mount();
 };
@@ -188,7 +184,10 @@ Router.navigate = function (
     if (route) {
       RouterBox["nextRouteController"] = route;
       RouterBox.params.params = params;
+      // one of this needs to be removed
+      route._paramData = params;
       RouterBox.params.data = data || null;
+      //
       link = href;
       RouterBox["pageHide"] && RouterBox["pageHide"](href + " :navigated");
       window.history.pushState({}, "", link);
@@ -212,17 +211,21 @@ Router.navigate = function (
  */
 
 RouterBox.router = async function (e: any, force = false) {
-  let url, route: any, params;
-  const Alink = e && e.target.tagName === "A" && e.target;
-  if (Alink) {
-    if (Alink.href.includes("#")) {
-      return;
+  let url, route: RouterRouteObject | undefined, params;
+  if (e) {
+    const Alink = e.target.tagName === "A" && e.target;
+    if (Alink) {
+      if (Alink.href.includes("#")) {
+        const l = Alink.href.split("#");
+        document.getElementById("#" + l[l.length - 1])?.scrollIntoView();
+        return;
+      }
+      if (Alink.href.includes("javascript")) {
+        return;
+      }
+      e.preventDefault();
+      url = new URL(Alink.href).pathname;
     }
-    if (Alink.href.includes("javascript")) {
-      return;
-    }
-    e.preventDefault();
-    url = new URL(Alink.href).pathname;
   }
   if (!url) {
     url = window.location.pathname;
@@ -237,18 +240,27 @@ RouterBox.router = async function (e: any, force = false) {
     [route, params] = checker(url);
   }
 
-  if (route) {
+  if (typeof route !== "undefined") {
     try {
       if (params) {
         RouterBox.params.params = params;
       }
-      if (!route.controller) {
-        route = await route();
-        console.log("fetched for ===> ", route);
+      if (!route._Activate && typeof route === "function") {
+        // @ts-ignore
+        route = (await route()) as any;
       }
-      await route.controller(force);
+      // delegation
+      if (route!._delegatedRoutes !== -1) {
+        route!._delegatedRoutes = true;
+        route = new _cradovaScreen({
+          name: route!._name,
+          template: route!._html,
+        }) as any;
+        RouterBox.routes[url] = route;
+      }
+      await route!._Activate(force);
       RouterBox["lastNavigatedRouteController"] &&
-        (await RouterBox["lastNavigatedRouteController"].deactivate());
+        (await RouterBox["lastNavigatedRouteController"]._deActivate());
       RouterBox["lastNavigatedRoute"] = url;
       RouterBox["lastNavigatedRouteController"] = route;
       RouterBox["pageShow"] && (await RouterBox["pageShow"](url));
@@ -263,8 +275,8 @@ RouterBox.router = async function (e: any, force = false) {
       }
     } catch (error) {
       const errorHandler =
-        RouterBox.errorHandler[RouterBox.params.params.path] ||
-        RouterBox.errorHandler["all"];
+        RouterBox.routes[RouterBox.params.params.path].errorHandler ||
+        RouterBox.errorHandler;
       if (errorHandler) {
         await errorHandler(error);
       }
@@ -320,7 +332,14 @@ Router.packageScreen = async function (path: string, data: any) {
     console.error(" ✘  Cradova err:  no screen with path " + path);
     throw new Error(" ✘  Cradova err:  cradova err: Not a defined screen path");
   }
-  await RouterBox.routes[path].packager(data);
+  if (
+    !RouterBox.routes[path]._Activate &&
+    typeof RouterBox.routes[path] === "function"
+  ) {
+    // @ts-ignore
+    RouterBox.routes[path] = (await RouterBox.routes[path]()) as any;
+  }
+  await RouterBox.routes[path]._package(data);
 };
 
 /**
@@ -345,9 +364,9 @@ Router.getParams = function () {
  * @param path? page path
  */
 
-Router["addErrorHandler"] = function (callback: () => void, path?: string) {
+Router["addErrorHandler"] = function (callback: () => void) {
   if (typeof callback === "function") {
-    RouterBox["errorHandler"][path || "all"] = callback;
+    RouterBox["errorHandler"] = callback;
   } else {
     throw new Error(
       " ✘  Cradova err:  callback for ever event event is not a function"

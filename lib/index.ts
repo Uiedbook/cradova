@@ -406,13 +406,14 @@ export { simpleStore as $ } from "./utils/simplestore";
 export * from "./utils/tags";
 
 export {
-  cradovaAftermountEvent,
   assert,
   assertOr,
+  cradovaAftermountEvent,
   css,
+  lazy,
+  loop,
   Ref,
   svgNS,
-  loop,
 } from "./utils/fns";
 
 export default _;

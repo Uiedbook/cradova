@@ -426,3 +426,20 @@ export const svgNS = (
   }
   return sc;
 };
+
+export class lazy {
+  public content: any = undefined;
+  private _cb: () => Promise<any>;
+  constructor(cb: () => Promise<any>) {
+    this._cb = cb;
+  }
+  async load() {
+    this.content = await this._cb();
+    if (typeof this.content === "function") {
+      this.content = await this.content;
+    } else {
+      this.content = await this.content;
+    }
+    this.content = this.content.default;
+  }
+}

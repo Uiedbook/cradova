@@ -34,9 +34,13 @@ export type ElementType<T> = (
  */
 
 export type RouterRouteObject = {
-  controller: (params: object, force?: boolean) => any;
-  deactivate: (params: object) => any;
-  packager: (params: any) => void;
+  _name: string;
+  _html: any;
+  _paramData: Record<string, any> | null | undefined;
+  _delegatedRoutes: number | boolean;
+  _Activate: (force: boolean) => Promise<void>;
+  _deActivate: (params: object) => void;
+  _package: (params: any) => void;
 };
 
 /**

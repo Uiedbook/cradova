@@ -29,6 +29,13 @@ export class createSignal<Type extends Record<string, any>> {
       if (key && key !== "undefined") {
         this.value = JSON.parse(key);
       }
+      if (typeof initial === "object") {
+        for (const key in initial) {
+          if (!Object.prototype.hasOwnProperty.call(this.value, key)) {
+            this.value[key] = initial[key];
+          }
+        }
+      }
     }
   }
   /**
