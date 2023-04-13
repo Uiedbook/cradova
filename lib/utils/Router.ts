@@ -61,11 +61,11 @@ const checker = (url: string) => {
           fixturesY += 1;
           continue;
         }
-        console.log(
-          urlFixtures[i],
-          pathFixtures[i],
-          urlFixtures[i] === pathFixtures[i]
-        );
+//        console.log(
+//          urlFixtures[i],
+//          pathFixtures[i],
+//          urlFixtures[i] === pathFixtures[i]
+//        );
         // if this is part of the path then let increment a value for it
         // we will need it later
         if (
