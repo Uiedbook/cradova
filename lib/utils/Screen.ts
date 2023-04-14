@@ -140,24 +140,12 @@ export class Screen {
     //
     if (!this._persist || force) {
       await this._package();
-      this._packed = true;
     } else {
       if (!this._packed) {
+        this._packed = true;
         await this._package();
       }
     }
-
-    // if (!this._persist) {
-    //   await this._package();
-    //   this._packed = true;
-    // }
-    // else {
-    //   if (!this._packed) {
-    //     await this._package();
-    //     this._packed = true;
-    //   }
-    // }
-    //
 
     const doc = document.querySelector("[data-cra-id=cradova-app-wrapper]");
     if (!doc) {
@@ -168,9 +156,6 @@ export class Screen {
     doc.innerHTML = "";
     doc.appendChild(this._template as any);
     document.title = this._name;
-    if (!this._persist) {
-      this._packed = false;
-    }
     if (this._callBack) {
       await this._callBack();
     }

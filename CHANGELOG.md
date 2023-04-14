@@ -131,4 +131,5 @@ and we went along with it.
 - added parallel rendering to cradova screens
 - redefining what global dispatcher can do.
 - fix routing bug
+- fix screen not persisting bug
 - proof tests
