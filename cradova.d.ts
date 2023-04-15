@@ -257,11 +257,8 @@ declare module "cradova" {
     /**
      * Cradova screen
      * ---
-     * Screen transition from the screen class
-     * @param data
-     * @returns void
-     *
-     *
+     * a css className to add to screen when rendering it
+     * Usually for adding css transitions
      * .
      */
     transition?: string;

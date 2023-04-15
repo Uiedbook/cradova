@@ -266,7 +266,7 @@ const _: any = (...element_initials: any[]) => {
         }
         if (typeof child !== "undefined") {
           // throw an error
-          console.error(" ✘  Cradova err:   got", { child });
+          console.warn(" ✘  Cradova err:   got", { child });
           throw new Error(
             "  ✘  Cradova err:  invalid child type: " + "(" + typeof child + ")"
           );
@@ -284,14 +284,15 @@ const _: any = (...element_initials: any[]) => {
             if (typeof element.style[k] !== "undefined" && k !== "src") {
               element.style[k] = v;
             } else {
-              throw new Error(
+              element.style[k] = v;
+              console.warn(
                 "✘  Cradova err :  " + k + " is not a valid css style property"
               );
             }
           }
           continue;
         }
-        // for compatibility
+        //? for compatibility
         if (typeof element.style[prop] !== "undefined" && prop !== "src") {
           element.style[prop] = props[prop];
           continue;
@@ -371,9 +372,10 @@ const _: any = (...element_initials: any[]) => {
               prop !== "text" &&
               prop !== "class" &&
               prop !== "tabindex" &&
+              prop !== "disabled" &&
               !prop.includes("aria")
             ) {
-              console.error(" ✘  Cradova err:  invalid html attribute ", {
+              console.warn(" ✘  Cradova err:  invalid html attribute ", {
                 prop,
               });
             } else {

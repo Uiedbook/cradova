@@ -60,6 +60,14 @@ export type CradovaScreenType = {
   /**
    * Cradova screen
    * ---
+   * a css className to add to screen when rendering it
+   * Usually for adding css transitions
+   * .
+   */
+  transition?: string;
+  /**
+   * Cradova screen
+   * ---
    * The component for the screen
    * @param data
    * @returns void

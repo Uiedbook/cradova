@@ -35,9 +35,10 @@ export class Screen {
   private _data: unknown;
   public _params: Record<string, any> | null = null;
   private _delegatedRoutesCount = -1;
+  private _transition;
   //
   constructor(cradova_screen_initials: CradovaScreenType) {
-    const { template, name, persist, renderInParallel } =
+    const { template, name, persist, renderInParallel, transition } =
       cradova_screen_initials;
     if (typeof template !== "function") {
       console.error(" ✘  Cradova err: expected a screen but got ", template);
@@ -47,6 +48,7 @@ export class Screen {
     }
     this._html = template;
     this._name = name;
+    this._transition = transition || "";
     this._template.setAttribute("id", "cradova-screen-set");
     if (renderInParallel === true) {
       this._delegatedRoutesCount = 0;
@@ -134,6 +136,9 @@ export class Screen {
     if (this._deCallBack) {
       await this._deCallBack();
     }
+    if (this._transition) {
+      this._template.classList.remove(this._transition);
+    }
     // other stuff that may come later
   }
   async _Activate(force?: boolean) {
@@ -152,6 +157,9 @@ export class Screen {
       throw new Error(
         " ✘  Cradova err: Unable to render, cannot find cradova root <div data-cra-id='cradova-app-wrapper'> ... </div>"
       );
+    }
+    if (this._transition) {
+      this._template.classList.add(this._transition);
     }
     doc.innerHTML = "";
     doc.appendChild(this._template as any);

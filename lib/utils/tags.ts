@@ -154,9 +154,10 @@ const cra: any = (element_initials: string) => {
               prop !== "text" &&
               prop !== "class" &&
               prop !== "tabindex" &&
+              prop !== "disabled" &&
               !prop.includes("aria")
             ) {
-              console.error(" ✘  Cradova err:  invalid html attribute ", {
+              console.warn(" ✘  Cradova err:  invalid html attribute ", {
                 prop,
               });
             } else {
