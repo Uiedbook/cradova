@@ -1,34 +1,34 @@
 # cradova changelog
 
-## 1.0.0
+## v1.0.0
 
 - basic functionality not proper way to handle state
 
-## 1.0.1
+## v1.0.1
 
 - improved performance
 
-## 1.0.2
+## v1.0.2
 
 - improved api and dev experience
 
-## 1.0.3
+## v1.0.3
 
 - improved state management
 
-## 1.0.4
+## v1.0.4
 
 this version never existed
 "npm version patch" was mistakenly entered twice
 and we went along with it.
 
-## 1.0.5
+## v1.0.5
 
 - more performance
 - improved state management
 - battle testing and production readiness
 
-## 1.0.6
+## v1.0.6
 
 - introducing scaffold - a simple way to render page components
   without url manipulation.
@@ -37,24 +37,24 @@ and we went along with it.
 - more performance
 - battle testing green
 
-## 1.0.7
+## v1.0.7
 
 - bug fixes
 - more performance
 - battle testing green
 
-## 1.0.8
+## v1.0.8
 
 - bug fixes
 - more performance
 - battle testing green
 
-## 1.0.1
+## v1.0.1
 
 - bug fixes
 - battle testing green
 
-## 1.1.0
+## v1.1.0
 
 - all bugs fixes
 - great performance gain
@@ -62,7 +62,7 @@ and we went along with it.
 - dripping build system
 - stable type system
 
-## 1.2.0
+## v1.2.0
 
 - bugs fixes
 - new performance gain unlocked
@@ -70,29 +70,29 @@ and we went along with it.
 - new apis for element level
 - fixed all know abnormal behaviors
 
-## 1.3.0
+## v1.3.0
 
 - new very feature to unlock more speed
 - battle testing green
 - new apis at element level
 
-## 1.4.0
+## v1.4.0
 
 - unlocked more speed by reducing work done by router
 - battle testing green
 - added error boundary
 - Ref working as wanted
 
-## 1.4.1
+## v1.4.1
 
 - fix effect on cradova screens
 
-## 1.5.0
+## v1.5.0
 
 - made cradova Ref to have Stash hold component state change
 - stable Ref effect and updateState compliant to the spec
 
-## 2.0.0
+## v2.0.0
 
 - export all html tags prebuilt and fully typed for more performance
 - removed effect and updateState from cradova screen class
@@ -105,7 +105,7 @@ and we went along with it.
 - fixed error boundary bug
 - setup hybrid server side rendering test using vite ssr
 
-## 2.1.0
+## v2.1.0
 
 - added loop
 - allow custom mount point
@@ -114,17 +114,17 @@ and we went along with it.
 - writing tests for more speed improvement index
 - fixed createAction callback type
 
-## 2.1.1
+## v2.1.1
 
 - increased child dept to ~
 
-## 2.1.2
+## v2.1.2
 
 - fixed child array recursion of the Rhoda function
 - fixed types
 - fixed errors on child type not caught by typescript
 
-## 2.2.0
+## v2.2.0
 
 - big performance boost using new methods of handling function calls so they get cached
 - added lazy loading to cradova routes
