@@ -257,7 +257,6 @@ RouterBox.router = async function (e: any, force = false) {
         RouterBox.routes[url] = route;
       }
       await route!._Activate(force);
-
       RouterBox["lastNavigatedRouteController"] &&
         RouterBox["lastNavigatedRouteController"]._deActivate();
       RouterBox["lastNavigatedRoute"] = url;
@@ -265,7 +264,7 @@ RouterBox.router = async function (e: any, force = false) {
       RouterBox["pageShow"] && RouterBox["pageShow"](url);
     } catch (error) {
       const errorHandler =
-        RouterBox.routes[RouterBox.params.params.path].errorHandler ||
+        RouterBox.routes[RouterBox.params.params._path].errorHandler ||
         RouterBox.errorHandler;
       if (errorHandler) {
         errorHandler(error);
@@ -322,13 +321,13 @@ Router.packageScreen = async function (path: string, data: any) {
     console.error(" ✘  Cradova err:  no screen with path " + path);
     throw new Error(" ✘  Cradova err:  cradova err: Not a defined screen path");
   }
-  const [route, params] = checker(path);
-  if (!route._Activate && typeof route._Activate === "function") {
+  let [route, params] = checker(path);
+  if (!route._Activate && typeof route === "function") {
     // @ts-ignore
-    route._Activate = (await route._Activate()) as any;
+    route = (await route()) as any;
   }
   // handled asynchronously
-  route._Activate._package(Object.assign(data, params || {}));
+  route._package(Object.assign(data, params || {}));
   route._packed = true;
 };
 

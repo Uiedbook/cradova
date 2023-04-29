@@ -24,9 +24,14 @@ export const makeElement = (
         }
       }
       // appending child
-      if (isNode(child)) {
-        element.appendChild(child);
-        continue;
+      try {
+        if (isNode(child)) {
+          element.appendChild(child);
+          continue;
+        }
+      } catch (error) {
+        console.log(element, ElementChildrenAndPropertyList);
+        console.log(error);
       }
       // children array
       if (Array.isArray(child)) {
@@ -184,10 +189,12 @@ export const makeElement = (
 };
 
 const cra: any = (element_initials: string) => {
-  return makeElement.bind(
-    undefined,
-    document.createElement(element_initials) as Record<string, any>
-  );
+  return (...bo: any[]) => {
+    return makeElement(
+      document.createElement(element_initials) as Record<string, any>,
+      ...bo
+    );
+  };
 };
 export const a: ElementType<HTMLAnchorElement> = cra("a");
 export const abbr: ElementType<HTMLElement> = cra("abbr");

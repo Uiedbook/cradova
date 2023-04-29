@@ -256,9 +256,9 @@ export class Ref<D> {
       window.removeEventListener("cradova-aftermount", av);
     };
     window.addEventListener("cradova-aftermount", av);
+    this.effector();
     this.published = true;
     this.rendered = true;
-    this.effector();
     if (!element) {
       element = this.preRendered;
     }
