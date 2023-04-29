@@ -58,7 +58,7 @@ see for yourself.
 
 Cradova has been used on a couple of projects in production and we will update this page to reflect our progress as we keep improving.
 
-[current version changes](https://github.com/fridaycandour/cradova/blob/main/CHANGELOG.md#v2.2.0)
+[current version changes](https://github.com/fridaycandour/cradova/blob/main/CHANGELOG.md#v220)
 
 ## Installation
 
