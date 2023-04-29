@@ -51,7 +51,7 @@ export class Screen {
     this._transition = transition || "";
     this._template.setAttribute("id", "cradova-screen-set");
     if (renderInParallel === true) {
-      this._delegatedRoutesCount = 0;
+      this._delegatedRoutesCount = 1;
     } else {
       if (typeof persist === "boolean") {
         this._persist = persist;
@@ -61,7 +61,7 @@ export class Screen {
 
   get _delegatedRoutes(): boolean {
     if (this._delegatedRoutesCount > 1000) {
-      return 0 as unknown as boolean;
+      return -1 as unknown as boolean;
     }
     return this._delegatedRoutesCount as unknown as boolean;
   }
@@ -117,9 +117,11 @@ export class Screen {
       );
     }
     if (this._secondaryChildren.length) {
-      for (const child of this._secondaryChildren) {
+      let i = 0;
+      while (this._secondaryChildren.length - i !== 0) {
         // @ts-ignore
-        this.template.appendChild(child);
+        this.template.appendChild(this._secondaryChildren[i]);
+        i++;
       }
     }
   }

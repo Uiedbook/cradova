@@ -6,7 +6,7 @@
   "type": "module",
   "files": [
     "dist/index.d.ts",
-    "dist/types.ts"
+    "dist/index.js"
   ],
   "repository": {
     "type": "git",

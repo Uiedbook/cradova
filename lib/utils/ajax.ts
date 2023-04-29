@@ -60,7 +60,7 @@ export function Ajax(
       if (!navigator.onLine) {
         resolve(
           JSON.stringify({
-            message: `the device is offline!`,
+            message: `this device is offline!`,
           })
         );
       } else {

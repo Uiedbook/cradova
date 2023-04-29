@@ -83,16 +83,16 @@ and we went along with it.
 - added error boundary
 - Ref working as wanted
 
-# 1.4.1
+## 1.4.1
 
 - fix effect on cradova screens
 
-# 1.5.0
+## 1.5.0
 
 - made cradova Ref to have Stash hold component state change
 - stable Ref effect and updateState compliant to the spec
 
-# 2.0.0
+## 2.0.0
 
 - export all html tags prebuilt and fully typed for more performance
 - removed effect and updateState from cradova screen class
@@ -105,7 +105,7 @@ and we went along with it.
 - fixed error boundary bug
 - setup hybrid server side rendering test using vite ssr
 
-# 2.1.0
+## 2.1.0
 
 - added loop
 - allow custom mount point
@@ -114,22 +114,25 @@ and we went along with it.
 - writing tests for more speed improvement index
 - fixed createAction callback type
 
-# 2.1.1
+## 2.1.1
 
 - increased child dept to ~
 
-# 2.1.2
+## 2.1.2
 
 - fixed child array recursion of the Rhoda function
 - fixed types
 - fixed errors on child type not caught by typescript
 
-# 2.2.0
+## 2.2.0
 
+- big performance boost using new methods of handling function calls so they get cached
 - added lazy loading to cradova routes
+- fixed Ref state flow with tests in ./manual_tests
 - added the lazy class to load components when needed
 - added parallel rendering to cradova screens
 - redefining what global dispatcher can do.
 - fix routing bug
 - fix screen not persisting bug
 - proof tests
+- battle testing used and tested in production

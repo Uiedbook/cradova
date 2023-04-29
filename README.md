@@ -41,7 +41,7 @@
 
 Cradova is a JavaScript framework for building Single Page Applications and PWAs.
 
-It's small, fast and provides state management, routing and a rest API utility out of the box.
+It's a fast and simple framework, it provides state management, routing system and a rest API utility out of the box.
 
 Cradova follows the [VJS specification](https://github.com/fridaycandour/cradova/blob/main/spec.md)
 
@@ -49,11 +49,16 @@ Cradova follows the [VJS specification](https://github.com/fridaycandour/cradova
 
 Cradova is aimed to be fast and simple with and fewer abstractions and yet easily composable.
 
-We don't use visual DOM or diff algorithms to manage the DOM.
+Cradova does't rely on visual DOM or diff algorithms to manage the DOM, instead, State management is done more elegantly with a simple predictive model, manually and easily with all the speed.
 
-State management is done more elegantly with the predictive model, manually and easily with all the speed.
+### is this a big benefit?
+
+Yes.
+see for yourself.
 
 Cradova has been used on a couple of projects in production and we will update this page to reflect our progress as we keep improving.
+
+[current version changes](https://github.com/fridaycandour/cradova/blob/main/CHANGELOG.md#2.2.0)
 
 ## Installation
 
@@ -192,7 +197,7 @@ function counter() {
 function dataCounter() {
   return _("h1| 0", {
     shouldUpdate: true,
-    $num: "0", // data-num
+    "data-num": "0",
     onclick() {
      const num = Number(this.getAttribute("data-num")) + 1;
       this.updateState({ text: num, $num: num });

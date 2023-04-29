@@ -3,23 +3,29 @@
  * ----
  *  create stateful data store.
  * ability to:
- * - create a store
- * - create a global store system
+ * - create store
  * - create actions and fire them
  * - bind a Ref
  * - listen to changes
  * - persist changes to localStorage
  * - set keys instead of all values
- * - update a cradova Ref automatically
+ * - update a cradova Ref and bindings automatically
  * @constructor initial: any, props: {useHistory, persist}
  */
+
+import { Ref } from "./fns";
 
 export class createSignal<Type extends Record<string, any>> {
   private callback: undefined | ((newValue: Type) => void);
   private persistName: string | undefined = "";
   private actions: Record<string, any> = {};
-  private ref: any;
-  private path: null | string = null;
+  private ref: {
+    ref: any;
+    _event?: string;
+    _signalProperty?: string;
+    _element_property?: string;
+  }[] = [];
+
   value: Type;
   constructor(initial: Type, props?: { persistName?: string | undefined }) {
     this.value = initial;
@@ -47,6 +53,7 @@ export class createSignal<Type extends Record<string, any>> {
    */
   set(value: Type | ((value: Type) => Type), shouldRefRender?: boolean) {
     if (typeof value === "function") {
+      //! value could be a promise
       this.value = value(this.value);
     } else {
       this.value = value;
@@ -54,12 +61,8 @@ export class createSignal<Type extends Record<string, any>> {
     if (this.persistName) {
       localStorage.setItem(this.persistName, JSON.stringify(this.value));
     }
-    if (this.ref && shouldRefRender !== false) {
-      if (this.path) {
-        this.ref.updateState(this.value[this.path]);
-      } else {
-        this.ref.updateState(this.value);
-      }
+    if (this.ref.length && shouldRefRender !== false) {
+      this._updateState();
     }
     if (this.callback) {
       this.callback(this.value);
@@ -80,12 +83,8 @@ export class createSignal<Type extends Record<string, any>> {
       if (this.persistName) {
         localStorage.setItem(this.persistName, JSON.stringify(this.value));
       }
-      if (this.ref && shouldRefRender !== false) {
-        if (this.path) {
-          this.ref.updateState(this.value[this.path]);
-        } else {
-          this.ref.updateState(this.value);
-        }
+      if (this.ref.length && shouldRefRender !== false) {
+        this._updateState();
       }
       if (this.callback) {
         this.callback(this.value);
@@ -107,9 +106,9 @@ export class createSignal<Type extends Record<string, any>> {
    */
   createAction(
     key: string | Record<string, (data?: Type) => void>,
-    action?: (data?: Type) => void
+    action?: ((data?: Type) => void) | Ref<unknown>
   ) {
-    if (typeof key === "string" && typeof action === "function") {
+    if (typeof key === "string") {
       this.actions[key] = action;
     } else {
       if (typeof key === "object" && !action) {
@@ -133,14 +132,86 @@ export class createSignal<Type extends Record<string, any>> {
    * @param data - data for the action
    */
   fireAction(key: string, data?: Type) {
-    try {
-      if (!(typeof key === "string" && this.actions[key])) {
-        throw Error("");
+    if (this.actions[key].updateState) {
+      this.actions[key].updateState(this, data);
+      this._updateState(key, data);
+      return;
+    } else {
+      if (typeof this.actions[key] === "function") {
+        this.actions[key](this, data);
+        this._updateState(key, data);
+        return;
       }
-    } catch (_e) {
-      throw Error("✘  Cradova err : action " + key + "  does not exist!");
     }
-    this.actions[key](this, data);
+    throw Error("✘  Cradova err : action " + key + "  does not exist!");
+  }
+
+  /**
+   * Cradova
+   * ---
+   * is used to bind store data to any element
+   *
+   * @param prop
+   * @returns something
+   */
+
+  bind(prop: string) {
+    if (
+      typeof this.value === "object" &&
+      typeof this.value[prop] !== "undefined"
+    ) {
+      return [this, prop];
+    } else {
+      throw new Error(
+        "✘  Cradova err : can't bind an unavailable property!  " + prop
+      );
+    }
+  }
+
+  private _updateState(name?: any, data?: Type) {
+    if (name && data) {
+      this.ref.map((ent) => {
+        if (ent._event === name) {
+          //
+          if (ent._element_property && ent._signalProperty) {
+            ent.ref.updateState({
+              [ent._element_property]: data[ent._signalProperty],
+            });
+            return;
+          }
+          if (ent._element_property) {
+            ent.ref.updateState({
+              [ent._element_property]: data,
+            });
+            return;
+          }
+          if (ent._signalProperty) {
+            ent.ref.updateState(data[ent._signalProperty]);
+            return;
+          }
+        }
+      });
+    } else {
+      for (let i = 0; i < this.ref.length; i++) {
+        const ent = this.ref[i];
+        if (ent._element_property && ent._signalProperty) {
+          ent.ref.updateState({
+            [ent._element_property]: this.value[ent._signalProperty],
+          });
+          continue;
+        }
+        if (ent._element_property) {
+          ent.ref.updateState({
+            [ent._element_property]: this.value,
+          });
+          continue;
+        }
+        if (ent._signalProperty) {
+          ent.ref.updateState(this.value[ent._signalProperty]);
+          continue;
+        }
+      }
+    }
   }
 
   /**
@@ -151,18 +222,31 @@ export class createSignal<Type extends Record<string, any>> {
    * @param Ref component to bind to.
    * @param path a property in the object to send to attached ref
    */
-  bindRef(Ref: any, path?: string) {
-    if (Ref && Ref.updateState) {
-      this.ref = Ref;
-      if (typeof path === "string") {
-        this.path = path;
-        Ref.render = Ref.render.bind(Ref, this.value[path]);
-      } else {
-        Ref.render = Ref.render.bind(Ref, this.value);
-      }
-    } else {
-      throw new Error("✘  Cradova err :  Invalid ref component" + Ref);
+  bindRef(
+    ref: any,
+    binding: {
+      event?: string;
+      signalProperty: string;
+      _element_property: string;
     }
+  ) {
+    if (ref.render) {
+      ref.render = ref.render.bind(ref, this.value);
+    }
+    if (ref && ref.updateState) {
+      // it's an element binding, not ref, not event(fire action events)
+      this.ref.push({
+        ref,
+        _signalProperty: binding.signalProperty,
+        _element_property: binding._element_property,
+        _event: binding.event,
+      });
+      return;
+    }
+
+    throw new Error(
+      "✘  Cradova err :  Invalid parameters for binding ref to simple store"
+    );
   }
 
   /**

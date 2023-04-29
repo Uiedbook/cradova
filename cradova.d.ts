@@ -1,144 +1,4 @@
 declare module "cradova" {
-  /**
-   *
-   * Cradova Ajax
-   * ------------------
-   * your new axios alternative
-   * supports files upload
-   * @param url string
-   * @param {{method: string;data;header;callbacks;}} opts
-   * @returns any
-   */
-  export function Ajax(
-    url: string | URL,
-    opts?:
-      | {
-          method?: "GET" | "POST";
-          data?: Record<string, any>;
-          header?: {
-            "content-type": string;
-          } & Record<string, any>;
-          callbacks?: Record<string, (arg: any) => void>;
-        }
-      | any
-  ): Promise<unknown>;
-
-  /**
-   *  Cradova Signal
-   * ----
-   *  create stateful data store.
-   * ability to:
-   * - create a store
-   * - create actions and fire them
-   * - bind a Ref or RefList
-   * - listen to changes
-   * - persist changes to localStorage
-   * - set keys instead of all values
-   * - update a cradova Ref/RefList automatically
-   * @constructor initial: any, props: {useHistory, persist}
-   */
-  export class createSignal<Type> {
-    private callback;
-    private persistName;
-    private actions;
-    private ref;
-    private path;
-    value: Type;
-    constructor(
-      initial: Type,
-      props?: {
-        persistName?: string | undefined;
-      }
-    );
-    /**
-     *  Cradova Signal
-     * ----
-     *  set signal value
-     * @param value - signal value
-     * @returns void
-     */
-    set(value: Type | ((value: Type) => Type), shouldRefRender?: boolean): void;
-    /**
-     *  Cradova Signal
-     * ----
-     *  set a key value if it's an object
-     * @param key - key of the key
-     * @param value - value of the key
-     * @returns void
-     */
-    setKey<k extends keyof Type>(
-      key: k,
-      value: any,
-      shouldRefRender?: boolean
-    ): void;
-    /**
-     *  Cradova Signal
-     * ----
-     *  set a key to signal an action
-     * @param key - key of the action
-     * @param action function to execute
-     */
-    createAction(
-      key: string | Record<string, (data?: Type) => void>,
-      action?: (data?: Type) => void
-    ): void;
-    /**
-     *  Cradova Signal
-     * ----
-     *  fires an action if available
-     * @param key - string key of the action
-     * @param data - data for the action
-     */
-    fireAction(key: string, data?: Type): void;
-    /**
-     *  Cradova Signal
-     * ----
-     *  set a auto - rendering component for this store
-     *
-     * @param Ref component to bind to.
-     * @param path a property in the object to send to attached ref
-     */
-    bindRef(Ref: any, path?: string): void;
-    /**
-     *  Cradova Signal
-     * ----
-     *  set a update listener on value changes
-     * @param callback
-     */
-    listen(callback: (a: any) => void): void;
-    /**
-     *  Cradova Signal
-     * ----
-     * clear the history on local storage
-     *
-     *
-     * .
-     */
-    clearPersist(): void;
-  }
-
-  type stateType =
-    | Partial<HTMLElement>
-    | {
-        class?: string;
-        text?: string;
-        style?: Partial<CSSStyleDeclaration>;
-        tree?: Function | HTMLElement;
-        remove?: boolean;
-      };
-  type stateID = string;
-  /**
-   * Send a new state to specified element with stateID
-   *
-   * @param stateID
-   * @param state
-   * @returns element(s)
-   */
-  export function dispatch(
-    stateID: stateID | Record<stateID, stateType>,
-    state?: stateType
-  ): any;
-
   type ElementType<T> = (
     ...VJS: (
       | string
@@ -153,81 +13,10 @@ declare module "cradova" {
           text?: string;
           stateID?: string;
           shouldUpdate?: boolean;
+          assert?: any;
         }
     )[]
   ) => T;
-
-  /**
-   * Cradova Router
-   * ---
-   * Facilitates navigation within the application and initializes
-   * page views based on the matched routes.
-   */
-  type RouterType = {
-    /**
-     * Registers a route.
-     *
-     * @param {string}   path     Route path.
-     * @param {any} screen the cradova document tree for the route.
-     */
-    route: (path: string, screen: Screen) => void;
-    /**
-     * get a screen ready before time.
-     *
-     * @param {string}   path     Route path.
-     * @param {any} data data for the screen.
-     */
-    packageScreen: (path: string, data?: any) => Promise<void>;
-    onPageShow: (callback: () => void) => void;
-    onPageHide: (callback: () => void) => void;
-    /**
-     * Registers lazy loaded routes.
-     *
-     * @param {{path: string, screen: any}}   routes  {path: string, screen: any, ...}   Route path.
-     */
-
-    BrowserRoutes: (routes: Record<string, any>) => void;
-    /**
-     * Cradova Router
-     * ------
-     *
-     * return last set router params
-     *
-     * .
-     */
-    getParams: <D>() => { data: D | unknown; params: any };
-    /**
-     * Cradova Router
-     * ------
-     *
-     * Navigates to a designated screen in your app
-     */
-    navigate: (
-      href: string,
-      data?: Record<string, any> | null,
-      force?: boolean
-    ) => void;
-
-    /**
-     * Cradova
-     * ---
-     * Error Handler for your app
-     *
-     * @param callback
-     * @param path? page path
-     */
-
-    addErrorHandler: (callback: (error: string) => void, path?: string) => void;
-  };
-
-  /**
-   * Cradova Router
-   * ---
-   * Facilitates navigation within the application and initializes
-   * page views based on the matched routes.
-   */
-  export const Router: RouterType;
-
   /**
    *
    */
@@ -236,13 +25,19 @@ declare module "cradova" {
      * Cradova screen
      * ---
      * title of the page
-     * @param data
-     * @returns void
      *
      *
      * .
      */
     name: string;
+    /**
+     * Cradova screen
+     * ---
+     * a css className to add to screen when rendering it
+     * Usually for adding css transitions
+     * .
+     */
+    transition?: string;
     /**
      * Cradova screen
      * ---
@@ -257,35 +52,6 @@ declare module "cradova" {
     /**
      * Cradova screen
      * ---
-     * a css className to add to screen when rendering it
-     * Usually for adding css transitions
-     * .
-     */
-    transition?: string;
-    /**
-     * Cradova screen
-     * ---
-     * gets called when the the screen is displayed
-     * @param data
-     * @returns void
-     *
-     *
-     * .
-     */
-    /**
-     * Cradova screen
-     * ---
-     * Should this screen be cached after first render?
-     * @param data
-     * @returns void
-     *
-     *
-     * .
-     */
-    persist?: boolean;
-    /**
-     * Cradova screen
-     * ---
      * Allows this screen render in parallel for unique routes
      *
      * limit is 1000
@@ -295,106 +61,29 @@ declare module "cradova" {
      * .
      */
     renderInParallel?: boolean;
+    /**
+     * Cradova screen
+     * ---
+     * gets called when the the screen is displayed
+     *
+     *
+     * .
+     */
+    /**
+     * Cradova screen
+     * ---
+     * Should this screen be cached after first render?
+     * you can use Route.navigate(url, null, true) to force later
+     *
+     * .
+     */
+    persist?: boolean;
   };
 
-  /**
-   *  Cradova Screen
-   * ---
-   * create instances of manageable pages and scaffolds
-   * @param name
-   * @param template
-   * @param transitions
-   */
-  export class Screen {
-    /**
-     * this should be a cradova screen component
-     */
-    private html;
-    /**
-     * this is the name of the screen that appears as the title
-     */
-    private name;
-    private packed;
-    private secondaryChildren;
-    /**
-     * used internally
-     */
-    private template;
-    private callBack;
-    private deCallBack;
-    errorHandler: (() => void) | null;
-    /**
-     * this tells cradova to persist state on the screen or not
-     * persisting is better
-     */
-    private persist;
-    private data;
-    constructor(cradova_screen_initials: CradovaScreenType);
-    setErrorHandler(errorHandler: () => void): void;
-    package(): Promise<void>;
-    onActivate(cb: () => Promise<void> | void): void;
-    onDeactivate(cb: () => Promise<void> | void): void;
-    addChild(...addOns: any[]): void;
-    deActivate(): void;
-    Activate(force?: boolean): Promise<void>;
-  }
-
-  /**
-   *  Cradova simpleStore
-   * ----
-   *  create stateful data store.
-   * ability to:
-   * - create a store
-   * - set keys instead of all values
-   * - able to update state on any element as a property value
-   * @constructor initial: any, Ref/RefList/RefElement: any
-   */
-  export class $<Type extends Record<string, unknown>> {
-    private ref;
-    value: Type;
-    constructor(initial: Type);
-    /**
-     *  Cradova simpleStore
-     * ----
-     *  set simpleStore value
-     * @param value - simpleStore value
-     * @returns void
-     */
-    set(value: Type | ((value: Type) => Type), shouldRefRender?: boolean): void;
-    /**
-     * Cradova
-     * ---
-     * is used to bind store data to any element
-     *
-     * @param prop
-     * @returns something
-     */
-    bind(prop: string): (string | this)[];
-    private updateState;
-    /**
-     *  Cradova simpleStore
-     * ----
-     *  set a key value if it's an object
-     * @param name - name of the key
-     * @param value - value of the key
-     * @returns void
-     */
-    setKey<k extends keyof Type>(
-      name: k,
-      value: any,
-      shouldRefRender?: boolean
-    ): void;
-    /**
-     *  Cradova simpleStore
-     * ----
-     *  set a auto - rendering component for this store
-     *
-     * @param Ref component to bind to.
-     * @param path a property in the object to send to attached ref
-     */
-    bindRef(ref: any, key: string, prop: string): void;
-  }
-
+  export const makeElement: (
+    element: Record<string, any>,
+    ...ElementChildrenAndPropertyList: ElementType<HTMLElement>[]
+  ) => Record<string, any>;
   export const a: ElementType<HTMLAnchorElement>;
   export const abbr: ElementType<HTMLElement>;
   export const address: ElementType<HTMLElement>;
@@ -509,6 +198,30 @@ declare module "cradova" {
   export const wbr: ElementType<HTMLElement>;
 
   /**
+   *
+   * Cradova Ajax
+   * ------------------
+   * your new axios alternative
+   * supports files upload
+   * @param url string
+   * @param {{method: string;data;header;callbacks;}} opts
+   * @returns any
+   */
+  export function Ajax(
+    url: string | URL,
+    opts?:
+      | {
+          method?: "GET" | "POST";
+          data?: Record<string, any>;
+          header?: {
+            "content-type": string;
+          } & Record<string, any>;
+          callbacks?: Record<string, (arg: any) => void>;
+        }
+      | any
+  ): Promise<unknown>;
+
+  /**
    * Cradova afterMount event
    */
   export let cradovaAftermountEvent: CustomEvent<unknown>;
@@ -538,21 +251,13 @@ css(".btn:hover",
   /**
    *
    * @param {expression} condition
-   * @param {function} callback
+   * @param {function} elements[]
    */
-  export function assert(condition: any, ...elements: any): undefined | any;
-
+  export function assert(condition: any, ...elements: any): any;
   export function loop(
     datalist: any[],
-    component: (value: any, index?: number, array?: any[]) => HTMLElement
-  ): any;
-
-  export function svgNS(
-    type: string,
-    props: Record<string, any>,
-    ...children: any
-  ): HTMLElement;
-
+    component: (value: any, index?: number, array?: any[]) => any
+  ): HTMLElement | undefined;
   export function assertOr(
     condition: boolean,
     ifTrue: () => any,
@@ -608,10 +313,205 @@ css(".btn:hover",
     private Activate;
     remove(): void;
   }
+  export const svgNS: (
+    type: string,
+    props: Record<string, any>,
+    ...children: any
+  ) => HTMLElement;
   export class lazy {
-    constructor(cb: () => Promise<any>);
-    load: () => Promise<any>;
     content: any;
+    private _cb;
+    constructor(cb: () => Promise<any>);
+    load(): Promise<void>;
+  }
+
+  /**
+   *  Cradova Signal
+   * ----
+   *  create stateful data store.
+   * ability to:
+   * - create store
+   * - create actions and fire them
+   * - bind a Ref
+   * - listen to changes
+   * - persist changes to localStorage
+   * - set keys instead of all values
+   * - update a cradova Ref and bindings automatically
+   * @constructor initial: any, props: {useHistory, persist}
+   */
+
+  export class createSignal<Type extends Record<string, any>> {
+    private callback;
+    private persistName;
+    private actions;
+    private ref;
+    value: Type;
+    constructor(
+      initial: Type,
+      props?: {
+        persistName?: string | undefined;
+      }
+    );
+    /**
+     *  Cradova Signal
+     * ----
+     *  set signal value
+     * @param value - signal value
+     * @returns void
+     */
+    set(value: Type | ((value: Type) => Type), shouldRefRender?: boolean): void;
+    /**
+     *  Cradova Signal
+     * ----
+     *  set a key value if it's an object
+     * @param key - key of the key
+     * @param value - value of the key
+     * @returns void
+     */
+    setKey<k extends keyof Type>(
+      key: k,
+      value: any,
+      shouldRefRender?: boolean
+    ): void;
+    /**
+     *  Cradova Signal
+     * ----
+     *  set a key to signal an action
+     * @param key - key of the action
+     * @param action function to execute
+     */
+    createAction(
+      key: string | Record<string, (data?: Type) => void>,
+      action?: ((data?: Type) => void) | Ref<unknown>
+    ): void;
+    /**
+     *  Cradova Signal
+     * ----
+     *  fires an action if available
+     * @param key - string key of the action
+     * @param data - data for the action
+     */
+    fireAction(key: string, data?: Type): void;
+    /**
+     * Cradova
+     * ---
+     * is used to bind store data to an element
+     *
+     * @param prop
+     * @returns something
+     */
+    bind(prop: string): (string | this)[];
+    private _updateState;
+    /**
+     *  Cradova Signal
+     * ----
+     *  set a auto - rendering component for this store
+     *
+     * @param Ref component to bind to.
+     * @param path a property in the object to send to attached ref
+     */
+    bindRef(
+      ref: any,
+      binding: {
+        event?: string;
+        signalProperty: string;
+        _element_property: string;
+      }
+    ): void;
+    /**
+     *  Cradova Signal
+     * ----
+     *  set a update listener on value changes
+     * @param callback
+     */
+    listen(callback: (a: any) => void): void;
+    /**
+     *  Cradova Signal
+     * ----
+     * clear the history on local storage
+     *
+     *
+     * .
+     */
+    clearPersist(): void;
+  }
+
+  type stateType =
+    | Partial<HTMLElement>
+    | {
+        class?: string;
+        text?: string;
+        style?: Partial<CSSStyleDeclaration>;
+        tree?: Function | HTMLElement;
+        remove?: boolean;
+      };
+  type stateID = string;
+  /**
+   * Send a new state to specified element with stateID
+   *
+   * @param stateID
+   * @param state
+   * @returns element(s)
+   */
+  export function dispatch(
+    stateID: stateID | Record<stateID, stateType>,
+    state?: stateType
+  ): any;
+
+  /**
+   * Cradova Router
+   * ---
+   * Facilitates navigation within the application and initializes
+   * page views based on the matched routes.
+   */
+  export const Router: Record<string, any>;
+
+  /**
+   *  Cradova Screen
+   * ---
+   * create instances of manageable pages and scaffolds
+   * @param name
+   * @param template
+   * @param transitions
+   */
+  export class Screen {
+    /**
+     * this should be a cradova screen component
+     */
+    _html: Function;
+    /**
+     * this is a set of added html to the screen
+     */
+    _secondaryChildren: Array<Node>;
+    /**
+     * error handler for the screen
+     */
+    errorHandler: (() => void) | null;
+    /**
+     * used internally
+     */
+    _name: string;
+    private _packed;
+    private _template;
+    private _callBack;
+    private _deCallBack;
+    private _persist;
+    private _data;
+    _params: Record<string, any> | null;
+    private _delegatedRoutesCount;
+    private _transition;
+    constructor(cradova_screen_initials: CradovaScreenType);
+    get _delegatedRoutes(): boolean;
+    set _delegatedRoutes(count: boolean);
+    get _paramData(): typeof this._params;
+    set _paramData(params: typeof this._params);
+    setErrorHandler(errorHandler: () => void): void;
+    _package(): Promise<void>;
+    onActivate(cb: () => Promise<void> | void): void;
+    onDeactivate(cb: () => Promise<void> | void): void;
+    addChild(...addOns: any[]): void;
+    _deActivate(): Promise<void>;
+    _Activate(force?: boolean): Promise<void>;
   }
 
   /**
@@ -634,11 +534,6 @@ css(".btn:hover",
    * color: "blue"
    * }
    * })
-   * // or no style props it works!
-   * _("p",{
-   * text: "am a p tag",
-   * color: "blue"
-   * })
    *
    * // props and children
    * _("p", // template first
@@ -646,17 +541,6 @@ css(".btn:hover",
    *  {style: {color: "brown"}, // optional
    *  // the rest should be children or text
    * _("span", " am a span tag text like so"),
-   * ...
-   * )
-   *
-   * // list of children
-   * _("p",
-   * // all children goes after
-   * _("span",
-   * {
-   * text:" am a span tag like so",
-   *  color: "brown",
-   * }),
    * ...
    * )
    *

@@ -61,11 +61,11 @@ const checker = (url: string) => {
           fixturesY += 1;
           continue;
         }
-//        console.log(
-//          urlFixtures[i],
-//          pathFixtures[i],
-//          urlFixtures[i] === pathFixtures[i]
-//        );
+        //        console.log(
+        //          urlFixtures[i],
+        //          pathFixtures[i],
+        //          urlFixtures[i] === pathFixtures[i]
+        //        );
         // if this is part of the path then let increment a value for it
         // we will need it later
         if (
@@ -192,9 +192,7 @@ Router.navigate = function (
       RouterBox["pageHide"] && RouterBox["pageHide"](href + " :navigated");
       window.history.pushState({}, "", link);
     }
-    (async () => {
-      await RouterBox.router(null, force);
-    })();
+    RouterBox.router(null, force);
   }
 };
 
@@ -250,7 +248,7 @@ RouterBox.router = async function (e: any, force = false) {
         route = (await route()) as any;
       }
       // delegation
-      if (route!._delegatedRoutes !== -1) {
+      if (route!._delegatedRoutes !== -1 && route!._delegatedRoutes !== 1) {
         route!._delegatedRoutes = true;
         route = new _cradovaScreen({
           name: route!._name,
@@ -259,26 +257,18 @@ RouterBox.router = async function (e: any, force = false) {
         RouterBox.routes[url] = route;
       }
       await route!._Activate(force);
+
       RouterBox["lastNavigatedRouteController"] &&
-        (await RouterBox["lastNavigatedRouteController"]._deActivate());
+        RouterBox["lastNavigatedRouteController"]._deActivate();
       RouterBox["lastNavigatedRoute"] = url;
       RouterBox["lastNavigatedRouteController"] = route;
-      RouterBox["pageShow"] && (await RouterBox["pageShow"](url));
-      // click handlers
-      for (const a of document.querySelectorAll("a")) {
-        if (a.href.includes(window.location.origin)) {
-          a.addEventListener("click", (e) => {
-            e.preventDefault();
-            Router.navigate(a.pathname);
-          });
-        }
-      }
+      RouterBox["pageShow"] && RouterBox["pageShow"](url);
     } catch (error) {
       const errorHandler =
         RouterBox.routes[RouterBox.params.params.path].errorHandler ||
         RouterBox.errorHandler;
       if (errorHandler) {
-        await errorHandler(error);
+        errorHandler(error);
       }
     }
   } else {
@@ -332,14 +322,14 @@ Router.packageScreen = async function (path: string, data: any) {
     console.error(" ✘  Cradova err:  no screen with path " + path);
     throw new Error(" ✘  Cradova err:  cradova err: Not a defined screen path");
   }
-  if (
-    !RouterBox.routes[path]._Activate &&
-    typeof RouterBox.routes[path] === "function"
-  ) {
+  const [route, params] = checker(path);
+  if (!route._Activate && typeof route._Activate === "function") {
     // @ts-ignore
-    RouterBox.routes[path] = (await RouterBox.routes[path]()) as any;
+    route._Activate = (await route._Activate()) as any;
   }
-  await RouterBox.routes[path]._package(data);
+  // handled asynchronously
+  route._Activate._package(Object.assign(data, params || {}));
+  route._packed = true;
 };
 
 /**

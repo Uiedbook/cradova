@@ -1,183 +1,193 @@
 import { ElementType } from "../types";
 import { dispatch } from "./track";
-import { simpleStore } from "./simplestore";
 import { isNode, Rhoda } from "./fns";
+import { createSignal } from "./createSignal";
+import { Router } from "./Router";
 
-const cra: any = (element_initials: string) => {
-  return (...ElementChildrenAndPropertyList: ElementType<HTMLElement>[]) => {
-    let beforeMount: ((this: any) => void) | null = null;
-    let props: Record<string, any> | null = null,
-      text: string | number | null = null;
-    let element: Record<string, any>;
-    element = document.createElement(element_initials);
+export const makeElement = (
+  element: Record<string, any>,
+  ...ElementChildrenAndPropertyList: ElementType<HTMLElement>[]
+) => {
+  let beforeMount: ((this: any) => void) | null = null;
+  let props: Record<string, any> | null = null,
+    text: string | number | null = null;
 
-    //? getting children ready
-    if (ElementChildrenAndPropertyList.length) {
-      for (let i = 0; i < ElementChildrenAndPropertyList.length; i++) {
-        let child = ElementChildrenAndPropertyList[i] as any;
-        // single child lane
+  //? getting children ready
+  if (ElementChildrenAndPropertyList.length) {
+    for (let i = 0; i < ElementChildrenAndPropertyList.length; i++) {
+      let child = ElementChildrenAndPropertyList[i] as any;
+      // single child lane
+      if (typeof child === "function") {
+        child = child() as any;
         if (typeof child === "function") {
           child = child() as any;
-          if (typeof child === "function") {
-            child = child() as any;
-          }
         }
-        // appending child
-        if (isNode(child)) {
-          element.appendChild(child);
-          continue;
+      }
+      // appending child
+      if (isNode(child)) {
+        element.appendChild(child);
+        continue;
+      }
+      // children array
+      if (Array.isArray(child)) {
+        element.appendChild(Rhoda(child));
+        continue;
+      }
+      // getting innerText
+      if (typeof child === "string" || typeof child === "number") {
+        text = child;
+        continue;
+      }
+      // getting props
+      if (typeof child === "object") {
+        if (!props) {
+          props = child;
+        } else {
+          props = Object.assign(props, child);
         }
-        // children array
-        if (Array.isArray(child)) {
-          element.appendChild(Rhoda(child));
-          continue;
-        }
-        // getting innerText
-        if (typeof child === "string" || typeof child === "number") {
-          text = child;
-          continue;
-        }
-        // getting props
-        if (typeof child === "object") {
-          if (!props) {
-            props = child;
-          } else {
-            props = Object.assign(props, child);
-          }
-          continue;
-        }
+        continue;
+      }
+      // throw an error
+      if (typeof child !== "undefined") {
         // throw an error
-        if (typeof child !== "undefined") {
-          // throw an error
-          console.error(" ✘  Cradova err:   got", { child });
-          throw new Error(
-            "  ✘  Cradova err:  invalid child type: " + "(" + typeof child + ")"
-          );
-        }
+        console.error(" ✘  Cradova err:   got", { child });
+        throw new Error(
+          "  ✘  Cradova err:  invalid child type: " + "(" + typeof child + ")"
+        );
       }
     }
-
-    //? adding props
-    if (typeof props === "object" && element) {
-      // adding attributes
-      for (const prop in props) {
-        // adding styles
-        if (prop === "style" && typeof props[prop] === "object") {
-          for (const [k, v] of Object.entries(props[prop])) {
-            if (typeof element.style[k] !== "undefined" && k !== "src") {
-              element.style[k] = v;
-            } else {
-              throw new Error(
-                "✘  Cradova err :  " + k + " is not a valid css style property"
-              );
-            }
-          }
-          continue;
-        }
-        // for compatibility
-        if (typeof element.style[prop] !== "undefined" && prop !== "src") {
-          element.style[prop] = props[prop];
-          continue;
-        }
-        // text content
-        if (
-          prop === "text" &&
-          typeof props[prop] === "string" &&
-          props[prop] !== ""
-        ) {
-          text = props[prop];
-          continue;
-        }
-        // class name
-        if (
-          prop === "class" &&
-          typeof props[prop] === "string" &&
-          props[prop] !== ""
-        ) {
-          element.classList.add(props[prop]);
-          continue;
-        }
-        // before mount event
-        if (prop === "beforeMount") {
-          beforeMount = props["beforeMount"];
-          continue;
-        }
-        // setting state id
-        if (prop === "stateID") {
-          element.setAttribute("data-cra-id", props[prop]);
-          continue;
-        }
-        // setting data attribute
-        if (prop.includes("$")) {
-          element.setAttribute("data-" + prop.split("$")[1], props[prop]);
-          continue;
-        }
-
-        if (
-          Array.isArray(props[prop]) &&
-          props[prop][0] instanceof simpleStore
-        ) {
-          element.updateState = dispatch.bind(null, element);
-          props[prop][0]._bindRef(element, prop, props[prop][1]);
-          continue;
-        }
-        // setting should update state key;
-        if (prop === "shouldUpdate" && props[prop] === true) {
-          element.updateState = dispatch.bind(null, element);
-          continue;
-        }
-
-        // setting afterMount event;
-        if (
-          prop === "afterMount" &&
-          typeof props["afterMount"] === "function"
-        ) {
-          const av = () => {
-            props!["afterMount"].apply(element);
-            window.removeEventListener("cradova-aftermount", av);
-          };
-          window.addEventListener("cradova-aftermount", av);
-          continue;
-        }
-        // trying to set other values
-        try {
-          if (typeof element[prop] !== "undefined") {
-            element[prop] = props[prop];
-          } else {
-            if (prop.includes("data-")) {
-              element.setAttribute(prop, props[prop]);
-              continue;
-            }
-            element[prop] = props[prop];
-            if (
-              prop !== "for" &&
-              prop !== "text" &&
-              prop !== "class" &&
-              prop !== "tabindex" &&
-              prop !== "disabled" &&
-              !prop.includes("aria")
-            ) {
-              console.warn(" ✘  Cradova err:  invalid html attribute ", {
-                prop,
-              });
-            } else {
-              continue;
-            }
-          }
-        } catch (error) {
-          console.error(" ✘  Cradova err: invalid html attribute ", { props });
-          console.error(" ✘  Cradova err:  ", error);
-        }
-      }
-    }
-    if (text) {
-      element.appendChild(document.createTextNode(text as string));
-    }
-    if (typeof beforeMount === "function") {
-      beforeMount.apply(element);
-    }
+  } else {
     return element;
-  };
+  }
+
+  //? adding props
+  if (typeof props === "object" && element) {
+    // adding attributes
+    for (const prop in props) {
+      // adding styles
+      if (prop === "style" && typeof props[prop] === "object") {
+        for (const [k, v] of Object.entries(props[prop])) {
+          if (typeof element.style[k] !== "undefined" && k !== "src") {
+            element.style[k] = v;
+          } else {
+            throw new Error(
+              "✘  Cradova err :  " + k + " is not a valid css style property"
+            );
+          }
+        }
+        continue;
+      }
+      // for compatibility
+      if (typeof element.style[prop] !== "undefined" && prop !== "src") {
+        element.style[prop] = props[prop];
+        continue;
+      }
+      // text content
+      if (
+        prop === "text" &&
+        typeof props[prop] === "string" &&
+        props[prop] !== ""
+      ) {
+        text = props[prop];
+        continue;
+      }
+
+      // before mount event
+      if (prop === "beforeMount") {
+        beforeMount = props["beforeMount"];
+        continue;
+      }
+      // setting state id
+      if (prop === "stateID") {
+        element.setAttribute("data-cra-id", props[prop]);
+        continue;
+      }
+      // setting data attribute
+      if (prop.includes("$")) {
+        element.setAttribute("data-" + prop.split("$")[1], props[prop]);
+        continue;
+      }
+
+      if (
+        Array.isArray(props[prop]) &&
+        props[prop][0] instanceof createSignal
+      ) {
+        element.updateState = dispatch.bind(null, element);
+        props[prop][0].bindRef(element, {
+          _element_property: prop,
+          signalProperty: props[prop][1],
+        });
+        continue;
+      }
+      // setting should update state key;
+      if (prop === "shouldUpdate" && props[prop] === true) {
+        element.updateState = dispatch.bind(undefined, element);
+        continue;
+      }
+
+      // setting afterMount event;
+      if (prop === "afterMount" && typeof props["afterMount"] === "function") {
+        const av = () => {
+          props!["afterMount"].apply(element);
+          window.removeEventListener("cradova-aftermount", av);
+        };
+        window.addEventListener("cradova-aftermount", av);
+        continue;
+      }
+      // trying to set other values
+      try {
+        if (typeof element[prop] !== "undefined") {
+          element[prop] = props[prop];
+        } else {
+          if (prop.includes("data-")) {
+            element.setAttribute(prop, props[prop]);
+            continue;
+          }
+          element[prop] = props[prop];
+          if (
+            prop !== "for" &&
+            prop !== "text" &&
+            prop !== "class" &&
+            prop !== "tabindex" &&
+            prop !== "disabled" &&
+            !prop.includes("aria")
+          ) {
+            console.warn(" ✘  Cradova err:  invalid html attribute ", {
+              prop,
+            });
+          } else {
+            continue;
+          }
+        }
+      } catch (error) {
+        console.error(" ✘  Cradova err: invalid html attribute ", { props });
+        console.error(" ✘  Cradova err:  ", error);
+      }
+    }
+  }
+  if (text) {
+    element.appendChild(document.createTextNode(text as string));
+  }
+  if (typeof beforeMount === "function") {
+    beforeMount.apply(element);
+  }
+  // adding click event to a tags
+  if (element.tagName === "A") {
+    if (element.href.includes(window.location.origin)) {
+      element.addEventListener("click", (e: any) => {
+        e.preventDefault();
+        Router.navigate(element.pathname);
+      });
+    }
+  }
+  return element;
+};
+
+const cra: any = (element_initials: string) => {
+  return makeElement.bind(
+    undefined,
+    document.createElement(element_initials) as Record<string, any>
+  );
 };
 export const a: ElementType<HTMLAnchorElement> = cra("a");
 export const abbr: ElementType<HTMLElement> = cra("abbr");

@@ -24,10 +24,6 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
           continue;
         }
 
-        // if (typeof element.style[key] !== "undefined" && key !== "src") {
-        //   element.style[key] = state[key];
-        //   continue;
-        // }
         if (typeof element[key] === "function") {
           if (key.startsWith("on")) {
             element[key] = state[key];
@@ -41,20 +37,7 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
           element.innerText = state[key];
           continue;
         }
-        // // adding class name to element
-        // if (
-        //   key === "class" &&
-        //   typeof state[key] === "string" &&
-        //   state[key] !== ""
-        // ) {
-        //   const classes = state[key].split(" ");
-        //   for (let i = 0; i < classes.length; i++) {
-        //     if (classes[i]) {
-        //       element.classList.add(classes[i]);
-        //     }
-        //   }
-        //   continue;
-        // }
+
         //removing element element
         if (key === "remove") {
           if (element.parentElement) {
@@ -88,6 +71,8 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
               key !== "for" &&
               key !== "text" &&
               key !== "class" &&
+              key !== "tabindex" &&
+              key !== "disabled" &&
               !key.includes("aria")
             ) {
               console.error(" ✘  Cradova err:  invalid html attribute " + key);

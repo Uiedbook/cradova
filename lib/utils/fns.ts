@@ -9,7 +9,7 @@ export const isNode = (node: any) =>
 export let cradovaAftermountEvent = new CustomEvent("cradova-aftermount");
 export function uuid() {
   let t = Date.now ? +Date.now() : +new Date();
-  return "cradova-id-xxxxxxxxxx".replace(/[x]/g, function (e) {
+  return "cradova-id-xxxxxx".replace(/[x]/g, function (e) {
     const r = (t + 16 * Math.random()) % 16 | 0;
     return ("x" === e ? r : (7 & r) | 8).toString(16);
   });
@@ -142,15 +142,18 @@ export function assert(condition: any, ...elements: any) {
   return undefined;
 }
 export function loop(
-  datalist: any,
-  component: (value: any, index?: number, array?: any[]) => HTMLElement
+  datalist: any[],
+  component: (value: any, index?: number, array?: any[]) => any
 ) {
   if (typeof component !== "function") {
     throw new Error(
       " ✘  Cradova err :  Invalid component type, must be a function that returns html  "
     );
   }
-  return Array.isArray(datalist) ? datalist.map(component) : undefined;
+  // am trying to confuse typescript compiler, but i know what am trying to do
+  return Array.isArray(datalist)
+    ? (datalist.map(component) as unknown as HTMLElement)
+    : undefined;
 }
 
 export function assertOr(
@@ -252,16 +255,14 @@ export class Ref<D> {
       await this.effector.apply(this);
       window.removeEventListener("cradova-aftermount", av);
     };
-    if (!this.published) {
-      this.published = true;
-      window.addEventListener("cradova-aftermount", av);
-    } else {
-      this.effector();
-    }
+    window.addEventListener("cradova-aftermount", av);
+    this.published = true;
+    this.rendered = true;
+    this.effector();
     if (!element) {
       element = this.preRendered;
     }
-    return element;
+    return element as HTMLElement;
   }
   instance() {
     return dispatch(this.stateID, {
@@ -283,18 +284,15 @@ export class Ref<D> {
   }
 
   private async effector() {
-    // ? tested
     if (!this.rendered) {
-      // effects
-      for (const effect of this.effects) {
-        await effect.apply(this);
+      for (let i = 0; i < this.effects.length; i++) {
+        await this.effects[i].apply(this);
       }
     }
     // first update
     if (!this.hasFirstStateUpdateRun && this.effectuate) {
       await this.effectuate();
     }
-    this.rendered = true;
     this.hasFirstStateUpdateRun = true;
   }
 
@@ -322,9 +320,11 @@ export class Ref<D> {
       }
       this.effectuate = updateState.bind(this, data);
     } else {
-      (async () => {
-        await this.Activate(data);
-      })();
+      if (this.published) {
+        (async () => {
+          await this.Activate(data);
+        })();
+      }
     }
     if (stash) {
       this.stash = data;
@@ -336,7 +336,7 @@ export class Ref<D> {
     if (!data) {
       return;
     }
-
+    this.published = false;
     const guy: HTMLElement = dispatch(this.stateID, {
       // @ts-ignore
       cradovaDispatchTrackBreak: true,
@@ -362,6 +362,7 @@ export class Ref<D> {
     } catch (e0) {
       console.error(e0);
     }
+    this.published = true;
   }
   remove() {
     dispatch(this.stateID, { remove: true });
