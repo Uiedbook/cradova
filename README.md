@@ -10,7 +10,7 @@
     Cradova is a JavaScript framework for building Single Page Applications and PWAs.
     <br/>
     <br/>
-    <a href="https://github.com/fridaycandour/cradova#examples"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/fridaycandour/cradova#examples"><strong>Explore the 🎙️ docs »</strong></a>
     <br/>
     <br/>
     <a href="https://t.me/cradovaframework">Join Community</a>
@@ -39,9 +39,9 @@
 
 ## What is Cradova?
 
-Cradova is a JavaScript framework for building Single Page Applications and PWAs.
+Cradova is a web development framework for building Single Page Applications and PWAs.
 
-It's a fast and simple framework, it provides state management, routing system and a rest API utility out of the box.
+It's a fast, simple and modern, it provides state management, routing system and a rest API utility out of the box.
 
 Cradova follows the [VJS specification](https://github.com/fridaycandour/cradova/blob/main/spec.md)
 
@@ -53,10 +53,9 @@ Cradova does't rely on visual DOM or diff algorithms to manage the DOM, instead,
 
 ### is this a big benefit?
 
-Yes!
-see for yourself.
+Undoubtedly, this provides a significant advantage. You can experience it firsthand and decide for yourself.
 
-Cradova has been used on a couple of projects in production and we will update this page to reflect our progress as we keep improving.
+Cradova has already been utilized in multiple production projects, and we will continuously update this page to showcase our advancements as we keep improving.
 
 [current version changes](https://github.com/fridaycandour/cradova/blob/main/CHANGELOG.md#v220)
 
@@ -278,7 +277,7 @@ Router.route("/", home);
 
 ## Documentation
 
-We are currently building cradova's documentation and we have only a few hands, if you're interested in helping you can join the community, learn first hand, and support cradova's progress.
+At the moment, we're in the process of creating documentation for Cradova, and we have limited resources. If you're interested in lending a hand, we invite you to join our community, gain firsthand experience, and contribute to the advancement of Cradova.
 
 ## Getting Help
 
