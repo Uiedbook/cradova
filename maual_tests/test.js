@@ -15,8 +15,8 @@
 // console.log(s, y);
 // console.log("2");
 
-const e = new Array(1000);
-e.fill({ name: "hello world" });
+// const e = new Array(1000);
+// e.fill({ name: "hello world" });
 
 function benchSuit(code, runs = 1) {
   const st = Date.now();
@@ -45,13 +45,28 @@ function benchSuit(code, runs = 1) {
 //   }
 // }, 1000);
 
-benchSuit(() => {
-  for (let i = 0; i < e.length; i++) {
-    e[i] = null;
-  }
-}, 10);
-benchSuit(() => {
-  for (let i = 0; i < e.length; i++) {
-    e[i] = null;
-  }
-}, 1000);
+// benchSuit(() => {
+//   for (let i = 0; i < e.length; i++) {
+//     e[i] = null;
+//   }
+// }, 10);
+// benchSuit(() => {
+//   for (let i = 0; i < e.length; i++) {
+//     e[i] = null;
+//   }
+// }, 1000);
+
+// benchSuit(() => {
+//   let txx = "l|l";
+//   if (txx.includes("|")) {
+//     txx = "";
+//     //
+//   }
+// });
+// benchSuit(() => {
+//   let txx = "";
+//   if (txx.indexOf("|") > -1) {
+//     txx = "";
+//     //
+//   }
+// });

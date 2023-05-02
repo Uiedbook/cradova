@@ -136,3 +136,12 @@ and we went along with it.
 - fix screen not persisting bug
 - proof tests
 - battle testing used and tested in production
+
+# v2.2.1
+
+- fix some little bugs
+
+# v2.2.2
+
+- make tag parser faster and fixed a tiny bug
+- completed various tests

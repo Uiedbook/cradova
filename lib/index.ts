@@ -42,73 +42,68 @@ import { makeElement } from "./utils/tags";
 
 ("use strict");
 
-const make = function (txx: any) {
-  if (!txx) {
+const Purifier = (txx: any) => {
+  let tag: string;
+  if (!txx.includes("#")) {
+    txx = txx.split(".");
+    tag = txx.shift();
+    if (!tag) {
+      tag = "div";
+    }
+    return [txx, [], tag];
+  } else {
+    if (!txx.includes(".")) {
+      txx = txx.split("#");
+      tag = txx.shift();
+      if (!tag) {
+        tag = "div";
+      }
+      if (txx[0].includes(" ")) {
+        txx = [txx[0].split(" ")[1]];
+      }
+      return [[], txx, tag];
+    }
+  }
+  txx = txx.split(".");
+  const classes = [];
+  const IDs = [];
+  tag = !txx[0].includes("#") && txx.shift();
+  if (!tag) {
+    tag = "div";
+  }
+  for (let i = 0; i < txx.length; i++) {
+    if (txx[i].includes("#")) {
+      const item = txx[i].split("#");
+      IDs.push(item[1]);
+      if (i === 0) {
+        tag = item[0];
+        continue;
+      }
+      classes.push(item[0]);
+      continue;
+    }
+    classes.push(txx[i]);
+  }
+  return [classes.join(" "), IDs[0], tag];
+};
+
+const make = function (txx: string) {
+  if (!txx.length) {
     return {
       tag: "div",
     };
   }
-  let tag;
-  let innerValue: string = "";
-  if (txx.includes("|")) {
-    const tc = txx.split("|");
-    innerValue = tc[1];
-    txx = tc[0] && tc[0];
+  if (Array.isArray(txx)) {
+    txx = txx[0];
   }
-  const itemsPurifier = () => {
-    if (!txx.includes("#")) {
-      txx = txx.split(".") as any;
-      tag = txx[0];
-      if (tag) {
-        txx.shift();
-      } else {
-        tag = "div";
-      }
-      return [txx, []];
-    } else {
-      if (!txx.includes(".")) {
-        txx = txx.split("#") as any;
-        tag = txx[0];
-        if (tag) {
-          txx.shift();
-        } else {
-          tag = "div";
-        }
-        if (txx[0].includes(" ")) {
-          txx = [txx[0].split(" ")[1]];
-        }
-        return [[], txx];
-      }
+  let innerValue = "";
+  if (txx.includes("|")) {
+    [txx, innerValue] = txx.split("|");
+    if (!txx) {
+      return { tag: "P", innerValue };
     }
-    txx = txx.split(".") as any;
-    const pureItems = [];
-    const impureItems = [];
-    tag = !txx[0].includes("#") && txx[0];
-    if (tag) {
-      txx.shift();
-    }
-    for (let i = 0; i < txx.length; i++) {
-      if (txx[i].includes("#")) {
-        const item = txx[i].split("#");
-        impureItems.push(item[1]);
-        if (i === 0) {
-          tag = item[0];
-          continue;
-        }
-        pureItems.push(item[0]);
-        continue;
-      }
-      pureItems.push(txx[i]);
-    }
-    if (!tag) {
-      tag = "div";
-    }
-    return [pureItems, impureItems];
-  };
-
-  const [classes, ids] = itemsPurifier() as any;
-  const ID = ids && ids[0];
-  const className = classes && classes.join(" ");
+  }
+  const [className, ID, tag] = Purifier(txx);
   return { tag, className, ID, innerValue };
 };
 
@@ -147,10 +142,6 @@ const make = function (txx: any) {
  */
 
 const _: any = (...element_initials: any[]) => {
-  if (element_initials[0].raw) {
-    // @ts-ignore
-    element_initials[0] = element_initials["raw"][0];
-  }
   if (typeof element_initials[0] !== "string") {
     return frag(element_initials);
   }
