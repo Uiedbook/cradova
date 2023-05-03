@@ -18,6 +18,6 @@ echo ""
 npm run build
 echo  "${cyan} Packing ...${clear}"
 npm pack
-mv cradova-2.2.2.tgz ~
+mv cradova-2.2.3.tgz ~
 echo  "${green} done! ~${clear}"
 
