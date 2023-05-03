@@ -12,7 +12,7 @@
 =============================================================================
   
   Cradova FrameWork
-  @version  2.2.1
+  @version  2.3.0
   License: Apache V2
   
   -----------------------------------------------------------------------------
@@ -56,9 +56,6 @@ const make = function (txx: any) {
       return ["P", undefined, undefined, innerValue];
     }
   }
-
-  //
-
   let tag;
   if (!txx.includes("#")) {
     txx = txx.split(".");
@@ -100,7 +97,6 @@ const make = function (txx: any) {
     }
     classes.push(txx[i]);
   }
-  //
   return [tag || "DIV", IDs[0], classes.join(" "), innerValue];
 };
 
@@ -188,12 +184,13 @@ export { Screen } from "./utils/Screen";
 export {
   assert,
   assertOr,
-  cradovaAftermountEvent,
+  CradovaEvent,
   css,
   lazy,
   loop,
   Ref,
   svgNS,
+  reference,
 } from "./utils/fns";
 
 export default _;

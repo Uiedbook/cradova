@@ -112,9 +112,9 @@ export class createSignal<Type extends Record<string, any>> {
       this.actions[key] = action;
     } else {
       if (typeof key === "object" && !action) {
-        for (const [nam, action] of Object.entries(key)) {
+        for (const [nam, act] of Object.entries(key)) {
           if (typeof nam === "string" && typeof action === "function") {
-            this.actions[nam] = action;
+            this.actions[nam] = act;
           } else {
             throw new Error(`✘  Cradova err : can't create action ${nam}`);
           }
@@ -132,14 +132,13 @@ export class createSignal<Type extends Record<string, any>> {
    * @param data - data for the action
    */
   fireAction(key: string, data?: Type) {
-    if (this.actions[key].updateState) {
-      this.actions[key].updateState(this, data);
-      this._updateState(key, data);
+    this._updateState(key, data);
+    if (this.actions[key] && this.actions[key].updateState) {
+      this.actions[key].updateState(data);
       return;
     } else {
       if (typeof this.actions[key] === "function") {
-        this.actions[key](this, data);
-        this._updateState(key, data);
+        this.actions[key].bind(this)(data);
         return;
       }
     }
@@ -210,6 +209,10 @@ export class createSignal<Type extends Record<string, any>> {
           ent.ref.updateState(this.value[ent._signalProperty]);
           continue;
         }
+        if (!ent._element_property && !ent._signalProperty) {
+          ent.ref.updateState(this.value);
+          continue;
+        }
       }
     }
   }
@@ -228,10 +231,13 @@ export class createSignal<Type extends Record<string, any>> {
       event?: string;
       signalProperty: string;
       _element_property: string;
-    }
+    } = { signalProperty: "", _element_property: "" }
   ) {
     if (ref.render) {
       ref.render = ref.render.bind(ref, this.value);
+    }
+    if (ref._setExtra) {
+      ref._setExtra(this);
     }
     if (ref && ref.updateState) {
       // it's an element binding, not ref, not event(fire action events)

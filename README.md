@@ -49,11 +49,12 @@ Cradova follows the [VJS specification](https://github.com/fridaycandour/cradova
 
 Cradova is aimed to be fast and simple with and fewer abstractions and yet easily composable.
 
-Cradova does't rely on visual DOM or diff algorithms to manage the DOM, instead, State management is done more elegantly with a simple predictive model, manually and easily with all the speed.
+Cradova is not built on visual DOM or diff algorithms.
+Instead, State management is done more elegantly with a simple predictive model, simple and easy with all the speed.
 
-### is this a big benefit?
+## Is this a big benefit?
 
-Undoubtedly, this provides a significant advantage. You can experience it firsthand and decide for yourself.
+Undoubtedly, this provides a significant advantage. You can experience it firsthand and decide.
 
 Cradova has already been utilized in multiple production projects, and we will continuously update this page to showcase our advancements as we keep improving.
 
@@ -83,12 +84,10 @@ npm i cradova
 
 Many aspects of Cradova are not reflected in the following example. More functionality will be entailed in future docs.
 
-Here's an example of create a basic component in Cradova:
+## A basic component in Cradova:
 
 ```js
-// cradova v2.0.0 comes with all html tags prebuilt and fully typed
-// this gives your app more performance gain.
-import _, { h1 } from "cradova";
+import { div, h1 } from "cradova";
 
 function Hello(name) {
   return h1("Hello " + name, {
@@ -99,27 +98,122 @@ function Hello(name) {
   });
 }
 
-// document fragment empty cradova call _()
-
-const html = _(Hello("peter"), Hello("joe"));
+const html = div(Hello("peter"), Hello("joe"));
 
 document.body.append(html);
 ```
+
+## working with state:
+
+this a collection of basic examples
+you can choose any that best suite what problem you want to solve
 
 ```js
-// regular example
-import _ from "cradova";
+import _, { Ref } from "cradova";
 
-function Hello(name) {
-  return _("h1", "Hello " + name);
+// setting shouldUpdate to true
+// gives you this.updateState binding
+
+function counter() {
+  let num = 0;
+  return _("h1| 0", {
+    shouldUpdate: true,
+    onclick() {
+      num++;
+      this.updateState({ text: num });
+    },
+  });
 }
 
-const html = _(Hello("peter"), Hello("joe"));
+// Another example with data- attribute
 
-document.body.append(html);
+function dataCounter() {
+  return _("h1| 0", {
+    shouldUpdate: true,
+    "data-num": "0",
+    onclick() {
+      const num = Number(this.getAttribute("data-num")) + 1;
+      this.updateState({ text: num, $num: num });
+    },
+  });
+}
+
+// hello message
+
+function HelloMessage(name = "no name") {
+  return _("div.foo#bar", {
+    shouldUpdate: true,
+    text: "hello  " + name,
+    onclick() {
+      const name = prompt("what are your names");
+      this.updateState({ text: "hello " + name });
+    },
+  });
+}
+
+// using cradova Ref
+
+const nameRef = new Ref(function (name) {
+  const self = this;
+  return _("div.foo#bar", {
+    text: "hello" + (name || "no name"),
+    onclick() {
+      const name = prompt();
+      self.updateState(name);
+    },
+  });
+});
+
+// Simple todo list
+
+function TodoList() {
+
+  const todoStore = new createSignal(["corn", "pita", "soup"]);
+
+  // create actions
+todoStore.createAction("add-todo", function (todo){
+  this.set([...this.value, todo])
+})
+
+todoStore.createAction("remove-todo", function (todo){
+  const ind = this.values.indexOf(todo)
+  this.set(this.value.splice(ind, 1))
+})
+
+// markup
+
+  return main(
+    div(Store.value.map((item) =>
+    p(item, {onclick(){
+todoStore.fireAction("remove-todo", item)
+    }})))
+
+    div(
+      input({placeholder: "type in todo"}),
+    button("Add todo", {
+      onclick(){
+            todoStore.fireAction("remove-todo", item)
+    }})
+    )
+  );
+}
+
+function App() {
+  return _(
+    "div.foo#bar",
+    counter,
+    dataCounter,
+    HelloMessage,
+    nameRef.render("no name")
+  );
+}
+
+// add your app to the DOM
+
+document.body.append(App());
 ```
 
-## Using Screen
+## working with screens:
 
 ```js
 import _, { Screen, Router } from "cradova";
@@ -136,6 +230,27 @@ function HelloMessage(name) {
   return _("div", "Hello  " + name);
 }
 
+/*
+
+Nice things about cradova screens
+
+screens are rendered once by default to hack
+responsiveness making your app work fast as user navigates.
+
+this behavior can be override
+by passing
+prerender: false
+in the constructor
+
+
+Cradova screens has
+onActivate() and
+onDeactivate() methods
+
+these allow you manage rendering
+circle for each in your app
+
+*/
 
 /*
 
@@ -167,113 +282,6 @@ Router.route("/", home);
 ```
 
 ## State management
-
-```js
-
-
- // element can have this.updateState when the shouldUpdate props is true
-
-// Ref components
-
-// state can be managed from a store when using createSignal or simpleStores
-// this method is not yet documented
-
-import _, { Ref } from "cradova";
-
-// simple count
-
-function counter() {
-  let num = 0;
-  return _("h1| 0", {
-    shouldUpdate: true,
-    onclick() {
-      num++;
-      this.updateState({ text: num });
-    },
-  });
-}
-
-function dataCounter() {
-  return _("h1| 0", {
-    shouldUpdate: true,
-    "data-num": "0",
-    onclick() {
-     const num = Number(this.getAttribute("data-num")) + 1;
-      this.updateState({ text: num, $num: num });
-    },
-  });
-}
-
-function HelloMessage(name = "no name") {
-  return _("div.foo#bar", {
-    shouldUpdate: true,
-    text: "hello  " + name,
-    onclick() {
-      const name = prompt("what are your names");
-      this.updateState({ text: "hello " + name });
-    },
-  });
-}
-
-const nameRef = new Ref(function ( name ) {
-  const self = this;
-  return _("div.foo#bar", {
-    text: "hello" + (name || "no name"),
-    onclick() {
-      const name = prompt();
-      self.updateState(name);
-    },
-  });
-});
-
-/*
-cradova Ref are component objects
-with methods for rendering, pre-rendering, and updating a it dom elements.
-
-Ref also has the feature to stash input values need by the components
-
-*/
-
-
-function Home() {
-  return _("div.foo#bar",
-   counter,
-   dataCounter,
-   HelloMessage,
-   nameRef.render( "no name" )
-  );
-}
-
-const home = new Screen({
-  name: "home page", // page title
-  template: Home,
-  ...
-});
-
-/*
-
-Nice things about cradova screens
-
-screens are rendered once by default to hack
-responsiveness making your app work fast as user navigates.
-
-this behavior can be override
-by passing
-prerender: false
-in the constructor
-
-
-Cradova screens has
-onActivate() and
-onDeactivate() methods
-
-these allow you manage rendering
-circle for each in your app
-
-*/
-
-Router.route("/", home);
-```
 
 ## Documentation
 

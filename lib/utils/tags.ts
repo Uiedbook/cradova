@@ -1,6 +1,6 @@
 import { ElementType } from "../types";
 import { dispatch } from "./track";
-import { isNode, Rhoda } from "./fns";
+import { isNode, reference, Rhoda, CradovaEvent } from "./fns";
 import { createSignal } from "./createSignal";
 import { Router } from "./Router";
 
@@ -124,6 +124,19 @@ export const makeElement = (
         });
         continue;
       }
+
+      // reference
+
+      if (
+        prop == "reference" &&
+        Array.isArray(props[prop]) &&
+        props[prop][0] instanceof reference
+      ) {
+        element.updateState = dispatch.bind(null, element);
+        props[prop][0]._appendDom(props[prop][1], element);
+        continue;
+      }
+
       // setting should update state key;
       if (prop === "shouldUpdate" && props[prop] === true) {
         element.updateState = dispatch.bind(undefined, element);
@@ -132,11 +145,11 @@ export const makeElement = (
 
       // setting afterMount event;
       if (prop === "afterMount" && typeof props["afterMount"] === "function") {
-        const av = () => {
+        const avi = () => {
           props!["afterMount"].apply(element);
-          window.removeEventListener("cradova-aftermount", av);
+          CradovaEvent.removeEventListener("cradovaAftermountEvent", avi);
         };
-        window.addEventListener("cradova-aftermount", av);
+        CradovaEvent.addEventListener("cradovaAftermountEvent", avi);
         continue;
       }
       // trying to set other values
@@ -177,7 +190,7 @@ export const makeElement = (
     beforeMount.apply(element);
   }
   // adding click event to a tags
-  if (element.tagName === "A") {
+  if (element.tagName === "A" && window) {
     if (element.href.includes(window.location.origin)) {
       element.addEventListener("click", (e: any) => {
         e.preventDefault();

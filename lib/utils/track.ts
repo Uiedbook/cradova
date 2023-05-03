@@ -39,20 +39,20 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
         }
 
         //removing element element
-        if (key === "remove") {
-          if (element.parentElement) {
-            element.parentElement?.removeChild(element);
-          } else {
-            element.remove();
-          }
-          continue;
-        }
+        // if (key === "remove") {
+        //   if (element.parentElement) {
+        //     element.parentElement?.removeChild(element);
+        //   } else {
+        //     element.remove();
+        //   }
+        //   continue;
+        // }
 
         // setting data attribute
-        if (key.includes("$")) {
-          element.setAttribute("data-" + key.split("$")[1], state[key]);
-          continue;
-        }
+        // if (key.includes("$")) {
+        //   element.setAttribute("data-" + key.split("$")[1], state[key]);
+        //   continue;
+        // }
 
         // changing the element children tree
         if (key === "tree") {
@@ -113,10 +113,10 @@ export function dispatch(
   stateID: stateID | Record<stateID, stateType>,
   state?: stateType
 ) {
-  let ele;
   if (stateID instanceof HTMLElement) {
-    ele = stateID;
+    cradovaDispatchTrack([stateID] as any);
   }
+  let ele;
   let updated = undefined;
   if (typeof state === "undefined" && typeof stateID === "object" && !ele) {
     for (const [id, eachState] of Object.entries(stateID)) {

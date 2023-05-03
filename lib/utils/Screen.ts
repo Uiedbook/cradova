@@ -1,5 +1,5 @@
 import { CradovaScreenType } from "../types.js";
-import { cradovaAftermountEvent, frag, isNode } from "./fns.js";
+import { CradovaEvent, frag, isNode } from "./fns.js";
 
 /**
  *  Cradova Screen
@@ -169,7 +169,9 @@ export class Screen {
     if (this._callBack) {
       await this._callBack();
     }
-    window.dispatchEvent(cradovaAftermountEvent);
-    window.scrollTo(0, 0);
+    CradovaEvent.dispatchEvent("cradovaAftermountEvent");
+    if (window) {
+      window.scrollTo(0, 0);
+    }
   }
 }
