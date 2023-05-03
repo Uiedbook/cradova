@@ -10,9 +10,9 @@ export type ElementType<T> = (
         beforeMount?: () => void;
         afterMount?: () => void;
         text?: string;
+        reference?: any;
         stateID?: string;
         shouldUpdate?: boolean;
-        assert?: any;
       }
   )[]
 ) => T;

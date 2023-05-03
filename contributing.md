@@ -1,9 +1,12 @@
-What does Cradova needs?
+# What does Cradova needs?
 
-- building cradova CLI (in progress)
+- Building cradova CLI (in progress)
 - Cradova Documentation Website
 - UI component libraries for cradova
 - Sample projects
 - maintenance and promotion
 
-community [telegram](https://t.me/cradovaframework)
+##### Cradova community
+
+[Discord](https://discord.gg/szF7CrZT)
+[Telegram](https://t.me/cradovaframework)

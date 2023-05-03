@@ -202,10 +202,10 @@ export const makeElement = (
 };
 
 const cra: any = (element_initials: string) => {
-  return (...bo: any[]) => {
+  return (...initials: any[]) => {
     return makeElement(
       document.createElement(element_initials) as Record<string, any>,
-      ...bo
+      ...initials
     );
   };
 };
