@@ -146,6 +146,11 @@ and we went along with it.
 - make tag parser faster and fixed a tiny bug
 - completed various tests
 
+# v2.2.3
+
+- make tag parser faster and fixed a tiny bug
+- completed various tests
+
 # v2.3.0
 
 - created CradovaEvent switched from the CustomEvent class (for more speed and node compatibility journey)
