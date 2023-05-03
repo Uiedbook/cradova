@@ -42,26 +42,42 @@ import { makeElement } from "./utils/tags";
 
 ("use strict");
 
-const Purifier = (txx: any) => {
-  let tag: string;
+const make = function (txx: any) {
+  if (!txx.length) {
+    return ["DIV"];
+  }
+  if (Array.isArray(txx)) {
+    txx = txx[0];
+  }
+  let innerValue = "";
+  if (txx.includes("|")) {
+    [txx, innerValue] = txx.split("|");
+    if (!txx) {
+      return ["P", undefined, undefined, innerValue];
+    }
+  }
+
+  //
+
+  let tag;
   if (!txx.includes("#")) {
     txx = txx.split(".");
     tag = txx.shift();
     if (!tag) {
-      tag = "div";
+      tag = "DIV";
     }
-    return [txx, [], tag];
+    return [tag, undefined, txx.join(" "), innerValue];
   } else {
     if (!txx.includes(".")) {
       txx = txx.split("#");
       tag = txx.shift();
       if (!tag) {
-        tag = "div";
+        tag = "DIV";
       }
       if (txx[0].includes(" ")) {
         txx = [txx[0].split(" ")[1]];
       }
-      return [[], txx, tag];
+      return [tag, txx[0], undefined, innerValue];
     }
   }
   txx = txx.split(".");
@@ -69,7 +85,7 @@ const Purifier = (txx: any) => {
   const IDs = [];
   tag = !txx[0].includes("#") && txx.shift();
   if (!tag) {
-    tag = "div";
+    tag = "DIV";
   }
   for (let i = 0; i < txx.length; i++) {
     if (txx[i].includes("#")) {
@@ -84,27 +100,8 @@ const Purifier = (txx: any) => {
     }
     classes.push(txx[i]);
   }
-  return [classes.join(" "), IDs[0], tag];
-};
-
-const make = function (txx: string) {
-  if (!txx.length) {
-    return {
-      tag: "div",
-    };
-  }
-  if (Array.isArray(txx)) {
-    txx = txx[0];
-  }
-  let innerValue = "";
-  if (txx.includes("|")) {
-    [txx, innerValue] = txx.split("|");
-    if (!txx) {
-      return { tag: "P", innerValue };
-    }
-  }
-  const [className, ID, tag] = Purifier(txx);
-  return { tag, className, ID, innerValue };
+  //
+  return [tag || "DIV", IDs[0], classes.join(" "), innerValue];
 };
 
 /**
@@ -146,38 +143,38 @@ const _: any = (...element_initials: any[]) => {
     return frag(element_initials);
   }
   const initials = make(element_initials.shift());
+
   let props: any = undefined;
   let element: Record<string, any>;
   try {
-    element = document.createElement(initials.tag!.trim());
+    element = document.createElement(initials[0]);
   } catch (error) {
-    throw new TypeError(" ✘  Cradova err:  invalid tag given  " + initials.tag);
+    throw new TypeError(" ✘  Cradova err:  invalid tag given  " + initials[0]);
   }
-  if (initials.className) {
+  if (initials[2]) {
     if (props) {
       // @ts-ignore js knows
-      props["className"] = initials.className.trim();
+      props["className"] = initials[2];
     } else {
-      props = { className: initials.className.trim() };
+      props = { className: initials[2] };
     }
   }
-  if (initials.ID) {
+  if (initials[1]) {
     if (props) {
       // @ts-ignore js knows
-      props["id"] = initials.ID.trim();
+      props["id"] = initials[1];
     } else {
-      props = { id: initials.ID.trim() };
+      props = { id: initials[1] };
     }
   }
-  if (initials.innerValue) {
+  if (initials[3]) {
     if (props) {
       // @ts-ignore js knows
-      props["innerText"] = initials.innerValue;
+      props["innerText"] = initials[3];
     } else {
-      props = { innerText: initials.innerValue };
+      props = { innerText: initials[3] };
     }
   }
-
   return makeElement(element, props, ...element_initials);
 };
 Init();

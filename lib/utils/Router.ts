@@ -263,9 +263,12 @@ RouterBox.router = async function (e: any, force = false) {
       RouterBox["lastNavigatedRouteController"] = route;
       RouterBox["pageShow"] && RouterBox["pageShow"](url);
     } catch (error) {
-      const errorHandler =
-        RouterBox.routes[RouterBox.params.params._path].errorHandler ||
-        RouterBox.errorHandler;
+      let errorHandler;
+      if (RouterBox.routes[RouterBox.params.params._path]) {
+        errorHandler =
+          RouterBox.routes[RouterBox.params.params._path].errorHandler ||
+          RouterBox.errorHandler;
+      }
       if (errorHandler) {
         errorHandler(error);
       }
@@ -316,7 +319,7 @@ Router["onPageHide"] = function (callback: () => void) {
  * @param {string}   path Route path.
  * @param {any} data data for the screen.
  */
-Router.packageScreen = async function (path: string, data: any) {
+Router.packageScreen = async function (path: string, data: any = {}) {
   if (!RouterBox.routes[path]) {
     console.error(" ✘  Cradova err:  no screen with path " + path);
     throw new Error(" ✘  Cradova err:  cradova err: Not a defined screen path");
