@@ -417,10 +417,10 @@ export class lazy {
 }
 
 export class reference {
-  [x: string]: Record<string, unknown>;
+  [x: string]: Record<string, any>;
   // @ts-ignore
   bindAs(name: string) {
-    return [this, name];
+    return [this, name] as any;
   }
   // @ts-ignore
   _appendDom(name: string, Element: any) {
@@ -436,9 +436,6 @@ export class reference {
         // @ts-ignore
         this[name] = [this[name], Element];
       }
-      // throw new Error(
-      //   `✘  Cradova err : Couldn't create reference to dom element as ${name}`
-      // );
     }
   }
   // @ts-ignore

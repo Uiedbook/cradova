@@ -11,9 +11,9 @@ declare module "cradova" {
           beforeMount?: () => void;
           afterMount?: () => void;
           text?: string;
+          reference?: any;
           stateID?: string;
           shouldUpdate?: boolean;
-          assert?: any;
         }
     )[]
   ) => T;
@@ -80,10 +80,6 @@ declare module "cradova" {
     persist?: boolean;
   };
 
-  export const makeElement: (
-    element: Record<string, any>,
-    ...ElementChildrenAndPropertyList: ElementType<HTMLElement>[]
-  ) => Record<string, any>;
   export const a: ElementType<HTMLAnchorElement>;
   export const abbr: ElementType<HTMLElement>;
   export const address: ElementType<HTMLElement>;
@@ -150,7 +146,6 @@ declare module "cradova" {
   export const meta: ElementType<HTMLMetaElement>;
   export const meter: ElementType<HTMLMeterElement>;
   export const nav: ElementType<HTMLElement>;
-  export const noscript: ElementType<HTMLElement>;
   export const object: ElementType<HTMLObjectElement>;
   export const ol: ElementType<HTMLOListElement>;
   export const optgroup: ElementType<HTMLOptGroupElement>;
@@ -222,32 +217,16 @@ declare module "cradova" {
   ): Promise<unknown>;
 
   /**
-   * Cradova afterMount event
+   * Cradova event
    */
-  export let cradovaAftermountEvent: CustomEvent<unknown>;
-  /**
-Write CSS styles in Javascript
-@example
-
-css("#container",
-{
-    height: "100%",
-    height: "100%",
-    background-color: "#ff9800"
-})
-
-css(".btn:hover",
-{
-    height: "100%",
-    height: "100%",
-    background-color: "#ff9800"
-})
-
-*/
-  export function css(
-    identifier: string,
-    properties?: Record<string, string>
-  ): void;
+  export class cradovaEvent {
+    private listeners;
+    addEventListener(eventName: string, callback: any): void;
+    removeEventListener(eventName: string, callback: any): void;
+    dispatchEvent(eventName: string, eventArgs?: any): void;
+  }
+  export const CradovaEvent: cradovaEvent;
+  export function css(identifier: string | TemplateStringsArray): void;
   /**
    *
    * @param {expression} condition
@@ -271,13 +250,14 @@ css(".btn:hover",
   type RefProps<D> = D | any;
   export class Ref<D> {
     private component;
-    private stateID;
     private effects;
     private effectuate;
     private rendered;
     private published;
     private hasFirstStateUpdateRun;
     private preRendered;
+    private reference;
+    Signal: createSignal<any> | undefined;
     stash: D | undefined;
     constructor(component: (data?: RefProps<D>) => any);
     preRender(data?: RefProps<D>): void;
@@ -290,7 +270,8 @@ css(".btn:hover",
      * @returns () => HTMLElement
      */
     render(data?: D, stash?: boolean): HTMLElement;
-    instance(): any;
+    instance(): Record<string, any>;
+    _setExtra(Extra: createSignal<any>): void;
     /**
      * Cradova Ref
      * ---
@@ -323,6 +304,12 @@ css(".btn:hover",
     private _cb;
     constructor(cb: () => Promise<any>);
     load(): Promise<void>;
+  }
+  export class reference {
+    [x: string]: Record<string, any>;
+    bindAs(name: string): any;
+    _appendDom(name: string, Element: any): void;
+    _appendDomForce(name: string, Element: any): void;
   }
 
   /**
@@ -391,11 +378,11 @@ css(".btn:hover",
      * @param key - string key of the action
      * @param data - data for the action
      */
-    fireAction(key: string, data?: Type): void;
+    fireAction(key: string, data?: unknown): void;
     /**
      * Cradova
      * ---
-     * is used to bind store data to an element
+     * is used to bind store data to any element
      *
      * @param prop
      * @returns something
@@ -412,7 +399,7 @@ css(".btn:hover",
      */
     bindRef(
       ref: any,
-      binding: {
+      binding?: {
         event?: string;
         signalProperty: string;
         _element_property: string;
@@ -458,13 +445,75 @@ css(".btn:hover",
     state?: stateType
   ): any;
 
-  /**
-   * Cradova Router
+  /** cradova router
    * ---
-   * Facilitates navigation within the application and initializes
-   * page views based on the matched routes.
+   * Registers a route.
+   *
+   * @param {string}   path     Route path.
+   * @param {any} screen the cradova document tree for the route.
    */
-  export const Router: Record<string, any>;
+  class RouterClass {
+    /** cradova router
+     * ---
+     * Registers a route.
+     *
+     * accepts an object containing
+     *
+     * @param {string}   path     Route path.
+     * @param {any} screen the cradova screen.
+     */
+    BrowserRoutes(obj: Record<string, any>): void;
+    /**
+     * Cradova Router
+     * ------
+     *
+     * Navigates to a designated screen in your app
+     *
+     * @param href string
+     * @param data object
+     * @param force boolean
+     */
+    navigate(
+      href: string,
+      data?: Record<string, any> | null,
+      force?: boolean
+    ): void;
+    /** cradova router
+     * ---
+     * Listen for navigation events
+     *
+     * @param callback   () => void
+     */
+    onPageEvent(callback: () => void): void;
+    /** cradova router
+     * ---
+     * get a screen ready before time.
+     *
+     * @param {string}   path Route path.
+     * @param {any} data data for the screen.
+     */
+    packageScreen(path: string, data?: any): Promise<void>;
+    /**
+     * Cradova Router
+     * ------
+     *
+     * return last set router params
+     *
+     * .
+     */
+    getParams: () => any;
+    /**
+     * Cradova
+     * ---
+     * Error Handler for your app
+     *
+     * @param callback
+     * @param path? page path
+     */
+    addErrorHandler(callback: () => void): void;
+    _mount(): void;
+  }
+  export const Router: RouterClass;
 
   /**
    *  Cradova Screen

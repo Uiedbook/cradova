@@ -8,7 +8,6 @@ import { RouterRouteObject } from "../types.js";
  * page views based on the matched routes.
  */
 
-export const Router: Record<string, any> = {};
 const RouterBox: Record<string, any> = {};
 
 RouterBox["lastNavigatedRouteController"] = null;
@@ -103,99 +102,6 @@ RouterBox.route = (path: string, screen: any) => {
   return RouterBox.routes[path];
 };
 
-/** cradova router
- * ---
- * Registers a route.
- *
- * @param {string}   path     Route path.
- * @param {any} screen the cradova document tree for the route.
- */
-
-Router.BrowserRoutes = function (obj: Record<string, any>) {
-  for (const path in obj) {
-    let screen = obj[path];
-    if (screen.catch || typeof screen === "function") {
-      RouterBox["routes"][path] = async () => {
-        if (typeof screen === "function") {
-          screen = await screen();
-        } else {
-          screen = await screen;
-        }
-        return RouterBox.route(path, screen.default);
-      };
-    } else {
-      RouterBox.route(path, screen);
-    }
-  }
-  Router.mount();
-};
-
-//-
-Router.delegateScreen = function (path = "/", screen: any) {
-  //
-  // const scr = new Screen({name: "", });
-  //
-  RouterBox.routes[path] = {
-    controller: async (params: any, force?: boolean) =>
-      await screen.Activate(params, force),
-    packager: async (params: any) => await screen.package(params),
-    deactivate: async () => {
-      await screen.deActivate();
-    },
-    paramData: (data: any) => {
-      screen.paramData = data;
-    },
-  };
-  if (typeof screen.errorHandler === "function") {
-    RouterBox["errorHandler"][path] = screen.errorHandler;
-  }
-};
-
-/**
- * Cradova Router
- * ------
- *
- * Navigates to a designated screen in your app
- */
-Router.navigate = function (
-  href: string,
-  data: Record<string, any> | null = null,
-  force = false
-) {
-  if (typeof href !== "string") {
-    throw new TypeError(
-      " ✘  Cradova err:  href must be a defined path but got " +
-        href +
-        " instead"
-    );
-  }
-  if (typeof data === "boolean") {
-    force = true;
-    data = null;
-  }
-  let route = null,
-    params;
-  if (href.includes("://")) {
-    window.location.href = href;
-  } else {
-    const lastR = window.location.pathname;
-    if (href === lastR) {
-      return;
-    }
-    [route, params] = checker(href);
-    if (route) {
-      RouterBox["nextRouteController"] = route;
-      RouterBox.params.params = params;
-      // one of this needs to be removed
-      route._paramData = params;
-      RouterBox.params.data = data || null;
-      window.history.pushState({}, "", href);
-    }
-    RouterBox.router(null, force);
-    RouterBox["start_pageevents"](lastR, href);
-  }
-};
-
 /**
  * Cradova Router
  * ----
@@ -228,7 +134,7 @@ RouterBox.router = async function (e: any, force = false) {
   if (!url) {
     url = window.location.pathname;
   }
-  if (url === Router["lastNavigatedRoute"]) {
+  if (url === RouterBox["lastNavigatedRoute"]) {
     return;
   }
   if (RouterBox["nextRouteController"]) {
@@ -280,11 +186,99 @@ RouterBox.router = async function (e: any, force = false) {
   }
 };
 
-Router["onPageEvent"] =
-  /**
-   * @param {Event} callback Click event.
+/** cradova router
+ * ---
+ * Registers a route.
+ *
+ * @param {string}   path     Route path.
+ * @param {any} screen the cradova document tree for the route.
+ */
+
+class RouterClass {
+  /** cradova router
+   * ---
+   * Registers a route.
+   *
+   * accepts an object containing
+   *
+   * @param {string}   path     Route path.
+   * @param {any} screen the cradova screen.
    */
-  function (callback: () => void) {
+  BrowserRoutes(obj: Record<string, any>) {
+    for (const path in obj) {
+      let screen = obj[path];
+      if (screen.catch || typeof screen === "function") {
+        RouterBox["routes"][path] = async () => {
+          if (typeof screen === "function") {
+            screen = await screen();
+          } else {
+            screen = await screen;
+          }
+          return RouterBox.route(path, screen.default);
+        };
+      } else {
+        RouterBox.route(path, screen);
+      }
+    }
+    this._mount();
+  }
+
+  /**
+   * Cradova Router
+   * ------
+   *
+   * Navigates to a designated screen in your app
+   *
+   * @param href string
+   * @param data object
+   * @param force boolean
+   */
+  navigate(
+    href: string,
+    data: Record<string, any> | null = null,
+    force = false
+  ) {
+    if (typeof href !== "string") {
+      throw new TypeError(
+        " ✘  Cradova err:  href must be a defined path but got " +
+          href +
+          " instead"
+      );
+    }
+    if (typeof data === "boolean") {
+      force = true;
+      data = null;
+    }
+    let route = null,
+      params;
+    if (href.includes("://")) {
+      window.location.href = href;
+    } else {
+      const lastR = window.location.pathname;
+      if (href === lastR) {
+        return;
+      }
+      [route, params] = checker(href);
+      if (route) {
+        RouterBox["nextRouteController"] = route;
+        RouterBox.params.params = params;
+        // one of this needs to be removed
+        route._paramData = params;
+        RouterBox.params.data = data || null;
+        window.history.pushState({}, "", href);
+      }
+      RouterBox.router(null, force);
+      RouterBox["start_pageevents"](lastR, href);
+    }
+  }
+
+  /** cradova router
+   * ---
+   * Listen for navigation events
+   *
+   * @param callback   () => void
+   */
+  onPageEvent(callback: () => void) {
     if (typeof callback === "function") {
       RouterBox["pageevents"].push(callback);
     } else {
@@ -292,178 +286,71 @@ Router["onPageEvent"] =
         " ✘  Cradova err:  callback for pageShow event is not a function"
       );
     }
+  }
+
+  /** cradova router
+   * ---
+   * get a screen ready before time.
+   *
+   * @param {string}   path Route path.
+   * @param {any} data data for the screen.
+   */
+  async packageScreen(path: string, data: any = {}) {
+    if (!RouterBox.routes[path]) {
+      console.error(" ✘  Cradova err:  no screen with path " + path);
+      throw new Error(
+        " ✘  Cradova err:  cradova err: Not a defined screen path"
+      );
+    }
+    let [route, params] = checker(path);
+    if (!route._Activate && typeof route === "function") {
+      // @ts-ignore
+      route = (await route()) as any;
+    }
+    // handled asynchronously
+    route._package(Object.assign(data, params || {}));
+    route._packed = true;
+  }
+
+  /**
+   * Cradova Router
+   * ------
+   *
+   * return last set router params
+   *
+   * .
+   */
+
+  getParams = function () {
+    return RouterBox["params"];
   };
 
-// Router["onPageHide"] = function (callback: () => void) {
-//   if (typeof callback === "function") {
-//     RouterBox["pageHide"] = callback;
-//   } else {
-//     throw new Error(
-//       " ✘  Cradova err:  callback for pageHide event is not a function"
-//     );
-//   }
-// };
-/** cradova router
- * ---
- * get a screen ready before time.
- *
- * @param {string}   path Route path.
- * @param {any} data data for the screen.
- */
-Router.packageScreen = async function (path: string, data: any = {}) {
-  if (!RouterBox.routes[path]) {
-    console.error(" ✘  Cradova err:  no screen with path " + path);
-    throw new Error(" ✘  Cradova err:  cradova err: Not a defined screen path");
+  /**
+   * Cradova
+   * ---
+   * Error Handler for your app
+   *
+   * @param callback
+   * @param path? page path
+   */
+
+  addErrorHandler(callback: () => void) {
+    if (typeof callback === "function") {
+      RouterBox["errorHandler"] = callback;
+    } else {
+      throw new Error(
+        " ✘  Cradova err:  callback for ever event event is not a function"
+      );
+    }
   }
-  let [route, params] = checker(path);
-  if (!route._Activate && typeof route === "function") {
-    // @ts-ignore
-    route = (await route()) as any;
+
+  _mount() {
+    window.addEventListener("pageshow", RouterBox.router);
+    window.addEventListener("popstate", (e) => {
+      e.preventDefault();
+      RouterBox.router();
+    });
   }
-  // handled asynchronously
-  route._package(Object.assign(data, params || {}));
-  route._packed = true;
-};
+}
 
-/**
- * Cradova Router
- * ------
- *
- * return last set router params
- *
- * .
- */
-
-Router.getParams = function () {
-  return RouterBox["params"];
-};
-
-/**
- * Cradova
- * ---
- * Error Handler for your app
- *
- * @param callback
- * @param path? page path
- */
-
-Router["addErrorHandler"] = function (callback: () => void) {
-  if (typeof callback === "function") {
-    RouterBox["errorHandler"] = callback;
-  } else {
-    throw new Error(
-      " ✘  Cradova err:  callback for ever event event is not a function"
-    );
-  }
-};
-
-Router.mount = () => {
-  window.addEventListener("pageshow", RouterBox.router);
-  window.addEventListener("popstate", (e) => {
-    e.preventDefault();
-    RouterBox.router();
-  });
-};
-
-// if (globalThis.document) {
-
-// }
-
-// Router.route(
-//   "/",
-//   new Screen({
-//     name: "cradova",
-//     template: () => {
-//       return _(
-//         ".div#bulaba",
-//         {
-//           shouldUpdate: true,
-//           $num: "0", // data-num
-//           onclick(e: any) {
-//             console.log("hello world");
-//           },
-//         },
-//         [
-//           _("h1| theres no problem in Nigeria 1"),
-//           _("h1| theres no problem in Nigeria 2", { style: { color: "aqua" } }),
-//         ],
-//         _("h1| theres no problem in Nigeria 3"),
-//         _("h1| theres no problem in Nigeria 4")
-//       );
-//     },
-//   })
-// );
-
-// @ts-ignore
-// Router["serve"] = async function (option: {
-//   port?: number;
-//   path?: string;
-//   debug?: boolean;
-// }) {
-//   let fileURLToPath, _dirname;
-//   const { readFile } = await import("fs/promises");
-//   const dr = await import("path");
-//   const fp = await import("url");
-//   fileURLToPath = fp.fileURLToPath;
-//   _dirname = dr
-//     .dirname(fileURLToPath(import.meta.url))
-//     .split("node_modules")[0];
-//   let html: string;
-//   try {
-//     html = await readFile(dr.join(_dirname, "index.html"), "utf-8");
-//   } catch (error) {
-//     console.log(error);
-//     throw new Error("cradova err: index.html not found in serving dir");
-//   }
-//   if (option.port) {
-//     const { createServer } = await import("http");
-//     createServer(handler).listen(option.port, start_callback);
-//     function start_callback() {
-//       console.log(
-//         "\x1B[32m Running Cradova on port " + option.port + " \x1B[39m"
-//       );
-//     }
-//     async function handler(req: any, res: any) {
-//       if (option.debug) {
-//         const clientIP = req.connection.remoteAddress;
-//         const connectUsing = req.connection.encrypted ? "SSL" : "HTTP";
-//         console.log(
-//           "Request received: " + connectUsing + " " + req.method + " " + req.url
-//         );
-//         console.log("Client IP: " + clientIP);
-//       }
-//       const [route, params] = checker(req.url);
-//       console.log(route, params);
-//       res.writeHead(200, "OK", { "Content-Type": "text/html" });
-//       if (route) {
-//         // @ts-ignore
-//         res.end(await route.html());
-//       } else {
-//         if (RouterBox.routes["/404"]) {
-//           res.end(await RouterBox.routes["/404"].html());
-//         } else {
-//           console.error(
-//             " ✘  Cradova err: route '" +
-//               req.url +
-//               "' does not exist and no '/404' route given!"
-//           );
-//         }
-//       }
-//       return;
-//     }
-//   } else {
-//     if (option.path) {
-//       // const [route, params] = checker(option.path);
-//       // console.log(route, params);
-//       return html;
-//     } else {
-//       console.log(
-//         "\x1B[32m Cradova did not serve! - no port or path provided \x1B[39m"
-//       );
-//     }
-//   }
-// };
-// Router.serve({ port: 3000 });
-
-// ! building the server side middleware and basic sever
-// with dir detection
+export const Router = new RouterClass();
