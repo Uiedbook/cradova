@@ -1,7 +1,7 @@
 export const Init = function () {
-  if (!document.querySelector("[data-cra-id=cradova-app-wrapper]")) {
+  if (!document.querySelector("[data-wrapper=app]")) {
     const Wrapper: any = document.createElement("div");
-    Wrapper.setAttribute("data-cra-id", "cradova-app-wrapper");
+    Wrapper.setAttribute("data-wrapper", "app");
     document.body.appendChild(Wrapper);
   }
 };

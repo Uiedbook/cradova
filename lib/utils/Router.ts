@@ -19,6 +19,13 @@ RouterBox["pageHide"] = null;
 RouterBox["errorHandler"] = null;
 RouterBox["params"] = {};
 RouterBox["routes"] = {};
+RouterBox["pageevents"] = [];
+
+RouterBox["start_pageevents"] = function (lastR: string, newR: string) {
+  for (let ci = 0; ci < RouterBox["pageevents"].length; ci++) {
+    RouterBox["pageevents"][ci](lastR, newR);
+  }
+};
 
 /**
  *
@@ -61,11 +68,6 @@ const checker = (url: string) => {
           fixturesY += 1;
           continue;
         }
-        //        console.log(
-        //          urlFixtures[i],
-        //          pathFixtures[i],
-        //          urlFixtures[i] === pathFixtures[i]
-        //        );
         // if this is part of the path then let increment a value for it
         // we will need it later
         if (
@@ -172,12 +174,12 @@ Router.navigate = function (
     data = null;
   }
   let route = null,
-    params,
-    link = null;
+    params;
   if (href.includes("://")) {
     window.location.href = href;
   } else {
-    if (href === window.location.pathname) {
+    const lastR = window.location.pathname;
+    if (href === lastR) {
       return;
     }
     [route, params] = checker(href);
@@ -187,12 +189,10 @@ Router.navigate = function (
       // one of this needs to be removed
       route._paramData = params;
       RouterBox.params.data = data || null;
-      //
-      link = href;
-      RouterBox["pageHide"] && RouterBox["pageHide"](href + " :navigated");
-      window.history.pushState({}, "", link);
+      window.history.pushState({}, "", href);
     }
     RouterBox.router(null, force);
+    RouterBox["start_pageevents"](lastR, href);
   }
 };
 
@@ -261,7 +261,6 @@ RouterBox.router = async function (e: any, force = false) {
         RouterBox["lastNavigatedRouteController"]._deActivate();
       RouterBox["lastNavigatedRoute"] = url;
       RouterBox["lastNavigatedRouteController"] = route;
-      RouterBox["pageShow"] && RouterBox["pageShow"](url);
     } catch (error) {
       let errorHandler;
       if (RouterBox.routes[RouterBox.params.params._path]) {
@@ -277,25 +276,17 @@ RouterBox.router = async function (e: any, force = false) {
     // or 404
     if (RouterBox.routes["/404"]) {
       RouterBox.routes["/404"].controller();
-    } else {
-      // if (Object.keys(RouterBox.routes).length > 0) {
-      //   console.error(
-      //     " ✘  Cradova err: route '" +
-      //       url +
-      //       "' does not exist and no '/404' route given!"
-      //   );
-      // }
     }
   }
 };
 
-Router["onPageShow"] =
+Router["onPageEvent"] =
   /**
    * @param {Event} callback Click event.
    */
   function (callback: () => void) {
     if (typeof callback === "function") {
-      RouterBox["pageShow"] = callback;
+      RouterBox["pageevents"].push(callback);
     } else {
       throw new Error(
         " ✘  Cradova err:  callback for pageShow event is not a function"
@@ -303,15 +294,15 @@ Router["onPageShow"] =
     }
   };
 
-Router["onPageHide"] = function (callback: () => void) {
-  if (typeof callback === "function") {
-    RouterBox["pageHide"] = callback;
-  } else {
-    throw new Error(
-      " ✘  Cradova err:  callback for pageHide event is not a function"
-    );
-  }
-};
+// Router["onPageHide"] = function (callback: () => void) {
+//   if (typeof callback === "function") {
+//     RouterBox["pageHide"] = callback;
+//   } else {
+//     throw new Error(
+//       " ✘  Cradova err:  callback for pageHide event is not a function"
+//     );
+//   }
+// };
 /** cradova router
  * ---
  * get a screen ready before time.

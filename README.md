@@ -116,6 +116,7 @@ import _, {
   reference,
   h1,
   br,
+  div,
 } from "../dist/index.js";
 
 function Hello(name) {
@@ -126,6 +127,8 @@ function Hello(name) {
     },
   });
 }
+
+const html = div(Hello("peter"), Hello("joe"));
 
 // reference (not state)
 
@@ -142,8 +145,6 @@ function typingExample() {
     p(" no thing typed yet!", { reference: re.bindAs("text") })
   );
 }
-
-const html = div(Hello("peter"), Hello("joe"));
 
 // setting shouldUpdate to true
 // gives you this.updateState binding
@@ -175,7 +176,7 @@ function dataCounter() {
 // hello message
 
 function HelloMessage() {
-  return _("div.foo#bar", {
+  return div({
     shouldUpdate: true,
     text: "Click to get a greeting",
     onclick() {
@@ -203,7 +204,7 @@ const nameRef = new Ref(function (name) {
 });
 
 function App() {
-  return _("div.foo#bar", counter, dataCounter, HelloMessage, br, nameRef);
+  return div(counter, dataCounter, HelloMessage, br, nameRef);
 }
 
 // add your app to the DOM
@@ -350,51 +351,60 @@ Router.BrowserRoutes({
   "/home": home,
   "/lazy-loaded-home": async () => await import("./home"),
 });
+// creates these routes
 
-/*
+Router.packageScreen("/home");
+// get the page ready in the background
 
-Nice things about cradova screens
+Router.navigate("/home", data);
+// navigates to that page
+
+Router.getParams();
+// get route params for this current page
+
+Router.onPageEvent((lastRoute, newRoute) => {
+  console.log(lastRoute, newRoute);
+});
+// listen for navigation changes
+```
+
+### More info
+
+---
+
+More info on cradova Router
+
+---
+
+Every cradova app mounts on a div with attribute data-wrapper="app"
+
+if it already exist cradova will use it instead.
+
+cradova will create a div with data-wrapper="app" if it doesn't exists already.
+
+so if you want to use your own mount point then create a div with data-wrapper="app".
+
+---
+
+More info on cradova screens
+
+---
 
 screens are rendered once by default to hack
 responsiveness making your app work fast as user navigates.
 
 this behavior can be override
 by passing
-prerender: false
+persist: false
 in the constructor
-
 
 Cradova screens has
 onActivate() and
 onDeactivate() methods which is also available in the
-component function on the this variable
+component function on the this variable bound to it.
 
-these allow you manage rendering
-circle for each in your app
-
-*/
-
-/*
-
-Nice things about cradova Router
-
-cradova will create a div with data-cra-id=cradova-app-wrapper
-
-if it already exist cradova will use it instead
-
-so if you want to use your own mount point then create a div with data-cra-id="cradova-app-wrapper"
-
-*/
-
-// navigates to that page
-// Router.navigate("/home", data, force);
-// get the page ready in the background
-// Router.packageScreen("/home");
-// get route params for this page
-// Router.getParams();
-```
-
-## State management
+this allow you manage rendering
+circle for each screen in your app
 
 ## Documentation
 
