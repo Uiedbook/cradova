@@ -12,6 +12,8 @@ import _, {
   reference,
   h1,
   br,
+  Screen,
+  Router,
 } from "../dist/index.js";
 
 function TodoList() {
@@ -176,10 +178,38 @@ function App() {
     HelloMessage,
     br,
     nameRef,
-    typingExample
+    typingExample,
+    _("a|home page", { href: "/p" })
   );
 }
 
 // add your app to the DOM
 
 document.body.append(App());
+
+// Ref can be used as screens
+
+const template = new Ref(function (name) {
+  // an effect run once after screen renders
+  const self = this;
+  self.effect(() => {
+    const name = new Promise((res) => {
+      res("friday");
+    });
+    setTimeout(async () => {
+      self.updateState(await name);
+    }, 1000);
+    console.log("boohoo");
+  });
+  // effects can be used to make api calls needed for the page
+  return _("div", ">>>>>>>>>>>>>>>>>>>>>>>  Hello  " + name);
+});
+
+const home = new Screen({
+  name: "home page", // page title
+  template,
+});
+
+// in your routes.ts file
+
+Router.BrowserRoutes({ "/p": home });

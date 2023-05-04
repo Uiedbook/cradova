@@ -127,16 +127,19 @@ function Hello(name) {
   });
 }
 
-function typing(name) {
+// reference (not state)
+
+function typingExample() {
   const re = new reference();
   return _(
     "div",
     input({
-      onclick() {
+      oninput() {
         re.text.innerText = this.value;
       },
+      placeholder: "typing simulation",
     }),
-    p({ reference: re.bindAs("text") })
+    p(" no thing typed yet!", { reference: re.bindAs("text") })
   );
 }
 
@@ -282,6 +285,7 @@ const todoList = new Ref(function () {
     )
   );
 });
+
 document.body.appendChild(TodoList());
 
 css`
@@ -331,6 +335,16 @@ function HelloMessage(name) {
   return _("div", "Hello  " + name);
 }
 
+const home = new Screen({
+  name: "hello page", // page title
+  template: HelloMessage,
+  ...
+});
+
+// in your routes.ts file
+
+Router.BrowserRoutes({"/": home, "/lazy-loaded":()=> import("./home")});
+
 /*
 
 Nice things about cradova screens
@@ -346,7 +360,8 @@ in the constructor
 
 Cradova screens has
 onActivate() and
-onDeactivate() methods
+onDeactivate() methods which is also available in the
+component function on the this variable
 
 these allow you manage rendering
 circle for each in your app
@@ -355,7 +370,7 @@ circle for each in your app
 
 /*
 
-when using router and screens
+Nice things about cradova Router
 
 cradova will create a div with data-cra-id=cradova-app-wrapper
 
@@ -364,14 +379,6 @@ if it already exist cradova will use it instead
 so if you want to use your own mount point then create a div with data-cra-id="cradova-app-wrapper"
 
 */
-
-const home = new Screen({
-  name: "hello page", // page title
-  template: HelloMessage,
-  ...
-});
-
-Router.route("/", home);
 
 // navigates to that page
 // Router.navigate("/home", data, force);

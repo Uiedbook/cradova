@@ -278,13 +278,13 @@ RouterBox.router = async function (e: any, force = false) {
     if (RouterBox.routes["/404"]) {
       RouterBox.routes["/404"].controller();
     } else {
-      if (Object.keys(RouterBox.routes).length > 0) {
-        console.error(
-          " ✘  Cradova err: route '" +
-            url +
-            "' does not exist and no '/404' route given!"
-        );
-      }
+      // if (Object.keys(RouterBox.routes).length > 0) {
+      //   console.error(
+      //     " ✘  Cradova err: route '" +
+      //       url +
+      //       "' does not exist and no '/404' route given!"
+      //   );
+      // }
     }
   }
 };

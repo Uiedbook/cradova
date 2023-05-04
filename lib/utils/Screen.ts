@@ -40,12 +40,7 @@ export class Screen {
   constructor(cradova_screen_initials: CradovaScreenType) {
     const { template, name, persist, renderInParallel, transition } =
       cradova_screen_initials;
-    if (typeof template !== "function") {
-      console.error(" ✘  Cradova err: expected a screen but got ", template);
-      throw new Error(
-        " ✘  Cradova err: only functions that returns a cradova element is valid as screen"
-      );
-    }
+    // @ts-ignore
     this._html = template;
     this._name = name;
     this._transition = transition || "";
@@ -86,6 +81,13 @@ export class Screen {
     this.errorHandler = errorHandler;
   }
   async _package() {
+    // @ts-ignore
+    if (this._html.render) {
+      // @ts-ignore
+      this._html = this._html.render.apply(this, this._data);
+    }
+    console.log(this._html);
+
     if (typeof this._html === "function") {
       let fuc = (await this._html.apply(this, this._data)) as any;
       if (typeof fuc === "function") {
@@ -110,6 +112,11 @@ export class Screen {
           this._template.appendChild(fuc);
         }
       }
+    } else {
+      console.error(" ✘  Cradova err: expected a screen but got ", this._html);
+      throw new Error(
+        " ✘  Cradova err: only functions that returns a cradova element is valid as screen"
+      );
     }
     if (!this._template.firstChild) {
       throw new Error(
