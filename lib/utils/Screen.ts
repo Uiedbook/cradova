@@ -158,10 +158,10 @@ export class Screen {
       }
     }
 
-    const doc = document.querySelector("[data-cra-id=cradova-app-wrapper]");
+    const doc = document.querySelector("[data-wrapper=app]");
     if (!doc) {
       throw new Error(
-        " ✘  Cradova err: Unable to render, cannot find cradova root <div data-cra-id='cradova-app-wrapper'> ... </div>"
+        " ✘  Cradova err: Unable to render, cannot find cradova root <div data-wrapper='app'> ... </div>"
       );
     }
     if (this._transition) {

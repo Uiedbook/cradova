@@ -212,13 +212,13 @@ const home = new Screen({
 // in your routes.ts file
 Router.BrowserRoutes({ "/home": home });
 
-// Router.packageScreen("/home");
+Router.packageScreen("/home");
 // get the page ready in the background
 
-// Router.navigate("/home", {});
+Router.navigate("/home", {});
 // navigates to that page
 
-Router.getParams();
+// Router.getParams();
 // get route params for this current page
 
 Router.onPageEvent((lastRoute, newRoute) => {

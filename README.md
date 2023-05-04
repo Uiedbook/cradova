@@ -353,7 +353,7 @@ Router.BrowserRoutes({
 });
 // creates these routes
 
-Router.packageScreen("/home");
+Router.packageScreen("/home", data);
 // get the page ready in the background
 
 Router.navigate("/home", data);
@@ -406,13 +406,48 @@ component function on the this variable bound to it.
 this allow you manage rendering
 circle for each screen in your app
 
+---
+
+More info on cradova Ref
+
+---
+
+Refs are dynamic components, they have simple abstractions like:
+
+- Effects
+- stash
+- preRender
+- updateState
+
+these behaviors allow you manage rendering
+circle for refs in your app
+
+---
+
+More info on cradova createSignal
+
+---
+
+Cradova Signals allows you to create powerful data stores.
+
+with ability to:
+
+- create store
+- create actions and fire them
+- bind a Ref
+- listen to changes
+- persist changes to localStorage
+- update a cradova Ref and bindings automatically
+
+With these simple and easy abstractions, you can use datastores with powerful convenience.
+
 ## Documentation
 
-At the moment, we're in the process of creating documentation for Cradova, and we have limited resources. If you're interested in lending a hand, we invite you to join our community, gain firsthand experience, and contribute to the advancement of Cradova.
+At the moment, we're in the process of creating a documentation website for Cradova, and we have limited resources. If you're interested in lending a hand, we invite you to join our community, gain firsthand experience, and contribute to the advancement of Cradova.
 
 ## Getting Help
 
-To get further insights and help on Cradova, visit our new [Telegram Community Chat](https://t.me/cradovaframework).
+To get further insights and help on Cradova, visit our [Discord](https://discord.gg/b7fvMg38) and [Telegram](https://t.me/cradovaframework) Community Chats.
 
 ## Contributing
 
