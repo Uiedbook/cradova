@@ -1,6 +1,7 @@
 # What does Cradova needs?
 
 - Building cradova CLI (in progress)
+- setting up server side rendering
 - Cradova Documentation Website
 - UI component libraries for cradova
 - Sample projects

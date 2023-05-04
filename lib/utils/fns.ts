@@ -36,13 +36,6 @@ export class cradovaEvent {
 }
 
 export const CradovaEvent = new cradovaEvent();
-// export function uuid() {
-//   let t = Date.now ? +Date.now() : +new Date();
-//   return "craxxxxx".replace(/[x]/g, function (e) {
-//     const r = (t + 16 * Math.random()) % 16 | 0;
-//     return ("x" === e ? r : (7 & r) | 8).toString(16);
-//   });
-// }
 
 export function Rhoda(l: any[]) {
   const fg = new DocumentFragment();
@@ -77,85 +70,23 @@ export function Rhoda(l: any[]) {
   }
   return fg;
 }
-/**
-Write CSS styles in Javascript
-@example
 
-css("#container",
-{
-    height: "100%",
-    height: "100%",
-    background-color: "#ff9800"
-})
-
-css(".btn:hover",
-{
-    height: "100%",
-    height: "100%",
-    background-color: "#ff9800"
-})
-
-*/
-
-export function css(identifier: string, properties?: Record<string, string>) {
+export function css(identifier: string) {
   /*This is for creating
  css styles using JavaScript*/
-  if (typeof identifier === "string" && typeof properties === "undefined") {
+  if (Array.isArray(identifier)) {
+    identifier = identifier[0];
+  }
+  if (typeof identifier === "string") {
     let styTag = document.querySelector("style");
     if (styTag !== null) {
-      identifier += styTag.textContent!;
-      styTag.textContent = identifier;
+      styTag.textContent = identifier + styTag.textContent!;
       return;
     }
     styTag = document.createElement("style");
     styTag.textContent = identifier;
     document.head.appendChild(styTag);
-    return;
   }
-
-  if (!properties) {
-    return;
-  }
-
-  const styS =
-    "" +
-    identifier +
-    "" +
-    "{" +
-    `
-`;
-  const styE =
-    "}" +
-    `
-`;
-  let style = "",
-    totalStyle = "";
-  for (const [k, v] of Object.entries(properties!)) {
-    style +=
-      "" +
-      k +
-      ": " +
-      v +
-      ";" +
-      `
-`;
-  }
-  let styleTag = document.querySelector("style");
-  if (styleTag !== null) {
-    totalStyle += styleTag.innerHTML;
-    totalStyle += styS + style + styE;
-    styleTag.innerHTML = totalStyle;
-    return;
-  }
-  styleTag = document.createElement("style");
-  totalStyle +=
-    styleTag.innerHTML +
-    `
-
-`;
-  totalStyle += styS + style + styE;
-  styleTag.innerHTML = totalStyle;
-  document.head.appendChild(styleTag);
 }
 
 /**

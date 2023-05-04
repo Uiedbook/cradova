@@ -156,4 +156,4 @@ and we went along with it.
 - created CradovaEvent switched from the CustomEvent class (for more speed and node compatibility journey)
 - created references as a way to point to dom elements
 - used reference internally to remove cradova-ids that appeared on the dom before.
-- completed various tests
+- completed tests

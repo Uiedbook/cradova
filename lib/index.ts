@@ -36,7 +36,7 @@
 
 // importing cradova scripts
 import { Init } from "./utils/init";
-import { frag } from "./utils/fns";
+// import { frag } from "./utils/fns";
 import { makeElement } from "./utils/tags";
 // importing types declarations
 
@@ -135,9 +135,6 @@ const make = function (txx: any) {
  */
 
 const _: any = (...element_initials: any[]) => {
-  if (typeof element_initials[0] !== "string") {
-    return frag(element_initials);
-  }
   const initials = make(element_initials.shift());
 
   let props: any = undefined;

@@ -73,7 +73,8 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
               key !== "class" &&
               key !== "tabindex" &&
               key !== "disabled" &&
-              !key.includes("aria")
+              !key.includes("aria") &&
+              !key.includes("data-")
             ) {
               console.error(" ✘  Cradova err:  invalid html attribute " + key);
             }
@@ -84,6 +85,7 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
         }
       }
     } else {
+      console.log(nodes, state);
       throw new TypeError(" ✘  Cradova err:   invalid state object" + state);
     }
   }
@@ -114,7 +116,7 @@ export function dispatch(
   state?: stateType
 ) {
   if (stateID instanceof HTMLElement) {
-    cradovaDispatchTrack([stateID] as any);
+    cradovaDispatchTrack([stateID] as any, state);
   }
   let ele;
   let updated = undefined;
