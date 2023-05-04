@@ -323,27 +323,33 @@ let's try an example.
 ```js
 import _, { Screen, Router } from "cradova";
 
-function HelloMessage(name) {
+// Ref can be used as screens
+
+const template = new Ref(function (name) {
   // an effect run once after screen renders
-  this.effect(() => {
-   const name = new Promise((res) => {
-      res("friday");
+  const self = this;
+  self.effect(() => {
+    const name = new Promise((res) => {
+      res("john doe");
     });
-    this.updateState(await name)
+    setTimeout(async () => {
+      self.updateState(await name);
+    }, 1000);
   });
   // effects can be used to make api calls needed for the page
-  return _("div", "Hello  " + name);
-}
+  return _("div", name ? ">>>>>>>>  Hello  " + name : "  loading...");
+});
 
 const home = new Screen({
-  name: "hello page", // page title
-  template: HelloMessage,
-  ...
+  name: "home page", // page title
+  template,
 });
 
 // in your routes.ts file
-
-Router.BrowserRoutes({"/": home, "/lazy-loaded":()=> import("./home")});
+Router.BrowserRoutes({
+  "/home": home,
+  "/lazy-loaded-home": async () => await import("./home"),
+});
 
 /*
 
@@ -386,7 +392,6 @@ so if you want to use your own mount point then create a div with data-cra-id="c
 // Router.packageScreen("/home");
 // get route params for this page
 // Router.getParams();
-
 ```
 
 ## State management

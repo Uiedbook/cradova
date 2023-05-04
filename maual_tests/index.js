@@ -179,7 +179,7 @@ function App() {
     br,
     nameRef,
     typingExample,
-    _("a|home page", { href: "/p" })
+    _("a|home page", { href: "/home" })
   );
 }
 
@@ -194,15 +194,14 @@ const template = new Ref(function (name) {
   const self = this;
   self.effect(() => {
     const name = new Promise((res) => {
-      res("friday");
+      res("john doe");
     });
     setTimeout(async () => {
       self.updateState(await name);
     }, 1000);
-    console.log("boohoo");
   });
   // effects can be used to make api calls needed for the page
-  return _("div", ">>>>>>>>>>>>>>>>>>>>>>>  Hello  " + name);
+  return _("div", name ? ">>>>>>>>  Hello  " + name : "  loading...");
 });
 
 const home = new Screen({
@@ -211,5 +210,4 @@ const home = new Screen({
 });
 
 // in your routes.ts file
-
-Router.BrowserRoutes({ "/p": home });
+Router.BrowserRoutes({ "/home": home });

@@ -83,10 +83,10 @@ export class Screen {
   async _package() {
     // @ts-ignore
     if (this._html.render) {
+      this._template.innerHTML = "";
       // @ts-ignore
-      this._html = this._html.render.apply(this, this._data);
+      this._template.appendChild(this._html.render(this._data));
     }
-    console.log(this._html);
 
     if (typeof this._html === "function") {
       let fuc = (await this._html.apply(this, this._data)) as any;
@@ -112,15 +112,12 @@ export class Screen {
           this._template.appendChild(fuc);
         }
       }
-    } else {
+    }
+
+    if (!this._template.firstChild) {
       console.error(" ✘  Cradova err: expected a screen but got ", this._html);
       throw new Error(
         " ✘  Cradova err: only functions that returns a cradova element is valid as screen"
-      );
-    }
-    if (!this._template.firstChild) {
-      throw new Error(
-        " ✘  Cradova err:  no screen is rendered, may have been past wrongly."
       );
     }
     if (this._secondaryChildren.length) {

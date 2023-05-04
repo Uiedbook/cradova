@@ -158,3 +158,4 @@ and we went along with it.
 - used reference internally to remove cradova-ids that appeared on the dom before.
 - completed tests
 - cradova now helps you with Ref.render() calls
+- Ref can be used as screens directly
