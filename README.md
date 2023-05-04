@@ -58,7 +58,7 @@ Undoubtedly, this provides a significant advantage. You can experience it firsth
 
 Cradova has already been utilized in multiple production projects, and we will continuously update this page to showcase our advancements as we keep improving.
 
-[current version changes](https://github.com/fridaycandour/cradova/blob/main/CHANGELOG.md#v220)
+[current version changes](https://github.com/fridaycandour/cradova/blob/main/CHANGELOG.md#v230)
 
 ## Installation
 
