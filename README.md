@@ -109,15 +109,7 @@ this a collection of basic examples
 you can choose any that best suite what problem you want to solve
 
 ```js
-import _, {
-  button,
-  createSignal,
-  Ref,
-  reference,
-  h1,
-  br,
-  div,
-} from "../dist/index.js";
+import _, { button, createSignal, Ref, reference, h1, br, div } from "cradova";
 
 function Hello(name) {
   return h1("Hello " + name, {
@@ -227,7 +219,7 @@ import _, {
   p,
   Ref,
   reference,
-} from "../dist/index.js";
+} from "cradova";
 
 function TodoList() {
   // can be used to hold multiple references
