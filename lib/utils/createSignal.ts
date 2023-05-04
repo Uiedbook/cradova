@@ -131,8 +131,8 @@ export class createSignal<Type extends Record<string, any>> {
    * @param key - string key of the action
    * @param data - data for the action
    */
-  fireAction(key: string, data?: Type) {
-    this._updateState(key, data);
+  fireAction(key: string, data?: unknown) {
+    this._updateState(key, data as any);
     if (this.actions[key] && this.actions[key].updateState) {
       this.actions[key].updateState(data);
       return;

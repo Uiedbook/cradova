@@ -157,3 +157,4 @@ and we went along with it.
 - created references as a way to point to dom elements
 - used reference internally to remove cradova-ids that appeared on the dom before.
 - completed tests
+- cradova now helps you with Ref.render() calls

@@ -17,6 +17,9 @@ export const makeElement = (
     for (let i = 0; i < ElementChildrenAndPropertyList.length; i++) {
       let child = ElementChildrenAndPropertyList[i] as any;
       // single child lane
+      if (child?.render) {
+        child = child.render() as any;
+      }
       if (typeof child === "function") {
         child = child() as any;
         if (typeof child === "function") {

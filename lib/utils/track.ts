@@ -66,15 +66,19 @@ function cradovaDispatchTrack(nodes: any[], state?: Record<string, any>) {
           if (typeof element[key] !== "undefined") {
             element[key] = state[key];
           } else {
-            element[key] = state[key];
+            if (key.includes("data-")) {
+              element.setAttribute(key, state[key]);
+              continue;
+            } else {
+              element[key] = state[key];
+            }
             if (
               key !== "for" &&
               key !== "text" &&
               key !== "class" &&
               key !== "tabindex" &&
               key !== "disabled" &&
-              !key.includes("aria") &&
-              !key.includes("data-")
+              !key.includes("aria")
             ) {
               console.error(" ✘  Cradova err:  invalid html attribute " + key);
             }

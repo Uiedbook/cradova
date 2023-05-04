@@ -37,7 +37,7 @@
 // importing cradova scripts
 import { Init } from "./utils/init";
 // import { frag } from "./utils/fns";
-import { makeElement } from "./utils/tags";
+import { makeElement } from "./utils/elements";
 // importing types declarations
 
 ("use strict");
@@ -171,7 +171,7 @@ const _: any = (...element_initials: any[]) => {
   return makeElement(element, props, ...element_initials);
 };
 Init();
-export * from "./utils/tags";
+export * from "./utils/elements";
 export { Ajax } from "./utils/ajax";
 export { createSignal } from "./utils/createSignal";
 export { dispatch } from "./utils/track";

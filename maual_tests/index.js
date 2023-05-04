@@ -11,6 +11,7 @@ import _, {
   Ref,
   reference,
   h1,
+  br,
 } from "../dist/index.js";
 
 function TodoList() {
@@ -94,9 +95,23 @@ function Hello(name) {
   });
 }
 
-const html = div(Hello("peter"), Hello("joe"));
+function typingExample() {
+  const re = new reference();
+  return _(
+    "div",
+    input({
+      oninput() {
+        re.text.innerText = this.value;
+      },
+      placeholder: "typing simulation",
+    }),
+    p(" no thing typed yet!", { reference: re.bindAs("text") })
+  );
+}
 
-// document.body.append(html);
+document.body.appendChild(typingExample());
+
+const html = div(Hello("peter"), Hello("joe"));
 
 function counter() {
   let num = 0;
@@ -117,7 +132,6 @@ function dataCounter() {
     "data-num": "0",
     onclick() {
       const num = this.getAttribute("data-num") * 1 + 1;
-      console.log(num);
       this.updateState({ text: num, "data-num": num });
     },
   });
@@ -125,13 +139,15 @@ function dataCounter() {
 
 // hello message
 
-function HelloMessage(name = "no name") {
+function HelloMessage() {
   return _("div.foo#bar", {
     shouldUpdate: true,
-    text: "hello  " + name,
+    text: "Click to get a greeting",
     onclick() {
       const name = prompt("what are your names");
-      this.updateState({ text: "hello " + name });
+      this.updateState({
+        text: name ? "hello " + name : "Click to get a greeting",
+      });
     },
   });
 }
@@ -141,7 +157,9 @@ function HelloMessage(name = "no name") {
 const nameRef = new Ref(function (name) {
   const self = this;
   return _("div.foo#bar", {
-    text: "hello" + (name || "  no name"),
+    text: name
+      ? "hello " + (name || " user 2")
+      : "Click to get a second greeting",
     onclick() {
       const name = prompt();
       self.updateState(name);
@@ -152,10 +170,13 @@ const nameRef = new Ref(function (name) {
 function App() {
   return _(
     "div.foo#bar",
+    html,
     counter,
     dataCounter,
     HelloMessage,
-    nameRef.render("no name")
+    br,
+    nameRef,
+    typingExample
   );
 }
 

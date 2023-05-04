@@ -43,11 +43,14 @@ export function Rhoda(l: any[]) {
     if (Array.isArray(ch)) {
       fg.appendChild(Rhoda(ch));
     } else {
-      if (typeof ch === "function") {
-        ch = ch();
+      if (ch?.render) {
+        ch = ch.render() as any;
       }
       if (typeof ch === "function") {
         ch = ch();
+        if (typeof ch === "function") {
+          ch = ch();
+        }
       }
       if (typeof ch === "string" || typeof ch === "number") {
         fg.appendChild(document.createTextNode(ch as string));
@@ -71,7 +74,7 @@ export function Rhoda(l: any[]) {
   return fg;
 }
 
-export function css(identifier: string) {
+export function css(identifier: string | TemplateStringsArray) {
   /*This is for creating
  css styles using JavaScript*/
   if (Array.isArray(identifier)) {
@@ -414,9 +417,12 @@ export class lazy {
 }
 
 export class reference {
+  [x: string]: Record<string, unknown>;
+  // @ts-ignore
   bindAs(name: string) {
     return [this, name];
   }
+  // @ts-ignore
   _appendDom(name: string, Element: any) {
     if (!Object.hasOwnProperty.call(this, name)) {
       // @ts-ignore
@@ -435,6 +441,7 @@ export class reference {
       // );
     }
   }
+  // @ts-ignore
   _appendDomForce(name: string, Element: any) {
     // @ts-ignore
     this[name] = Element;
