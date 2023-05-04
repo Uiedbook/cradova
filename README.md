@@ -111,33 +111,6 @@ you can choose any that best suite what problem you want to solve
 ```js
 import _, { button, createSignal, Ref, reference, h1, br, div } from "cradova";
 
-function Hello(name) {
-  return h1("Hello " + name, {
-    className: "title",
-    style: {
-      color: "grey",
-    },
-  });
-}
-
-const html = div(Hello("peter"), Hello("joe"));
-
-// reference (not state)
-
-function typingExample() {
-  const re = new reference();
-  return _(
-    "div",
-    input({
-      oninput() {
-        re.text.innerText = this.value;
-      },
-      placeholder: "typing simulation",
-    }),
-    p(" no thing typed yet!", { reference: re.bindAs("text") })
-  );
-}
-
 // setting shouldUpdate to true
 // gives you this.updateState binding
 
@@ -194,6 +167,22 @@ const nameRef = new Ref(function (name) {
     },
   });
 });
+
+// reference (not state)
+
+function typingExample() {
+  const re = new reference();
+  return _(
+    "div",
+    input({
+      oninput() {
+        re.text.innerText = this.value;
+      },
+      placeholder: "typing simulation",
+    }),
+    p(" no thing typed yet!", { reference: re.bindAs("text") })
+  );
+}
 
 function App() {
   return div(counter, dataCounter, HelloMessage, br, nameRef);
