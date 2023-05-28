@@ -12,7 +12,7 @@
 //         {
 //           shouldUpdate: true,
 //           $num: "0", // data-num
-//           onclick(e: any) {
+//           onclick(e ) {
 //             console.log("hello world");
 //           },
 //         },
@@ -27,7 +27,6 @@
 //   })
 // );
 
-// @ts-ignore
 // Router["serve"] = async function (option: {
 //   port?: number;
 //   path?: string;
@@ -56,7 +55,7 @@
 //         "\x1B[32m Running Cradova on port " + option.port + " \x1B[39m"
 //       );
 //     }
-//     async function handler(req: any, res: any) {
+//     async function handler(req, res) {
 //       if (option.debug) {
 //         const clientIP = req.connection.remoteAddress;
 //         const connectUsing = req.connection.encrypted ? "SSL" : "HTTP";
@@ -69,7 +68,7 @@
 //       console.log(route, params);
 //       res.writeHead(200, "OK", { "Content-Type": "text/html" });
 //       if (route) {
-//         // @ts-ignore
+//
 //         res.end(await route.html());
 //       } else {
 //         if (RouterBox.routes["/404"]) {

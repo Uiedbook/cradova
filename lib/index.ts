@@ -12,7 +12,7 @@
 =============================================================================
   
   Cradova FrameWork
-  @version  2.3.0
+  @version  2.4.0
   License: Apache V2
   
   -----------------------------------------------------------------------------
@@ -35,14 +35,11 @@
 */
 
 // importing cradova scripts
-import { Init } from "./utils/init";
-// import { frag } from "./utils/fns";
-import { makeElement } from "./utils/elements";
-// importing types declarations
+import { makeElement } from "./parts/elements";
+import { VJS_params_TYPE } from "./types";
 
 ("use strict");
-
-const make = function (txx: any) {
+const make = function (txx: string) {
   if (!txx.length) {
     return ["DIV"];
   }
@@ -57,36 +54,37 @@ const make = function (txx: any) {
     }
   }
   let tag;
+  let txxk;
   if (!txx.includes("#")) {
-    txx = txx.split(".");
-    tag = txx.shift();
+    txxk = txx.split(".");
+    tag = txxk.shift();
     if (!tag) {
       tag = "DIV";
     }
-    return [tag, undefined, txx.join(" "), innerValue];
+    return [tag, undefined, txxk.join(" "), innerValue];
   } else {
     if (!txx.includes(".")) {
-      txx = txx.split("#");
-      tag = txx.shift();
+      txxk = txx.split("#");
+      tag = txxk.shift();
       if (!tag) {
         tag = "DIV";
       }
-      if (txx[0].includes(" ")) {
-        txx = [txx[0].split(" ")[1]];
+      if (txxk[0].includes(" ")) {
+        txxk = [txxk[0].split(" ")[1]];
       }
-      return [tag, txx[0], undefined, innerValue];
+      return [tag, txxk[0], undefined, innerValue];
     }
   }
-  txx = txx.split(".");
+  txxk = txx.split(".");
   const classes = [];
   const IDs = [];
-  tag = !txx[0].includes("#") && txx.shift();
+  tag = !txxk[0].includes("#") && txxk.shift();
   if (!tag) {
     tag = "DIV";
   }
-  for (let i = 0; i < txx.length; i++) {
-    if (txx[i].includes("#")) {
-      const item = txx[i].split("#");
+  for (let i = 0; i < txxk.length; i++) {
+    if (txxk[i].includes("#")) {
+      const item = txxk[i].split("#");
       IDs.push(item[1]);
       if (i === 0) {
         tag = item[0];
@@ -95,10 +93,14 @@ const make = function (txx: any) {
       classes.push(item[0]);
       continue;
     }
-    classes.push(txx[i]);
+    classes.push(txxk[i]);
   }
   return [tag || "DIV", IDs[0], classes.join(" "), innerValue];
 };
+
+type TemplateType = (
+  ...element_initials: VJS_params_TYPE<HTMLElement>
+) => HTMLElement;
 
 /**
  * Cradova
@@ -130,23 +132,16 @@ const make = function (txx: any) {
  * ...
  * )
  *
- * @param  {...any[]} element_initials
+ * @param element_initials
  * @returns function - cradova element
  */
 
-const _: any = (...element_initials: any[]) => {
-  const initials = make(element_initials.shift());
-
-  let props: any = undefined;
-  let element: Record<string, any>;
-  try {
-    element = document.createElement(initials[0]);
-  } catch (error) {
-    throw new TypeError(" ✘  Cradova err:  invalid tag given  " + initials[0]);
-  }
+const _: TemplateType = (...element_initials) => {
+  const initials = make(element_initials.shift() as unknown as string);
+  let props: Partial<HTMLElement> | undefined;
+  const element: HTMLElement = document.createElement(initials[0] as string);
   if (initials[2]) {
     if (props) {
-      // @ts-ignore js knows
       props["className"] = initials[2];
     } else {
       props = { className: initials[2] };
@@ -154,7 +149,6 @@ const _: any = (...element_initials: any[]) => {
   }
   if (initials[1]) {
     if (props) {
-      // @ts-ignore js knows
       props["id"] = initials[1];
     } else {
       props = { id: initials[1] };
@@ -162,32 +156,23 @@ const _: any = (...element_initials: any[]) => {
   }
   if (initials[3]) {
     if (props) {
-      // @ts-ignore js knows
       props["innerText"] = initials[3];
     } else {
       props = { innerText: initials[3] };
     }
   }
-  return makeElement(element, props, ...element_initials);
+  if (element_initials.length === 0) {
+    return element;
+  }
+  // adding the property object to children list
+  props && element_initials.push(props);
+  return makeElement(element, ...element_initials);
 };
-Init();
-export * from "./utils/elements";
-export { Ajax } from "./utils/ajax";
-export { createSignal } from "./utils/createSignal";
-export { dispatch } from "./utils/track";
-export { Router } from "./utils/Router";
-export { Screen } from "./utils/Screen";
-
-export {
-  assert,
-  assertOr,
-  CradovaEvent,
-  css,
-  lazy,
-  loop,
-  Ref,
-  svgNS,
-  reference,
-} from "./utils/fns";
+export * from "./parts/elements";
+export { createSignal } from "./parts/createSignal";
+export { Router } from "./parts/Router";
+export { Screen } from "./parts/Screen";
+export { assert, assertOr, css, lazy, loop, Ref, reference } from "./parts/fns";
+export { Ajax } from "./parts/ajax";
 
 export default _;

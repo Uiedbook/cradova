@@ -2,7 +2,7 @@
 
 ## v1.0.0
 
-- basic functionality not proper way to handle state
+- basic functionality no proper way to handle state
 
 ## v1.0.1
 
@@ -14,7 +14,7 @@
 
 ## v1.0.3
 
-- improved state management
+- an improved state management
 
 ## v1.0.4
 
@@ -159,3 +159,17 @@ and we went along with it.
 - completed tests
 - cradova now helps you with Ref.render() calls
 - Ref can be used as screens directly
+
+# v2.3.1
+
+- fixes and more stability
+
+# v3.0.0
+
+- Redefined types
+- removed afterMount and beforeMount events from cradova elements
+- added the onmount event that get's called when the screen tree or ref get's updated
+- disabled the global dispatcher because it's no longer a need for reactivity
+- production tests
+- the cradova \_ function now has types
+- fixes and more speed gain for your apps when you update cradova.

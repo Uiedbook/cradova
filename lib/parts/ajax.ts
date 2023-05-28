@@ -6,19 +6,17 @@
  * supports files upload
  * @param url string
  * @param {{method: string;data;header;callbacks;}} opts
- * @returns any
+ * @returns unknown
  */
 
 export function Ajax(
   url: string | URL,
-  opts:
-    | {
-        method?: "GET" | "POST";
-        data?: Record<string, any>;
-        header?: { "content-type": string } & Record<string, any>;
-        callbacks?: Record<string, (arg: any) => void>;
-      }
-    | any = {}
+  opts: {
+    method?: "GET" | "POST";
+    data?: Record<string, unknown>;
+    header?: { "content-type": string } & Record<string, string>;
+    callbacks?: Record<string, (arg: Function) => void>;
+  } = {}
 ) {
   // getting params
   const { method, data, header, callbacks } = opts;
@@ -27,14 +25,12 @@ export function Ajax(
   }
   // promisified xhr function
   return new Promise(function (resolve) {
-    const ajax: any = new XMLHttpRequest();
+    const ajax: XMLHttpRequest = new XMLHttpRequest();
     const formData = new FormData();
     // setting callbacks
     if (callbacks && typeof callbacks === "object") {
       for (const [k, v] of Object.entries(callbacks)) {
-        if (typeof v === "function" && ajax[k]) {
-          ajax[k] = v;
-        }
+        ajax.addEventListener(k, v as unknown as EventListener);
       }
     }
 
@@ -44,11 +40,14 @@ export function Ajax(
 
     if (data && typeof data === "object") {
       for (const [k, v] of Object.entries(data)) {
-        let value = v as any;
+        let value = v as Record<string, unknown> | string;
         if (typeof value === "object" && value && !value.name) {
           value = JSON.stringify(value);
+          formData.set(k, value);
         }
-        formData.set(k, value);
+        if (typeof value === "string") {
+          formData.set(k, value);
+        }
       }
     }
 

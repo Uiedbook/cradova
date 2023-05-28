@@ -118,10 +118,9 @@ const html = div(Hello("peter"), Hello("joe"));
 function counter() {
   let num = 0;
   return _("h1| 0", {
-    shouldUpdate: true,
     onclick() {
       num++;
-      this.updateState({ text: num });
+      this.innerText = num;
     },
   });
 }
@@ -130,11 +129,11 @@ function counter() {
 
 function dataCounter() {
   return _("h1| 0", {
-    shouldUpdate: true,
     "data-num": "0",
     onclick() {
       const num = this.getAttribute("data-num") * 1 + 1;
-      this.updateState({ text: num, "data-num": num });
+      this.innerText = num;
+      this.setAttribute("data-num", num);
     },
   });
 }
@@ -143,13 +142,10 @@ function dataCounter() {
 
 function HelloMessage() {
   return _("div.foo#bar", {
-    shouldUpdate: true,
     text: "Click to get a greeting",
     onclick() {
       const name = prompt("what are your names");
-      this.updateState({
-        text: name ? "hello " + name : "Click to get a greeting",
-      });
+      this.innerText = name ? "hello " + name : "Click to get a greeting";
     },
   });
 }
@@ -157,14 +153,13 @@ function HelloMessage() {
 // using cradova Ref
 
 const nameRef = new Ref(function (name) {
-  const self = this;
   return _("div.foo#bar", {
     text: name
       ? "hello " + (name || " user 2")
       : "Click to get a second greeting",
     onclick() {
       const name = prompt();
-      self.updateState(name);
+      this.innerText = name;
     },
   });
 });
@@ -179,7 +174,11 @@ function App() {
     br,
     nameRef,
     typingExample,
-    _("a|home page", { href: "/home" })
+    _("a|home page", {
+      onclick() {
+        Router.back();
+      },
+    })
   );
 }
 
@@ -201,7 +200,7 @@ const template = new Ref(function (name) {
     }, 1000);
   });
   // effects can be used to make api calls needed for the page
-  return _("div", name ? ">>>>>>>>  Hello  " + name : "  loading...");
+  return _("div", name ? ">>>>>>>>  Hello  " + name : "  loading...", {});
 });
 
 const home = new Screen({
@@ -215,13 +214,13 @@ Router.BrowserRoutes({ "/home": home });
 Router.packageScreen("/home");
 // get the page ready in the background
 
-Router.navigate("/home", {});
-// navigates to that page
-
 // Router.getParams();
 // get route params for this current page
 
 Router.onPageEvent((lastRoute, newRoute) => {
-  console.log(lastRoute, newRoute);
+  // console.log(lastRoute, newRoute);
 });
 // listen for navigation changes
+
+Router.navigate("/home", {});
+// navigates to that page

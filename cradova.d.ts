@@ -1,333 +1,19 @@
 declare module "cradova" {
-  type ElementType<T> = (
-    ...VJS: (
-      | string
-      | undefined
-      | Partial<T>
-      | HTMLElement
-      | (() => HTMLElement)
-      | {
-          style?: Partial<CSSStyleDeclaration>;
-          beforeMount?: () => void;
-          afterMount?: () => void;
-          text?: string;
-          reference?: any;
-          stateID?: string;
-          shouldUpdate?: boolean;
-        }
-    )[]
-  ) => T;
-  /**
-   *
-   */
-  type CradovaScreenType = {
-    /**
-     * Cradova screen
-     * ---
-     * title of the page
-     *
-     *
-     * .
-     */
-    name: string;
-    /**
-     * Cradova screen
-     * ---
-     * a css className to add to screen when rendering it
-     * Usually for adding css transitions
-     * .
-     */
-    transition?: string;
-    /**
-     * Cradova screen
-     * ---
-     * The component for the screen
-     * @param data
-     * @returns void
-     *
-     *
-     * .
-     */
-    template: Function | HTMLElement;
-    /**
-     * Cradova screen
-     * ---
-     * Allows this screen render in parallel for unique routes
-     *
-     * limit is 1000
-     *
-     *
-     *
-     * .
-     */
-    renderInParallel?: boolean;
-    /**
-     * Cradova screen
-     * ---
-     * gets called when the the screen is displayed
-     *
-     *
-     * .
-     */
-    /**
-     * Cradova screen
-     * ---
-     * Should this screen be cached after first render?
-     * you can use Route.navigate(url, null, true) to force later
-     *
-     * .
-     */
-    persist?: boolean;
-  };
-
-  export const a: ElementType<HTMLAnchorElement>;
-  export const abbr: ElementType<HTMLElement>;
-  export const address: ElementType<HTMLElement>;
-  export const area: ElementType<HTMLAreaElement>;
-  export const article: ElementType<HTMLElement>;
-  export const aside: ElementType<HTMLElement>;
-  export const audio: ElementType<HTMLAudioElement>;
-  export const b: ElementType<HTMLElement>;
-  export const base: ElementType<HTMLBaseElement>;
-  export const bdi: ElementType<HTMLElement>;
-  export const bdo: ElementType<HTMLElement>;
-  export const blockquote: ElementType<HTMLElement>;
-  export const body: ElementType<HTMLBodyElement>;
-  export const br: ElementType<HTMLBRElement>;
-  export const button: ElementType<HTMLButtonElement>;
-  export const canvas: ElementType<HTMLCanvasElement>;
-  export const caption: ElementType<HTMLTableCaptionElement>;
-  export const cite: ElementType<HTMLElement>;
-  export const code: ElementType<HTMLElement>;
-  export const col: ElementType<HTMLTableColElement>;
-  export const colgroup: ElementType<HTMLElement>;
-  export const data: ElementType<HTMLDataElement>;
-  export const datalist: ElementType<HTMLDataListElement>;
-  export const dd: ElementType<HTMLElement>;
-  export const del: ElementType<HTMLElement>;
-  export const details: ElementType<HTMLDetailsElement>;
-  export const dfn: ElementType<HTMLElement>;
-  export const dialog: ElementType<HTMLDialogElement>;
-  export const div: ElementType<HTMLDivElement>;
-  export const dl: ElementType<HTMLElement>;
-  export const dt: ElementType<HTMLElement>;
-  export const em: ElementType<HTMLElement>;
-  export const embed: ElementType<HTMLEmbedElement>;
-  export const fieldset: ElementType<HTMLFieldSetElement>;
-  export const figcaption: ElementType<HTMLElement>;
-  export const figure: ElementType<HTMLElement>;
-  export const footer: ElementType<HTMLElement>;
-  export const form: ElementType<HTMLFormElement>;
-  export const h1: ElementType<HTMLHeadingElement>;
-  export const h2: ElementType<HTMLHeadingElement>;
-  export const h3: ElementType<HTMLHeadingElement>;
-  export const h4: ElementType<HTMLHeadingElement>;
-  export const h5: ElementType<HTMLHeadingElement>;
-  export const h6: ElementType<HTMLHeadingElement>;
-  export const head: ElementType<HTMLHeadElement>;
-  export const header: ElementType<HTMLElement>;
-  export const hr: ElementType<HTMLHRElement>;
-  export const html: ElementType<HTMLHtmlElement>;
-  export const i: ElementType<HTMLElement>;
-  export const iframe: ElementType<HTMLIFrameElement>;
-  export const img: ElementType<HTMLImageElement>;
-  export const input: ElementType<HTMLInputElement>;
-  export const ins: ElementType<HTMLElement>;
-  export const kbd: ElementType<HTMLElement>;
-  export const label: ElementType<HTMLLabelElement>;
-  export const legend: ElementType<HTMLLegendElement>;
-  export const li: ElementType<HTMLLIElement>;
-  export const link: ElementType<HTMLLinkElement>;
-  export const main: ElementType<HTMLElement>;
-  export const map: ElementType<HTMLMapElement>;
-  export const mark: ElementType<HTMLElement>;
-  export const math: ElementType<HTMLElement>;
-  export const menu: ElementType<HTMLMenuElement>;
-  export const meta: ElementType<HTMLMetaElement>;
-  export const meter: ElementType<HTMLMeterElement>;
-  export const nav: ElementType<HTMLElement>;
-  export const object: ElementType<HTMLObjectElement>;
-  export const ol: ElementType<HTMLOListElement>;
-  export const optgroup: ElementType<HTMLOptGroupElement>;
-  export const option: ElementType<HTMLOptionElement>;
-  export const output: ElementType<HTMLOutputElement>;
-  export const p: ElementType<HTMLParagraphElement>;
-  export const picture: ElementType<HTMLPictureElement>;
-  export const portal: ElementType<HTMLElement>;
-  export const pre: ElementType<HTMLPreElement>;
-  export const progress: ElementType<HTMLProgressElement>;
-  export const q: ElementType<HTMLQuoteElement>;
-  export const rp: ElementType<HTMLElement>;
-  export const rt: ElementType<HTMLElement>;
-  export const ruby: ElementType<HTMLElement>;
-  export const s: ElementType<HTMLElement>;
-  export const samp: ElementType<HTMLElement>;
-  export const script: ElementType<HTMLScriptElement>;
-  export const section: ElementType<HTMLElement>;
-  export const select: ElementType<HTMLSelectElement>;
-  export const slot: ElementType<HTMLSlotElement>;
-  export const small: ElementType<HTMLElement>;
-  export const source: ElementType<HTMLSourceElement>;
-  export const span: ElementType<HTMLSpanElement>;
-  export const strong: ElementType<HTMLElement>;
-  export const style: ElementType<HTMLStyleElement>;
-  export const sub: ElementType<HTMLElement>;
-  export const summary: ElementType<HTMLElement>;
-  export const sup: ElementType<HTMLElement>;
-  export const table: ElementType<HTMLTableElement>;
-  export const tbody: ElementType<HTMLTableColElement>;
-  export const td: ElementType<HTMLTableCellElement>;
-  export const template: ElementType<HTMLTemplateElement>;
-  export const textarea: ElementType<HTMLTextAreaElement>;
-  export const tfoot: ElementType<HTMLElement>;
-  export const th: ElementType<HTMLTableSectionElement>;
-  export const thead: ElementType<HTMLTableSectionElement>;
-  export const time: ElementType<HTMLTimeElement>;
-  export const title: ElementType<HTMLTitleElement>;
-  export const tr: ElementType<HTMLTableRowElement>;
-  export const track: ElementType<HTMLTrackElement>;
-  export const u: ElementType<HTMLElement>;
-  export const ul: ElementType<HTMLUListElement>;
-  export const val: ElementType<HTMLElement>;
-  export const video: ElementType<HTMLVideoElement>;
-  export const wbr: ElementType<HTMLElement>;
-
-  /**
-   *
-   * Cradova Ajax
-   * ------------------
-   * your new axios alternative
-   * supports files upload
-   * @param url string
-   * @param {{method: string;data;header;callbacks;}} opts
-   * @returns any
-   */
-  export function Ajax(
-    url: string | URL,
-    opts?:
-      | {
-          method?: "GET" | "POST";
-          data?: Record<string, any>;
-          header?: {
-            "content-type": string;
-          } & Record<string, any>;
-          callbacks?: Record<string, (arg: any) => void>;
-        }
-      | any
-  ): Promise<unknown>;
-
-  /**
-   * Cradova event
-   */
-  export class cradovaEvent {
-    private listeners;
-    addEventListener(eventName: string, callback: any): void;
-    removeEventListener(eventName: string, callback: any): void;
-    dispatchEvent(eventName: string, eventArgs?: any): void;
-  }
-  export const CradovaEvent: cradovaEvent;
-  export function css(identifier: string | TemplateStringsArray): void;
-  /**
-   *
-   * @param {expression} condition
-   * @param {function} elements[]
-   */
-  export function assert(condition: any, ...elements: any): any;
-  export function loop(
-    datalist: any[],
-    component: (value: any, index?: number, array?: any[]) => any
-  ): HTMLElement | undefined;
-  export function assertOr(
-    condition: boolean,
-    ifTrue: () => any,
-    ifFalse: () => any
-  ): () => any;
-  /**
-   * Cradova Ref
-   * -------
-   * create dynamic components
-   */
-  type RefProps<D> = D | any;
-  export class Ref<D> {
-    private component;
-    private effects;
-    private effectuate;
-    private rendered;
-    private published;
-    private hasFirstStateUpdateRun;
-    private preRendered;
-    private reference;
-    Signal: createSignal<any> | undefined;
-    stash: D | undefined;
-    constructor(component: (data?: RefProps<D>) => any);
-    preRender(data?: RefProps<D>): void;
-    destroyPreRendered(): void;
-    /**
-     * Cradova Ref
-     * ---
-     * returns html with cradova reference
-     * @param data
-     * @returns () => HTMLElement
-     */
-    render(data?: D, stash?: boolean): HTMLElement;
-    instance(): Record<string, any>;
-    _setExtra(Extra: createSignal<any>): void;
-    /**
-     * Cradova Ref
-     * ---
-     * runs on first state update
-     *
-     */
-    effect(fn: () => Promise<unknown>): void;
-    private effector;
-    /**
-     * Cradova Ref
-     * ---
-     * update ref component with new data and update the dom.
-     * @param data
-     * @returns void
-     *
-     *
-     * .
-     */
-    updateState(data: D, stash?: boolean): void;
-    private Activate;
-    remove(): void;
-  }
-  export const svgNS: (
-    type: string,
-    props: Record<string, any>,
-    ...children: any
-  ) => HTMLElement;
-  export class lazy {
-    content: any;
-    private _cb;
-    constructor(cb: () => Promise<any>);
-    load(): Promise<void>;
-  }
-  export class reference {
-    [x: string]: Record<string, any>;
-    bindAs(name: string): any;
-    _appendDom(name: string, Element: any): void;
-    _appendDomForce(name: string, Element: any): void;
-  }
-
   /**
    *  Cradova Signal
    * ----
-   *  create stateful data store.
-   * ability to:
-   * - create store
+   *  Create stateful data store.
+   *  Features:
+   * - create a store
    * - create actions and fire them
-   * - bind a Ref
-   * - listen to changes
+   * - bind a Ref and elements
+   * - listen to updates
+   * - set object keys instead of all values
    * - persist changes to localStorage
-   * - set keys instead of all values
-   * - update a cradova Ref and bindings automatically
-   * @constructor initial: any, props: {useHistory, persist}
+   * - update a cradova Ref automatically
+   * @constructor initial: unknown, props: {useHistory, persist}
    */
-
-  export class createSignal<Type extends Record<string, any>> {
+  export class createSignal<Type extends Record<string, unknown>> {
     private callback;
     private persistName;
     private actions;
@@ -357,20 +43,25 @@ declare module "cradova" {
      */
     setKey<k extends keyof Type>(
       key: k,
-      value: any,
+      value: k,
       shouldRefRender?: boolean
     ): void;
     /**
      *  Cradova Signal
      * ----
      *  set a key to signal an action
-     * @param key - key of the action
+     * @param name - name of the action
      * @param action function to execute
      */
-    createAction(
-      key: string | Record<string, (data?: Type) => void>,
-      action?: ((data?: Type) => void) | Ref<unknown>
-    ): void;
+    createAction(name: string, action: (data?: unknown) => void): void;
+    /**
+     *  Cradova Signal
+     * ----
+     *  creates many actions at a time
+     * @param name - name of the action
+     * @param action function to execute
+     */
+    createActions(Actions: Record<string, (data?: unknown) => void>): void;
     /**
      *  Cradova Signal
      * ----
@@ -382,7 +73,7 @@ declare module "cradova" {
     /**
      * Cradova
      * ---
-     * is used to bind store data to any element
+     * is used to bind signal data to elements and Refs
      *
      * @param prop
      * @returns something
@@ -398,7 +89,7 @@ declare module "cradova" {
      * @param path a property in the object to send to attached ref
      */
     bindRef(
-      ref: any,
+      ref: Partial<Ref<unknown>>, //! there's more to this friday (even elements act as ref here because of the updateState)
       binding?: {
         event?: string;
         signalProperty: string;
@@ -411,48 +102,316 @@ declare module "cradova" {
      *  set a update listener on value changes
      * @param callback
      */
-    listen(callback: (a: any) => void): void;
+    listen(callback: (a: Type) => void): void;
     /**
      *  Cradova Signal
      * ----
      * clear the history on local storage
      *
-     *
-     * .
      */
     clearPersist(): void;
   }
 
-  type stateType =
-    | Partial<HTMLElement>
-    | {
-        class?: string;
-        text?: string;
-        style?: Partial<CSSStyleDeclaration>;
-        tree?: Function | HTMLElement;
-        remove?: boolean;
-      };
-  type stateID = string;
+  export function css(identifier: string | TemplateStringsArray): void;
   /**
-   * Send a new state to specified element with stateID
    *
-   * @param stateID
-   * @param state
-   * @returns element(s)
+   * @param {expression} condition
+   * @param {function} elements[]
    */
-  export function dispatch(
-    stateID: stateID | Record<stateID, stateType>,
-    state?: stateType
-  ): any;
+  export function assert(
+    condition: unknown,
+    ...elements: VJSType<HTMLElement>[]
+  ): VJSType<HTMLElement>[] | undefined;
+  export function loop(
+    datalist: unknown[],
+    component: (
+      value: unknown,
+      index?: number,
+      array?: unknown[]
+    ) => VJSType<HTMLElement>[] | undefined
+  ): HTMLElement | undefined;
+  export function assertOr(
+    condition: boolean,
+    ifTrue: () => VJSType<HTMLElement>,
+    ifFalse: () => VJSType<HTMLElement>
+  ): () => VJSType<HTMLElement>;
+  /**
+   * Cradova Ref
+   * -------
+   * create dynamic components
+   */
+  type RefProps<D> = D | undefined;
+  export class Ref<D> {
+    private component;
+    private effects;
+    private effectuate;
+    private rendered;
+    private published;
+    private hasFirstStateUpdateRun;
+    private preRendered;
+    private reference;
+    Signal: createSignal<any> | undefined;
+    stash: RefProps<D>;
+    constructor(component: (data?: RefProps<D>) => HTMLElement);
+    preRender(data?: RefProps<D>): void;
+    destroyPreRendered(): void;
+    /**
+     * Cradova Ref
+     * ---
+     * returns html with cradova reference
+     * @param data
+     * @returns () => HTMLElement
+     */
+    render(data?: D, stash?: boolean): HTMLElement;
+    instance(): Record<string, any>;
+    _setExtra(Extra: createSignal<any>): void;
+    /**
+     * Cradova Ref
+     * ---
+     * runs on first state update
+     *
+     */
+    effect(fn: () => Promise<void> | void): void;
+    private effector;
+    /**
+     * Cradova Ref
+     * ---
+     * update ref component with new data and update the dom.
+     * @param data
+     * @returns void
+     *
+     *
+     * .
+     */
+    updateState(data: D, stash?: boolean): void;
+    private Activate;
+    remove(): void;
+  }
+  export class lazy {
+    content: unknown;
+    private _cb;
+    constructor(cb: () => Promise<unknown>);
+    load(): Promise<void>;
+  }
+  /**
+   * Cradova
+   * ---
+   * make reference to dom elements
+   */
+  export class reference {
+    [x: string]: Record<string, any>;
+    bindAs(name: string): reference;
+    _appendDom(name: string, Element: HTMLElement): void;
+    _appendDomForce(name: string, Element: HTMLElement): void;
+  }
+
+  type VJSType<T> = (
+    ...VJS: (
+      | undefined
+      | string
+      | Partial<T>
+      | HTMLElement
+      | (() => HTMLElement)
+      | {
+          style?: Partial<CSSStyleDeclaration>;
+          onmount?: () => void;
+          text?: string;
+          reference?: reference;
+        }
+    )[]
+  ) => T;
+  type VJS_params_TYPE<T> = (
+    | undefined
+    | string
+    | Partial<T>
+    | HTMLElement
+    | (() => HTMLElement)
+    | {
+        style?: Partial<CSSStyleDeclaration>;
+        onmount?: () => void;
+        text?: string;
+        reference?: reference;
+      }
+  )[];
+  /**
+   *
+   */
+  type CradovaScreenType = {
+    /**
+     * Cradova screen
+     * ---
+     * title of the page
+     * .
+     */
+    name: string;
+    /**
+     * Cradova screen
+     * ---
+     * a css className to add to screen when rendering it
+     * Usually for adding css transitions
+     * .
+     */
+    transition?: string;
+    /**
+     * Cradova screen
+     * ---
+     * The component for the screen
+     * @param data
+     * @returns void
+     * .
+     */
+    template: Function | HTMLElement;
+    /**
+     * Cradova screen
+     * ---
+     * Allows this screen render in parallel for unique routes
+     *
+     * limit is 1000
+     *
+     * .
+     */
+    renderInParallel?: boolean;
+    /**
+     * Cradova screen
+     * ---
+     * gets called when the the screen is displayed
+     * .
+     */
+    /**
+     * Cradova screen
+     * ---
+     * Should this screen be cached after first render?
+     * you can use Route.navigate(url, null, true) to force later
+     *
+     * .
+     */
+    persist?: boolean;
+  };
+
+  export const makeElement: (
+    element: HTMLElement,
+    ...ElementChildrenAndPropertyList: VJS_params_TYPE<HTMLElement>
+  ) => HTMLElement;
+  export const a: VJSType<HTMLAnchorElement>;
+  export const abbr: VJSType<HTMLElement>;
+  export const address: VJSType<HTMLElement>;
+  export const area: VJSType<HTMLAreaElement>;
+  export const article: VJSType<HTMLElement>;
+  export const aside: VJSType<HTMLElement>;
+  export const audio: VJSType<HTMLAudioElement>;
+  export const b: VJSType<HTMLElement>;
+  export const base: VJSType<HTMLBaseElement>;
+  export const bdi: VJSType<HTMLElement>;
+  export const bdo: VJSType<HTMLElement>;
+  export const blockquote: VJSType<HTMLElement>;
+  export const body: VJSType<HTMLBodyElement>;
+  export const br: VJSType<HTMLBRElement>;
+  export const button: VJSType<HTMLButtonElement>;
+  export const canvas: VJSType<HTMLCanvasElement>;
+  export const caption: VJSType<HTMLTableCaptionElement>;
+  export const cite: VJSType<HTMLElement>;
+  export const code: VJSType<HTMLElement>;
+  export const col: VJSType<HTMLTableColElement>;
+  export const colgroup: VJSType<HTMLElement>;
+  export const data: VJSType<HTMLDataElement>;
+  export const datalist: VJSType<HTMLDataListElement>;
+  export const dd: VJSType<HTMLElement>;
+  export const del: VJSType<HTMLElement>;
+  export const details: VJSType<HTMLDetailsElement>;
+  export const dfn: VJSType<HTMLElement>;
+  export const dialog: VJSType<HTMLDialogElement>;
+  export const div: VJSType<HTMLDivElement>;
+  export const dl: VJSType<HTMLElement>;
+  export const dt: VJSType<HTMLElement>;
+  export const em: VJSType<HTMLElement>;
+  export const embed: VJSType<HTMLEmbedElement>;
+  export const fieldset: VJSType<HTMLFieldSetElement>;
+  export const figcaption: VJSType<HTMLElement>;
+  export const figure: VJSType<HTMLElement>;
+  export const footer: VJSType<HTMLElement>;
+  export const form: VJSType<HTMLFormElement>;
+  export const h1: VJSType<HTMLHeadingElement>;
+  export const h2: VJSType<HTMLHeadingElement>;
+  export const h3: VJSType<HTMLHeadingElement>;
+  export const h4: VJSType<HTMLHeadingElement>;
+  export const h5: VJSType<HTMLHeadingElement>;
+  export const h6: VJSType<HTMLHeadingElement>;
+  export const head: VJSType<HTMLHeadElement>;
+  export const header: VJSType<HTMLElement>;
+  export const hr: VJSType<HTMLHRElement>;
+  export const html: VJSType<HTMLHtmlElement>;
+  export const i: VJSType<HTMLElement>;
+  export const iframe: VJSType<HTMLIFrameElement>;
+  export const img: VJSType<HTMLImageElement>;
+  export const input: VJSType<HTMLInputElement>;
+  export const ins: VJSType<HTMLElement>;
+  export const kbd: VJSType<HTMLElement>;
+  export const label: VJSType<HTMLLabelElement>;
+  export const legend: VJSType<HTMLLegendElement>;
+  export const li: VJSType<HTMLLIElement>;
+  export const link: VJSType<HTMLLinkElement>;
+  export const main: VJSType<HTMLElement>;
+  export const map: VJSType<HTMLMapElement>;
+  export const mark: VJSType<HTMLElement>;
+  export const math: VJSType<HTMLElement>;
+  export const menu: VJSType<HTMLMenuElement>;
+  export const meta: VJSType<HTMLMetaElement>;
+  export const meter: VJSType<HTMLMeterElement>;
+  export const nav: VJSType<HTMLElement>;
+  export const object: VJSType<HTMLObjectElement>;
+  export const ol: VJSType<HTMLOListElement>;
+  export const optgroup: VJSType<HTMLOptGroupElement>;
+  export const option: VJSType<HTMLOptionElement>;
+  export const output: VJSType<HTMLOutputElement>;
+  export const p: VJSType<HTMLParagraphElement>;
+  export const picture: VJSType<HTMLPictureElement>;
+  export const portal: VJSType<HTMLElement>;
+  export const pre: VJSType<HTMLPreElement>;
+  export const progress: VJSType<HTMLProgressElement>;
+  export const q: VJSType<HTMLQuoteElement>;
+  export const rp: VJSType<HTMLElement>;
+  export const rt: VJSType<HTMLElement>;
+  export const ruby: VJSType<HTMLElement>;
+  export const s: VJSType<HTMLElement>;
+  export const samp: VJSType<HTMLElement>;
+  export const script: VJSType<HTMLScriptElement>;
+  export const section: VJSType<HTMLElement>;
+  export const select: VJSType<HTMLSelectElement>;
+  export const slot: VJSType<HTMLSlotElement>;
+  export const small: VJSType<HTMLElement>;
+  export const source: VJSType<HTMLSourceElement>;
+  export const span: VJSType<HTMLSpanElement>;
+  export const strong: VJSType<HTMLElement>;
+  export const style: VJSType<HTMLStyleElement>;
+  export const sub: VJSType<HTMLElement>;
+  export const summary: VJSType<HTMLElement>;
+  export const sup: VJSType<HTMLElement>;
+  export const table: VJSType<HTMLTableElement>;
+  export const tbody: VJSType<HTMLTableColElement>;
+  export const td: VJSType<HTMLTableCellElement>;
+  export const template: VJSType<HTMLTemplateElement>;
+  export const textarea: VJSType<HTMLTextAreaElement>;
+  export const tfoot: VJSType<HTMLElement>;
+  export const th: VJSType<HTMLTableSectionElement>;
+  export const thead: VJSType<HTMLTableSectionElement>;
+  export const time: VJSType<HTMLTimeElement>;
+  export const title: VJSType<HTMLTitleElement>;
+  export const tr: VJSType<HTMLTableRowElement>;
+  export const track: VJSType<HTMLTrackElement>;
+  export const u: VJSType<HTMLElement>;
+  export const ul: VJSType<HTMLUListElement>;
+  export const val: VJSType<HTMLElement>;
+  export const video: VJSType<HTMLVideoElement>;
+  export const wbr: VJSType<HTMLElement>;
 
   /** cradova router
    * ---
    * Registers a route.
    *
    * @param {string}   path     Route path.
-   * @param {any} screen the cradova document tree for the route.
+   * @param  screen the cradova document tree for the route.
    */
-  class RouterClass {
+  export class RouterClass {
     /** cradova router
      * ---
      * Registers a route.
@@ -460,9 +419,17 @@ declare module "cradova" {
      * accepts an object containing
      *
      * @param {string}   path     Route path.
-     * @param {any} screen the cradova screen.
+     * @param  screen the cradova screen.
      */
     BrowserRoutes(obj: Record<string, any>): void;
+    /**
+      Go back in Navigation history
+      */
+    back(): void;
+    /**
+      Go forward in Navigation history
+      */
+    forward(): void;
     /**
      * Cradova Router
      * ------
@@ -475,7 +442,7 @@ declare module "cradova" {
      */
     navigate(
       href: string,
-      data?: Record<string, any> | null,
+      data?: Record<string, unknown> | null,
       force?: boolean
     ): void;
     /** cradova router
@@ -490,9 +457,9 @@ declare module "cradova" {
      * get a screen ready before time.
      *
      * @param {string}   path Route path.
-     * @param {any} data data for the screen.
+     * @param  data data for the screen.
      */
-    packageScreen(path: string, data?: any): Promise<void>;
+    packageScreen(path: string, data?: Record<string, unknown>): Promise<void>;
     /**
      * Cradova Router
      * ------
@@ -527,15 +494,15 @@ declare module "cradova" {
     /**
      * this should be a cradova screen component
      */
-    _html: Function;
+    _html: Function | HTMLElement;
     /**
      * this is a set of added html to the screen
      */
-    _secondaryChildren: Array<Node>;
+    _secondaryChildren: VJSType<HTMLElement>[];
     /**
      * error handler for the screen
      */
-    errorHandler: (() => void) | null;
+    errorHandler: ((err: unknown) => void) | null;
     /**
      * used internally
      */
@@ -546,23 +513,49 @@ declare module "cradova" {
     private _deCallBack;
     private _persist;
     private _data;
-    _params: Record<string, any> | null;
+    _params: Record<string, unknown> | null;
     private _delegatedRoutesCount;
     private _transition;
+    private _doc;
     constructor(cradova_screen_initials: CradovaScreenType);
     get _delegatedRoutes(): boolean;
     set _delegatedRoutes(count: boolean);
     get _paramData(): typeof this._params;
     set _paramData(params: typeof this._params);
-    setErrorHandler(errorHandler: () => void): void;
+    setErrorHandler(errorHandler: (err: unknown) => void): void;
     _package(): Promise<void>;
     onActivate(cb: () => Promise<void> | void): void;
     onDeactivate(cb: () => Promise<void> | void): void;
-    addChild(...addOns: any[]): void;
+    addChildren(...addOns: VJSType<HTMLElement>[]): void;
     _deActivate(): Promise<void>;
     _Activate(force?: boolean): Promise<void>;
   }
 
+  /**
+   *
+   * Cradova Ajax
+   * ------------------
+   * your new axios alternative
+   * supports files upload
+   * @param url string
+   * @param {{method: string;data;header;callbacks;}} opts
+   * @returns unknown
+   */
+  export function Ajax(
+    url: string | URL,
+    opts?: {
+      method?: "GET" | "POST";
+      data?: Record<string, unknown>;
+      header?: {
+        "content-type": string;
+      } & Record<string, string>;
+      callbacks?: Record<string, (arg: Function) => void>;
+    }
+  ): Promise<unknown>;
+
+  type TemplateType = (
+    ...element_initials: VJS_params_TYPE<HTMLElement>
+  ) => HTMLElement;
   /**
    * Cradova
    * ---
@@ -593,9 +586,8 @@ declare module "cradova" {
    * ...
    * )
    *
-   * @param  {...any[]} element_initials
+   * @param element_initials
    * @returns function - cradova element
    */
-  const _: any;
-  export default _;
+  export const _: TemplateType;
 }

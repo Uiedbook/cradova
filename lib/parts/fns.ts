@@ -1,55 +1,57 @@
+import { VJSType } from "../types";
 import { createSignal } from "./createSignal";
 
 export const isNode = (node: any) =>
   typeof node === "object" && typeof node.nodeType === "number";
 
+export const addInvalidProperty = (
+  x: Record<string, unknown>,
+  y: string,
+  z: unknown
+) => {
+  // ! what an evil thing
+  x[y] = z;
+};
 /**
  * Cradova event
  */
 
 export class cradovaEvent {
-  private listeners: Record<string, any[]> = {};
-  addEventListener(eventName: string, callback: any) {
+  private listeners: Record<string, Function[]> = {};
+  addEventListener(eventName: string, callback: () => void) {
     if (!this.listeners[eventName]) {
       this.listeners[eventName] = [];
     }
     this.listeners[eventName].push(callback);
   }
-
-  removeEventListener(eventName: string, callback: any) {
-    if (this.listeners[eventName]) {
-      const index = this.listeners[eventName].indexOf(callback);
-      if (index !== -1) {
-        this.listeners[eventName].splice(index, 1);
-      }
-    }
-  }
-
-  dispatchEvent(eventName: string, eventArgs?: any) {
-    const eventListeners = this.listeners[eventName];
-    if (eventListeners) {
-      for (let i = 0; i < eventListeners.length; i++) {
-        eventListeners[i](eventArgs);
-      }
+  // removeEventListener(eventName: string, num: number) {
+  //   this.listeners[eventName].splice(num, 1);
+  // }
+  dispatchEvent(eventName: string, eventArgs?: unknown) {
+    const eventListeners = this.listeners[eventName] || [];
+    while (eventListeners.length) {
+      eventListeners.shift()?.call(undefined, eventArgs);
     }
   }
 }
 
 export const CradovaEvent = new cradovaEvent();
 
-export function Rhoda(l: any[]) {
+export function Rhoda(
+  l: VJSType<HTMLElement>[] | (() => any)[] | Ref<unknown>[] | HTMLElement[]
+) {
   const fg = new DocumentFragment();
   for (let ch of l) {
     if (Array.isArray(ch)) {
       fg.appendChild(Rhoda(ch));
     } else {
-      if (ch?.render) {
-        ch = ch.render() as any;
+      if (ch instanceof Ref) {
+        ch = ch.render();
       }
       if (typeof ch === "function") {
-        ch = ch();
+        ch = ch() as VJSType<HTMLElement>;
         if (typeof ch === "function") {
-          ch = ch();
+          ch = ch() as VJSType<HTMLElement>;
         }
       }
       if (typeof ch === "string" || typeof ch === "number") {
@@ -57,7 +59,7 @@ export function Rhoda(l: any[]) {
         continue;
       }
       if (isNode(ch)) {
-        fg.appendChild(ch);
+        fg.appendChild(ch as unknown as HTMLElement);
       } else {
         if (typeof ch !== "undefined") {
           throw new Error(
@@ -98,22 +100,28 @@ export function css(identifier: string | TemplateStringsArray) {
  * @param {function} elements[]
  */
 
-export function assert(condition: any, ...elements: any) {
+export function assert(
+  condition: unknown,
+  ...elements: VJSType<HTMLElement>[]
+) {
   if (condition) {
     return elements;
   }
   return undefined;
 }
 export function loop(
-  datalist: any[],
-  component: (value: any, index?: number, array?: any[]) => any
+  datalist: unknown[],
+  component: (
+    value: unknown,
+    index?: number,
+    array?: unknown[]
+  ) => VJSType<HTMLElement>[] | undefined
 ) {
   if (typeof component !== "function") {
     throw new Error(
       " ✘  Cradova err :  Invalid component type, must be a function that returns html  "
     );
   }
-  // am trying to confuse typescript compiler, but i know what am trying to do
   return Array.isArray(datalist)
     ? (datalist.map(component) as unknown as HTMLElement)
     : undefined;
@@ -121,8 +129,8 @@ export function loop(
 
 export function assertOr(
   condition: boolean,
-  ifTrue: () => any,
-  ifFalse: () => any
+  ifTrue: () => VJSType<HTMLElement>,
+  ifFalse: () => VJSType<HTMLElement>
 ) {
   if (condition) {
     return ifTrue;
@@ -138,12 +146,12 @@ export function assertOr(
  * create dynamic components
  */
 
-type RefProps<D> = D | any;
+type RefProps<D> = D | undefined;
 
 export class Ref<D> {
   private component: (data?: D) => HTMLElement | ((data?: D) => HTMLElement);
-  private effects: (() => Promise<unknown>)[] = [];
-  private effectuate: (() => unknown) | null = null;
+  private effects: (() => Promise<void> | void)[] = [];
+  private effectuate: ((this: Ref<D>) => void) | null = null;
   private rendered = false;
   private published = false;
   private hasFirstStateUpdateRun = false;
@@ -151,28 +159,27 @@ export class Ref<D> {
   private reference: reference = new reference();
   Signal: createSignal<any> | undefined;
   // public testName = null;
-  public stash: D | undefined;
+  public stash: RefProps<D>;
 
-  constructor(component: (data?: RefProps<D>) => any) {
+  constructor(component: (data?: RefProps<D>) => HTMLElement) {
     this.component = component.bind(this);
   }
 
   preRender(data?: RefProps<D>) {
     // parking
-    const chtml = this.component(data);
-    if (chtml instanceof HTMLElement) {
-      this.preRendered = chtml;
+    const ihtml = this.component(data);
+    if (ihtml instanceof HTMLElement) {
+      this.preRendered = ihtml;
     } else {
-      this.preRendered = chtml();
+      this.preRendered = ihtml();
     }
-    // @ts-ignore
     if (!this.preRendered) {
       throw new Error(
         " ✘  Cradova err :  Invalid component type for cradova Ref got  -  " +
           this.preRendered
       );
     }
-    this.reference._appendDomForce("reference", this.preRendered);
+    this.reference._appendDomForce("element", this.preRendered);
   }
   destroyPreRendered() {
     this.preRendered = null;
@@ -192,13 +199,12 @@ export class Ref<D> {
     let element: HTMLElement | null = null;
     if (!this.preRendered) {
       // parking
-      const chtml = this.component(data);
-      if (chtml instanceof HTMLElement) {
-        element = chtml;
+      const ihtml = this.component(data);
+      if (ihtml instanceof HTMLElement) {
+        element = ihtml;
       } else {
-        element = chtml();
+        element = ihtml();
       }
-      // @ts-ignore
       if (!element) {
         throw new Error(
           " ✘  Cradova err :  Invalid component type for cradova Ref, got  -  " +
@@ -211,24 +217,22 @@ export class Ref<D> {
     }
     const av = async () => {
       await this.effector.apply(this);
-      CradovaEvent.removeEventListener("cradovaAftermountEvent", av);
+      // CradovaEvent.removeEventListener("onmountEvent", num);
     };
-    CradovaEvent.addEventListener("cradovaAftermountEvent", av);
+    CradovaEvent.addEventListener("onmountEvent", av);
     this.effector();
     this.published = true;
     this.rendered = true;
     if (!element) {
       element = this.preRendered;
     }
-    this.reference._appendDomForce("reference", element);
+    this.reference._appendDomForce("element", element as HTMLElement);
     return element as HTMLElement;
   }
   instance() {
-    // @ts-ignore
-    return this.reference.reference;
+    return this.reference.element;
   }
   _setExtra(Extra: createSignal<any>) {
-    // @ts-ignore
     this.Signal = Extra;
   }
 
@@ -238,7 +242,7 @@ export class Ref<D> {
    * runs on first state update
    *
    */
-  effect(fn: () => Promise<unknown>) {
+  effect(fn: () => Promise<void> | void) {
     if (!this.rendered) {
       this.effects.push(fn.bind(this));
     }
@@ -276,7 +280,7 @@ export class Ref<D> {
       return;
     }
     if (!this.rendered) {
-      async function updateState(this: any, data: any) {
+      async function updateState(this: Ref<D>, data: D) {
         await this.Activate(data);
       }
       this.effectuate = updateState.bind(this, data);
@@ -292,23 +296,22 @@ export class Ref<D> {
     }
   }
 
-  // @ts-ignore
-  private async Activate(data: any) {
+  private async Activate(data: D) {
     if (!data) {
       return;
     }
+
     this.published = false;
 
-    // @ts-ignore
-    if (!this.reference.reference) {
+    if (!this.reference.element) {
       return;
     }
-    const chtml = this.component(data);
+    const ihtml = this.component(data);
     let element;
-    if (chtml instanceof HTMLElement) {
-      element = chtml;
+    if (ihtml instanceof HTMLElement) {
+      element = ihtml;
     } else {
-      element = chtml();
+      element = ihtml();
     }
     if (!element) {
       throw new Error(
@@ -316,29 +319,18 @@ export class Ref<D> {
           element
       );
     }
-    try {
-      // @ts-ignore
-      this.reference.reference.insertAdjacentElement("beforebegin", element);
-      // @ts-ignore
-      if (this.reference.reference.parentElement) {
-        // @ts-ignore
-        this.reference.reference.parentElement.removeChild(
-          // @ts-ignore
-          this.reference.reference
-        );
-      } else {
-        // @ts-ignore
-        this.reference.reference.remove();
-      }
-      this.reference._appendDomForce("reference", element);
-    } catch (e0) {
-      console.error(e0);
+    this.reference.element.insertAdjacentElement("beforebegin", element);
+    if (this.reference.element.parentElement) {
+      this.reference.element.parentElement.removeChild(this.reference.element);
+    } else {
+      this.reference.element.remove();
     }
+    this.reference._appendDomForce("element", element);
     this.published = true;
+    CradovaEvent.dispatchEvent("onmountEvent");
   }
   remove() {
-    // @ts-ignore
-    this.reference.reference.remove();
+    this.reference.element.remove();
   }
 }
 
@@ -348,24 +340,20 @@ export class Ref<D> {
  * @returns
  */
 
-export const frag = function (children: any) {
+export const frag = function (children: VJSType<HTMLElement>[]) {
   const par = document.createDocumentFragment();
   // building it's children tree.
   for (let i = 0; i < children.length; i++) {
-    let a = children[i];
+    let a: HTMLElement | (() => HTMLElement) = children[i];
     if (typeof a === "function") {
-      a = a() as any;
-    }
-    if (typeof a === "function") {
-      a = a() as any;
+      a = a() as HTMLElement;
     }
     if (isNode(a)) {
-      // @ts-ignore
       par.appendChild(a);
       continue;
     }
     if (a instanceof String) {
-      par.appendChild(document.createTextNode(a as string));
+      par.appendChild(document.createTextNode(a as unknown as string));
       continue;
     }
     console.error(" ✘  Cradova err:   wrong element type" + a);
@@ -374,73 +362,77 @@ export const frag = function (children: any) {
   return par;
 };
 
-export const svgNS = (
-  type: string,
-  props: Record<string, any>,
-  ...children: any
-) => {
-  const sc = document.createElementNS(
-    props.xmlns || "http://www.w3.org/2000/svg",
-    type
-  );
-  delete props.xmlns;
-  for (const p in props) {
-    sc.setAttributeNS(null, p, props[p]);
-  }
-  for (let ch of children) {
-    if (typeof ch === "function") {
-      ch = ch();
-    }
-    if (typeof ch === "function") {
-      ch = ch();
-    }
-    sc.appendChild(ch);
-  }
-  return sc;
-};
+// export const svgNS = (
+//   type: string,
+//   props: Record<string, unknown>,
+//   ...children: unknown
+// ) => {
+//   const sc = document.createElementNS(
+//     props.xmlns || "http://www.w3.org/2000/svg",
+//     type
+//   );
+//   delete props.xmlns;
+//   for (const p in props) {
+//     sc.setAttributeNS(null, p, props[p]);
+//   }
+//   for (let ch of children) {
+//     if (typeof ch === "function") {
+//       ch = ch();
+//     }
+//     if (typeof ch === "function") {
+//       ch = ch();
+//     }
+//     sc.appendChild(ch);
+//   }
+//   return sc;
+// };
 
 export class lazy {
-  public content: any = undefined;
-  private _cb: () => Promise<any>;
-  constructor(cb: () => Promise<any>) {
+  public content: unknown;
+  private _cb: () => Promise<unknown>;
+  constructor(cb: () => Promise<unknown>) {
     this._cb = cb;
   }
   async load() {
-    this.content = await this._cb();
-    if (typeof this.content === "function") {
-      this.content = await this.content;
+    let content = await this._cb();
+    if (typeof content === "function") {
+      content = await content();
     } else {
-      this.content = await this.content;
+      content = await content;
     }
-    this.content = this.content.default;
+    const def = content as { default: unknown };
+    if (def.default) {
+      this.content = def?.default;
+    }
   }
 }
 
+/**
+ * Cradova
+ * ---
+ * make reference to dom elements
+ */
+
 export class reference {
   [x: string]: Record<string, any>;
-  // @ts-ignore
+
   bindAs(name: string) {
-    return [this, name] as any;
+    return [this, name] as unknown as reference;
   }
-  // @ts-ignore
-  _appendDom(name: string, Element: any) {
+
+  _appendDom(name: string, Element: HTMLElement) {
     if (!Object.hasOwnProperty.call(this, name)) {
-      // @ts-ignore
       this[name] = Element;
     } else {
-      // @ts-ignore
       if (Array.isArray(this[name])) {
-        // @ts-ignore
         this[name].push(Element);
       } else {
-        // @ts-ignore
         this[name] = [this[name], Element];
       }
     }
   }
-  // @ts-ignore
-  _appendDomForce(name: string, Element: any) {
-    // @ts-ignore
+
+  _appendDomForce(name: string, Element: HTMLElement) {
     this[name] = Element;
   }
 }

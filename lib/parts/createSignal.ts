@@ -1,26 +1,26 @@
+import { Ref } from "./fns";
+
 /**
  *  Cradova Signal
  * ----
- *  create stateful data store.
- * ability to:
- * - create store
+ *  Create stateful data store.
+ *  Features:
+ * - create a store
  * - create actions and fire them
- * - bind a Ref
- * - listen to changes
+ * - bind a Ref and elements
+ * - listen to updates
+ * - set object keys instead of all values
  * - persist changes to localStorage
- * - set keys instead of all values
- * - update a cradova Ref and bindings automatically
- * @constructor initial: any, props: {useHistory, persist}
+ * - update a cradova Ref automatically
+ * @constructor initial: unknown, props: {useHistory, persist}
  */
 
-import { Ref } from "./fns";
-
-export class createSignal<Type extends Record<string, any>> {
+export class createSignal<Type extends Record<string, unknown>> {
   private callback: undefined | ((newValue: Type) => void);
   private persistName: string | undefined = "";
-  private actions: Record<string, any> = {};
+  private actions: Record<string, (data?: unknown) => void> = {};
   private ref: {
-    ref: any;
+    ref: Ref<unknown>;
     _event?: string;
     _signalProperty?: string;
     _element_property?: string;
@@ -77,9 +77,9 @@ export class createSignal<Type extends Record<string, any>> {
    * @returns void
    */
 
-  setKey<k extends keyof Type>(key: k, value: any, shouldRefRender?: boolean) {
+  setKey<k extends keyof Type>(key: k, value: k, shouldRefRender?: boolean) {
     if (typeof this.value === "object" && !Array.isArray(this.value)) {
-      this.value[key] = value;
+      this.value[key] = value as any;
       if (this.persistName) {
         localStorage.setItem(this.persistName, JSON.stringify(this.value));
       }
@@ -101,26 +101,33 @@ export class createSignal<Type extends Record<string, any>> {
    *  Cradova Signal
    * ----
    *  set a key to signal an action
-   * @param key - key of the action
+   * @param name - name of the action
    * @param action function to execute
    */
-  createAction(
-    key: string | Record<string, (data?: Type) => void>,
-    action?: ((data?: Type) => void) | Ref<unknown>
-  ) {
-    if (typeof key === "string") {
-      this.actions[key] = action;
+  createAction(name: string, action: (data?: unknown) => void) {
+    if (typeof name === "string" && typeof action === "function") {
+      this.actions[name] = action;
     } else {
-      if (typeof key === "object" && !action) {
-        for (const [nam, act] of Object.entries(key)) {
-          if (typeof nam === "string" && typeof action === "function") {
-            this.actions[nam] = act;
-          } else {
-            throw new Error(`✘  Cradova err : can't create action ${nam}`);
-          }
-        }
+      throw new Error(
+        `✘  Cradova err : can't create action, ${name} is not a function`
+      );
+    }
+  }
+  /**
+   *  Cradova Signal
+   * ----
+   *  creates many actions at a time
+   * @param name - name of the action
+   * @param action function to execute
+   */
+  createActions(Actions: Record<string, (data?: unknown) => void>) {
+    for (const [name, action] of Object.entries(Actions)) {
+      if (typeof name === "string" && typeof action === "function") {
+        this.actions[name] = action;
       } else {
-        throw new Error(`✘  Cradova err : can't create action ${key}`);
+        throw new Error(
+          `✘  Cradova err : can't create action, ${name} is not a function`
+        );
       }
     }
   }
@@ -132,23 +139,18 @@ export class createSignal<Type extends Record<string, any>> {
    * @param data - data for the action
    */
   fireAction(key: string, data?: unknown) {
-    this._updateState(key, data as any);
-    if (this.actions[key] && this.actions[key].updateState) {
-      this.actions[key].updateState(data);
-      return;
+    this._updateState(key, data as Type);
+    if (typeof this.actions[key] === "function") {
+      this.actions[key].call(this, data);
     } else {
-      if (typeof this.actions[key] === "function") {
-        this.actions[key].bind(this)(data);
-        return;
-      }
+      throw Error("✘  Cradova err : action " + key + "  does not exist!");
     }
-    throw Error("✘  Cradova err : action " + key + "  does not exist!");
   }
 
   /**
    * Cradova
    * ---
-   * is used to bind store data to any element
+   * is used to bind signal data to elements and Refs
    *
    * @param prop
    * @returns something
@@ -167,13 +169,13 @@ export class createSignal<Type extends Record<string, any>> {
     }
   }
 
-  private _updateState(name?: any, data?: Type) {
+  private _updateState(name?: string, data?: Type) {
     if (name && data) {
       this.ref.map((ent) => {
         if (ent._event === name) {
           //
           if (ent._element_property && ent._signalProperty) {
-            ent.ref.updateState({
+            ent.ref?.updateState({
               [ent._element_property]: data[ent._signalProperty],
             });
             return;
@@ -226,13 +228,14 @@ export class createSignal<Type extends Record<string, any>> {
    * @param path a property in the object to send to attached ref
    */
   bindRef(
-    ref: any,
+    ref: Partial<Ref<unknown>>, //! there's more to this friday (even elements act as ref here because of the updateState)
     binding: {
       event?: string;
       signalProperty: string;
       _element_property: string;
     } = { signalProperty: "", _element_property: "" }
   ) {
+    //
     if (ref.render) {
       ref.render = ref.render.bind(ref, this.value);
     }
@@ -242,7 +245,7 @@ export class createSignal<Type extends Record<string, any>> {
     if (ref && ref.updateState) {
       // it's an element binding, not ref, not event(fire action events)
       this.ref.push({
-        ref,
+        ref: ref as Ref<unknown>,
         _signalProperty: binding.signalProperty,
         _element_property: binding._element_property,
         _event: binding.event,
@@ -251,7 +254,7 @@ export class createSignal<Type extends Record<string, any>> {
     }
 
     throw new Error(
-      "✘  Cradova err :  Invalid parameters for binding ref to simple store"
+      "✘  Cradova err :  Invalid parameters for binding ref to Signal"
     );
   }
 
@@ -261,7 +264,7 @@ export class createSignal<Type extends Record<string, any>> {
    *  set a update listener on value changes
    * @param callback
    */
-  listen(callback: (a: any) => void) {
+  listen(callback: (a: Type) => void) {
     this.callback = callback;
   }
   /**
@@ -269,8 +272,6 @@ export class createSignal<Type extends Record<string, any>> {
    * ----
    * clear the history on local storage
    *
-   *
-   * .
    */
   clearPersist() {
     if (this.persistName) {

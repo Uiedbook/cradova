@@ -1,46 +1,61 @@
-export type ElementType<T> = (
+import { reference } from "./parts/fns";
+
+export type VJSType<T> = (
   ...VJS: (
-    | string
     | undefined
+    | string
     | Partial<T>
     | HTMLElement
     | (() => HTMLElement)
     | {
         style?: Partial<CSSStyleDeclaration>;
-        beforeMount?: () => void;
-        afterMount?: () => void;
+        onmount?: () => void;
         text?: string;
-        reference?: any;
-        stateID?: string;
-        shouldUpdate?: boolean;
+        reference?: reference;
       }
   )[]
 ) => T;
 
-/**
- *  Cradova Signal
- * ----
- *  create stateful data store.
- * ability to:
- * - create a store
- * - create actions and fire them
- * - bind a Ref or RefList
- * - listen to changes
- * -  persist changes to localStorage
- * - go back and forward in value history
- * - set keys instead of all values
- * - update a cradova Ref/RefList automatically
- * @constructor initial: any, props: {useHistory, persist}
- */
+export type VJS_params_TYPE<T> = (
+  | undefined
+  | string
+  | Partial<T>
+  | HTMLElement
+  | (() => HTMLElement)
+  | {
+      style?: Partial<CSSStyleDeclaration>;
+      onmount?: () => void;
+      text?: string;
+      reference?: reference;
+    }
+)[];
+
+export type VJS_props_TYPE = {
+  style?: Partial<CSSStyleDeclaration>;
+  onmount?: () => void;
+  text?: string;
+  reference?: reference;
+} & { [x: string]: unknown };
+
+export type stateType =
+  | string
+  | HTMLElement
+  | (() => HTMLElement)
+  | {
+      style?: Partial<CSSStyleDeclaration>;
+      text?: string;
+      reference?: reference;
+      tree?: HTMLElement | (() => HTMLElement);
+    };
 
 export type RouterRouteObject = {
   _name: string;
-  _html: any;
-  _paramData: Record<string, any> | null | undefined;
+  _html: Function | HTMLElement;
+  _paramData: Record<string, unknown> | null | undefined;
   _delegatedRoutes: number | boolean;
   _Activate: (force: boolean) => Promise<void>;
   _deActivate: (params: object) => void;
-  _package: (params: any) => void;
+  _package: (params: unknown) => void;
 };
 
 /**
@@ -52,8 +67,6 @@ export type CradovaScreenType = {
    * Cradova screen
    * ---
    * title of the page
-   *
-   *
    * .
    */
   name: string;
@@ -71,8 +84,6 @@ export type CradovaScreenType = {
    * The component for the screen
    * @param data
    * @returns void
-   *
-   *
    * .
    */
   template: Function | HTMLElement;
@@ -83,8 +94,6 @@ export type CradovaScreenType = {
    *
    * limit is 1000
    *
-   *
-   *
    * .
    */
   renderInParallel?: boolean;
@@ -92,11 +101,9 @@ export type CradovaScreenType = {
    * Cradova screen
    * ---
    * gets called when the the screen is displayed
-   *
-   *
    * .
    */
-  // onActivate: (fn: (data: any) => void) => Promise<void>;
+  // onActivate: (fn: (data: unknown) => void) => Promise<void>;
   /**
    * Cradova screen
    * ---
@@ -106,58 +113,4 @@ export type CradovaScreenType = {
    * .
    */
   persist?: boolean;
-};
-
-/**
- * Cradova Router
- * ---
- * Facilitates navigation within the application and initializes
- * page views based on the matched routes.
- */
-
-export type RouterType = {
-  /**
-   * Registers a route.
-   *
-   * @param {string}   path     Route path.
-   * @param {any} screen the cradova document tree for the route.
-   */
-  route: (path: string, screen: CradovaScreenType) => void;
-  routes: Record<string, RouterRouteObject>;
-  lastNavigatedRoute: string | null;
-  lastNavigatedRouteController: RouterRouteObject | null;
-  nextRouteController: RouterRouteObject | null;
-  params: Record<string, any>;
-  /**
-   * Cradova Router
-   * ------
-   *
-   * return last set router params
-   *
-   * .
-   */
-  getParams: <D>() => { data: D | unknown; params: any };
-  /**
-   * get a screen ready before time.
-   *
-   * @param {string}   path     Route path.
-   * @param {any} data data for the screen.
-   */
-  packageScreen: (path: string, data?: any) => Promise<void>;
-  pageShow: ((path: string) => void) | null;
-  pageHide: ((path: string) => void) | null;
-  onPageShow: (callback: () => void) => void;
-  onPageHide: (callback: () => void) => void;
-  addErrorHandler: (callback: () => void) => void;
-  /**
-   * Cradova Router
-   * ------
-   *
-   * Navigates to a designated screen in your app
-   */
-  navigate: (
-    href: string,
-    data?: Record<string, any> | null,
-    force?: boolean
-  ) => void;
 };

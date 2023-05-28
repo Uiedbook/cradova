@@ -59,7 +59,7 @@ const checker = (url: string) => {
     pathFixtures.shift();
     // length check of / (backslash)
     if (pathFixtures.length === urlFixtures.length) {
-      const routesParams = { _path: "" };
+      const routesParams = { _path: "" } as Record<string, string>;
       for (let i = 0; i < pathFixtures.length; i++) {
         // let's jump place holders in the path since we can't determine from them
         // we increment that we skipped a position because we need later
@@ -81,7 +81,6 @@ const checker = (url: string) => {
       if (fixturesX + fixturesY === pathFixtures.length) {
         for (let i = 0; i < pathFixtures.length; i++) {
           if (pathFixtures[i].includes(":")) {
-            // @ts-ignore
             routesParams[pathFixtures[i].split(":")[1]] = urlFixtures[i];
           }
         }
@@ -93,7 +92,7 @@ const checker = (url: string) => {
   return [];
 };
 
-RouterBox.route = (path: string, screen: any) => {
+RouterBox.route = (path: string, screen: _cradovaScreen) => {
   if (!screen || !screen._Activate) {
     console.error(" ✘  Cradova err:  not a valid screen  ", screen);
     throw new Error(" ✘  Cradova err:  Not a valid cradova screen component");
@@ -114,7 +113,10 @@ RouterBox.route = (path: string, screen: any) => {
  * @param {Event} e Click event | popstate event | load event.
  */
 
-RouterBox.router = async function (e: any, force = false) {
+RouterBox.router = async function (
+  e: { target: { tagName: string; href: string }; preventDefault: () => void },
+  force: boolean
+) {
   let url, route: RouterRouteObject | undefined, params;
   if (e) {
     const Alink = e.target.tagName === "A" && e.target;
@@ -150,8 +152,8 @@ RouterBox.router = async function (e: any, force = false) {
         RouterBox.params.params = params;
       }
       if (!route._Activate && typeof route === "function") {
-        // @ts-ignore
-        route = (await route()) as any;
+        const lazy = route as Function;
+        route = await lazy();
       }
       // delegation
       if (route!._delegatedRoutes !== -1 && route!._delegatedRoutes !== 1) {
@@ -159,7 +161,7 @@ RouterBox.router = async function (e: any, force = false) {
         route = new _cradovaScreen({
           name: route!._name,
           template: route!._html,
-        }) as any;
+        });
         RouterBox.routes[url] = route;
       }
       await route!._Activate(force);
@@ -191,7 +193,7 @@ RouterBox.router = async function (e: any, force = false) {
  * Registers a route.
  *
  * @param {string}   path     Route path.
- * @param {any} screen the cradova document tree for the route.
+ * @param  screen the cradova document tree for the route.
  */
 
 class RouterClass {
@@ -202,7 +204,7 @@ class RouterClass {
    * accepts an object containing
    *
    * @param {string}   path     Route path.
-   * @param {any} screen the cradova screen.
+   * @param  screen the cradova screen.
    */
   BrowserRoutes(obj: Record<string, any>) {
     for (const path in obj) {
@@ -222,7 +224,18 @@ class RouterClass {
     }
     this._mount();
   }
-
+  /** 
+    Go back in Navigation history
+    */
+  back() {
+    history.go(-1);
+  }
+  /** 
+    Go forward in Navigation history
+    */
+  forward() {
+    history.go(1);
+  }
   /**
    * Cradova Router
    * ------
@@ -235,7 +248,7 @@ class RouterClass {
    */
   navigate(
     href: string,
-    data: Record<string, any> | null = null,
+    data: Record<string, unknown> | null = null,
     force = false
   ) {
     if (typeof href !== "string") {
@@ -244,10 +257,6 @@ class RouterClass {
           href +
           " instead"
       );
-    }
-    if (typeof data === "boolean") {
-      force = true;
-      data = null;
     }
     let route = null,
       params;
@@ -293,9 +302,9 @@ class RouterClass {
    * get a screen ready before time.
    *
    * @param {string}   path Route path.
-   * @param {any} data data for the screen.
+   * @param  data data for the screen.
    */
-  async packageScreen(path: string, data: any = {}) {
+  async packageScreen(path: string, data: Record<string, unknown> = {}) {
     if (!RouterBox.routes[path]) {
       console.error(" ✘  Cradova err:  no screen with path " + path);
       throw new Error(
@@ -304,8 +313,7 @@ class RouterClass {
     }
     let [route, params] = checker(path);
     if (!route._Activate && typeof route === "function") {
-      // @ts-ignore
-      route = (await route()) as any;
+      route = await route();
     }
     // handled asynchronously
     route._package(Object.assign(data, params || {}));
@@ -338,16 +346,20 @@ class RouterClass {
     if (typeof callback === "function") {
       RouterBox["errorHandler"] = callback;
     } else {
-      throw new Error(
-        " ✘  Cradova err:  callback for ever event event is not a function"
-      );
+      throw new Error(" ✘  Cradova err:  callback for event is not a function");
     }
   }
 
   _mount() {
+    // creating mount point
+    if (!document.querySelector("[data-wrapper=app]")) {
+      const Wrapper = document.createElement("div");
+      Wrapper.setAttribute("data-wrapper", "app");
+      document.body.appendChild(Wrapper);
+    }
     window.addEventListener("pageshow", RouterBox.router);
-    window.addEventListener("popstate", (e) => {
-      e.preventDefault();
+    window.addEventListener("popstate", (_e) => {
+      // e.preventDefault();
       RouterBox.router();
     });
   }

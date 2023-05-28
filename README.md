@@ -41,7 +41,11 @@
 
 Cradova is a web development framework for building Single Page Applications and PWAs.
 
-It's a fast, simple and modern, it provides state management, routing system and a rest API utility out of the box.
+It's a fast, simple and modern, with powerful state management and routing system.
+
+```
+No matter how complex your UI, cradova helps you build fast, reactivity and scalable web apps.
+```
 
 Cradova follows the [VJS specification](https://github.com/fridaycandour/cradova/blob/main/spec.md)
 
@@ -117,10 +121,9 @@ import _, { button, createSignal, Ref, reference, h1, br, div } from "cradova";
 function counter() {
   let num = 0;
   return _("h1| 0", {
-    shouldUpdate: true,
     onclick() {
       num++;
-      this.updateState({ text: num });
+      this.innerText = num;
     },
   });
 }
@@ -129,11 +132,11 @@ function counter() {
 
 function dataCounter() {
   return _("h1| 0", {
-    shouldUpdate: true,
     "data-num": "0",
     onclick() {
       const num = this.getAttribute("data-num") * 1 + 1;
-      this.updateState({ text: num, "data-num": num });
+      this.setAttribute("data-num",  num });
+      this.innerText = num;
     },
   });
 }
@@ -142,13 +145,10 @@ function dataCounter() {
 
 function HelloMessage() {
   return div({
-    shouldUpdate: true,
     text: "Click to get a greeting",
     onclick() {
       const name = prompt("what are your names");
-      this.updateState({
-        text: name ? "hello " + name : "Click to get a greeting",
-      });
+      this.innerText = name ? "hello " + name : "Click to get a greeting";
     },
   });
 }

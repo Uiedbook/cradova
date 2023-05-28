@@ -17,5 +17,5 @@
     "isolatedModules": true
   },
   "exclude": ["node_modules", "lib/types"],
-  "include": ["lib"]
+  "include": ["lib", "lib/ajax.ts"]
 }
