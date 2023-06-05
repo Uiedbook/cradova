@@ -1,4 +1,4 @@
-import { VJSType } from "../types";
+import { VJSType, VJS_Child_TYPE } from "../types";
 import { createSignal } from "./createSignal";
 
 export const isNode = (node: any) =>
@@ -46,7 +46,7 @@ export function Rhoda(
       fg.appendChild(Rhoda(ch));
     } else {
       if (ch instanceof Ref) {
-        ch = ch.render();
+        ch = ch.render(undefined);
       }
       if (typeof ch === "function") {
         ch = ch() as VJSType<HTMLElement>;
@@ -101,21 +101,24 @@ export function css(identifier: string | TemplateStringsArray) {
  */
 
 export function assert(
-  condition: unknown,
-  ...elements: VJSType<HTMLElement>[]
+  condition: boolean,
+  ...elements: VJS_Child_TYPE<HTMLElement>[]
 ) {
   if (condition) {
     return elements;
   }
   return undefined;
 }
-export function loop(
-  datalist: unknown[],
+
+type LoopData<Type> = Type[];
+
+export function loop<Type>(
+  datalist: LoopData<Type>,
   component: (
-    value: unknown,
+    value: Type,
     index?: number,
-    array?: unknown[]
-  ) => VJSType<HTMLElement>[] | undefined
+    array?: LoopData<Type>
+  ) => HTMLElement | undefined
 ) {
   if (typeof component !== "function") {
     throw new Error(
@@ -129,8 +132,8 @@ export function loop(
 
 export function assertOr(
   condition: boolean,
-  ifTrue: () => VJSType<HTMLElement>,
-  ifFalse: () => VJSType<HTMLElement>
+  ifTrue: HTMLElement,
+  ifFalse: HTMLElement
 ) {
   if (condition) {
     return ifTrue;
@@ -146,10 +149,8 @@ export function assertOr(
  * create dynamic components
  */
 
-type RefProps<D> = D | undefined;
-
 export class Ref<D> {
-  private component: (data?: D) => HTMLElement | ((data?: D) => HTMLElement);
+  private component: (this: Ref<D>, data: D) => HTMLElement;
   private effects: (() => Promise<void> | void)[] = [];
   private effectuate: ((this: Ref<D>) => void) | null = null;
   private rendered = false;
@@ -159,19 +160,22 @@ export class Ref<D> {
   private reference: reference = new reference();
   Signal: createSignal<any> | undefined;
   // public testName = null;
-  public stash: RefProps<D>;
+  public stash: D | undefined;
 
-  constructor(component: (data?: RefProps<D>) => HTMLElement) {
+  constructor(component: (this: Ref<D>, data: D) => HTMLElement) {
     this.component = component.bind(this);
   }
 
-  preRender(data?: RefProps<D>) {
+  preRender(data?: D) {
     // parking
-    const ihtml = this.component(data);
+    let ihtml = this.component(data as D);
+    let phtml;
+    if (typeof ihtml === "function") {
+      phtml = ihtml as Function;
+      ihtml = phtml();
+    }
     if (ihtml instanceof HTMLElement) {
       this.preRendered = ihtml;
-    } else {
-      this.preRendered = ihtml();
     }
     if (!this.preRendered) {
       throw new Error(
@@ -199,12 +203,16 @@ export class Ref<D> {
     let element: HTMLElement | null = null;
     if (!this.preRendered) {
       // parking
-      const ihtml = this.component(data);
+      let ihtml = this.component(data as D);
+      let phtml;
+      if (typeof ihtml === "function") {
+        phtml = ihtml as Function;
+        ihtml = phtml();
+      }
       if (ihtml instanceof HTMLElement) {
         element = ihtml;
-      } else {
-        element = ihtml();
       }
+
       if (!element) {
         throw new Error(
           " ✘  Cradova err :  Invalid component type for cradova Ref, got  -  " +
@@ -306,12 +314,15 @@ export class Ref<D> {
     if (!this.reference.element) {
       return;
     }
-    const ihtml = this.component(data);
+    let ihtml = this.component(data as D);
     let element;
+    let phtml;
+    if (typeof ihtml === "function") {
+      phtml = ihtml as Function;
+      ihtml = phtml();
+    }
     if (ihtml instanceof HTMLElement) {
       element = ihtml;
-    } else {
-      element = ihtml();
     }
     if (!element) {
       throw new Error(

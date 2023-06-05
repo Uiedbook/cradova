@@ -1,10 +1,12 @@
 import _, { div } from "../dist/index.js";
-function benchSuit(code, runs = 10_000, lab) {
+
+function benchSuit(code, runs = 1_000, lab) {
   const startTime = performance.now();
   for (let i = 0; i < runs; i++) {
     code();
   }
-  let totalTime = performance.now() - startTime;
+  const endTime = performance.now();
+  let totalTime = endTime - startTime;
   console.log(
     `Code took ${totalTime} ms on ${runs} runs with an average of ${
       totalTime / runs
@@ -16,11 +18,16 @@ function benchSuit(code, runs = 10_000, lab) {
   return totalTime;
 }
 let a = 0;
+function render(c, p) {
+  p.innerHTML = "";
+  p.appendChild(c);
+}
 benchSuit(
   () => {
-    document.body.appendChild(div(a));
+    const element = div(a);
+    render(element, document.getElementById("root2"));
     a += 1;
   },
-  1000,
+  1_000_000,
   "cradova"
 );

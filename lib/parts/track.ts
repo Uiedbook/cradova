@@ -81,9 +81,10 @@ export function dispatch(element: Record<string, any>, state: stateType) {
 
   if (state instanceof HTMLElement) {
     element.appendChild(state);
-    return;
   }
-  throw new Error(
-    " ✘  Cradova err: Cradova got invalid state  => \n" + String(state)
-  );
+  if (!(typeof state === "object" && !Array.isArray(state))) {
+    throw new Error(
+      " ✘  Cradova err: Cradova got invalid state  => \n" + String(state)
+    );
+  }
 }

@@ -30,6 +30,8 @@ export type VJS_params_TYPE<T> = (
     }
 )[];
 
+export type VJS_Child_TYPE<T> = undefined | string | T | (() => T);
+
 export type VJS_props_TYPE = {
   style?: Partial<CSSStyleDeclaration>;
   onmount?: () => void;

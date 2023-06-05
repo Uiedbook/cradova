@@ -43,7 +43,7 @@ declare module "cradova" {
      */
     setKey<k extends keyof Type>(
       key: k,
-      value: k,
+      value: unknown,
       shouldRefRender?: boolean
     ): void;
     /**
@@ -119,28 +119,31 @@ declare module "cradova" {
    * @param {function} elements[]
    */
   export function assert(
-    condition: unknown,
-    ...elements: VJSType<HTMLElement>[]
-  ): VJSType<HTMLElement>[] | undefined;
-  export function loop(
-    datalist: unknown[],
+    condition: boolean,
+    ...elements: VJS_Child_TYPE<HTMLElement>[]
+  ): VJS_Child_TYPE<HTMLElement> | undefined;
+
+  type LoopData<Type> = Type[];
+
+  export function loop<Type>(
+    datalist: LoopData<Type>,
     component: (
-      value: unknown,
+      value: Type,
       index?: number,
-      array?: unknown[]
-    ) => VJSType<HTMLElement>[] | undefined
+      array?: LoopData<Type>
+    ) => HTMLElement | undefined
   ): HTMLElement | undefined;
   export function assertOr(
     condition: boolean,
-    ifTrue: () => VJSType<HTMLElement>,
-    ifFalse: () => VJSType<HTMLElement>
-  ): () => VJSType<HTMLElement>;
+    ifTrue: HTMLElement,
+    ifFalse: HTMLElement
+  ): HTMLElement;
   /**
    * Cradova Ref
    * -------
    * create dynamic components
    */
-  type RefProps<D> = D | undefined;
+
   export class Ref<D> {
     private component;
     private effects;
@@ -151,9 +154,9 @@ declare module "cradova" {
     private preRendered;
     private reference;
     Signal: createSignal<any> | undefined;
-    stash: RefProps<D>;
-    constructor(component: (data?: RefProps<D>) => HTMLElement);
-    preRender(data?: RefProps<D>): void;
+    stash: D | undefined;
+    constructor(component: (this: Ref<D>, data: D) => HTMLElement);
+    preRender(data?: D | undefined): void;
     destroyPreRendered(): void;
     /**
      * Cradova Ref
@@ -233,6 +236,8 @@ declare module "cradova" {
         reference?: reference;
       }
   )[];
+
+  type VJS_Child_TYPE<T> = undefined | string | T | (() => T);
   /**
    *
    */
@@ -589,5 +594,6 @@ declare module "cradova" {
    * @param element_initials
    * @returns function - cradova element
    */
-  export const _: TemplateType;
+  const _: TemplateType;
+  export default _;
 }

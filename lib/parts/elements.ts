@@ -24,7 +24,7 @@ export const makeElement = (
       let child = ElementChildrenAndPropertyList[i];
       // single child lane
       if (child instanceof Ref) {
-        child = child.render();
+        child = child.render(undefined);
       }
       if (typeof child === "function") {
         child = child();
@@ -153,7 +153,6 @@ export const makeElement = (
         const avi = () => {
           props.onmount?.apply(element);
           props!["onmount"] = undefined;
-          // CradovaEvent.removeEventListener("onmountEvent", num);
         };
         CradovaEvent.addEventListener("onmountEvent", avi);
         continue;

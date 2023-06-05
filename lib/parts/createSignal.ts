@@ -77,7 +77,11 @@ export class createSignal<Type extends Record<string, unknown>> {
    * @returns void
    */
 
-  setKey<k extends keyof Type>(key: k, value: k, shouldRefRender?: boolean) {
+  setKey<k extends keyof Type>(
+    key: k,
+    value: unknown,
+    shouldRefRender?: boolean
+  ) {
     if (typeof this.value === "object" && !Array.isArray(this.value)) {
       this.value[key] = value as any;
       if (this.persistName) {

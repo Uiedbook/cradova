@@ -15,40 +15,10 @@
       crossorigin
       src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
     ></script>
-    <!-- <script type="module" src="index.js"></script> -->
     <script type="module" src="cradova_bench.js"></script>
-    <div id="root"></div>
-
-    <script>
-      const { createElement } = React;
-      const { render } = ReactDOM;
-      function benchSuit(code, runs = 10_000, lab) {
-        const startTime = performance.now();
-        for (let i = 0; i < runs; i++) {
-          code();
-        }
-        let totalTime = performance.now() - startTime;
-        console.log(
-          `Code took ${totalTime} ms on ${runs} runs with an average of ${
-            totalTime / runs
-          } ms per operation`
-        );
-        if (lab) {
-          console.log(lab);
-        }
-        return totalTime;
-      }
-
-      let a = 0;
-      benchSuit(
-        () => {
-          const element = createElement("div", null, a);
-          render(element, document.getElementById("root"));
-          a += 1;
-        },
-        1000,
-        "react"
-      );
-    </script>
+    <script type="module" src="react.js"></script>
+    <!-- <script type="module" src="index.js"></script> -->
+    <div id="root1"></div>
+    <div id="root2"></div>
   </body>
 </html>

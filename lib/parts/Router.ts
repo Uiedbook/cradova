@@ -170,14 +170,18 @@ RouterBox.router = async function (
       RouterBox["lastNavigatedRoute"] = url;
       RouterBox["lastNavigatedRouteController"] = route;
     } catch (error) {
-      let errorHandler;
+      let errorHandler = RouterBox["errorHandler"];
       if (RouterBox.routes[RouterBox.params.params._path]) {
         errorHandler =
-          RouterBox.routes[RouterBox.params.params._path].errorHandler ||
-          RouterBox.errorHandler;
+          RouterBox.routes[RouterBox.params.params._path].errorHandler;
       }
       if (errorHandler) {
         errorHandler(error);
+      } else {
+        console.error(error);
+        throw new Error(
+          " ✘  Cradova err:  consider adding error boundary to the specific screen  "
+        );
       }
     }
   } else {
