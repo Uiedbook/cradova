@@ -439,11 +439,11 @@ We are currently working to [set](https://github.com/fridaycandour/cradova/blob/
 - UI component libraries for cradova
 - Sample projects
 - maintenance and promotion
-
+<!-- 
 ## Sponsor
 
 Your support is appreciated and needed to advance Cradova for more performance and improvements.
 
 Sponsorships can be done via [Patreon](https://www.patreon.com/FridayCandour) and [KO-FI](https://www.ko-fi.com/fridaycandour).
 
-Both monthly-recurring sponsorships and one-time donations are accepted.
+Both monthly-recurring sponsorships and one-time donations are accepted. -->

@@ -41,7 +41,6 @@ export class Screen {
   constructor(cradova_screen_initials: CradovaScreenType) {
     const { template, name, persist, renderInParallel, transition } =
       cradova_screen_initials;
-
     this._html = template;
     this._name = name;
     this._transition = transition || "";

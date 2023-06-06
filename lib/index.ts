@@ -54,37 +54,37 @@ const make = function (txx: string) {
     }
   }
   let tag;
-  let txxk;
+  let teak;
   if (!txx.includes("#")) {
-    txxk = txx.split(".");
-    tag = txxk.shift();
+    teak = txx.split(".");
+    tag = teak.shift();
     if (!tag) {
       tag = "DIV";
     }
-    return [tag, undefined, txxk.join(" "), innerValue];
+    return [tag, undefined, teak.join(" "), innerValue];
   } else {
     if (!txx.includes(".")) {
-      txxk = txx.split("#");
-      tag = txxk.shift();
+      teak = txx.split("#");
+      tag = teak.shift();
       if (!tag) {
         tag = "DIV";
       }
-      if (txxk[0].includes(" ")) {
-        txxk = [txxk[0].split(" ")[1]];
+      if (teak[0].includes(" ")) {
+        teak = [teak[0].split(" ")[1]];
       }
-      return [tag, txxk[0], undefined, innerValue];
+      return [tag, teak[0], undefined, innerValue];
     }
   }
-  txxk = txx.split(".");
+  teak = txx.split(".");
   const classes = [];
   const IDs = [];
-  tag = !txxk[0].includes("#") && txxk.shift();
+  tag = !teak[0].includes("#") && teak.shift();
   if (!tag) {
     tag = "DIV";
   }
-  for (let i = 0; i < txxk.length; i++) {
-    if (txxk[i].includes("#")) {
-      const item = txxk[i].split("#");
+  for (let i = 0; i < teak.length; i++) {
+    if (teak[i].includes("#")) {
+      const item = teak[i].split("#");
       IDs.push(item[1]);
       if (i === 0) {
         tag = item[0];
@@ -93,7 +93,7 @@ const make = function (txx: string) {
       classes.push(item[0]);
       continue;
     }
-    classes.push(txxk[i]);
+    classes.push(teak[i]);
   }
   return [tag || "DIV", IDs[0], classes.join(" "), innerValue];
 };
@@ -168,6 +168,7 @@ const _: TemplateType = (...element_initials) => {
   props && element_initials.push(props);
   return makeElement(element, ...element_initials);
 };
+
 export * from "./parts/elements";
 export { createSignal } from "./parts/createSignal";
 export { Router } from "./parts/Router";

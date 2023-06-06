@@ -9,7 +9,6 @@ export const addInvalidProperty = (
   y: string,
   z: unknown
 ) => {
-  // ! what an evil thing
   x[y] = z;
 };
 /**
