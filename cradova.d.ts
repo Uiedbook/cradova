@@ -57,7 +57,7 @@ declare module "cradova" {
     /**
      *  Cradova Signal
      * ----
-     *  creates many actions at a time
+     *  creates man y actions at a time
      * @param name - name of the action
      * @param action function to execute
      */
@@ -492,7 +492,8 @@ declare module "cradova" {
      *
      * @param screen
      */
-    addLoadingScreen(screen: Screen): void;
+    setLoadingScreen(screen: Screen): void;
+
     _mount(): void;
   }
   export const Router: RouterClass;

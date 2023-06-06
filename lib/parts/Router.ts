@@ -21,7 +21,7 @@ RouterBox["params"] = {};
 RouterBox["routes"] = {};
 RouterBox["pageevents"] = [];
 
-RouterBox["start_pageevents"] = function (lastR: string, newR: string) {
+RouterBox["start_pageevents"] = async function (lastR: string, newR: string) {
   for (let ci = 0; ci < RouterBox["pageevents"].length; ci++) {
     RouterBox["pageevents"][ci](lastR, newR);
   }
@@ -107,7 +107,7 @@ RouterBox.route = (path: string, screen: _cradovaScreen) => {
  * ----
  * * The whole magic happens here
  * -
- * Responds to click events anywhere in the document and when
+ * Responds to click events an ywhere in the document and when
  * the click happens on a link that is supposed to be handled
  * by the router, it loads and displays the target page.
  * * Responds to popstate and load events and does it's job
@@ -160,7 +160,7 @@ RouterBox.router = async function (
           await s._Activate(true);
           const lazy = route as Function;
           route = await lazy();
-          await s._deActivate();
+          s._deActivate();
         } else {
           const lazy = route as Function;
           route = await lazy();
@@ -175,6 +175,7 @@ RouterBox.router = async function (
         });
         RouterBox.routes[url] = route;
       }
+      //
       await route!._Activate(force);
       RouterBox["lastNavigatedRouteController"] &&
         RouterBox["lastNavigatedRouteController"]._deActivate();
@@ -295,6 +296,25 @@ class RouterClass {
     }
   }
 
+  /**
+   * Cradova
+   * ---
+   * Loading screen for your app
+   *
+   * lazy loaded loading use
+   *
+   * @param screen
+   */
+  setLoadingScreen(screen: _cradovaScreen) {
+    if (screen instanceof _cradovaScreen) {
+      RouterBox["LoadingScreen"] = screen;
+    } else {
+      throw new Error(
+        " ✘  Cradova err:  Loading Screen should be a cradova screen class"
+      );
+    }
+  }
+
   /** cradova router
    * ---
    * Listen for navigation events
@@ -343,9 +363,9 @@ class RouterClass {
    * .
    */
 
-  getParams = function () {
+  getParams() {
     return RouterBox["params"];
-  };
+  }
 
   /**
    * Cradova
@@ -361,24 +381,6 @@ class RouterClass {
       RouterBox["errorHandler"] = callback;
     } else {
       throw new Error(" ✘  Cradova err:  callback for event is not a function");
-    }
-  }
-  /**
-   * Cradova
-   * ---
-   * Loading screen for your app
-   *
-   * lazy loaded loading use
-   *
-   * @param screen
-   */
-  addLoadingScreen(screen: _cradovaScreen) {
-    if (screen instanceof _cradovaScreen) {
-      RouterBox["addLoadingScreen"] = screen;
-    } else {
-      throw new Error(
-        " ✘  Cradova err:  Loading Screen should be a cradova screen class"
-      );
     }
   }
 

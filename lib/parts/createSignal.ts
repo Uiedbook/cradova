@@ -120,7 +120,7 @@ export class createSignal<Type extends Record<string, unknown>> {
   /**
    *  Cradova Signal
    * ----
-   *  creates many actions at a time
+   *  creates man y actions at a time
    * @param name - name of the action
    * @param action function to execute
    */
