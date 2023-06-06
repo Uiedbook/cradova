@@ -398,8 +398,8 @@ export const frag = function (children: VJSType<HTMLElement>[]) {
 //   return sc;
 // };
 
-export class lazy {
-  public content: unknown;
+export class lazy<Type> {
+  public content: Type | undefined;
   private _cb: () => Promise<unknown>;
   constructor(cb: () => Promise<unknown>) {
     this._cb = cb;
@@ -413,7 +413,7 @@ export class lazy {
     }
     const def = content as { default: unknown };
     if (def.default) {
-      this.content = def?.default;
+      this.content = def?.default as Type;
     }
   }
 }

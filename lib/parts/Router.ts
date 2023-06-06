@@ -16,6 +16,7 @@ RouterBox["lastNavigatedRoute"] = null;
 RouterBox["pageShow"] = null;
 RouterBox["pageHide"] = null;
 RouterBox["errorHandler"] = null;
+RouterBox["loadingScreen"] = null;
 RouterBox["params"] = {};
 RouterBox["routes"] = {};
 RouterBox["pageevents"] = [];
@@ -147,15 +148,25 @@ RouterBox.router = async function (
   }
 
   if (typeof route !== "undefined") {
+    // we need to caught the error and propagate to the app
     try {
       if (params) {
         RouterBox.params.params = params;
       }
+      // lazy loaded screens
       if (!route._Activate && typeof route === "function") {
-        const lazy = route as Function;
-        route = await lazy();
+        if (RouterBox["LoadingScreen"]) {
+          const s = RouterBox["LoadingScreen"] as _cradovaScreen;
+          await s._Activate(true);
+          const lazy = route as Function;
+          route = await lazy();
+          await s._deActivate();
+        } else {
+          const lazy = route as Function;
+          route = await lazy();
+        }
       }
-      // delegation
+      // delegation causing parallel rendering sequence
       if (route!._delegatedRoutes !== -1 && route!._delegatedRoutes !== 1) {
         route!._delegatedRoutes = true;
         route = new _cradovaScreen({
@@ -170,18 +181,17 @@ RouterBox.router = async function (
       RouterBox["lastNavigatedRoute"] = url;
       RouterBox["lastNavigatedRouteController"] = route;
     } catch (error) {
-      let errorHandler = RouterBox["errorHandler"];
-      if (RouterBox.routes[RouterBox.params.params._path]) {
-        errorHandler =
-          RouterBox.routes[RouterBox.params.params._path].errorHandler;
-      }
-      if (errorHandler) {
-        errorHandler(error);
+      if (route && route["_errorHandler"]) {
+        route._errorHandler(error);
       } else {
-        console.error(error);
-        throw new Error(
-          " ✘  Cradova err:  consider adding error boundary to the specific screen  "
-        );
+        if (RouterBox["errorHandler"]) {
+          RouterBox["errorHandler"](error);
+        } else {
+          console.error(error);
+          throw new Error(
+            " ✘  Cradova err:  consider adding error boundary to the specific screen  "
+          );
+        }
       }
     }
   } else {
@@ -346,11 +356,29 @@ class RouterClass {
    * @param path? page path
    */
 
-  addErrorHandler(callback: () => void) {
+  addErrorHandler(callback: (err: unknown) => void) {
     if (typeof callback === "function") {
       RouterBox["errorHandler"] = callback;
     } else {
       throw new Error(" ✘  Cradova err:  callback for event is not a function");
+    }
+  }
+  /**
+   * Cradova
+   * ---
+   * Loading screen for your app
+   *
+   * lazy loaded loading use
+   *
+   * @param screen
+   */
+  addLoadingScreen(screen: _cradovaScreen) {
+    if (screen instanceof _cradovaScreen) {
+      RouterBox["addLoadingScreen"] = screen;
+    } else {
+      throw new Error(
+        " ✘  Cradova err:  Loading Screen should be a cradova screen class"
+      );
     }
   }
 

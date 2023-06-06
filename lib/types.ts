@@ -58,6 +58,7 @@ export type RouterRouteObject = {
   _Activate: (force: boolean) => Promise<void>;
   _deActivate: (params: object) => void;
   _package: (params: unknown) => void;
+  _errorHandler: ((err: unknown) => void) | null;
 };
 
 /**

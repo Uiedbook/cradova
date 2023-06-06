@@ -190,8 +190,8 @@ declare module "cradova" {
     private Activate;
     remove(): void;
   }
-  export class lazy {
-    content: unknown;
+  export class lazy<Type> {
+    public content: Type | undefined;
     private _cb;
     constructor(cb: () => Promise<unknown>);
     load(): Promise<void>;
@@ -416,7 +416,7 @@ declare module "cradova" {
    * @param {string}   path     Route path.
    * @param  screen the cradova document tree for the route.
    */
-  export class RouterClass {
+  class RouterClass {
     /** cradova router
      * ---
      * Registers a route.
@@ -482,7 +482,17 @@ declare module "cradova" {
      * @param callback
      * @param path? page path
      */
-    addErrorHandler(callback: () => void): void;
+    addErrorHandler(callback: (err: unknown) => void): void;
+    /**
+     * Cradova
+     * ---
+     * Loading screen for your app
+     *
+     * lazy loaded loading use
+     *
+     * @param screen
+     */
+    addLoadingScreen(screen: Screen): void;
     _mount(): void;
   }
   export const Router: RouterClass;
@@ -507,7 +517,7 @@ declare module "cradova" {
     /**
      * error handler for the screen
      */
-    errorHandler: ((err: unknown) => void) | null;
+    _errorHandler: ((err: unknown) => void) | null;
     /**
      * used internally
      */

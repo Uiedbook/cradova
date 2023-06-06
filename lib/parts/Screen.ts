@@ -22,7 +22,7 @@ export class Screen {
   /**
    * error handler for the screen
    */
-  public errorHandler: ((err: unknown) => void) | null = null;
+  public _errorHandler: ((err: unknown) => void) | null = null;
   /**
    * used internally
    */
@@ -79,7 +79,7 @@ export class Screen {
   }
 
   setErrorHandler(errorHandler: (err: unknown) => void) {
-    this.errorHandler = errorHandler;
+    this._errorHandler = errorHandler;
   }
   async _package() {
     if (this._html instanceof Ref) {
