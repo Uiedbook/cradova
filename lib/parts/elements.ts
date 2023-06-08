@@ -1,13 +1,6 @@
 import { VJSType, VJS_params_TYPE, VJS_props_TYPE } from "../types";
 import { dispatch } from "./track";
-import {
-  isNode,
-  reference,
-  Rhoda,
-  CradovaEvent,
-  Ref,
-  addInvalidProperty,
-} from "./fns";
+import { isNode, reference, Rhoda, CradovaEvent, Ref } from "./fns";
 import { createSignal } from "./createSignal";
 import { Router } from "./Router";
 
@@ -111,8 +104,7 @@ export const makeElement = (
             "click",
             (e: { preventDefault: () => void }) => {
               e.preventDefault();
-              const a = element as HTMLAnchorElement;
-              Router.navigate(a.pathname);
+              Router.navigate((element as HTMLAnchorElement).pathname);
             }
           );
         }
@@ -124,11 +116,8 @@ export const makeElement = (
         const clas = props[prop]! as unknown[];
         // signal
         if (clas[0] instanceof createSignal) {
-          addInvalidProperty(
-            element as unknown as Record<string, unknown>,
-            "updateState",
-            dispatch.bind(null, element)
-          );
+          (element as unknown as Record<string, unknown>)["updateState"] =
+            dispatch.bind(null, element);
           clas![0].bindRef(element, {
             _element_property: prop,
             signalProperty: clas![1] as string,
@@ -138,11 +127,8 @@ export const makeElement = (
 
         // reference
         if (prop == "reference" && clas![0] instanceof reference) {
-          addInvalidProperty(
-            element as unknown as Record<string, unknown>,
-            "updateState",
-            dispatch.bind(null, element)
-          );
+          (element as unknown as Record<string, unknown>)["updateState"] =
+            dispatch.bind(null, element);
           clas![0]._appendDom(clas![1] as string, element);
           continue;
         }
@@ -163,11 +149,7 @@ export const makeElement = (
         continue;
       }
       // trying to set other values
-      addInvalidProperty(
-        element as unknown as Record<string, unknown>,
-        prop,
-        props[prop]
-      );
+      (element as unknown as Record<string, unknown>)[prop] = props[prop];
       // event of error and it checking has been removed, because this happens at runtime
     }
   }

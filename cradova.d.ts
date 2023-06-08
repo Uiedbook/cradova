@@ -265,23 +265,16 @@ declare module "cradova" {
      * @returns void
      * .
      */
-    template: Function | HTMLElement;
+    template: ((this: Screen, data?: unknown) => HTMLElement) | HTMLElement;
     /**
      * Cradova screen
      * ---
      * Allows this screen render in parallel for unique routes
      *
      * limit is 1000
-     *
      * .
      */
     renderInParallel?: boolean;
-    /**
-     * Cradova screen
-     * ---
-     * gets called when the the screen is displayed
-     * .
-     */
     /**
      * Cradova screen
      * ---
@@ -291,6 +284,13 @@ declare module "cradova" {
      * .
      */
     persist?: boolean;
+    /**
+     * Cradova screen
+     * ---
+     * Should the loading screen be show as this screen is loading?
+     * .
+     */
+    suspend?: boolean;
   };
 
   export const makeElement: (
@@ -529,15 +529,16 @@ declare module "cradova" {
     private _deCallBack;
     private _persist;
     private _data;
-    _params: Record<string, unknown> | null;
+    // _params: Record<string, unknown> | null;
+    _suspend: boolean;
     private _delegatedRoutesCount;
     private _transition;
     private _doc;
     constructor(cradova_screen_initials: CradovaScreenType);
     get _delegatedRoutes(): boolean;
     set _delegatedRoutes(count: boolean);
-    get _paramData(): typeof this._params;
-    set _paramData(params: typeof this._params);
+    // get _paramData(): typeof this._params;
+    // set _paramData(params: typeof this._params);
     setErrorHandler(errorHandler: (err: unknown) => void): void;
     _package(): Promise<void>;
     onActivate(cb: () => Promise<void> | void): void;

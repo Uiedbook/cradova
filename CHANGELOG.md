@@ -173,3 +173,5 @@ and we went along with it.
 - production tests
 - the cradova \_ function now has types
 - fixes and more speed gain for your apps when you update cradova.
+- added a solution for setting a loading screen
+- production tests for parallel rendering completed

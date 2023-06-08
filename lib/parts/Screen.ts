@@ -1,5 +1,5 @@
 import { CradovaScreenType, VJSType } from "../types.js";
-import { CradovaEvent, Ref, frag, isNode } from "./fns.js";
+import { CradovaEvent, frag, isNode, reference } from "./fns.js";
 
 /**
  *  Cradova Screen
@@ -9,6 +9,7 @@ import { CradovaEvent, Ref, frag, isNode } from "./fns.js";
  * @param template
  * @param transitions
  */
+const localTree = new reference();
 
 export class Screen {
   /**
@@ -27,35 +28,36 @@ export class Screen {
    * used internally
    */
   public _name: string;
+  // public _suspend = false;
+  //
   private _packed = false;
   private _template = document.createElement("div");
   private _callBack: (() => Promise<void> | void) | undefined;
   private _deCallBack: (() => Promise<void> | void) | undefined;
   private _persist = true;
   private _data: unknown;
-  public _params: Record<string, unknown> | null = null;
   private _delegatedRoutesCount = -1;
   private _transition;
-  private _doc: HTMLDivElement | null = null;
   //
   constructor(cradova_screen_initials: CradovaScreenType) {
     const { template, name, persist, renderInParallel, transition } =
       cradova_screen_initials;
     this._html = template;
     this._name = name;
-    this._transition = transition || "";
+    // this._suspend = suspend!;
+    this._transition = transition;
     this._template.setAttribute("id", "cradova-screen-set");
     if (renderInParallel === true) {
-      this._delegatedRoutesCount = 1;
+      this._delegatedRoutesCount = 0;
     } else {
       if (typeof persist === "boolean") {
-        this._persist = persist;
+        this._persist = persist!;
       }
     }
   }
 
   get _delegatedRoutes(): boolean {
-    if (this._delegatedRoutesCount > 1000) {
+    if (this._delegatedRoutesCount > 100) {
       return -1 as unknown as boolean;
     }
     return this._delegatedRoutesCount as unknown as boolean;
@@ -67,24 +69,10 @@ export class Screen {
     }
   }
 
-  get _paramData(): typeof this._params {
-    return this._params;
-  }
-
-  set _paramData(params: typeof this._params) {
-    if (params) {
-      this._params = params;
-    }
-  }
-
   setErrorHandler(errorHandler: (err: unknown) => void) {
     this._errorHandler = errorHandler;
   }
   async _package() {
-    if (this._html instanceof Ref) {
-      this._template.innerHTML = "";
-      this._template.appendChild(this._html.render(this._data));
-    }
     if (typeof this._html === "function") {
       let fuc = await this._html.apply(this, this._data);
       if (typeof fuc === "function") {
@@ -122,30 +110,20 @@ export class Screen {
     }
     // other stuff that may come later
   }
-  async _Activate(force?: boolean) {
-    // rare case
-    if (!this._persist && force === false) {
-      if (!this._packed) {
-        this._packed = true;
-        await this._package();
-      }
-    } else {
-      // regular case
-      if (!this._persist || force) {
-        await this._package();
-      } else {
-        if (!this._packed) {
-          this._packed = true;
-          await this._package();
-        }
-      }
+  async _Activate(force: boolean = false) {
+    // packaging the screen dom
+    if (!this._persist || force || !this._packed) {
+      await this._package();
+      this._packed = true;
     }
 
-    //
-    if (!this._doc) {
-      this._doc = document.querySelector("[data-wrapper=app]");
+    if (!localTree._doc) {
+      localTree._appendDomForce(
+        "_doc",
+        document.querySelector("[data-wrapper=app]")!
+      );
     }
-    if (!this._doc) {
+    if (!localTree._doc) {
       throw new Error(
         " ✘  Cradova err: Unable to render, cannot find cradova root <div data-wrapper='app'> ... </div>"
       );
@@ -153,12 +131,13 @@ export class Screen {
     if (this._transition) {
       this._template.classList.add(this._transition);
     }
-    this._doc.innerHTML = "";
-    this._doc.appendChild(this._template as Node);
+    localTree._doc.innerHTML = "";
+    localTree._doc.appendChild(this._template as Node);
     document.title = this._name;
+    CradovaEvent.dispatchEvent("onmountEvent");
+    // window.scroll(0, 0);
     if (this._callBack) {
       await this._callBack();
     }
-    CradovaEvent.dispatchEvent("onmountEvent");
   }
 }

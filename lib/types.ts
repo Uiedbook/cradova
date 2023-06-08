@@ -1,3 +1,4 @@
+import { Screen } from "./parts/Screen";
 import { reference } from "./parts/fns";
 
 export type VJSType<T> = (
@@ -53,12 +54,13 @@ export type stateType =
 export type RouterRouteObject = {
   _name: string;
   _html: Function | HTMLElement;
-  _paramData: Record<string, unknown> | null | undefined;
+  // _paramData: Record<string, unknown> | null | undefined;
   _delegatedRoutes: number | boolean;
   _Activate: (force: boolean) => Promise<void>;
   _deActivate: (params: object) => void;
   _package: (params: unknown) => void;
   _errorHandler: ((err: unknown) => void) | null;
+  // _suspend: boolean;
 };
 
 /**
@@ -89,7 +91,7 @@ export type CradovaScreenType = {
    * @returns void
    * .
    */
-  template: Function | HTMLElement;
+  template: ((this: Screen, data?: unknown) => HTMLElement) | HTMLElement;
   /**
    * Cradova screen
    * ---
@@ -103,17 +105,17 @@ export type CradovaScreenType = {
   /**
    * Cradova screen
    * ---
-   * gets called when the the screen is displayed
-   * .
-   */
-  // onActivate: (fn: (data: unknown) => void) => Promise<void>;
-  /**
-   * Cradova screen
-   * ---
    * Should this screen be cached after first render?
    * you can use Route.navigate(url, null, true) to force later
    *
    * .
    */
   persist?: boolean;
+  /**
+   * Cradova screen
+   * ---
+   * Should the loading screen be show as this screen is loading?
+   * .
+   */
+  // suspend?: boolean;
 };

@@ -4,13 +4,6 @@ import { createSignal } from "./createSignal";
 export const isNode = (node: any) =>
   typeof node === "object" && typeof node.nodeType === "number";
 
-export const addInvalidProperty = (
-  x: Record<string, unknown>,
-  y: string,
-  z: unknown
-) => {
-  x[y] = z;
-};
 /**
  * Cradova event
  */

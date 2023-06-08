@@ -16,7 +16,7 @@ RouterBox["lastNavigatedRoute"] = null;
 RouterBox["pageShow"] = null;
 RouterBox["pageHide"] = null;
 RouterBox["errorHandler"] = null;
-RouterBox["loadingScreen"] = null;
+RouterBox["loadingScreen"] = {};
 RouterBox["params"] = {};
 RouterBox["routes"] = {};
 RouterBox["pageevents"] = [];
@@ -116,7 +116,7 @@ RouterBox.route = (path: string, screen: _cradovaScreen) => {
 
 RouterBox.router = async function (
   e: { target: { tagName: string; href: string }; preventDefault: () => void },
-  force: boolean
+  _force: boolean
 ) {
   let url, route: RouterRouteObject | undefined, params;
   if (e) {
@@ -150,37 +150,39 @@ RouterBox.router = async function (
   if (typeof route !== "undefined") {
     // we need to caught the error and propagate to the app
     try {
-      if (params) {
-        RouterBox.params.params = params;
-      }
       // lazy loaded screens
-      if (!route._Activate && typeof route === "function") {
-        if (RouterBox["LoadingScreen"]) {
-          const s = RouterBox["LoadingScreen"] as _cradovaScreen;
-          await s._Activate(true);
-          const lazy = route as Function;
-          route = await lazy();
-          s._deActivate();
-        } else {
-          const lazy = route as Function;
-          route = await lazy();
+      if (typeof route === "function") {
+        if (RouterBox["LoadingScreen"]._Activate) {
+          await (RouterBox["LoadingScreen"] as _cradovaScreen)._Activate();
         }
+        const lazy = route as Function;
+        route = await lazy();
       }
       // delegation causing parallel rendering sequence
-      if (route!._delegatedRoutes !== -1 && route!._delegatedRoutes !== 1) {
+      if (route!._delegatedRoutes !== -1) {
         route!._delegatedRoutes = true;
         route = new _cradovaScreen({
           name: route!._name,
-          template: route!._html,
+          template: route!._html as HTMLElement,
         });
         RouterBox.routes[url] = route;
       }
-      //
-      await route!._Activate(force);
+      // show loader
+      // if (route?._suspend && RouterBox["LoadingScreen"]._Activate) {
+      //   await (RouterBox["LoadingScreen"] as _cradovaScreen)._Activate();
+      // }
+      if (params) {
+        RouterBox.params.params = params;
+      }
+      await route!._Activate(_force);
       RouterBox["lastNavigatedRouteController"] &&
         RouterBox["lastNavigatedRouteController"]._deActivate();
       RouterBox["lastNavigatedRoute"] = url;
       RouterBox["lastNavigatedRouteController"] = route;
+      //
+      // if (route?._suspend && typeof RouterBox["LoadingScreen"]._deActivate) {
+      //   await (RouterBox["LoadingScreen"] as _cradovaScreen)._deActivate();
+      // }
     } catch (error) {
       if (route && route["_errorHandler"]) {
         route._errorHandler(error);
@@ -285,12 +287,10 @@ class RouterClass {
       [route, params] = checker(href);
       if (route) {
         RouterBox["nextRouteController"] = route;
-        RouterBox.params.params = params;
-        // one of this needs to be removed
-        route._paramData = params;
-        RouterBox.params.data = data || null;
         window.history.pushState({}, "", href);
       }
+      RouterBox.params.params = params;
+      RouterBox.params.data = data;
       RouterBox.router(null, force);
       RouterBox["start_pageevents"](lastR, href);
     }

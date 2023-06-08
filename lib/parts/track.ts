@@ -1,5 +1,5 @@
 import { VJSType, stateType } from "../types";
-import { addInvalidProperty, frag, reference } from "./fns";
+import { frag, reference } from "./fns";
 
 /**
  * Send a new state to specified element with stateID
@@ -62,12 +62,11 @@ export function dispatch(element: Record<string, any>, state: stateType) {
         continue;
       }
       // trying to set other values
-
       if (key.includes("data-")) {
         element.setAttribute(key, stateK[key] as string);
         continue;
       }
-      addInvalidProperty(element, key, stateK[key] as unknown);
+      element[key] = stateK[key] as unknown;
     }
   }
   if (typeof state === "string") {
