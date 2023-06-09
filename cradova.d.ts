@@ -223,7 +223,7 @@ declare module "cradova" {
       | (() => HTMLElement)
       | {
           style?: Partial<CSSStyleDeclaration>;
-          onmount?: () => void;
+          onmount?: (this: T) => void;
           text?: string;
           reference?: reference;
         }
@@ -241,7 +241,7 @@ declare module "cradova" {
     | (() => HTMLElement)
     | {
         style?: Partial<CSSStyleDeclaration>;
-        onmount?: () => void;
+        onmount?: (this: T) => void;
         text?: string;
         reference?: reference;
       }

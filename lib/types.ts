@@ -16,7 +16,7 @@ export type VJSType<T> = (
     | (() => HTMLElement)
     | {
         style?: Partial<CSSStyleDeclaration>;
-        onmount?: () => void;
+        onmount?: (this: T) => void;
         text?: string;
         reference?: reference;
       }
@@ -35,7 +35,7 @@ export type VJS_params_TYPE<T> = (
   | (() => HTMLElement)
   | {
       style?: Partial<CSSStyleDeclaration>;
-      onmount?: () => void;
+      onmount?: (this: T) => void;
       text?: string;
       reference?: reference;
     }
