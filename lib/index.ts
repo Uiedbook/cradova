@@ -40,8 +40,8 @@ import { VJS_params_TYPE } from "./types";
 
 ("use strict");
 const make = function (txx: string) {
-  if (!txx.length) {
-    return ["DIV"];
+  if (typeof txx !== "string") {
+    return [];
   }
   if (Array.isArray(txx)) {
     txx = txx[0];
@@ -100,7 +100,7 @@ const make = function (txx: string) {
 
 type TemplateType = (
   ...element_initials: VJS_params_TYPE<HTMLElement>
-) => HTMLElement;
+) => HTMLElement | DocumentFragment;
 
 /**
  * Cradova
@@ -137,36 +137,33 @@ type TemplateType = (
  */
 
 const _: TemplateType = (...element_initials) => {
-  const initials = make(element_initials.shift() as unknown as string);
-  let props: Partial<HTMLElement> | undefined;
-  const element: HTMLElement = document.createElement(initials[0] as string);
-  if (initials[2]) {
-    if (props) {
-      props["className"] = initials[2];
-    } else {
-      props = { className: initials[2] };
+  // let's get the props in the string if available
+  const {
+    0: tag,
+    1: id,
+    2: className,
+    3: innerText,
+  } = make(element_initials[0] as unknown as string);
+  let props: Partial<HTMLElement> = {};
+  const element = (
+    tag ? document.createElement(tag) : new DocumentFragment()
+  ) as HTMLElement;
+  if (element.tagName) {
+    if (className) {
+      props["className"] = className;
+    }
+    if (id) {
+      props["id"] = id;
+    }
+    if (innerText) {
+      props["innerText"] = innerText;
     }
   }
-  if (initials[1]) {
-    if (props) {
-      props["id"] = initials[1];
-    } else {
-      props = { id: initials[1] };
-    }
-  }
-  if (initials[3]) {
-    if (props) {
-      props["innerText"] = initials[3];
-    } else {
-      props = { innerText: initials[3] };
-    }
-  }
-  if (element_initials.length === 0) {
-    return element;
-  }
+
+  typeof tag === "string" && element_initials.shift();
   // adding the property object to children list
   props && element_initials.push(props);
-  return makeElement(element, ...element_initials);
+  return makeElement(element, element_initials);
 };
 
 export * from "./parts/elements";

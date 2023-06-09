@@ -9,7 +9,7 @@ import { CradovaEvent, frag, isNode, reference } from "./fns.js";
  * @param template
  * @param transitions
  */
-const localTree = new reference();
+export const localTree = new reference();
 
 export class Screen {
   /**

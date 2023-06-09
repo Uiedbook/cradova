@@ -1,12 +1,18 @@
 import { Screen } from "./parts/Screen";
 import { reference } from "./parts/fns";
 
+type DataAttributes = { [key: `data-${string}`]: string };
+type AriaAttributes = { [key: `aria-${string}`]: string };
+
 export type VJSType<T> = (
   ...VJS: (
     | undefined
     | string
     | Partial<T>
     | HTMLElement
+    | HTMLElement[]
+    | DataAttributes
+    | AriaAttributes
     | (() => HTMLElement)
     | {
         style?: Partial<CSSStyleDeclaration>;
@@ -22,6 +28,9 @@ export type VJS_params_TYPE<T> = (
   | string
   | Partial<T>
   | HTMLElement
+  | HTMLElement[]
+  | DataAttributes
+  | AriaAttributes
   | (() => HTMLElement)
   | {
       style?: Partial<CSSStyleDeclaration>;
@@ -43,6 +52,7 @@ export type VJS_props_TYPE = {
 export type stateType =
   | string
   | HTMLElement
+  | HTMLElement[]
   | (() => HTMLElement)
   | {
       style?: Partial<CSSStyleDeclaration>;

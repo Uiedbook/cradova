@@ -6,7 +6,7 @@ import { Router } from "./Router";
 
 export const makeElement = (
   element: HTMLElement,
-  ...ElementChildrenAndPropertyList: VJS_params_TYPE<HTMLElement>
+  ElementChildrenAndPropertyList: VJS_params_TYPE<HTMLElement>
 ) => {
   //
   let props: VJS_props_TYPE = {},
@@ -17,7 +17,7 @@ export const makeElement = (
       let child = ElementChildrenAndPropertyList[i];
       // single child lane
       if (child instanceof Ref) {
-        child = child.render(undefined);
+        child = child.render();
       }
       if (typeof child === "function") {
         child = child();
@@ -39,11 +39,7 @@ export const makeElement = (
       }
       // getting props
       if (typeof child === "object") {
-        if (typeof props === "undefined") {
-          props = child as VJS_props_TYPE;
-        } else {
-          props = Object.assign(props, child);
-        }
+        props = Object.assign(props, child);
         continue;
       }
       // throw an error
@@ -61,10 +57,10 @@ export const makeElement = (
   //? adding props
   if (typeof props === "object" && element) {
     // adding attributes
-    for (const prop in props) {
+    for (const [prop, value] of Object.entries(props)) {
       // adding styles
-      if (prop === "style" && typeof props[prop] === "object") {
-        for (const [k, v] of Object.entries(props[prop]!)) {
+      if (prop === "style" && typeof value === "object") {
+        for (const [k, v] of Object.entries(value!)) {
           if (
             typeof element.style[k as unknown as number] !== "undefined" &&
             k !== "src"
@@ -83,22 +79,18 @@ export const makeElement = (
         typeof element.style[prop as unknown as number] !== "undefined" &&
         prop !== "src"
       ) {
-        element.style[prop as unknown as number] = props[prop] as string;
+        element.style[prop as unknown as number] = value as string;
         continue;
       }
       // text content
-      if (
-        prop === "text" &&
-        typeof props[prop] === "string" &&
-        props[prop] !== ""
-      ) {
-        text = props[prop] as string;
+      if (prop === "text" && typeof value === "string" && value !== "") {
+        text = value as string;
         continue;
       }
 
-      // text content
-      if (prop === "href" && typeof props[prop] === "string") {
-        const href = (props[prop] || "") as string;
+      // A tags (the only special tag)
+      if (prop === "href" && typeof value === "string") {
+        const href = (value || "") as string;
         if (!href.includes("://")) {
           element.addEventListener(
             "click",
@@ -108,12 +100,12 @@ export const makeElement = (
             }
           );
         }
-        element.setAttribute(prop, props[prop] as string);
+        element.setAttribute(prop, value as string);
         continue;
       }
 
-      if (Array.isArray(props[prop])) {
-        const clas = props[prop]! as unknown[];
+      if (Array.isArray(value)) {
+        const clas = value! as unknown[];
         // signal
         if (clas[0] instanceof createSignal) {
           (element as unknown as Record<string, unknown>)["updateState"] =
@@ -136,20 +128,25 @@ export const makeElement = (
 
       // setting onmount event;
       if (prop === "onmount" && typeof props["onmount"] === "function") {
-        const avi = () => {
+        props!["onmount"] = undefined;
+        const ev = () => {
           props.onmount?.apply(element);
-          props!["onmount"] = undefined;
         };
-        CradovaEvent.addEventListener("onmountEvent", avi);
+        CradovaEvent.addEventListener("onmountEvent", ev);
         continue;
       }
       // data-(s)
       if (prop.includes("data-")) {
-        element.setAttribute(prop, props[prop] as string);
+        element.setAttribute(prop, value as string);
+        continue;
+      }
+      // aria-(s)
+      if (prop.includes("aria-")) {
+        element.setAttribute(prop, value as string);
         continue;
       }
       // trying to set other values
-      (element as unknown as Record<string, unknown>)[prop] = props[prop];
+      (element as unknown as Record<string, unknown>)[prop] = value;
       // event of error and it checking has been removed, because this happens at runtime
     }
   }
@@ -161,7 +158,7 @@ export const makeElement = (
 
 const cra: any = (element_initials: string) => {
   return (...initials: VJSType<HTMLElement>[]) => {
-    return makeElement(document.createElement(element_initials), ...initials);
+    return makeElement(document.createElement(element_initials), initials);
   };
 };
 

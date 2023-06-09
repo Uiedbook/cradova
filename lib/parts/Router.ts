@@ -1,5 +1,6 @@
 import _, { Screen as _cradovaScreen } from "../index.js";
 import { RouterRouteObject } from "../types.js";
+import { localTree } from "./Screen.js";
 
 /**
  * Cradova Router
@@ -22,9 +23,12 @@ RouterBox["routes"] = {};
 RouterBox["pageevents"] = [];
 
 RouterBox["start_pageevents"] = async function (lastR: string, newR: string) {
-  for (let ci = 0; ci < RouterBox["pageevents"].length; ci++) {
-    RouterBox["pageevents"][ci](lastR, newR);
-  }
+  setTimeout(() => {
+    for (let ci = 0; ci < RouterBox["pageevents"].length; ci++) {
+      RouterBox["pageevents"][ci](lastR, newR);
+    }
+    //! always starts events a moment later
+  }, 300);
 };
 
 /**
@@ -48,11 +52,14 @@ const checker = (url: string) => {
       continue;
     }
     // check for extra / in the route by normalize before checking
-    if (url.endsWith("/")) {
-      url = url.slice(0, path.length - 2);
-    }
+    // if (url.endsWith("/")) {
+    //   url = url.slice(0, path.length - 2);
+    // }
     const urlFixtures = url.split("/");
     const pathFixtures = path.split("/");
+    if (url.endsWith("/")) {
+      urlFixtures.pop();
+    }
     let fixturesX = 0;
     let fixturesY = 0;
     // remove empty string after split operation
@@ -65,17 +72,20 @@ const checker = (url: string) => {
         // let's jump place holders in the path since we can't determine from them
         // we increment that we skipped a position because we need later
         if (pathFixtures[i].includes(":")) {
-          fixturesY += 1;
+          fixturesY++;
+          // fixturesY += 1;
           continue;
         }
         // if this is part of the path then let increment a value for it
         // we will need it later
         if (
-          urlFixtures[i] === pathFixtures[i] &&
-          pathFixtures.indexOf(urlFixtures[i]) ===
-            pathFixtures.lastIndexOf(urlFixtures[i])
+          urlFixtures[i] === pathFixtures[i]
+          // &&
+          // pathFixtures.indexOf(urlFixtures[i]) ===
+          //   pathFixtures.lastIndexOf(urlFixtures[i])
         ) {
-          fixturesX += 1;
+          // fixturesX+=1;
+          fixturesX++;
         }
       }
       // if after the checks it all our count are equal then we got it correctly
@@ -98,8 +108,7 @@ RouterBox.route = (path: string, screen: _cradovaScreen) => {
     console.error(" ✘  Cradova err:  not a valid screen  ", screen);
     throw new Error(" ✘  Cradova err:  Not a valid cradova screen component");
   }
-  RouterBox.routes[path] = screen;
-  return RouterBox.routes[path];
+  return (RouterBox.routes[path] = screen);
 };
 
 /**
@@ -107,7 +116,7 @@ RouterBox.route = (path: string, screen: _cradovaScreen) => {
  * ----
  * * The whole magic happens here
  * -
- * Responds to click events an ywhere in the document and when
+ * Responds to click events an y where in the document and when
  * the click happens on a link that is supposed to be handled
  * by the router, it loads and displays the target page.
  * * Responds to popstate and load events and does it's job
@@ -115,25 +124,25 @@ RouterBox.route = (path: string, screen: _cradovaScreen) => {
  */
 
 RouterBox.router = async function (
-  e: { target: { tagName: string; href: string }; preventDefault: () => void },
+  _e: { target: { tagName: string; href: string }; preventDefault: () => void },
   _force: boolean
 ) {
   let url, route: RouterRouteObject | undefined, params;
-  if (e) {
-    const Alink = e.target.tagName === "A" && e.target;
-    if (Alink) {
-      if (Alink.href.includes("#")) {
-        const l = Alink.href.split("#");
-        document.getElementById("#" + l[l.length - 1])?.scrollIntoView();
-        return;
-      }
-      if (Alink.href.includes("javascript")) {
-        return;
-      }
-      e.preventDefault();
-      url = new URL(Alink.href).pathname;
-    }
-  }
+  // if (e) {
+  //   const Alink = e.target.tagName === "A" && e.target;
+  //   if (Alink) {
+  //     if (Alink.href.includes("#")) {
+  //       const l = Alink.href.split("#");
+  //       document.getElementById("#" + l[l.length - 1])?.scrollIntoView();
+  //       return;
+  //     }
+  //     if (Alink.href.includes("javascript")) {
+  //       return;
+  //     }
+  //     e.preventDefault();
+  //     url = new URL(Alink.href).pathname;
+  //   }
+  // }
   if (!url) {
     url = window.location.pathname;
   }
@@ -152,11 +161,13 @@ RouterBox.router = async function (
     try {
       // lazy loaded screens
       if (typeof route === "function") {
-        if (RouterBox["LoadingScreen"]._Activate) {
+        if (
+          RouterBox["LoadingScreen"] &&
+          RouterBox["LoadingScreen"]._Activate
+        ) {
           await (RouterBox["LoadingScreen"] as _cradovaScreen)._Activate();
         }
-        const lazy = route as Function;
-        route = await lazy();
+        route = await (route as Function)();
       }
       // delegation causing parallel rendering sequence
       if (route!._delegatedRoutes !== -1) {
@@ -167,10 +178,6 @@ RouterBox.router = async function (
         });
         RouterBox.routes[url] = route;
       }
-      // show loader
-      // if (route?._suspend && RouterBox["LoadingScreen"]._Activate) {
-      //   await (RouterBox["LoadingScreen"] as _cradovaScreen)._Activate();
-      // }
       if (params) {
         RouterBox.params.params = params;
       }
@@ -179,10 +186,6 @@ RouterBox.router = async function (
         RouterBox["lastNavigatedRouteController"]._deActivate();
       RouterBox["lastNavigatedRoute"] = url;
       RouterBox["lastNavigatedRouteController"] = route;
-      //
-      // if (route?._suspend && typeof RouterBox["LoadingScreen"]._deActivate) {
-      //   await (RouterBox["LoadingScreen"] as _cradovaScreen)._deActivate();
-      // }
     } catch (error) {
       if (route && route["_errorHandler"]) {
         route._errorHandler(error);
@@ -226,14 +229,14 @@ class RouterClass {
   BrowserRoutes(obj: Record<string, any>) {
     for (const path in obj) {
       let screen = obj[path];
-      if (screen.catch || typeof screen === "function") {
+      if (
+        (typeof screen === "object" && typeof screen.then === "function") ||
+        typeof screen === "function"
+      ) {
+        // creating the lazy
         RouterBox["routes"][path] = async () => {
-          if (typeof screen === "function") {
-            screen = await screen();
-          } else {
-            screen = await screen;
-          }
-          return RouterBox.route(path, screen.default);
+          screen = await (typeof screen === "function" ? screen() : screen);
+          return RouterBox.route(path, (await screen).default);
         };
       } else {
         RouterBox.route(path, screen);
@@ -386,14 +389,16 @@ class RouterClass {
 
   _mount() {
     // creating mount point
-    if (!document.querySelector("[data-wrapper=app]")) {
-      const Wrapper = document.createElement("div");
-      Wrapper.setAttribute("data-wrapper", "app");
-      document.body.appendChild(Wrapper);
+    let doc = document.querySelector("[data-wrapper=app]");
+    if (!doc) {
+      doc = document.createElement("div");
+      doc.setAttribute("data-wrapper", "app");
+      document.body.appendChild(doc);
+      localTree._appendDomForce("doc", doc as HTMLElement);
     }
     window.addEventListener("pageshow", RouterBox.router);
     window.addEventListener("popstate", (_e) => {
-      // e.preventDefault();
+      // _e.preventDefault();
       RouterBox.router();
     });
   }

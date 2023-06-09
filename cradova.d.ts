@@ -208,12 +208,18 @@ declare module "cradova" {
     _appendDomForce(name: string, Element: HTMLElement): void;
   }
 
+  type DataAttributes = { [key: `data-${string}`]: string };
+  type AriaAttributes = { [key: `aria-${string}`]: string };
+
   type VJSType<T> = (
     ...VJS: (
       | undefined
       | string
       | Partial<T>
       | HTMLElement
+      | HTMLElement[]
+      | DataAttributes
+      | AriaAttributes
       | (() => HTMLElement)
       | {
           style?: Partial<CSSStyleDeclaration>;
@@ -228,6 +234,9 @@ declare module "cradova" {
     | string
     | Partial<T>
     | HTMLElement
+    | HTMLElement[]
+    | DataAttributes
+    | AriaAttributes
     | (() => HTMLElement)
     | {
         style?: Partial<CSSStyleDeclaration>;
