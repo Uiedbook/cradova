@@ -237,6 +237,7 @@ declare module "cradova" {
     | HTMLElement[]
     | DataAttributes
     | AriaAttributes
+    | TemplateStringsArray
     | (() => HTMLElement)
     | {
         style?: Partial<CSSStyleDeclaration>;

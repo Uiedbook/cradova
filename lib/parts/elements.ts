@@ -128,9 +128,9 @@ export const makeElement = (
 
       // setting onmount event;
       if (prop === "onmount" && typeof props["onmount"] === "function") {
-        props!["onmount"] = undefined;
         const ev = () => {
           props.onmount?.apply(element);
+          props!["onmount"] = undefined;
         };
         CradovaEvent.addEventListener("onmountEvent", ev);
         continue;

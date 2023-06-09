@@ -40,6 +40,9 @@ import { VJS_params_TYPE } from "./types";
 
 ("use strict");
 const make = function (txx: string) {
+  if (Array.isArray(txx)) {
+    txx = txx[0];
+  }
   if (typeof txx !== "string") {
     return [];
   }

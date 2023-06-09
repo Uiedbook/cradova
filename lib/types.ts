@@ -31,6 +31,7 @@ export type VJS_params_TYPE<T> = (
   | HTMLElement[]
   | DataAttributes
   | AriaAttributes
+  | TemplateStringsArray
   | (() => HTMLElement)
   | {
       style?: Partial<CSSStyleDeclaration>;
