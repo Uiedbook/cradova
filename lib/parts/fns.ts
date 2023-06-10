@@ -423,17 +423,17 @@ export class reference {
     return [this, name] as unknown as reference;
   }
 
-  _appendDom(name: string, Element: HTMLElement) {
-    if (!Object.hasOwnProperty.call(this, name)) {
-      this[name] = Element;
-    } else {
-      if (Array.isArray(this[name])) {
-        this[name].push(Element);
-      } else {
-        this[name] = [this[name], Element];
-      }
-    }
-  }
+  // _appendDom(name: string, Element: HTMLElement) {
+  //   if (!Object.hasOwnProperty.call(this, name)) {
+  //     this[name] = Element;
+  //   } else {
+  //     if (Array.isArray(this[name])) {
+  //       this[name].push(Element);
+  //     } else {
+  //       this[name] = [this[name], Element];
+  //     }
+  //   }
+  // }
 
   _appendDomForce(name: string, Element: HTMLElement) {
     this[name] = Element;

@@ -104,11 +104,14 @@ const checker = (url: string) => {
 };
 
 RouterBox.route = (path: string, screen: _cradovaScreen) => {
-  if (!screen || !screen._Activate) {
-    console.error(" ✘  Cradova err:  not a valid screen  ", screen);
-    throw new Error(" ✘  Cradova err:  Not a valid cradova screen component");
+  if (typeof screen !== "undefined") {
+    if (!screen._Activate) {
+      console.error(" ✘  Cradova err:  not a valid screen  ", screen);
+      throw new Error(" ✘  Cradova err:  Not a valid cradova screen component");
+    }
+    return (RouterBox.routes[path] = screen);
   }
-  return (RouterBox.routes[path] = screen);
+  return undefined;
 };
 
 /**
@@ -168,6 +171,10 @@ RouterBox.router = async function (
           await (RouterBox["LoadingScreen"] as _cradovaScreen)._Activate();
         }
         route = await (route as Function)();
+        // ! bad operation let's drop it
+        if (!route) {
+          return;
+        }
       }
       // delegation causing parallel rendering sequence
       if (route!._delegatedRoutes !== -1) {
@@ -236,7 +243,7 @@ class RouterClass {
         // creating the lazy
         RouterBox["routes"][path] = async () => {
           screen = await (typeof screen === "function" ? screen() : screen);
-          return RouterBox.route(path, (await screen).default);
+          return RouterBox.route(path, (await screen)?.default);
         };
       } else {
         RouterBox.route(path, screen);

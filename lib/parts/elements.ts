@@ -121,7 +121,7 @@ export const makeElement = (
         if (prop == "reference" && clas![0] instanceof reference) {
           (element as unknown as Record<string, unknown>)["updateState"] =
             dispatch.bind(null, element);
-          clas![0]._appendDom(clas![1] as string, element);
+          clas![0]._appendDomForce(clas![1] as string, element);
           continue;
         }
       }
