@@ -14,17 +14,17 @@ export function Ajax(
   opts: {
     method?: "GET" | "POST";
     data?: Record<string, unknown>;
-    header?: { "content-type": string } & Record<string, string>;
+    header?: { "content-type"?: string } & Record<string, string>;
     callbacks?: Record<string, (arg: Function) => void>;
   } = {}
-) {
+): Promise<string> {
   // getting params
   const { method, data, header, callbacks } = opts;
   if (typeof url !== "string") {
     throw new Error("✘  Cradova err : Ajax invalid url " + url);
   }
   // promisified xhr function
-  return new Promise(function (resolve) {
+  return new Promise<string>(function (resolve) {
     const ajax: XMLHttpRequest = new XMLHttpRequest();
     const formData = new FormData();
     // setting callbacks

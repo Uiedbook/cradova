@@ -102,6 +102,22 @@ export const makeElement = (
         }
         element.setAttribute(prop, value as string);
         continue;
+
+        // if (e) {
+        //   const Alink = e.target.tagName === "A" && e.target;
+        //   if (Alink) {
+        //     if (Alink.href.includes("#")) {
+        //       const l = Alink.href.split("#");
+        //       document.getElementById("#" + l[l.length - 1])?.scrollIntoView();
+        //       return;
+        //     }
+        //     if (Alink.href.includes("javascript")) {
+        //       return;
+        //     }
+        //     e.preventDefault();
+        //     url = new URL(Alink.href).pathname;
+        //   }
+        // }
       }
 
       if (Array.isArray(value)) {

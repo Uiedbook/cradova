@@ -101,9 +101,9 @@ const make = function (txx: string) {
   return [tag || "DIV", IDs[0], classes.join(" "), innerValue];
 };
 
-type TemplateType = (
-  ...element_initials: VJS_params_TYPE<HTMLElement>
-) => HTMLElement | DocumentFragment;
+type TemplateType = <E extends HTMLElement>(
+  ...element_initials: VJS_params_TYPE<E | HTMLElement>
+) => E | HTMLElement | DocumentFragment;
 
 /**
  * Cradova
@@ -162,7 +162,7 @@ const _: TemplateType = (...element_initials) => {
       props["innerText"] = innerText;
     }
   }
-
+  //  DocumentFragment does not have a tag lol
   typeof tag === "string" && element_initials.shift();
   // adding the property object to children list
   props && element_initials.push(props);

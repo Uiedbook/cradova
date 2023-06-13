@@ -160,7 +160,7 @@ export class createSignal<Type extends Record<string, unknown>> {
    * @returns something
    */
 
-  bind(prop: string) {
+  bind(prop: string): any {
     if (
       typeof this.value === "object" &&
       typeof this.value[prop] !== "undefined"

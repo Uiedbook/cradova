@@ -104,8 +104,9 @@ const checker = (url: string) => {
 };
 
 RouterBox.route = (path: string, screen: _cradovaScreen) => {
+  // undefined is an option  here for auth routes
   if (typeof screen !== "undefined") {
-    if (!screen._Activate) {
+    if (screen && !screen._Activate) {
       console.error(" ✘  Cradova err:  not a valid screen  ", screen);
       throw new Error(" ✘  Cradova err:  Not a valid cradova screen component");
     }
@@ -131,21 +132,6 @@ RouterBox.router = async function (
   _force: boolean
 ) {
   let url, route: RouterRouteObject | undefined, params;
-  // if (e) {
-  //   const Alink = e.target.tagName === "A" && e.target;
-  //   if (Alink) {
-  //     if (Alink.href.includes("#")) {
-  //       const l = Alink.href.split("#");
-  //       document.getElementById("#" + l[l.length - 1])?.scrollIntoView();
-  //       return;
-  //     }
-  //     if (Alink.href.includes("javascript")) {
-  //       return;
-  //     }
-  //     e.preventDefault();
-  //     url = new URL(Alink.href).pathname;
-  //   }
-  // }
   if (!url) {
     url = window.location.pathname;
   }
@@ -173,6 +159,9 @@ RouterBox.router = async function (
         route = await (route as Function)();
         // ! bad operation let's drop it
         if (!route) {
+          if (RouterBox["lastNavigatedRoute"]) {
+            history.pushState({}, url, RouterBox["lastNavigatedRoute"]);
+          }
           return;
         }
       }
@@ -210,7 +199,7 @@ RouterBox.router = async function (
   } else {
     // or 404
     if (RouterBox.routes["/404"]) {
-      RouterBox.routes["/404"].controller();
+      await RouterBox.routes["/404"]!._Activate(_force);
     }
   }
 };
@@ -242,8 +231,11 @@ class RouterClass {
       ) {
         // creating the lazy
         RouterBox["routes"][path] = async () => {
-          screen = await (typeof screen === "function" ? screen() : screen);
-          return RouterBox.route(path, (await screen)?.default);
+          screen = await (typeof screen === "function"
+            ? await screen()
+            : await screen);
+          // const s = await screen;
+          return RouterBox.route(path, screen?.default || screen);
         };
       } else {
         RouterBox.route(path, screen);

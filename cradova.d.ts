@@ -78,7 +78,7 @@ declare module "cradova" {
      * @param prop
      * @returns something
      */
-    bind(prop: string): (string | this)[];
+    bind(prop: string): any;
     private _updateState;
     /**
      *  Cradova Signal
@@ -135,8 +135,8 @@ declare module "cradova" {
   ): HTMLElement | undefined;
   export function assertOr(
     condition: boolean,
-    ifTrue: HTMLElement,
-    ifFalse: HTMLElement
+    ifTrue: HTMLElement | HTMLElement[],
+    ifFalse: HTMLElement | HTMLElement[]
   ): HTMLElement;
   /**
    * Cradova Ref
@@ -235,10 +235,12 @@ declare module "cradova" {
     | Partial<T>
     | HTMLElement
     | HTMLElement[]
+    | Partial<CSSStyleDeclaration>
     | DataAttributes
     | AriaAttributes
     | TemplateStringsArray
     | (() => HTMLElement)
+    | any
     | {
         style?: Partial<CSSStyleDeclaration>;
         onmount?: (this: T) => void;
@@ -574,7 +576,7 @@ declare module "cradova" {
       method?: "GET" | "POST";
       data?: Record<string, unknown>;
       header?: {
-        "content-type": string;
+        "content-type"?: string;
       } & Record<string, string>;
       callbacks?: Record<string, (arg: Function) => void>;
     }

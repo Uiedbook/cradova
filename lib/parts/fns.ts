@@ -21,7 +21,7 @@ export class cradovaEvent {
   // }
   dispatchEvent(eventName: string, eventArgs?: unknown) {
     const eventListeners = this.listeners[eventName] || [];
-    while (eventListeners.length) {
+    for (; eventListeners.length !== 0; ) {
       eventListeners.shift()?.call(undefined, eventArgs);
     }
   }
@@ -124,8 +124,8 @@ export function loop<Type>(
 
 export function assertOr(
   condition: boolean,
-  ifTrue: HTMLElement,
-  ifFalse: HTMLElement
+  ifTrue: HTMLElement | HTMLElement[],
+  ifFalse: HTMLElement | HTMLElement[]
 ) {
   if (condition) {
     return ifTrue;
