@@ -62,7 +62,7 @@ Undoubtedly, this provides a significant advantage. You can experience it firsth
 
 Cradova has already been utilized in multiple production projects, and we will continuously update this page to showcase our advancements as we keep improving.
 
-[current version changes](https://github.com/fridaycandour/cradova/blob/main/CHANGELOG.md#v230)
+[current version changes](https://github.com/fridaycandour/cradova/blob/main/CHANGELOG.md#v300)
 
 ## Installation
 
@@ -439,7 +439,8 @@ We are currently working to [set](https://github.com/fridaycandour/cradova/blob/
 - UI component libraries for cradova
 - Sample projects
 - maintenance and promotion
-<!-- 
+<!--
+
 ## Sponsor
 
 Your support is appreciated and needed to advance Cradova for more performance and improvements.
