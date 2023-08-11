@@ -1,5 +1,5 @@
 import { VJSType, stateType } from "../types";
-import { frag, reference } from "./fns";
+import { frag } from "./fns";
 
 /**
  * Send a new state to specified element with stateID
@@ -34,11 +34,7 @@ export function dispatch(element: Record<string, any>, state: stateType) {
         continue;
       }
 
-      const stateK = state as {
-        text?: string;
-        reference?: reference;
-        tree?: HTMLElement | (() => HTMLElement);
-      } & { [x: string]: unknown };
+      const stateK = state as unknown as  { [x: string]: unknown };
 
       if (typeof element[key] === "function") {
         if (key.startsWith("on")) {
