@@ -233,7 +233,7 @@ declare module "cradova" {
   export function useState<S>(
     initialValue: S,
     ActiveRef: Ref<S>
-  ): (S | ((newState: S) => void))[];
+  ): [S, (newState: S) => void];
   /**
  * Cradova
  * ---
