@@ -6,14 +6,16 @@
    ██║        ██╔══██╗  ██║  ██║   █      ██  ██║     ██   ╚██╗ ██╔╝  ██║  ██╗ 
    ╚██████╗   ██║  ██║  ██║  ██║   ███████╔╝   ████████      ╚███╔╝   ██║  ██║ 
     ╚═════╝   ╚═╝  ╚═╝  ╚═╝  ╚═╝   ╚══════╝     ╚════╝        ╚══╝    ╚═╝  ╚═╝ 
-=============================================================================
-Cradova FrameWork
-@version  3.0.0
-License: Apache V2
+    =============================================================================
+    Cradova FrameWork
+    @version  3.0.0
+    License: Apache V2
 Copyright 2022 Friday Candour. 
 Repository - https://github.com/fridaycandour/cradova
 =============================================================================
 */
+
+import * as CSS from "csstype";
 
 declare module "cradova" {
   /**
@@ -129,6 +131,19 @@ declare module "cradova" {
     clearPersist(): void;
   }
 
+  export const isNode: (element: unknown) => boolean;
+  /**
+   * Cradova event
+   */
+  export class cradovaEvent {
+    private listeners;
+    addEventListener(eventName: string, callback: () => void): void;
+    dispatchEvent(eventName: string, eventArgs?: unknown): void;
+  }
+  export const CradovaEvent: cradovaEvent;
+  export function Rhoda(
+    l: VJSType<HTMLElement>[] | (() => any)[] | Ref<unknown>[] | HTMLElement[]
+  ): DocumentFragment;
   export function css(identifier: string | TemplateStringsArray): void;
   /**
    *
@@ -138,7 +153,12 @@ declare module "cradova" {
   export function assert<Type>(
     condition: boolean,
     ...elements: VJS_Child_TYPE<Type | HTMLElement>[]
-  ): HTMLElement[];
+  ): HTMLElement[] | undefined;
+  export function assertOr<Type>(
+    condition: boolean,
+    ifTrue: VJS_Child_TYPE<Type | HTMLElement>,
+    ifFalse: VJS_Child_TYPE<Type | HTMLElement>
+  ): VJS_Child_TYPE<HTMLElement | Type>;
   type LoopData<Type> = Type[];
   export function loop<Type>(
     datalist: LoopData<Type>,
@@ -148,11 +168,6 @@ declare module "cradova" {
       array?: LoopData<Type>
     ) => HTMLElement | DocumentFragment | undefined
   ): HTMLElement[] | undefined;
-  export function assertOr<Type>(
-    condition: boolean,
-    ifTrue: VJS_Child_TYPE<Type | HTMLElement>,
-    ifFalse: VJS_Child_TYPE<Type | HTMLElement>
-  ): HTMLElement;
   /**
    * Cradova Ref
    * -------
@@ -202,6 +217,12 @@ declare module "cradova" {
     private Activate;
   }
   /**
+   * Document fragment
+   * @param children
+   * @returns
+   */
+  export const frag: (children: VJSType<HTMLElement>[]) => DocumentFragment;
+  /**
    * cradova
    * ---
    * lazy load a file
@@ -230,24 +251,24 @@ declare module "cradova" {
    * @param ActiveRef
    * @returns [state, setState]
    */
-  export function useState<S>(
+  export function useState<S = unknown>(
     initialValue: S,
-    ActiveRef: Ref<S>
+    ActiveRef: Ref<unknown>
   ): [S, (newState: S) => void];
   /**
- * Cradova
- * ---
-Allows side effects to be performed in functional components (Refs), such as fetching data or subscribing to events.
- * @param effect
- * @returns
- */
+     * Cradova
+     * ---
+    Allows side effects to be performed in functional components (Refs), such as fetching data or subscribing to events.
+     * @param effect
+     * @returns
+     */
   export function useEffect(effect: () => void, ActiveRef: Ref<unknown>): void;
   /**
- * Cradova
- * ---
-Returns a mutable reference object of dom elements that persists across component renders.
- * @returns reference
- */
+     * Cradova
+     * ---
+    Returns a mutable reference object of dom elements that persists across component renders.
+     * @returns reference
+     */
   export function useRef(): Record<string, HTMLElement | undefined>;
 
   /**
@@ -316,9 +337,9 @@ Returns a mutable reference object of dom elements that persists across componen
       | (() => HTMLElement)
       | Partial<DataAttributes>
       | Partial<AriaAttributes>
-      | Partial<CSSStyleDeclaration>
+      | CSS.Properties
       | {
-          style?: Partial<CSSStyleDeclaration>;
+          style?: CSS.Properties;
           onmount?: (this: T) => void;
           reference?: reference;
         }
@@ -336,9 +357,8 @@ Returns a mutable reference object of dom elements that persists across componen
     | (() => HTMLElement)
     | Partial<DataAttributes>
     | Partial<AriaAttributes>
-    | Partial<CSSStyleDeclaration>
+    | CSS.Properties<string | number>
     | {
-        style?: Partial<CSSStyleDeclaration>;
         src?: string;
         href?: string;
         placeholder?: string;
@@ -354,6 +374,7 @@ Returns a mutable reference object of dom elements that persists across componen
         rel?: string;
         required?: string;
         frameBorder?: string;
+        style?: CSS.Properties;
         onmount?: (this: T) => void;
         reference?: reference;
       }
@@ -412,6 +433,7 @@ Returns a mutable reference object of dom elements that persists across componen
     element: E & HTMLElement,
     ElementChildrenAndPropertyList: VJS_params_TYPE<E>
   ) => E;
+  export const make: (descriptor: any) => any[];
   export const a: VJSType<HTMLAnchorElement>;
   export const area: VJSType<HTMLAreaElement>;
   export const article: VJSType<HTMLElement>;
@@ -503,12 +525,12 @@ Returns a mutable reference object of dom elements that persists across componen
      */
     BrowserRoutes(obj: Record<string, any>): void;
     /**
-      Go back in Navigation history
-      */
+          Go back in Navigation history
+          */
     back(): void;
     /**
-      Go forward in Navigation history
-      */
+          Go forward in Navigation history
+          */
     forward(): void;
     /**
      * Cradova Router

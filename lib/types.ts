@@ -1,6 +1,6 @@
+import * as CSS from "csstype";
 import { Screen } from "./parts/Screen";
 import { reference } from "./parts/fns";
-
 type DataAttributes = { [key: `data-${string}`]: string };
 type AriaAttributes = { [key: `aria-${string}`]: string };
 
@@ -19,9 +19,9 @@ export type VJSType<T> = (
     | (() => HTMLElement)
     | Partial<DataAttributes>
     | Partial<AriaAttributes>
-    | Partial<CSSStyleDeclaration>
+    | CSS.Properties
     | {
-        style?: Partial<CSSStyleDeclaration>;
+        style?: CSS.Properties;
         onmount?: (this: T) => void;
         reference?: reference;
       }
@@ -43,7 +43,7 @@ export type VJS_params_TYPE<T> =
     | (() => HTMLElement)
     | Partial<DataAttributes>
     | Partial<AriaAttributes>
-    | Partial<CSSStyleDeclaration>
+    | CSS.Properties<string | number>
     | {
         src?: string;
         href?: string;
@@ -60,7 +60,8 @@ export type VJS_params_TYPE<T> =
         rel?: string;
         required?: string;
         frameBorder?: string;
-        style?: Partial<CSSStyleDeclaration>;
+        // style?: Partial<CSSStyleDeclaration>;
+        style?: CSS.Properties;
         onmount?: (this: T) => void;
         reference?: reference;
       }
@@ -69,7 +70,7 @@ export type VJS_params_TYPE<T> =
 export type VJS_Child_TYPE<T> = undefined | string | T | (() => T);
 
 export type VJS_props_TYPE = {
-  style?: Partial<CSSStyleDeclaration>;
+  style?: CSS.Properties;
   onmount?: () => void;
   text?: string;
   reference?: reference;
@@ -80,7 +81,7 @@ export type stateType =
   | HTMLElement
   | HTMLElement[]
   | ((() => HTMLElement) & {
-      style?: Partial<CSSStyleDeclaration>;
+      style?: CSS.Properties;
       reference?: reference;
       tree?: HTMLElement | (() => HTMLElement);
     });
