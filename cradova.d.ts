@@ -241,6 +241,7 @@ declare module "cradova" {
   export class reference {
     [x: string]: Record<string, any>;
     bindAs(name: string): reference;
+    dom<ElementType>(name: string): ElementType | undefined;
     _appendDomForce(name: string, Element: HTMLElement): void;
   }
   /**

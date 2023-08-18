@@ -356,6 +356,9 @@ export class reference {
   bindAs(name: string) {
     return [this, name] as unknown as reference;
   }
+  dom<ElementType>(name: string) {
+    return this[name] as ElementType | undefined;
+  }
   _appendDomForce(name: string, Element: HTMLElement) {
     this[name] = Element;
   }
@@ -371,7 +374,10 @@ export class reference {
  * @param ActiveRef
  * @returns [state, setState]
  */
-export function useState<S = unknown>(initialValue: S, ActiveRef: Ref<unknown>): [  S,  ((newState: S)=> void)] {
+export function useState<S = unknown>(
+  initialValue: S,
+  ActiveRef: Ref<unknown>
+): [S, (newState: S) => void] {
   ActiveRef._state_index += 1;
   const idx = ActiveRef._state_index;
   if (!ActiveRef._state_track[idx]) {
