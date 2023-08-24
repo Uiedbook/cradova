@@ -43,7 +43,7 @@ Cradova is a web development framework for building Single Page Applications and
 
 It's a fast and simple framework, it provides an easy to use state management and router system.
 
-Cradova follows the [VJS specification]([](https://github.com/FridayCandour/cradova/blob/main/VJS_spec/spec.md))
+Cradova follows the [VJS specification](https://github.com/FridayCandour/cradova/blob/main/VJS_spec/spec.md)
 
 ## What's the benefit?
 
