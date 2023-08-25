@@ -10,9 +10,9 @@ Vanilla JavaScript spec (VJS) is particularly normal JavaScript and nothing more
 
 It is naturally ECMAScript compliant and doesn't require any preprocessor (transpilers), which means it works on all engines and browsers.
 
-In VJS the first parameter is the template for the HTML element which can consists of a Class Name, ID and Inner Text in a single string, other properties are the HTML element attribute in an object syntax and it's children.
+In VJS the first parameter is the template for the HTML element which can consists of a class name, id and inner text in a single string, other properties are the HTML element attributes in an object syntax and its children.
 
-Another type of VJS syntax is the tag name as a function in lowercase, while it's parameters will then consists the HTML element attribute in an object syntax and it's children.
+Another type of VJS syntax is the tag name as a function in lowercase, while its parameters will then consists the HTML element attribute in an object syntax and its children.
 
 VJS should be completely typed to support HTML attributes for each element type where possible.
 
@@ -208,10 +208,10 @@ In the [JXON](https://htmlpreview.github.io/?https://github.com/mdn/archived-con
 
 VJS can be a standard for more concise web development uses cases where interoperability with vanilla JavaScript is important, to achieve better developer experience and creativity and faster web apps due to its design.
 
-VJS is currently implemented in the [cradova](https://github.com/fridaycandour/cradova) web development framework.
+VJS is currently implemented in the [Cradova](https://github.com/fridaycandour/cradova) web development framework.
 
 It's fairly easy to see how VJS is similar to the flutter mobile development syntax.
-it's only quite more intuitive.
+it is only quite more intuitive.
 
 <hr>
 

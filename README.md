@@ -49,7 +49,7 @@ Cradova follows the [VJS specification](https://github.com/FridayCandour/cradova
 
 Cradova is aimed to be fast and simple with and fewer abstractions and yet easily composable.
 
-Cradova is not built on visual DOM or diff algorithms.
+Cradova is not built on virtual DOM or diff algorithms.
 Instead, State management is done more elegantly with a simple predictive model, simple and easy with all the speed.
 
 ## Is this a big benefit?
@@ -155,7 +155,7 @@ function HelloMessage() {
   });
 }
 
-// using cradova Ref
+// using CradovaRef
 
 const nameRef = new Ref(function (name) {
   const self = this;
@@ -355,21 +355,21 @@ Router.onPageEvent((lastRoute, newRoute) => {
 
 ---
 
-More info on cradova Router
+More info on CradovaRouter
 
 ---
 
-Every cradova app mounts on a div with attribute data-wrapper="app"
+Every Cradovaapp mounts on a div with attribute data-wrapper="app"
 
-if it already exist cradova will use it instead.
+if it already exist Cradovawill use it instead.
 
-cradova will create a div with data-wrapper="app" if it doesn't exists already.
+Cradovawill create a div with data-wrapper="app" if it doesn't exists already.
 
 so if you want to use your own mount point then create a div with data-wrapper="app".
 
 ---
 
-More info on cradova screens
+More info on Cradovascreens
 
 ---
 
@@ -391,7 +391,7 @@ circle for each screen in your app
 
 ---
 
-More info on cradova Ref
+More info on CradovaRef
 
 ---
 
@@ -407,7 +407,7 @@ circle for refs in your app
 
 ---
 
-More info on cradova createSignal
+More info on CradovacreateSignal
 
 ---
 
@@ -420,7 +420,7 @@ with ability to:
 - bind a Ref
 - listen to changes
 - persist changes to localStorage
-- update a cradova Ref and bindings automatically
+- update a CradovaRef and bindings automatically
 
 With these simple and easy abstractions, you can use datastores with powerful convenience.
 
@@ -436,7 +436,7 @@ To get further insights and help on Cradova, visit our [Discord](https://discord
 
 We are currently working to [set](https://github.com/fridaycandour/cradova/blob/main/contributing.md) up the following:
 
-- building cradova CLI (in progress)
+- building CradovaCLI (in progress)
 - Cradova Documentation Website
 - UI component libraries for cradova
 - Sample projects
