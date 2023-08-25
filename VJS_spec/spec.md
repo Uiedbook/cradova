@@ -6,15 +6,15 @@ Updated / August 25, 2023 by friday candour
 
 ## VJS
 
-Vanilla JavaScript spec (VJS) is particularly normal JavaScript and nothing more, but a stack of function calls defining a Document object model (DOM) structure.
+Vanilla JavaScript spec (VJS) is particularly normal JavaScript and nothing more, but a stack of function calls defining a Document Object Model (DOM) structure.
 
 It is naturally ECMAScript compliant and doesn't require any preprocessor (transpilers), which means it works on all engines and browsers.
 
-In VJS the first parameter is the template for the HTML element which can consists of a Class Name, ID and Inner Text in a single string, other properties are the html element attribute in an object syntax and it's children.
+In VJS the first parameter is the template for the HTML element which can consists of a Class Name, ID and Inner Text in a single string, other properties are the HTML element attribute in an object syntax and it's children.
 
-Another type of VJS syntax is the tag name as a function in lowercase, while it's parameters will then consists the html element attribute in an object syntax and it's children.
+Another type of VJS syntax is the tag name as a function in lowercase, while it's parameters will then consists the HTML element attribute in an object syntax and it's children.
 
-VJS should be completely typed to support html attributes for each element type where possible.
+VJS should be completely typed to support HTML attributes for each element type where possible.
 
 It is required that second parameter to be the Attributes object of the element type if needed, but it can appear at any position of the parameter list.
 
@@ -22,7 +22,7 @@ If the first parameter is not a template or string it is considered as a documen
 
 Every other thing on the parameter list which is not the first string parameter or a normal JavaScript object is considered as a child of the element if valid.
 
-Valid VJS children are string, valid html, VJS functions, functions that return valid html or string and undefined.
+Valid VJS children are string, valid HTML, VJS functions, functions that return valid HTML or string and undefined.
 
 # Rationale
 
@@ -101,7 +101,7 @@ VJS("div", (style: { $age: "bar" })); // data-age
 Syntax
 
 ```js
-// A child can be the VJS function call, html element or a document fragment.
+// A child can be the VJS function call, HTML element or a document fragment.
 
 VJS(
   "div",
@@ -166,7 +166,7 @@ function paragraphs(name) {
 
 [JSX](https://facebook.github.io/jsx/#sec-prior-art) is a standard in abundant use, and Another alternative would be to use object initializers like the JXON spec.
 
-In JSX adding attributes and values to elements using netted curly braces lacks ability to send a single value to the resulting component or html markup function.
+In JSX adding attributes and values to elements using netted curly braces lacks ability to send a single value to the resulting component or HTML markup function.
 
 this is an opinionated syntax that tied to transpilation benefits which jsx is heavily based on.
 
@@ -192,7 +192,7 @@ This is significant regarding VJS can be more useful in many light cases whereas
 
 ## JXON
 
-In the [JXON](https://htmlpreview.github.io/?https://github.com/mdn/archived-content/blob/main/files/en-us/archive/jxon/raw.html) spec, the balanced braces do not give great syntactic hints for where an element starts and ends in large trees and also the Balanced named tags is a critical syntactic feature of the XML-style notation.
+In the [JXON](https://htmlpreview.github.io/?https://github.com/mdn/archived-content/blob/main/files/en-us/archive/jxon/raw.HTML) spec, the balanced braces do not give great syntactic hints for where an element starts and ends in large trees and also the Balanced named tags is a critical syntactic feature of the XML-style notation.
 
 ## VJS
 
