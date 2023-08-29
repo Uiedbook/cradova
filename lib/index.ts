@@ -12,7 +12,7 @@
 =============================================================================
   
   Cradova FrameWork
-  @version  3.0.0
+  @version  3.1.3
   License: Apache V2
   
   -----------------------------------------------------------------------------
@@ -78,7 +78,6 @@ type TemplateType = <E extends HTMLElement>(
  */
 
 const _: TemplateType = (...element_initials) => {
-  // let's get the props in the string if available
   const {
     0: tag,
     1: id,

@@ -10,7 +10,7 @@ export const isNode = (element: unknown) =>
 
 export class cradovaEvent {
   private listeners: Record<string, Function[]> = {};
-  addEventListener(eventName: string, callback: () => void) {
+  async addEventListener(eventName: string, callback: () => void) {
     if (!this.listeners[eventName]) {
       this.listeners[eventName] = [];
     }
@@ -19,7 +19,7 @@ export class cradovaEvent {
   // removeEventListener(eventName: string, num: number) {
   //   this.listeners[eventName].splice(num, 1);
   // }
-  dispatchEvent(eventName: string, eventArgs?: unknown) {
+  async dispatchEvent(eventName: string, eventArgs?: unknown) {
     const eventListeners = this.listeners[eventName] || [];
     for (; eventListeners.length !== 0; ) {
       eventListeners.shift()?.call(undefined, eventArgs);

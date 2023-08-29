@@ -18,7 +18,7 @@ export const makeElement = <E extends HTMLElement>(
       if (typeof child === "function") {
         child = child();
       }
-
+      // Ref as child
       if (child instanceof Ref) {
         child = child.render();
       }
@@ -48,12 +48,13 @@ export const makeElement = <E extends HTMLElement>(
       }
 
       // throw an error
-      if (typeof child !== "undefined") {
-        console.error(" ✘  Cradova err:   got", { child });
-        throw new Error(
-          "  ✘  Cradova err:  invalid child type: " + "(" + typeof child + ")"
-        );
-      }
+      // ! seems pointless
+      // if (typeof child !== "undefined") {
+      //   console.error(" ✘  Cradova err:   got", { child });
+      //   throw new Error(
+      //     "  ✘  Cradova err:  invalid child type: " + "(" + typeof child + ")"
+      //   );
+      // }
     }
   } else {
     return element;
@@ -69,8 +70,8 @@ export const makeElement = <E extends HTMLElement>(
         continue;
       }
 
+      // signal
       if (Array.isArray(value)) {
-        // signal
         if ((value! as unknown[])[0] instanceof createSignal) {
           (element as unknown as Record<string, unknown>)["updateState"] =
             dispatch.bind(null, element);

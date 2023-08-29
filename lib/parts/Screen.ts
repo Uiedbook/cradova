@@ -125,8 +125,8 @@ export class Screen {
     }
     document.title = this._name;
     localTree.doc.innerHTML = "";
-    localTree.doc.appendChild(this._template as Node);
     CradovaEvent.dispatchEvent("onmountEvent");
+    localTree.doc.appendChild(this._template as Node);
     window.scrollTo({
       top: 0,
       left: 0,
