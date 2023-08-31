@@ -23,7 +23,7 @@ export class Screen {
   /**
    * this is a set of added html to the screen
    */
-  public _secondaryChildren: VJSType<HTMLElement>[] = [];
+  // private _secondaryChildren: VJSType<HTMLElement>[] = [];
   /**
    * error handler for the screen
    */
@@ -93,9 +93,9 @@ export class Screen {
         }
       }
     }
-    if (this._secondaryChildren.length) {
-      this._template.appendChild(frag(this._secondaryChildren));
-    }
+    // if (this._secondaryChildren.length) {
+    //   this._template.appendChild(frag(this._secondaryChildren));
+    // }
   }
   onActivate(cb: () => Promise<void> | void) {
     this._callBack = cb;
@@ -103,9 +103,9 @@ export class Screen {
   onDeactivate(cb: () => Promise<void> | void) {
     this._deCallBack = cb;
   }
-  addChildren(...addOns: VJSType<HTMLElement>[]) {
-    this._secondaryChildren.push(...addOns);
-  }
+  // addChildren(...addOns: VJSType<HTMLElement>[]) {
+  //   this._secondaryChildren.push(...addOns);
+  // }
   async _deActivate() {
     if (this._deCallBack) {
       await this._deCallBack();

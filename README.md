@@ -62,22 +62,19 @@ Cradova has already been utilized in multiple production projects, and we will c
 
 ## Installation
 
+### From npm
+
+```bash
+npm i cradova
+```
+
 ### CDN sources
 
 ```html
 <!-- unpkg -->
-
 <script src="https://unpkg.com/cradova/dist/index.js"></script>
-
 <!--    js deliver -->
-
 <script src="https://cdn.jsdelivr.net/npm/cradova/dist/index.js"></script>
-```
-
-### npm
-
-```bash
-npm i cradova
 ```
 
 ## Examples
@@ -190,8 +187,6 @@ function App() {
   return div(count, counter, dataCounter, HelloMessage, br, nameRef);
 }
 
-// add your app to the DOM
-
 document.body.append(App());
 ```
 
@@ -201,20 +196,26 @@ Let's see a simple TodoList example
 
 ```js
 import _, {
-  button,
-  createSignal,
-  css,
+  // elements
   div,
-  input,
+  button,
   main,
   p,
+  input,
+  // allows you to create powerful data stores
+  createSignal,
+  // dom ref
+  useRef(),
+  // useState
+  // useEffect
+  // dynamic component class
   Ref,
-  reference,
+  css,
 } from "cradova";
 
 function TodoList() {
   // can be used to hold multiple references
-  const referenceSet = new reference();
+  const referenceSet = useRef();
 
   // creating a store
   const todoStore = new createSignal([
@@ -355,21 +356,21 @@ Router.onPageEvent((lastRoute, newRoute) => {
 
 ---
 
-More info on CradovaRouter
+More info on Cradova Router
 
 ---
 
-Every Cradovaapp mounts on a div with attribute data-wrapper="app"
+Every Cradova app mounts on a div with attribute data-wrapper="app"
 
-if it already exist Cradovawill use it instead.
+if it already exist Cradova will use it instead.
 
-Cradovawill create a div with data-wrapper="app" if it doesn't exists already.
+Cradova will create a div with data-wrapper="app" if it doesn't exists already.
 
 so if you want to use your own mount point then create a div with data-wrapper="app".
 
 ---
 
-More info on Cradovascreens
+More info on Cradova screens
 
 ---
 
@@ -391,11 +392,11 @@ circle for each screen in your app
 
 ---
 
-More info on CradovaRef
+More info on Cradova Ref
 
 ---
 
-Refs are dynamic components, they have simple abstractions like:
+Cradova Ref is a dynamic component class, which ships simple abstractions like:
 
 - Effects
 - stash
@@ -407,7 +408,7 @@ circle for refs in your app
 
 ---
 
-More info on CradovacreateSignal
+More info on Cradova createSignal
 
 ---
 
@@ -436,7 +437,7 @@ To get further insights and help on Cradova, visit our [Discord](https://discord
 
 We are currently working to [set](https://github.com/fridaycandour/cradova/blob/main/contributing.md) up the following:
 
-- building CradovaCLI (in progress)
+- building Cradova CLI (in progress)
 - Cradova Documentation Website
 - UI component libraries for cradova
 - Sample projects
