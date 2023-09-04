@@ -168,8 +168,8 @@ export const makeElement = <E extends HTMLElement>(
 };
 
 export const make = function (descriptor: any) {
-  if (!descriptor.length) {
-    return ["DIV"];
+  if (typeof descriptor !== "string") {
+    return [];
   }
   if (Array.isArray(descriptor)) {
     descriptor = descriptor[0];
@@ -222,7 +222,7 @@ export const make = function (descriptor: any) {
     }
     classes.push(descriptor[i]);
   }
-  return [tag || "DIV", IDs[0], classes.join(" "), innerValue];
+  return [tag, IDs[0], classes.join(" "), innerValue];
 };
 
 const cra = <E extends HTMLElement>(tag: string) => {

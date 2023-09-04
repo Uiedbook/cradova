@@ -1,5 +1,5 @@
-import { CradovaScreenType, VJSType } from "../types.js";
-import { CradovaEvent, frag, isNode, reference } from "./fns.js";
+import { CradovaScreenType /*VJSType */ } from "../types.js";
+import { CradovaEvent, /*frag,*/ isNode, reference } from "./fns.js";
 
 export const localTree = new reference();
 
