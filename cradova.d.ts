@@ -137,8 +137,8 @@ declare module "cradova" {
    */
   export class cradovaEvent {
     private listeners;
-    addEventListener(eventName: string, callback: () => void): void;
-    dispatchEvent(eventName: string, eventArgs?: unknown): void;
+    addEventListener(eventName: string, callback: () => void): Promise<void>;
+    dispatchEvent(eventName: string, eventArgs?: unknown): Promise<void>;
   }
   export const CradovaEvent: cradovaEvent;
   export function Rhoda(
@@ -291,7 +291,6 @@ declare module "cradova" {
     /**
      * this is a set of added html to the screen
      */
-    _secondaryChildren: VJSType<HTMLElement>[];
     /**
      * error handler for the screen
      */
@@ -307,6 +306,7 @@ declare module "cradova" {
     private _persist;
     private _delegatedRoutesCount;
     private _transition;
+    private _dropped;
     constructor(cradova_screen_initials: CradovaScreenType);
     get _delegatedRoutes(): boolean;
     set _delegatedRoutes(count: boolean);
@@ -314,8 +314,8 @@ declare module "cradova" {
     _package(): Promise<void>;
     onActivate(cb: () => Promise<void> | void): void;
     onDeactivate(cb: () => Promise<void> | void): void;
-    addChildren(...addOns: VJSType<HTMLElement>[]): void;
     _deActivate(): Promise<void>;
+    drop(state: boolean): boolean | undefined;
     _Activate(force?: boolean): Promise<void>;
   }
 
@@ -514,7 +514,7 @@ declare module "cradova" {
    * @param {string}   path     Route path.
    * @param  screen the cradova document tree for the route.
    */
-  export class RouterClass {
+  export class Router {
     /** cradova router
      * ---
      * Registers a route.
@@ -524,15 +524,23 @@ declare module "cradova" {
      * @param {string}   path     Route path.
      * @param  screen the cradova screen.
      */
-    BrowserRoutes(obj: Record<string, any>): void;
+    static BrowserRoutes(obj: Record<string, any>): void;
     /**
           Go back in Navigation history
           */
-    back(): void;
+    static back(): void;
     /**
           Go forward in Navigation history
           */
-    forward(): void;
+    static forward(): void;
+    /**
+          Pause navigation
+          */
+    static pauseNaviagtion(): void;
+    /**
+         resume navigation
+        */
+    static resumeNaviagtion(): void;
     /**
      * Cradova Router
      * ------
@@ -543,7 +551,7 @@ declare module "cradova" {
      * @param data object
      * @param force boolean
      */
-    navigate(
+    static navigate(
       href: string,
       data?: Record<string, unknown> | null,
       force?: boolean
@@ -557,14 +565,14 @@ declare module "cradova" {
      *
      * @param screen
      */
-    setLoadingScreen(screen: Screen): void;
+    static setLoadingScreen(screen: Screen): void;
     /** cradova router
      * ---
      * Listen for navigation events
      *
      * @param callback   () => void
      */
-    onPageEvent(callback: () => void): void;
+    static onPageEvent(callback: () => void): void;
     /** cradova router
      * ---
      * get a screen ready before time.
@@ -572,7 +580,10 @@ declare module "cradova" {
      * @param {string}   path Route path.
      * @param  data data for the screen.
      */
-    packageScreen(path: string, data?: Record<string, unknown>): Promise<void>;
+    static packageScreen(
+      path: string,
+      data?: Record<string, unknown>
+    ): Promise<void>;
     /**
      * Cradova Router
      * ------
@@ -581,7 +592,7 @@ declare module "cradova" {
      *
      * .
      */
-    getParams(): any;
+    static getParams(): any;
     /**
      * Cradova
      * ---
@@ -590,10 +601,9 @@ declare module "cradova" {
      * @param callback
      * @param path? page path
      */
-    addErrorHandler(callback: (err: unknown) => void): void;
-    _mount(): void;
+    static addErrorHandler(callback: (err: unknown) => void): void;
+    static _mount(): void;
   }
-  export const Router: RouterClass;
 
   /**
    *

@@ -39,6 +39,7 @@ export class Screen {
   private _persist = true;
   private _delegatedRoutesCount = -1;
   private _transition;
+  private _dropped = false;
   constructor(cradova_screen_initials: CradovaScreenType) {
     const { template, name, persist, renderInParallel, transition } =
       cradova_screen_initials;
@@ -114,7 +115,18 @@ export class Screen {
     //   this._template.classList.remove(this._transition);
     // }
   }
+  drop(state?: boolean) {
+    if (typeof state === "boolean") {
+      this._dropped = state;
+      return undefined;
+    } else return this._dropped;
+  }
   async _Activate(force: boolean = false) {
+    // check if the screen is dropped
+    if (this._dropped) {
+      history.go(-1);
+      return;
+    }
     // packaging the screen dom
     if (!this._persist || force || !this._packed) {
       await this._package();

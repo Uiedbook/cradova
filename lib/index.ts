@@ -103,11 +103,10 @@ const _: TemplateType = (...element_initials) => {
   return makeElement(element, element_initials);
 };
 
-export * from "./parts/elements";
-export * from "./parts/fns";
+export { Screen } from "./parts/Screen";
 export { createSignal } from "./parts/createSignal";
 export { Router } from "./parts/Router";
-export { Screen } from "./parts/Screen";
+export * from "./parts/elements";
+export * from "./parts/fns";
 export { Ajax } from "./parts/ajax";
-
 export default _;

@@ -21,6 +21,8 @@ RouterBox["loadingScreen"] = null;
 RouterBox["params"] = {};
 RouterBox["routes"] = {};
 RouterBox["pageevents"] = [];
+// tarcking paused state of navigation
+RouterBox["paused"] = false;
 
 RouterBox["start_pageevents"] = async function (url: string) {
   setTimeout(() => {
@@ -76,7 +78,7 @@ const checker = (url: string) => {
           // fixturesY += 1;
           continue;
         }
-        // if this is part of the path then let increment a value for it
+        // if it is part of the path then let increment a value for it
         // we will need it later
         if (
           urlFixtures[i] === pathFixtures[i]
@@ -124,17 +126,22 @@ RouterBox.route = (path: string, screen: _cradovaScreen) => {
  * the click happens on a link that is supposed to be handled
  * by the router, it loads and displays the target page.
  * * Responds to popstate and load events and does it's job
- * @param {Event} e Click event | popstate event | load event.
+ * @param {Event} _e  popstate event | load event.
  */
 
 RouterBox.router = async function (
-  _e: { target: { tagName: string; href: string }; preventDefault: () => void },
+  _e: { preventDefault: () => void },
   _force: boolean
 ) {
-  let url, route: RouterRouteObject | undefined, params;
-  if (!url) {
-    url = window.location.pathname;
+  let url = window.location.pathname,
+    route: RouterRouteObject | undefined,
+    params;
+  // ? abort navigation when router is paused
+  if (RouterBox["paused"]) {
+    window.location.hash = "paused";
+    return;
   }
+  //? abort unneeded navigation
   if (url === RouterBox["lastNavigatedRoute"]) {
     return;
   }
@@ -213,7 +220,7 @@ RouterBox.router = async function (
  * @param  screen the cradova document tree for the route.
  */
 
-class RouterClass {
+export class Router {
   /** cradova router
    * ---
    * Registers a route.
@@ -223,7 +230,8 @@ class RouterClass {
    * @param {string}   path     Route path.
    * @param  screen the cradova screen.
    */
-  BrowserRoutes(obj: Record<string, any>) {
+
+  static BrowserRoutes(obj: Record<string, any>) {
     for (const path in obj) {
       let screen = obj[path];
       if (
@@ -242,19 +250,34 @@ class RouterClass {
         RouterBox.route(path, screen);
       }
     }
-    this._mount();
+    Router._mount();
   }
   /** 
     Go back in Navigation history
     */
-  back() {
+  static back() {
     history.go(-1);
   }
   /** 
     Go forward in Navigation history
     */
-  forward() {
+  static forward() {
     history.go(1);
+  }
+  /** 
+    Pause navigation
+    */
+  static pauseNaviagtion() {
+    RouterBox["paused"] = true;
+    window.location.hash = "paused";
+  }
+  /** 
+   resume navigation
+  */
+  static resumeNaviagtion() {
+    RouterBox["paused"] = false;
+    window.location.replace(window.location.pathname + window.location.search);
+    history.go(-1);
   }
   /**
    * Cradova Router
@@ -266,7 +289,7 @@ class RouterClass {
    * @param data object
    * @param force boolean
    */
-  navigate(
+  static navigate(
     href: string,
     data: Record<string, unknown> | null = null,
     force = false
@@ -306,7 +329,7 @@ class RouterClass {
    *
    * @param screen
    */
-  setLoadingScreen(screen: _cradovaScreen) {
+  static setLoadingScreen(screen: _cradovaScreen) {
     if (screen instanceof _cradovaScreen) {
       RouterBox["LoadingScreen"] = screen;
     } else {
@@ -322,7 +345,7 @@ class RouterClass {
    *
    * @param callback   () => void
    */
-  onPageEvent(callback: () => void) {
+  static onPageEvent(callback: () => void) {
     if (typeof callback === "function") {
       RouterBox["pageevents"].push(callback);
     } else {
@@ -339,7 +362,7 @@ class RouterClass {
    * @param {string}   path Route path.
    * @param  data data for the screen.
    */
-  async packageScreen(path: string, data: Record<string, unknown> = {}) {
+  static async packageScreen(path: string, data: Record<string, unknown> = {}) {
     if (!RouterBox.routes[path]) {
       console.error(" ✘  Cradova err:  no screen with path " + path);
       throw new Error(
@@ -373,7 +396,7 @@ class RouterClass {
    * .
    */
 
-  getParams() {
+  static getParams() {
     return RouterBox["params"];
   }
 
@@ -386,7 +409,7 @@ class RouterClass {
    * @param path? page path
    */
 
-  addErrorHandler(callback: (err: unknown) => void) {
+  static addErrorHandler(callback: (err: unknown) => void) {
     if (typeof callback === "function") {
       RouterBox["errorHandler"] = callback;
     } else {
@@ -396,7 +419,7 @@ class RouterClass {
     }
   }
 
-  _mount() {
+  static _mount() {
     // creating mount point
     let doc = document.querySelector("[data-wrapper=app]");
     if (!doc) {
@@ -415,4 +438,4 @@ class RouterClass {
   }
 }
 
-export const Router = new RouterClass();
+// export const Router = new RouterClass();
