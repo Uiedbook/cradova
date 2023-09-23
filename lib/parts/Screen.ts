@@ -145,7 +145,6 @@ export class Screen {
       // @ts-ignore
       behavior: "instant",
     });
-
     if (this._callBack) {
       await this._callBack();
     }

@@ -319,6 +319,24 @@ export class Router {
       RouterBox.router(null, force);
     }
   }
+  /**
+   * Cradova Router
+   * ------
+   *
+   * Navigates to a designated screen in your app by loading a seperate page;
+   *
+   * @param pathname string
+   */
+  static navigateNauturally(pathname: string) {
+    if (typeof pathname !== "string") {
+      throw new TypeError(
+        " ✘  Cradova err:  pathname must be a defined path but got " +
+          pathname +
+          " instead"
+      );
+    }
+    window.location.pathname = pathname;
+  }
 
   /**
    * Cradova

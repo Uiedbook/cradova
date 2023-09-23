@@ -557,6 +557,15 @@ declare module "cradova" {
       force?: boolean
     ): void;
     /**
+     * Cradova Router
+     * ------
+     *
+     * Navigates to a designated screen in your app by loading a seperate page;
+     *
+     * @param pathname string
+     */
+    static navigateNauturally(pathname: string): void;
+    /**
      * Cradova
      * ---
      * Loading screen for your app
