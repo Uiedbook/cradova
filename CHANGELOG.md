@@ -175,3 +175,9 @@ and we went along with it.
 - fixes and more speed gain for your apps when you update cradova.
 - added a solution for setting a loading screen
 - production tests for parallel rendering completed
+
+# v3.1.1
+
+- Added useState, useEffect and useRef hooks
+- did some more optimisation
+- other changes

@@ -133,6 +133,15 @@ export function loop<Type>(
     : undefined;
 }
 
+/**  Calculate a simple numerical representation of the URL */
+function SNRU(url: string) {
+  let key = 0;
+  for (let i = 0; i < url.length; i++) {
+    key += url.charCodeAt(i);
+  }
+  return key.toString();
+}
+
 /**
  * Cradova Ref
  * -------
@@ -147,6 +156,7 @@ export class Ref<D> {
   private published = false;
   private preRendered: HTMLElement | null = null;
   private reference: reference = new reference();
+  private current_id?: string;
   Signal: createSignal<any> | undefined;
   // hooks management
   _state: D[] = [];
@@ -154,29 +164,18 @@ export class Ref<D> {
   _state_index = 0;
   // public testName = null;
   public stash: D | undefined;
-
   constructor(
     component: (this: Ref<D>, data: D) => HTMLElement | DocumentFragment
   ) {
     this.component = component.bind(this);
   }
 
-  preRender(data?: D) {
+  preRender(data?: D, stash?: boolean) {
     // parking
-    let html = this.component(data as D);
-    if (typeof html === "function") {
-      html = (html as Function)();
-    }
-    if (isNode(html)) {
-      this.preRendered = html as HTMLElement;
-    }
-    if (!this.preRendered) {
-      throw new Error(
-        " ✘  Cradova err :  Invalid component type for cradova Ref got  -  " +
-          this.preRendered
-      );
-    }
-    this.reference._appendDomForce("html", this.preRendered);
+    this.reference._appendDomForce(
+      this.current_id!,
+      this.render(data, stash) as HTMLElement
+    );
   }
   destroyPreRendered() {
     this.preRendered = null;
@@ -190,6 +189,7 @@ export class Ref<D> {
    * @returns () => HTMLElement
    */
   render(data?: D, stash?: boolean) {
+    this.current_id = SNRU(location.href);
     this.effects = [];
     this.rendered = false;
     let html = this.component(data as D);
@@ -204,7 +204,10 @@ export class Ref<D> {
       this.stash = data;
     }
     if (isNode(html)) {
-      this.reference._appendDomForce("html", html as unknown as HTMLElement);
+      this.reference._appendDomForce(
+        this.current_id,
+        html as unknown as HTMLElement
+      );
       this.effector.apply(this);
       this.rendered = true;
       this.published = true;
@@ -254,6 +257,7 @@ export class Ref<D> {
    */
 
   updateState(data?: D, stash?: boolean) {
+    this.current_id = SNRU(location.href);
     if (!this.rendered) {
       this.effectuate = () => {
         if (this.published) {
@@ -284,7 +288,10 @@ export class Ref<D> {
       this.reference.html.insertAdjacentElement("beforebegin", html);
       this.reference.html.remove();
       this.published = true;
-      this.reference._appendDomForce("html", html as unknown as HTMLElement);
+      this.reference._appendDomForce(
+        this.current_id!,
+        html as unknown as HTMLElement
+      );
       CradovaEvent.dispatchEvent("onmountEvent");
     } else {
       console.error(" ✘  Cradova err :  Invalid html content, got  - " + html);
@@ -353,12 +360,28 @@ export class lazy<Type> {
 
 export class reference {
   [x: string]: Record<string, any>;
+
+  /**
+   * Bind a DOM element to a reference name.
+   * @param name - The name to reference the DOM element by.
+   */
   bindAs(name: string) {
     return [this, name] as unknown as reference;
   }
-  dom<ElementType>(name: string) {
+
+  /**
+   * Retrieve a referenced DOM element.
+   * @param name - The name of the referenced DOM element.
+   */
+  dom<ElementType extends HTMLElement>(name: string) {
     return this[name] as ElementType | undefined;
   }
+
+  /**
+   * Append a DOM element to the reference, overwriting any existing reference.
+   * @param name - The name to reference the DOM element by.
+   * @param element - The DOM element to reference.
+   */
   _appendDomForce(name: string, Element: HTMLElement) {
     this[name] = Element;
   }
