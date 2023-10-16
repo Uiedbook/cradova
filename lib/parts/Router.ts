@@ -1,4 +1,4 @@
-import _, { Screen as _cradovaScreen } from "../index.js";
+import _, { CradovaEvent, Screen as _cradovaScreen } from "../index.js";
 import { RouterRouteObject } from "../types.js";
 import { localTree } from "./Screen.js";
 
@@ -25,6 +25,8 @@ RouterBox["pageevents"] = [];
 RouterBox["paused"] = false;
 
 RouterBox["start_pageevents"] = async function (url: string) {
+  //? dispatch Ref id change response event
+  CradovaEvent.dispatchEvent("onTransition");
   setTimeout(() => {
     for (let ci = 0; ci < RouterBox["pageevents"].length; ci++) {
       RouterBox["pageevents"][ci](url);

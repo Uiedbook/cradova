@@ -182,7 +182,8 @@ and we went along with it.
 - did some more optimisation
 - other changes
 
-# v3.1.2
+# v3.1.4
 
-- fixed bug parallel rendering
+- fixed bug parallel rendering in ref by managing screen id events
+  making them more powerfull by also now reactiving to screen changes
 - other optimisations in prerendering

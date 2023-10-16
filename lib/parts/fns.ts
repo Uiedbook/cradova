@@ -8,7 +8,7 @@ export const isNode = (element: unknown) =>
  * Cradova event
  */
 
-export class cradovaEvent {
+class cradovaEvent {
   private listeners: Record<string, Function[]> = {};
   async addEventListener(eventName: string, callback: () => void) {
     if (!this.listeners[eventName]) {
@@ -158,16 +158,24 @@ export class Ref<D> {
   private reference: reference = new reference();
   private current_id?: string;
   Signal: createSignal<any> | undefined;
-  // hooks management
+  //? hooks management
   _state: D[] = [];
   _state_track: { [x: number]: boolean } = {};
   _state_index = 0;
-  // public testName = null;
+  //? public testName = null;
   public stash: D | undefined;
   constructor(
     component: (this: Ref<D>, data: D) => HTMLElement | DocumentFragment
   ) {
     this.component = component.bind(this);
+    const Recusr = () => {
+      CradovaEvent.addEventListener("onTransition", () => {
+        this.current_id = SNRU(location.href);
+        Recusr();
+      });
+    };
+    //? kick of screen id ref logic
+    Recusr();
   }
 
   preRender(data?: D, stash?: boolean) {
@@ -189,7 +197,6 @@ export class Ref<D> {
    * @returns () => HTMLElement
    */
   render(data?: D, stash?: boolean) {
-    this.current_id = SNRU(location.href);
     this.effects = [];
     this.rendered = false;
     let html = this.component(data as D);
@@ -205,7 +212,7 @@ export class Ref<D> {
     }
     if (isNode(html)) {
       this.reference._appendDomForce(
-        this.current_id,
+        this.current_id!,
         html as unknown as HTMLElement
       );
       this.effector.apply(this);
