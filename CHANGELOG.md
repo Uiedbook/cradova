@@ -181,3 +181,8 @@ and we went along with it.
 - Added useState, useEffect and useRef hooks
 - did some more optimisation
 - other changes
+
+# v3.1.2
+
+- fixed bug parallel rendering
+- other optimisations in prerendering
