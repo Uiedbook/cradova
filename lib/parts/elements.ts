@@ -302,3 +302,11 @@ export const track = cra<HTMLTrackElement>("track");
 export const u = cra<HTMLUListElement>("u");
 export const ul = cra<HTMLUListElement>("ul");
 export const video = cra<HTMLVideoElement>("video");
+export const ___svg = (
+  svg: string,
+  properties?: VJS_props_TYPE
+): HTMLSpanElement => {
+  const span = document.createElement("span");
+  span.innerHTML = svg;
+  return makeElement<HTMLSpanElement>(span, [properties]);
+};

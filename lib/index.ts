@@ -34,7 +34,7 @@
   -----------------------------------------------------------------------------
 */
 
-import { make, makeElement } from "./parts/elements";
+import { ___svg, make, makeElement } from "./parts/elements";
 import { VJS_params_TYPE } from "./types";
 
 ("use strict");
@@ -102,6 +102,8 @@ const _: TemplateType = (...element_initials) => {
   }
   return makeElement(element, element_initials);
 };
+
+(_ as unknown as { __proto__: { svg: Function } }).__proto__.svg = ___svg;
 
 export { Screen } from "./parts/Screen";
 export { createSignal } from "./parts/createSignal";

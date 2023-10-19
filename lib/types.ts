@@ -72,9 +72,9 @@ export type VJS_Child_TYPE<T> = undefined | string | T | (() => T);
 export type VJS_props_TYPE = {
   style?: CSS.Properties;
   onmount?: () => void;
-  text?: string;
   reference?: reference;
-} & { [x: string]: unknown };
+};
+// } & { [x: string]: unknown };
 
 export type stateType =
   | string
