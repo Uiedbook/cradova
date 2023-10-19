@@ -302,7 +302,7 @@ export const track = cra<HTMLTrackElement>("track");
 export const u = cra<HTMLUListElement>("u");
 export const ul = cra<HTMLUListElement>("ul");
 export const video = cra<HTMLVideoElement>("video");
-export const ___svg = (
+export const svg = (
   svg: string,
   properties?: VJS_props_TYPE
 ): HTMLSpanElement => {

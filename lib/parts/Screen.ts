@@ -21,10 +21,6 @@ export class Screen {
     | HTMLElement
     | DocumentFragment;
   /**
-   * this is a set of added html to the screen
-   */
-  // private _secondaryChildren: VJSType<HTMLElement>[] = [];
-  /**
    * error handler for the screen
    */
   public _errorHandler: ((err: unknown) => void) | null = null;
@@ -94,9 +90,6 @@ export class Screen {
         }
       }
     }
-    // if (this._secondaryChildren.length) {
-    //   this._template.appendChild(frag(this._secondaryChildren));
-    // }
   }
   onActivate(cb: () => Promise<void> | void) {
     this._callBack = cb;
@@ -104,16 +97,13 @@ export class Screen {
   onDeactivate(cb: () => Promise<void> | void) {
     this._deCallBack = cb;
   }
-  // addChildren(...addOns: VJSType<HTMLElement>[]) {
-  //   this._secondaryChildren.push(...addOns);
-  // }
   async _deActivate() {
     if (this._deCallBack) {
       await this._deCallBack();
     }
-    // if (this._transition) {
-    //   this._template.classList.remove(this._transition);
-    // }
+    if (this._transition) {
+      this._template.classList.remove(this._transition);
+    }
   }
   drop(state?: boolean) {
     if (typeof state === "boolean") {

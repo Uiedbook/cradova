@@ -1,6 +1,6 @@
 import * as CSS from "csstype";
 import { Screen } from "./parts/Screen";
-import { reference } from "./parts/fns";
+import { Ref, reference } from "./parts/fns";
 type DataAttributes = { [key: `data-${string}`]: string };
 type AriaAttributes = { [key: `aria-${string}`]: string };
 
@@ -11,6 +11,8 @@ export type VJSType<T> = (
     | string
     | HTMLElement
     | HTMLElement[]
+    | Ref<unknown>
+    | Ref<unknown>[]
     | DocumentFragment
     | DocumentFragment[]
     | TemplateStringsArray
@@ -35,6 +37,8 @@ export type VJS_params_TYPE<T> =
     | string
     | HTMLElement
     | HTMLElement[]
+    | Ref<unknown>
+    | Ref<unknown>[]
     | DocumentFragment
     | DocumentFragment[]
     | TemplateStringsArray

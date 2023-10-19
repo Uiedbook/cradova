@@ -1,5 +1,6 @@
 import { VJSType, VJS_Child_TYPE } from "../types";
 import { createSignal } from "./createSignal";
+// import { createSignal } from "./createSignal";
 
 export const isNode = (element: unknown) =>
   element instanceof HTMLElement || element instanceof DocumentFragment;
@@ -168,18 +169,14 @@ export class Ref<D> {
     component: (this: Ref<D>, data: D) => HTMLElement | DocumentFragment
   ) {
     this.component = component.bind(this);
-    const Recusr = () => {
-      CradovaEvent.addEventListener("onTransition", () => {
-        this.current_id = SNRU(location.href);
-        Recusr();
-      });
-    };
-    //? kick of screen id ref logic
-    Recusr();
+    CradovaEvent.addEventListener("onTransition", () => {
+      //? kick of screen id ref logic
+      this.current_id = SNRU(location.href);
+    });
   }
 
   preRender(data?: D, stash?: boolean) {
-    // parking
+    // ? parking
     this.reference._appendDomForce(
       this.current_id!,
       this.render(data, stash) as HTMLElement
