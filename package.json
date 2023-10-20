@@ -14,6 +14,7 @@
   },
   "scripts": {
     "build": "tsup lib/index.ts",
+    "pub": "tsup lib/index.ts && npm publish",
     "lint": "eslint . --fix"
   },
   "keywords": [
