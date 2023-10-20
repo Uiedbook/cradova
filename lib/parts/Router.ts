@@ -25,8 +25,6 @@ RouterBox["pageevents"] = [];
 RouterBox["paused"] = false;
 
 RouterBox["start_pageevents"] = async function (url: string) {
-  //? dispatch Ref id change response event
-  !CradovaEvent.dispatchEvent("onTransition");
   setTimeout(() => {
     for (let ci = 0; ci < RouterBox["pageevents"].length; ci++) {
       RouterBox["pageevents"][ci](url);
@@ -181,6 +179,8 @@ RouterBox.router = async function (
           template: route!._html,
         });
         RouterBox.routes[url] = route;
+        //? dispatch Ref id change response event
+        CradovaEvent.dispatchEvent("onTransition");
       }
       if (params) {
         RouterBox.params.params = params;

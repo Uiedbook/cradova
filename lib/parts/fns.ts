@@ -208,6 +208,7 @@ export class Ref<D> {
       this.stash = data;
     }
     if (isNode(html)) {
+      this.current_id = SNRU(location.href);
       this.reference._appendDomForce(
         this.current_id!,
         html as unknown as HTMLElement
@@ -221,6 +222,7 @@ export class Ref<D> {
     return html as HTMLElement | DocumentFragment;
   }
   instance() {
+    this.current_id = SNRU(location.href);
     return this.reference[this.current_id!];
   }
   _setExtra(Extra: createSignal<any>) {
@@ -261,10 +263,10 @@ export class Ref<D> {
    */
 
   updateState(data?: D, stash?: boolean) {
-    this.current_id = SNRU(location.href);
     if (!this.rendered) {
       this.effectuate = () => {
         if (this.published) {
+          this.current_id = SNRU(location.href);
           this.Activate(data);
         }
       };
