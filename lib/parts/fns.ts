@@ -221,7 +221,7 @@ export class Ref<D> {
     return html as HTMLElement | DocumentFragment;
   }
   instance() {
-    return this.reference.html;
+    return this.reference[this.current_id!];
   }
   _setExtra(Extra: createSignal<any>) {
     this.Signal = Extra;
@@ -289,8 +289,11 @@ export class Ref<D> {
       html = (html as Function)();
     }
     if (isNode(html)) {
-      this.reference.html.insertAdjacentElement("beforebegin", html);
-      this.reference.html.remove();
+      this.reference[this.current_id!].insertAdjacentElement(
+        "beforebegin",
+        html
+      );
+      this.reference[this.current_id!].remove();
       this.published = true;
       this.reference._appendDomForce(
         this.current_id!,
