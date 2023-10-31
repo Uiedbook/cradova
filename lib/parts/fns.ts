@@ -1,6 +1,5 @@
 import { VJSType, VJS_Child_TYPE } from "../types";
 import { createSignal } from "./createSignal";
-// import { createSignal } from "./createSignal";
 
 export const isNode = (element: unknown) =>
   element instanceof HTMLElement || element instanceof DocumentFragment;
@@ -135,8 +134,9 @@ export function loop<Type>(
 }
 
 /**  Calculate a simple numerical representation of the URL */
-function SNRU(url: string) {
+function SNRU() {
   let key = 0;
+  const url = window.location.href;
   for (let i = 0; i < url.length; i++) {
     key += url.charCodeAt(i);
   }
@@ -157,7 +157,6 @@ export class Ref<D> {
   private published = false;
   private preRendered: HTMLElement | null = null;
   private reference: reference = new reference();
-  private current_id?: string;
   Signal: createSignal<any> | undefined;
   //? hooks management
   _state: D[] = [];
@@ -169,16 +168,12 @@ export class Ref<D> {
     component: (this: Ref<D>, data: D) => HTMLElement | DocumentFragment
   ) {
     this.component = component.bind(this);
-    CradovaEvent.addEventListener("onTransition", () => {
-      //? kick of screen id ref logic
-      this.current_id = SNRU(location.href);
-    });
   }
 
   preRender(data?: D, stash?: boolean) {
     // ? parking
     this.reference._appendDomForce(
-      this.current_id!,
+      "html",
       this.render(data, stash) as HTMLElement
     );
   }
@@ -208,11 +203,7 @@ export class Ref<D> {
       this.stash = data;
     }
     if (isNode(html)) {
-      this.current_id = SNRU(location.href);
-      this.reference._appendDomForce(
-        this.current_id!,
-        html as unknown as HTMLElement
-      );
+      this.reference._appendDomForce("html", html as unknown as HTMLElement);
       this.effector.apply(this);
       this.rendered = true;
       this.published = true;
@@ -222,8 +213,7 @@ export class Ref<D> {
     return html as HTMLElement | DocumentFragment;
   }
   instance() {
-    this.current_id = SNRU(location.href);
-    return this.reference[this.current_id!];
+    return this.reference.current("html");
   }
   _setExtra(Extra: createSignal<any>) {
     this.Signal = Extra;
@@ -266,7 +256,6 @@ export class Ref<D> {
     if (!this.rendered) {
       this.effectuate = () => {
         if (this.published) {
-          this.current_id = SNRU(location.href);
           this.Activate(data);
         }
       };
@@ -291,16 +280,13 @@ export class Ref<D> {
       html = (html as Function)();
     }
     if (isNode(html)) {
-      this.reference[this.current_id!].insertAdjacentElement(
-        "beforebegin",
-        html
-      );
-      this.reference[this.current_id!].remove();
+      const node = this.reference.current("html");
+      if (node) {
+        node.insertAdjacentElement("beforebegin", html as Element);
+        node.remove();
+      }
       this.published = true;
-      this.reference._appendDomForce(
-        this.current_id!,
-        html as unknown as HTMLElement
-      );
+      this.reference._appendDomForce("html", html as unknown as HTMLElement);
       CradovaEvent.dispatchEvent("onmountEvent");
     } else {
       console.error(" ✘  Cradova err :  Invalid html content, got  - " + html);
@@ -368,8 +354,8 @@ export class lazy<Type> {
  */
 
 export class reference {
-  [x: string]: Record<string, any>;
-
+  tree: Record<string, any> = {};
+  globalTree: Record<string, HTMLElement> = {};
   /**
    * Bind a DOM element to a reference name.
    * @param name - The name to reference the DOM element by.
@@ -382,8 +368,11 @@ export class reference {
    * Retrieve a referenced DOM element.
    * @param name - The name of the referenced DOM element.
    */
-  dom<ElementType extends HTMLElement>(name: string) {
-    return this[name] as ElementType | undefined;
+  current<ElementType extends HTMLElement = HTMLElement>(name: string) {
+    if (this.tree[SNRU()]) {
+      return this.tree[SNRU()][name] as ElementType;
+    }
+    return null as unknown as ElementType;
   }
 
   /**
@@ -392,7 +381,16 @@ export class reference {
    * @param element - The DOM element to reference.
    */
   _appendDomForce(name: string, Element: HTMLElement) {
-    this[name] = Element;
+    const node = SNRU();
+    if (this.tree[node]) {
+      this.tree[node][name] = Element;
+    } else {
+      this.tree[node] = {};
+      this.tree[node][name] = Element;
+    }
+  }
+  _appendDomForceGlobal(name: string, Element: HTMLElement) {
+    this.globalTree[name] = Element;
   }
 }
 

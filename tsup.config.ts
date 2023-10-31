@@ -6,7 +6,7 @@ const config: Options = {
   dts: true,
   clean: true,
   format: ["esm"],
-  // minify: true,
+  minify: true,
   treeshake: "safest",
   async onSuccess() {
     readFile("./dist/index.js", "utf-8", (e, d) => {
@@ -25,8 +25,12 @@ const config: Options = {
     //   console.log("done");
     // }, 10_000);
   },
-  // target: "ES2015",
+  // target: "esnext",
+  // target: "es2015",
   bundle: true,
+  esbuildOptions(options) {
+    options.legalComments = "none";
+  },
 };
 
 const details = `

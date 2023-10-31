@@ -90,8 +90,9 @@ export type stateType =
       tree?: HTMLElement | (() => HTMLElement);
     });
 
-export type RouterRouteObject = {
-  _name: string;
+export interface RouterRouteObject {
+  // _name?: string;
+  // _transition: string | undefined;
   _html:
     | ((this: Screen, data?: unknown) => HTMLElement | DocumentFragment)
     | HTMLElement
@@ -101,7 +102,19 @@ export type RouterRouteObject = {
   _deActivate: (params: object) => void;
   _package: (params: unknown) => void;
   _errorHandler: ((err: unknown) => void) | null;
-};
+  _derive(): {
+    _name: string;
+    _transition: string | undefined;
+    _callBack: (() => void | Promise<void>) | undefined;
+    _deCallBack: (() => void | Promise<void>) | undefined;
+  };
+  _apply_derivation(data: {
+    _name: string;
+    _transition: string | undefined;
+    _callBack: (() => void | Promise<void>) | undefined;
+    _deCallBack: (() => void | Promise<void>) | undefined;
+  }): unknown;
+}
 
 export type CradovaScreenType<T = unknown> = {
   /**
@@ -110,7 +123,7 @@ export type CradovaScreenType<T = unknown> = {
    * title of the page
    * .
    */
-  name: string;
+  name?: string;
   /**
    * Cradova screen
    * ---
@@ -156,5 +169,4 @@ export type CradovaScreenType<T = unknown> = {
    * Should the loading screen be show as this screen is loading?
    * .
    */
-  // suspend?: boolean;
 };

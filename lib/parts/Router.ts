@@ -171,13 +171,14 @@ RouterBox.router = async function (
           return;
         }
       }
-      // delegation causing parallel rendering sequence
+      //? delegation causing parallel rendering sequence
       if (route!._delegatedRoutes !== -1) {
         route!._delegatedRoutes = true;
+        const a = route._derive();
         route = new _cradovaScreen({
-          name: route!._name,
           template: route!._html,
         });
+        route._apply_derivation(a);
         RouterBox.routes[url] = route;
         //? dispatch Ref id change response event
         CradovaEvent.dispatchEvent("onTransition");
@@ -207,8 +208,8 @@ RouterBox.router = async function (
     }
   } else {
     // or 404
-    if (RouterBox.routes["/*"]) {
-      await RouterBox.routes["/*"]!._Activate(_force);
+    if (RouterBox.routes["*"]) {
+      await RouterBox.routes["*"]!._Activate(_force);
     }
   }
 };
@@ -445,9 +446,9 @@ export class Router {
       doc = document.createElement("div");
       doc.setAttribute("data-wrapper", "app");
       document.body.appendChild(doc);
-      localTree._appendDomForce("doc", doc as HTMLElement);
+      localTree._appendDomForceGlobal("doc", doc as HTMLElement);
     } else {
-      localTree._appendDomForce("doc", doc as HTMLElement);
+      localTree._appendDomForceGlobal("doc", doc as HTMLElement);
     }
     window.addEventListener("pageshow", RouterBox.router);
     window.addEventListener("popstate", (_e) => {

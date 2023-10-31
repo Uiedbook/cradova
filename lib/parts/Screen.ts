@@ -27,20 +27,20 @@ export class Screen {
   /**
    * used internally
    */
-  _name: string;
+  private _name: string;
+  private _transition;
   private _packed = false;
   private _template = document.createElement("div");
   private _callBack: (() => Promise<void> | void) | undefined;
   private _deCallBack: (() => Promise<void> | void) | undefined;
   private _persist = true;
   private _delegatedRoutesCount = -1;
-  private _transition;
   private _dropped = false;
   constructor(cradova_screen_initials: CradovaScreenType) {
     const { template, name, persist, renderInParallel, transition } =
       cradova_screen_initials;
     this._html = template;
-    this._name = name;
+    this._name = name || "Document";
     this._transition = transition;
     this._template.setAttribute("id", "cradova-screen-set");
     if (renderInParallel === true) {
@@ -51,6 +51,26 @@ export class Screen {
         this._persist = persist!;
       }
     }
+  }
+
+  _derive() {
+    return {
+      _name: this._name,
+      _transition: this._transition,
+      _callBack: this._callBack,
+      _deCallBack: this._deCallBack,
+    };
+  }
+  _apply_derivation(derivation: {
+    _name: string;
+    _transition: string | undefined;
+    _callBack: (() => void | Promise<void>) | undefined;
+    _deCallBack: (() => void | Promise<void>) | undefined;
+  }) {
+    this._name = derivation._name;
+    this._transition = derivation._transition;
+    this._callBack = derivation._callBack;
+    this._deCallBack = derivation._deCallBack;
   }
 
   get _delegatedRoutes(): boolean {
@@ -126,8 +146,8 @@ export class Screen {
       this._template.classList.add(this._transition);
     }
     document.title = this._name;
-    localTree.doc.innerHTML = "";
-    localTree.doc.appendChild(this._template as Node);
+    localTree.globalTree.doc.innerHTML = "";
+    localTree.globalTree.doc.appendChild(this._template as Node);
     CradovaEvent.dispatchEvent("onmountEvent");
     window.scrollTo({
       top: 0,
@@ -136,7 +156,7 @@ export class Screen {
       behavior: "instant",
     });
     if (this._callBack) {
-      await this._callBack();
+      this._callBack();
     }
   }
 }
