@@ -1,5 +1,11 @@
-import { VJSType, VJS_Child_TYPE } from "../types";
-import { createSignal } from "./createSignal";
+/*
+Cradova 
+License: Apache V2
+Copyright 2022 Friday Candour.  
+*/
+
+import { VJSType, VJS_Child_TYPE } from "./types";
+import { createSignal } from "./Signal";
 
 export const isNode = (element: unknown) =>
   element instanceof HTMLElement || element instanceof DocumentFragment;
@@ -10,11 +16,18 @@ export const isNode = (element: unknown) =>
 
 class cradovaEvent {
   private listeners: Record<string, Function[]> = {};
+  private active_listeners: Record<string, Function[]> = {};
   async addEventListener(eventName: string, callback: () => void) {
     if (!this.listeners[eventName]) {
       this.listeners[eventName] = [];
     }
     this.listeners[eventName].push(callback);
+  }
+  async addActiveEventListener(eventName: string, callback: () => void) {
+    if (!this.listeners[eventName]) {
+      this.listeners[eventName] = [];
+    }
+    this.active_listeners[eventName].push(callback);
   }
   // removeEventListener(eventName: string, num: number) {
   //   this.listeners[eventName].splice(num, 1);
@@ -22,7 +35,15 @@ class cradovaEvent {
   async dispatchEvent(eventName: string, eventArgs?: unknown) {
     const eventListeners = this.listeners[eventName] || [];
     for (; eventListeners.length !== 0; ) {
-      eventListeners.shift()?.call(undefined, eventArgs);
+      eventListeners.shift()!(eventArgs);
+    }
+  }
+  async dispatchActiveEvent(eventName: string, eventArgs?: unknown) {
+    const eventListeners = this.listeners[eventName] || [];
+    // ? change snru value
+    eventListeners.length && memo_SNRU();
+    for (let i = 0; i < eventListeners.length; i++) {
+      eventListeners[i](eventArgs);
     }
   }
 }
@@ -92,7 +113,7 @@ export function css(identifier: string | TemplateStringsArray) {
  * @param {function} elements[]
  */
 
-export function assert<Type>(
+export function $if<Type>(
   condition: boolean,
   ...elements: VJS_Child_TYPE<Type | HTMLElement>[]
 ) {
@@ -102,7 +123,7 @@ export function assert<Type>(
   return undefined;
 }
 
-export function assertOr<Type>(
+export function $ifelse<Type>(
   condition: boolean,
   ifTrue: VJS_Child_TYPE<Type | HTMLElement>,
   ifFalse: VJS_Child_TYPE<Type | HTMLElement>
@@ -111,6 +132,33 @@ export function assertOr<Type>(
     return ifTrue;
   }
   return ifFalse;
+}
+
+export function $case<Type>(
+  value: any,
+  ...elements: VJS_Child_TYPE<Type | HTMLElement>[]
+) {
+  return (key: any) => {
+    if (key === value) {
+      return elements as HTMLElement[];
+    }
+    return undefined;
+  };
+}
+export function $switch(
+  key: unknown,
+  ...cases: ((key: any) => HTMLElement[] | undefined)[]
+) {
+  if (cases.length) {
+    for (let i = 0; i < cases.length; i++) {
+      const case_N = cases[i];
+      const elements = case_N(key);
+      if (elements) {
+        return elements;
+      }
+    }
+  }
+  return undefined;
 }
 
 type LoopData<Type> = Type[];
@@ -134,13 +182,14 @@ export function loop<Type>(
 }
 
 /**  Calculate a simple numerical representation of the URL */
-function SNRU() {
+let SNRU: string;
+export function memo_SNRU() {
   let key = 0;
   const url = window.location.href;
   for (let i = 0; i < url.length; i++) {
     key += url.charCodeAt(i);
   }
-  return key.toString();
+  SNRU = key.toString();
 }
 
 /**
@@ -165,9 +214,16 @@ export class Ref<D> {
   //? public testName = null;
   public stash: D | undefined;
   constructor(
-    component: (this: Ref<D>, data: D) => HTMLElement | DocumentFragment
+    component: (this: Ref<D>, data: D) => HTMLElement | DocumentFragment,
+    options?: { active: boolean } | boolean
   ) {
     this.component = component.bind(this);
+    if (options && (options === true || options.active)) {
+      CradovaEvent.addActiveEventListener("active-Refs", () => {
+        // ? we can only send stash data
+        this.updateState(this.stash);
+      });
+    }
   }
 
   preRender(data?: D, stash?: boolean) {
@@ -179,6 +235,23 @@ export class Ref<D> {
   }
   destroyPreRendered() {
     this.preRendered = null;
+  }
+
+  /**
+   * Cradova Ref
+   * ---
+   * construct to add custom methods to Refs
+   * @param methodName
+   * @param method
+   * @returns  void
+   */
+  define(methodName: string, method: () => void) {
+    if (typeof methodName == "string" && typeof method == "function") {
+      (this as unknown as Record<string, Function>)[methodName] =
+        method.bind(this);
+    } else {
+      console.error(" ✘  Cradova err :  Invalid Ref.define parameters");
+    }
   }
 
   /**
@@ -369,8 +442,8 @@ export class reference {
    * @param name - The name of the referenced DOM element.
    */
   current<ElementType extends HTMLElement = HTMLElement>(name: string) {
-    if (this.tree[SNRU()]) {
-      return this.tree[SNRU()][name] as ElementType;
+    if (this.tree[SNRU]) {
+      return this.tree[SNRU][name] as ElementType;
     }
     return null as unknown as ElementType;
   }
@@ -381,12 +454,11 @@ export class reference {
    * @param element - The DOM element to reference.
    */
   _appendDomForce(name: string, Element: HTMLElement) {
-    const node = SNRU();
-    if (this.tree[node]) {
-      this.tree[node][name] = Element;
+    if (this.tree[SNRU]) {
+      this.tree[SNRU][name] = Element;
     } else {
-      this.tree[node] = {};
-      this.tree[node][name] = Element;
+      this.tree[SNRU] = {};
+      this.tree[SNRU][name] = Element;
     }
   }
   _appendDomForceGlobal(name: string, Element: HTMLElement) {

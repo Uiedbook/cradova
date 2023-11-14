@@ -1,7 +1,12 @@
-import { VJSType, VJS_params_TYPE, VJS_props_TYPE } from "../types";
-import { dispatch } from "./track";
-import { isNode, reference, Rhoda, CradovaEvent, Ref } from "./fns";
-import { createSignal } from "./createSignal";
+/*
+Cradova 
+License: Apache V2
+Copyright 2022 Friday Candour.  
+*/
+
+import { VJSType, VJS_params_TYPE, VJS_props_TYPE } from "./types";
+import { isNode, reference, Rhoda, CradovaEvent, Ref } from "./parts";
+import { createSignal } from "./Signal";
 import { Router } from "./Router";
 
 export const makeElement = <E extends HTMLElement>(
@@ -70,31 +75,27 @@ export const makeElement = <E extends HTMLElement>(
         continue;
       }
 
-      // signal
       if (Array.isArray(value)) {
+        // reference
+        if (
+          prop == "reference" &&
+          (value! as unknown[])![0] instanceof reference
+        ) {
+          ((value! as unknown[])![0] as reference)._appendDomForce(
+            (value! as unknown[])![1] as string,
+            element
+          );
+          continue;
+        }
+
+        // signal
         if ((value! as unknown[])[0] instanceof createSignal) {
-          (element as unknown as Record<string, unknown>)["updateState"] =
-            dispatch.bind(null, element);
           ((value! as unknown[])![0] as createSignal<{}>).bindRef(
             element as unknown as Ref<unknown>,
             {
               _element_property: prop,
               signalProperty: (value! as unknown[])![1] as string,
             }
-          );
-          continue;
-        }
-
-        // reference
-        if (
-          prop == "reference" &&
-          (value! as unknown[])![0] instanceof reference
-        ) {
-          (element as unknown as Record<string, unknown>)["updateState"] =
-            dispatch.bind(null, element);
-          ((value! as unknown[])![0] as reference)._appendDomForce(
-            (value! as unknown[])![1] as string,
-            element
           );
           continue;
         }

@@ -43,8 +43,8 @@ const details = `
    ╚██████╗   ██║  ██║  ██║  ██║   ███████╔╝   ████████      ╚███╔╝   ██║  ██║ 
     ╚═════╝   ╚═╝  ╚═╝  ╚═╝  ╚═╝   ╚══════╝     ╚════╝        ╚══╝    ╚═╝  ╚═╝ 
 =============================================================================
-Cradova FrameWork
-@version  3.0.0
+Cradova
+@version  3.3.0
 License: Apache V2
 Copyright 2022 Friday Candour. 
 Repository - https://github.com/fridaycandour/cradova

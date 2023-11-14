@@ -1,4 +1,10 @@
-import { Ref } from "./fns";
+/*
+Cradova 
+License: Apache V2
+Copyright 2022 Friday Candour.  
+*/
+
+import { Ref } from "./parts";
 
 /**
  *  Cradova Signal

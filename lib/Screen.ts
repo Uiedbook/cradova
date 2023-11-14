@@ -1,18 +1,27 @@
-import { CradovaScreenType /*VJSType */ } from "../types.js";
-import { CradovaEvent, /*frag,*/ isNode, reference } from "./fns.js";
+/*
+Cradova 
+License: Apache V2
+Copyright 2022 Friday Candour.  
+*/
+
+import { CradovaScreenType } from "./types.js";
+import { CradovaEvent, isNode, memo_SNRU, reference } from "./parts.js";
 
 export const localTree = new reference();
 
 /**
  *  Cradova Screen
  * ---
- * create instances of manageable pages and scaffolds
+ * create instances of manageable pages
  * @param name
  * @param template
- * @param transitions
  */
 
 export class Screen {
+  /**
+   * used internally
+   */
+  private _name: string;
   /**
    * this should be a cradova screen component
    */
@@ -20,28 +29,26 @@ export class Screen {
     | ((this: Screen, data?: unknown) => HTMLElement | DocumentFragment)
     | HTMLElement
     | DocumentFragment;
+  private _packed = false;
+  private _template = document.createElement("div");
+  private _callBack:
+    | ((cradovaScreenSet: HTMLElement) => Promise<void> | void)
+    | undefined;
+  private _deCallBack:
+    | ((cradovaScreenSet: HTMLElement) => Promise<void> | void)
+    | undefined;
+  private _persist = true;
+  private _delegatedRoutesCount = -1;
+  private _dropped = false;
   /**
    * error handler for the screen
    */
   public _errorHandler: ((err: unknown) => void) | null = null;
-  /**
-   * used internally
-   */
-  private _name: string;
-  private _transition;
-  private _packed = false;
-  private _template = document.createElement("div");
-  private _callBack: (() => Promise<void> | void) | undefined;
-  private _deCallBack: (() => Promise<void> | void) | undefined;
-  private _persist = true;
-  private _delegatedRoutesCount = -1;
-  private _dropped = false;
   constructor(cradova_screen_initials: CradovaScreenType) {
-    const { template, name, persist, renderInParallel, transition } =
+    const { template, name, persist, renderInParallel } =
       cradova_screen_initials;
     this._html = template;
     this._name = name || "Document";
-    this._transition = transition;
     this._template.setAttribute("id", "cradova-screen-set");
     if (renderInParallel === true) {
       this._delegatedRoutesCount = 0;
@@ -56,7 +63,6 @@ export class Screen {
   _derive() {
     return {
       _name: this._name,
-      _transition: this._transition,
       _callBack: this._callBack,
       _deCallBack: this._deCallBack,
     };
@@ -68,7 +74,6 @@ export class Screen {
     _deCallBack: (() => void | Promise<void>) | undefined;
   }) {
     this._name = derivation._name;
-    this._transition = derivation._transition;
     this._callBack = derivation._callBack;
     this._deCallBack = derivation._deCallBack;
   }
@@ -118,12 +123,7 @@ export class Screen {
     this._deCallBack = cb;
   }
   async _deActivate() {
-    if (this._deCallBack) {
-      await this._deCallBack();
-    }
-    if (this._transition) {
-      this._template.classList.remove(this._transition);
-    }
+    this._deCallBack && (await this._deCallBack(localTree.globalTree.doc));
   }
   drop(state?: boolean) {
     if (typeof state === "boolean") {
@@ -138,12 +138,14 @@ export class Screen {
       return;
     }
     // packaging the screen dom
+
     if (!this._persist || force || !this._packed) {
+      memo_SNRU();
       await this._package();
       this._packed = true;
-    }
-    if (this._transition) {
-      this._template.classList.add(this._transition);
+    } else {
+      // ? tell all active Refs to re-render
+      CradovaEvent.dispatchActiveEvent("active-Refs");
     }
     document.title = this._name;
     localTree.globalTree.doc.innerHTML = "";
@@ -155,8 +157,6 @@ export class Screen {
       // @ts-ignore
       behavior: "instant",
     });
-    if (this._callBack) {
-      this._callBack();
-    }
+    this._callBack && (await this._callBack(localTree.globalTree.doc));
   }
 }

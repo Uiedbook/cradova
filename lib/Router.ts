@@ -1,5 +1,11 @@
-import _, { CradovaEvent, Screen as _cradovaScreen } from "../index.js";
-import { RouterRouteObject } from "../types.js";
+/*
+Cradova 
+License: Apache V2
+Copyright 2022 Friday Candour.  
+*/
+
+import _, { Screen as _cradovaScreen } from "./index.js";
+import { RouterRouteObject } from "./types.js";
 import { localTree } from "./Screen.js";
 
 /**
@@ -180,8 +186,6 @@ RouterBox.router = async function (
         });
         route._apply_derivation(a);
         RouterBox.routes[url] = route;
-        //? dispatch Ref id change response event
-        CradovaEvent.dispatchEvent("onTransition");
       }
       if (params) {
         RouterBox.params.params = params;

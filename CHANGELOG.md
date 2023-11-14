@@ -185,5 +185,19 @@ and we went along with it.
 # v3.1.4
 
 - fixed bug parallel rendering in ref by managing screen id events
-  making them more powerfull by also now reactiving to screen changes
+  making them more powerful by also now reactiving to screen changes
 - other optimisations in prerendering
+
+# v3.2.0
+
+- introduced a more standardised reference class for manageing dom references update the previous implementations.
+- fixed more bug parallel rendering in ref by managing screen id events
+  making them more powerful by also now reactiving to screen changes
+- other optimisations in prerendering
+
+# v3.3.0
+
+- introduced Ref.define construct to add custom methods to Refs
+- introduced more refined conditional rendering of $switch & $case, $if and $ifelse.
+- introduced active option in Refs to fine tune multi-rendered Refs mostly in parallel rendered situations, hence further making parallel rendering more stable and rock solid with this new feature.
+- tested in production across serveral persoanl projects and did some custom testing

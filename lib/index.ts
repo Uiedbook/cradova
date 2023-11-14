@@ -34,7 +34,7 @@
   -----------------------------------------------------------------------------
 */
 
-import { make, makeElement } from "./parts/elements";
+import { make, makeElement } from "./elements";
 import { VJS_params_TYPE } from "./types";
 
 ("use strict");
@@ -103,10 +103,9 @@ const _: TemplateType = (...element_initials) => {
   return makeElement(element, element_initials);
 };
 
-export { Screen } from "./parts/Screen";
-export { createSignal } from "./parts/createSignal";
-export { Router } from "./parts/Router";
-export * from "./parts/elements";
-export * from "./parts/fns";
-export { Ajax } from "./parts/ajax";
+export { Screen } from "./Screen";
+export { createSignal } from "./Signal";
+export { Router } from "./Router";
+export * from "./elements";
+export * from "./parts";
 export default _;

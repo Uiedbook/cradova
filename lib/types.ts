@@ -1,6 +1,13 @@
+/*
+Cradova 
+License: Apache V2
+Copyright 2022 Friday Candour.  
+*/
+
 import * as CSS from "csstype";
-import { Screen } from "./parts/Screen";
-import { Ref, reference } from "./parts/fns";
+import { Screen } from "./Screen";
+import { Ref, reference } from "./parts";
+
 type DataAttributes = { [key: `data-${string}`]: string };
 type AriaAttributes = { [key: `aria-${string}`]: string };
 
@@ -64,7 +71,6 @@ export type VJS_params_TYPE<T> =
         rel?: string;
         required?: string;
         frameBorder?: string;
-        // style?: Partial<CSSStyleDeclaration>;
         style?: CSS.Properties;
         onmount?: (this: T) => void;
         reference?: reference;
@@ -78,7 +84,6 @@ export type VJS_props_TYPE = {
   onmount?: () => void;
   reference?: reference;
 };
-// } & { [x: string]: unknown };
 
 export type stateType =
   | string
@@ -92,7 +97,6 @@ export type stateType =
 
 export interface RouterRouteObject {
   // _name?: string;
-  // _transition: string | undefined;
   _html:
     | ((this: Screen, data?: unknown) => HTMLElement | DocumentFragment)
     | HTMLElement
@@ -104,15 +108,21 @@ export interface RouterRouteObject {
   _errorHandler: ((err: unknown) => void) | null;
   _derive(): {
     _name: string;
-    _transition: string | undefined;
-    _callBack: (() => void | Promise<void>) | undefined;
-    _deCallBack: (() => void | Promise<void>) | undefined;
+    _callBack:
+      | ((cradovaScreenSet: HTMLElement) => void | Promise<void>)
+      | undefined;
+    _deCallBack:
+      | ((cradovaScreenSet: HTMLElement) => void | Promise<void>)
+      | undefined;
   };
   _apply_derivation(data: {
     _name: string;
-    _transition: string | undefined;
-    _callBack: (() => void | Promise<void>) | undefined;
-    _deCallBack: (() => void | Promise<void>) | undefined;
+    _callBack:
+      | ((cradovaScreenSet: HTMLElement) => void | Promise<void>)
+      | undefined;
+    _deCallBack:
+      | ((cradovaScreenSet: HTMLElement) => void | Promise<void>)
+      | undefined;
   }): unknown;
 }
 
@@ -131,7 +141,7 @@ export type CradovaScreenType<T = unknown> = {
    * Usually for adding css transitions
    * .
    */
-  transition?: string;
+  // transition?: string;
   /**
    * Cradova screen
    * ---
