@@ -201,3 +201,5 @@ and we went along with it.
 - introduced more refined conditional rendering of $switch & $case, $if and $ifelse.
 - introduced active option in Refs to fine tune multi-rendered Refs mostly in parallel rendered situations, hence further making parallel rendering more stable and rock solid with this new feature.
 - tested in production across serveral persoanl projects and did some custom testing
+- introduced the raw tag, just put in raw html strings if you need to for static contents/makeup,
+  better for seo and faster render of none-dynamic contents.

@@ -1,8 +1,12 @@
-/*
-Cradova 
-License: Apache V2
-Copyright 2022 Friday Candour.  
-*/
+/*! *****************************************************************************
+Copyright 2022 Friday Candour. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
+
+See the Apache Version 2.0 License for specific language governing permissions
+and limitations under the License.
+***************************************************************************** */
 
 import { VJSType, VJS_Child_TYPE } from "./types";
 import { createSignal } from "./Signal";
@@ -246,7 +250,11 @@ export class Ref<D> {
    * @returns  void
    */
   define(methodName: string, method: () => void) {
-    if (typeof methodName == "string" && typeof method == "function") {
+    if (
+      typeof methodName == "string" &&
+      typeof method == "function" &&
+      !Object.prototype.hasOwnProperty.call(this, methodName)
+    ) {
       (this as unknown as Record<string, Function>)[methodName] =
         method.bind(this);
     } else {

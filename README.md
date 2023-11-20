@@ -442,12 +442,22 @@ We are currently working to [set](https://github.com/fridaycandour/cradova/blob/
 - UI component libraries for cradova
 - Sample projects
 - maintenance and promotion
-<!--
+
+```
+    ██████╗   ██████╗    █████═╗   ███████╗    ███████╗    ██╗   ██╗  █████╗
+   ██╔════╝   ██╔══██╗  ██╔═╗██║   █      ██  ██╔═════╝█   ██║   ██║  ██╔═╗██
+   ██║        ██████╔╝  ███████║   █      ██  ██║     ██   ██║   ██║  ██████╗
+   ██║        ██╔══██╗  ██║  ██║   █      ██  ██║     ██   ╚██╗ ██╔╝  ██║  ██╗
+   ╚██████╗   ██║  ██║  ██║  ██║   ███████╔╝   ████████      ╚███╔╝   ██║  ██║
+    ╚═════╝   ╚═╝  ╚═╝  ╚═╝  ╚═╝   ╚══════╝     ╚════╝        ╚══╝    ╚═╝  ╚═╝
+```
 
 ## Sponsor
 
-Your support is appreciated and needed to advance Cradova for more performance and improvements.
+Your contribution(s) is a good force for change anytime you do it, you can ensure Cradova's growth and improvement by contributing a re-occuring or fixed donations to:
 
-Sponsorships can be done via [Patreon](https://www.patreon.com/FridayCandour) and [KO-FI](https://www.ko-fi.com/fridaycandour).
+https://www.buymeacoffee.com/fridaycandour
 
-Both monthly-recurring sponsorships and one-time donations are accepted. -->
+Or Click.
+
+<a href="https://www.buymeacoffee.com/fridaycandour"><img src="https://img.buymeacoffee.com/button-api/?text=Buy us a coffee&emoji=&slug=fridaycandour&button_colour=FFDD00&font_colour=000000&outline_colour=000000&coffee_colour=ffffff" /></a>

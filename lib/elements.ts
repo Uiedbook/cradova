@@ -1,8 +1,12 @@
-/*
-Cradova 
-License: Apache V2
-Copyright 2022 Friday Candour.  
-*/
+/*! *****************************************************************************
+Copyright 2022 Friday Candour. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
+
+See the Apache Version 2.0 License for specific language governing permissions
+and limitations under the License.
+***************************************************************************** */
 
 import { VJSType, VJS_params_TYPE, VJS_props_TYPE } from "./types";
 import { isNode, reference, Rhoda, CradovaEvent, Ref } from "./parts";
@@ -233,21 +237,21 @@ const cra = <E extends HTMLElement>(tag: string) => {
 };
 
 export const a = cra<HTMLAnchorElement>("a");
-export const area = cra<HTMLAreaElement>("area");
+// export const area = cra<HTMLAreaElement>("area");
 export const article = cra<HTMLElement>("article");
-export const aside = cra<HTMLElement>("aside");
+// export const aside = cra<HTMLElement>("aside");
 export const audio = cra<HTMLAudioElement>("audio");
-export const b = cra<HTMLElement>("b");
-export const base = cra<HTMLBaseElement>("base");
-export const blockquote = cra<HTMLElement>("blockquote");
+// export const b = cra<HTMLElement>("b");
+// export const base = cra<HTMLBaseElement>("base");
+// export const blockquote = cra<HTMLElement>("blockquote");
 export const br = cra<HTMLBRElement>("br");
 export const button = cra<HTMLButtonElement>("button");
 export const canvas = cra<HTMLCanvasElement>("canvas");
 export const caption = cra<HTMLTableCaptionElement>("caption");
-export const code = cra<HTMLElement>("code");
+// export const code = cra<HTMLElement>("code");
 export const col = cra<HTMLTableColElement>("col");
 export const colgroup = cra<HTMLOptGroupElement>("colgroup");
-export const data = cra<HTMLDataElement>("data");
+// export const data = cra<HTMLDataElement>("data");
 export const datalist = cra<HTMLDataListElement>("datalist");
 export const details = cra<HTMLDetailsElement>("details");
 export const dialog = cra<HTMLDialogElement>("dialog");
@@ -271,18 +275,18 @@ export const iframe = cra<HTMLIFrameElement>("iframe");
 export const img = cra<HTMLImageElement>("img");
 export const input = cra<HTMLInputElement>("input");
 export const label = cra<HTMLLabelElement>("label");
-export const legend = cra<HTMLLegendElement>("legend");
+// export const legend = cra<HTMLLegendElement>("legend");
 export const li = cra<HTMLLIElement>("li");
-export const link = cra<HTMLLinkElement>("link");
+// export const link = cra<HTMLLinkElement>("link");
 export const main = cra<HTMLElement>("main");
-export const menu = cra<HTMLMenuElement>("menu");
+// export const menu = cra<HTMLMenuElement>("menu");
 export const nav = cra<HTMLElement>("nav");
-export const object = cra<HTMLObjectElement>("object");
+// export const object = cra<HTMLObjectElement>("object");
 export const ol = cra<HTMLOListElement>("ol");
 export const optgroup = cra<HTMLOptGroupElement>("optgroup");
 export const option = cra<HTMLOptionElement>("option");
 export const p = cra<HTMLParagraphElement>("p");
-export const pre = cra<HTMLPreElement>("pre");
+// export const pre = cra<HTMLPreElement>("pre");
 export const progress = cra<HTMLProgressElement>("progress");
 export const q = cra<HTMLQuoteElement>("q");
 export const section = cra<HTMLElement>("section");
@@ -310,4 +314,9 @@ export const svg = (
   const span = document.createElement("span");
   span.innerHTML = svg;
   return makeElement<HTMLSpanElement>(span, [properties]);
+};
+export const raw = (html: string): HTMLElement[] => {
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return Array.from(div.children) as HTMLElement[];
 };

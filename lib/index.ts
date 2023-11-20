@@ -12,7 +12,7 @@
 =============================================================================
   
   Cradova FrameWork
-  @version  3.1.3
+  @version  3.3.0
   License: Apache V2
   
   -----------------------------------------------------------------------------
@@ -50,21 +50,9 @@ type TemplateType = <E extends HTMLElement>(
  *  @example
  * // using template
  * const p = _("p");
- * _("p.class");
- * _("p#id");
- * _("p.class#id");
  * _("p.foo.bar#poo.loo");
  *
- * // using inline props
- *
- * _("p",{
- * text: "am a p tag",
- * style: {
- * color: "blue"
- * }
- * })
- *
- * // props and children
+ * // full example
  * _("p", // template first
  *  // property next if wanted
  *  {style: {color: "brown"}, // optional
