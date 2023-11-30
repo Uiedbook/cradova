@@ -1,6 +1,6 @@
 <br/>
 <p align="center">
-  <a href="https://github.com/fridaycandour/cradova">
+  <a href="https://github.com/uiedbook/cradova">
     <img src="cradova.png" alt="Logo" width="80" height="80">
   </a>
 
@@ -10,22 +10,51 @@
     Cradova is a JavaScript framework for building Single Page Applications and PWAs.
     <br/>
     <br/>
-    <a href="https://github.com/fridaycandour/cradova#examples"><strong>Explore the 🎙️ docs »</strong></a>
+    <a href="https://github.com/uiedbook/cradova#examples"><strong>Explore the 🎙️ docs »</strong></a>
     <br/>
     <br/>
-    <a href="https://t.me/cradovaframework">Join Community</a>
+    <a href="https://t.me/uiedbookHQ">Join Community</a>
     .
-    <a href="https://github.com/fridaycandour/cradova/issues">Report Bug</a>
+    <a href="https://github.com/uiedbook/cradova/issues">Report Bug</a>
     .
-    <a href="https://github.com/fridaycandour/cradova/issues">Request Feature</a>
+    <a href="https://github.com/uiedbook/cradova/issues">Request Feature</a>
   </p>
 </p>
 
-![Contributors](https://img.shields.io/github/contributors/fridaycandour/cradova?color=dark-green) ![Issues](https://img.shields.io/github/issues/fridaycandour/cradova) ![License](https://img.shields.io/github/license/fridaycandour/cradova)
+![Contributors](https://img.shields.io/github/contributors/uiedbook/cradova?color=dark-green) ![Issues](https://img.shields.io/github/issues/uiedbook/cradova) ![License](https://img.shields.io/github/license/uiedbook/cradova)
 [![npm Version](https://img.shields.io/npm/v/cradova.svg)](https://www.npmjs.com/package/cradova)
 [![License](https://img.shields.io/npm/l/cradova.svg)](https://github.com/cradova/cradova.js/blob/next/LICENSE)
 [![npm Downloads](https://img.shields.io/npm/dm/cradova.svg)](https://www.npmjs.com/package/cradova)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cradova/cradova.js/blob/next/contributing.md)![Forks](https://img.shields.io/github/forks/fridaycandour/cradova?style=social) ![Stargazers](https://img.shields.io/github/stars/fridaycandour/cradova?style=social)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cradova/cradova.js/blob/next/contributing.md)![Forks](https://img.shields.io/github/forks/uiedbook/cradova?style=social) ![Stargazers](https://img.shields.io/github/stars/uiedbook/cradova?style=social)
+
+## What's New? Conditionals!
+
+```js
+import { div, h1, $if, $ifelse, $case, $switch } from "cradova";
+
+function Hello({ name }) {
+  return div(
+    $if(name === "john", h1("Hello john")),
+    $if(name === "paul", h1("Goodbye paul")),
+    $ifelse(name === "john", h1("Hello john"), h1("Hello Paul"))
+  );
+}
+
+const html = div(Hello("john"), Hello("paul"));
+
+function whatsAllowed({ age }) {
+  return div(
+    $switch(
+      age,
+      $case(12, h1("too young")),
+      $case(26, h1("you are welcome")),
+      $case(52, h1("too old"))
+    )
+  );
+}
+
+document.body.append(html, whatsAllowed({ age: 26 }));
+```
 
 # Contents
 
@@ -43,7 +72,7 @@ Cradova is a web development framework for building Single Page Applications and
 
 It's a fast and simple framework, it provides an easy to use state management and router system.
 
-Cradova follows the [VJS specification](https://github.com/FridayCandour/cradova/blob/main/VJS_spec/spec.md)
+Cradova follows the [VJS specification](https://github.com/uiedbook/cradova/blob/main/VJS_spec/spec.md)
 
 ## What's the benefit?
 
@@ -58,7 +87,7 @@ Undoubtedly, this provides a significant advantage.
 
 Cradova has already been utilized in multiple production projects, and we will continuously update this page to showcase our advancements as we keep improving.
 
-[current version changes](https://github.com/fridaycandour/cradova/blob/main/CHANGELOG.md#v300)
+[current version changes](https://github.com/uiedbook/cradova/blob/main/CHANGELOG.md#v330)
 
 ## Installation
 
@@ -431,11 +460,11 @@ At the moment, we're in the process of creating a documentation website for Crad
 
 ## Getting Help
 
-To get further insights and help on Cradova, visit our [Discord](https://discord.gg/b7fvMg38) and [Telegram](https://t.me/cradovaframework) Community Chats.
+To get further insights and help on Cradova, visit our [Discord](https://discord.gg/b7fvMg38) and [Telegram](https://t.me/uiedbookHQ) Community Chats.
 
 ## Contributing
 
-We are currently working to [set](https://github.com/fridaycandour/cradova/blob/main/contributing.md) up the following:
+We are currently working to [set](https://github.com/uiedbook/cradova/blob/main/contributing.md) up the following:
 
 - building Cradova CLI (in progress)
 - Cradova Documentation Website
