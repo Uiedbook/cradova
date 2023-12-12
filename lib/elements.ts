@@ -173,11 +173,11 @@ export const makeElement = <E extends HTMLElement>(
 };
 
 export const make = function (descriptor: any) {
-  if (typeof descriptor !== "string") {
-    return [];
-  }
   if (Array.isArray(descriptor)) {
     descriptor = descriptor[0];
+  }
+  if (typeof descriptor !== "string") {
+    return [];
   }
   let innerValue = "";
   if (descriptor.includes("|")) {

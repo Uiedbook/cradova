@@ -157,7 +157,8 @@ export type CradovaScreenType<T = unknown> = {
   template:
     | ((this: Screen, data?: T | unknown) => HTMLElement | DocumentFragment)
     | HTMLElement
-    | DocumentFragment;
+    | DocumentFragment
+    | Ref<any>;
   /**
    * Cradova screen
    * ---

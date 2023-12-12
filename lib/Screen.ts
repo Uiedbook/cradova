@@ -7,9 +7,9 @@ License at http://www.apache.org/licenses/LICENSE-2.0
 See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
- 
+
 import { CradovaScreenType } from "./types.js";
-import { CradovaEvent, isNode, memo_SNRU, reference } from "./parts.js";
+import { CradovaEvent, Ref, isNode, memo_SNRU, reference } from "./parts.js";
 
 export const localTree = new reference();
 
@@ -51,7 +51,11 @@ export class Screen {
   constructor(cradova_screen_initials: CradovaScreenType) {
     const { template, name, persist, renderInParallel } =
       cradova_screen_initials;
-    this._html = template;
+    if (template instanceof Ref) {
+      this._html = template.render({});
+    } else {
+      this._html = template;
+    }
     this._name = name || "Document";
     this._template.setAttribute("id", "cradova-screen-set");
     if (renderInParallel === true) {
