@@ -1,5 +1,5 @@
 import type { Options } from "tsup";
-import { readFile, writeFile } from "fs";
+import { readFile, writeFile } from "node:fs";
 
 const config: Options = {
   entry: ["lib/index.ts"],

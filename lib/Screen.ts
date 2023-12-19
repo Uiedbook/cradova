@@ -52,7 +52,7 @@ export class Screen {
     const { template, name, persist, renderInParallel } =
       cradova_screen_initials;
     if (template instanceof Ref) {
-      this._html = template.render({});
+      this._html = () => template.render({});
     } else {
       this._html = template;
     }
@@ -147,13 +147,12 @@ export class Screen {
     }
     // packaging the screen dom
 
+    memo_SNRU();
+    // ? tell all active Refs to re-render
+    CradovaEvent.dispatchActiveEvent("active-Refs");
     if (!this._persist || force || !this._packed) {
-      memo_SNRU();
       await this._package();
       this._packed = true;
-    } else {
-      // ? tell all active Refs to re-render
-      CradovaEvent.dispatchActiveEvent("active-Refs");
     }
     document.title = this._name;
     localTree.globalTree.doc.innerHTML = "";

@@ -28,8 +28,8 @@ class cradovaEvent {
     this.listeners[eventName].push(callback);
   }
   async addActiveEventListener(eventName: string, callback: () => void) {
-    if (!this.listeners[eventName]) {
-      this.listeners[eventName] = [];
+    if (!this.active_listeners[eventName]) {
+      this.active_listeners[eventName] = [];
     }
     this.active_listeners[eventName].push(callback);
   }
@@ -42,6 +42,12 @@ class cradovaEvent {
       eventListeners.shift()!(eventArgs);
     }
   }
+  /**
+   * Active refs is a concept for delegated screens to keep their active refs alive
+   * even in the case of naviagtion
+   * @param eventName
+   * @param eventArgs
+   */
   async dispatchActiveEvent(eventName: string, eventArgs?: unknown) {
     const eventListeners = this.listeners[eventName] || [];
     // ? change snru value
@@ -212,22 +218,23 @@ export class Ref<D> {
   private reference: reference = new reference();
   Signal: createSignal<any> | undefined;
   //? hooks management
-  _state: D[] = [];
-  _state_track: { [x: number]: boolean } = {};
-  _state_index = 0;
+  _state?: D;
+  _first_state?: D;
+  _first_stated: boolean = false;
   //? public testName = null;
   public stash: D | undefined;
   constructor(
-    component: (this: Ref<D>, data: D) => HTMLElement | DocumentFragment,
-    options?: { active: boolean } | boolean
+    component: (this: Ref<D>, data: D) => HTMLElement | DocumentFragment
+    // options?: { active: boolean } | boolean
   ) {
     this.component = component.bind(this);
-    if (options && (options === true || options.active)) {
-      CradovaEvent.addActiveEventListener("active-Refs", () => {
-        // ? we can only send stash data
-        this.updateState(this.stash);
-      });
-    }
+    CradovaEvent.addActiveEventListener("active-Refs", () => {
+      this._first_stated = false;
+      // if (options && (options === true || options.active)) {
+      // ? we can only send stash data
+      // this.updateState(this.stash);
+      // }
+    });
   }
 
   preRender(data?: D, stash?: boolean) {
@@ -299,11 +306,14 @@ export class Ref<D> {
   _setExtra(Extra: createSignal<any>) {
     this.Signal = Extra;
   }
-  _roll_state(data: D, idx: number, get = false) {
-    if (!get) {
-      this._state[idx] = data;
+  _roll_state(data?: D, get?: boolean, first?: boolean) {
+    if (get) {
+      this._state = data;
+      this.updateState(data);
     }
-    return this._state[idx];
+    if (first) this._first_state = data;
+    if (!this._first_stated) this._state = this._first_state;
+    return this._state;
   }
   _effect(fn: () => Promise<void> | void) {
     if (!this.rendered) {
@@ -351,7 +361,7 @@ export class Ref<D> {
   }
 
   private async Activate(data?: D) {
-    this._state_index = 0;
+    // this._state_index = 0;
     this.published = false;
     if (!this.rendered) {
       return;
@@ -488,12 +498,7 @@ export function useState<S = unknown>(
   initialValue: S,
   ActiveRef: Ref<unknown>
 ): [S, (newState: S) => void] {
-  ActiveRef._state_index += 1;
-  const idx = ActiveRef._state_index;
-  if (!ActiveRef._state_track[idx]) {
-    ActiveRef._roll_state(initialValue, idx);
-    ActiveRef._state_track[idx] = true;
-  }
+  ActiveRef._roll_state(initialValue, false, true);
   /**
    * cradova
    * ---
@@ -501,10 +506,12 @@ export function useState<S = unknown>(
    * @param newState
    */
   function setState(newState: S) {
-    ActiveRef._roll_state(newState, idx);
-    ActiveRef.updateState(newState);
+    if (!ActiveRef._first_stated) {
+      ActiveRef._first_stated = true;
+    }
+    ActiveRef._roll_state(newState, true);
   }
-  return [ActiveRef._roll_state(null as S, idx, true) as S, setState];
+  return [ActiveRef._roll_state(null) as S, setState];
 }
 /**
  * Cradova
