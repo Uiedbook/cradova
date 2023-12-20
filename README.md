@@ -484,7 +484,7 @@ Opensourced And Free.
 
 Uiedbook is an open source team of web focused engineers, Our vision is to make the web better, improving and innovating infrastructures for a better web experience.
 
-Join Us on [telegram]("https://t.me/UiedbookHQ").
+Join Us on [telegram](https://t.me/UiedbookHQ).
 
 ### Contribution and License Agreement
 
