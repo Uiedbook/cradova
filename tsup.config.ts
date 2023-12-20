@@ -2,7 +2,7 @@ import type { Options } from "tsup";
 import { readFile, writeFile } from "node:fs";
 
 const config: Options = {
-  entry: ["lib/index.ts"],
+  entry: ["src/index.ts"],
   dts: true,
   clean: true,
   format: ["esm"],
@@ -15,15 +15,16 @@ const config: Options = {
         if (e) throw e;
       });
     });
-    // setTimeout(() => {
-    //   readFile("./dist/index.d.ts", "utf-8", (e, d) => {
-    //     if (e) throw e;
-    //     writeFile("./dist/index.d.ts", details + d, (e) => {
-    //       if (e) throw e;
-    //     });
-    //   });
-    //   console.log("done");
-    // }, 10_000);
+    //
+    setTimeout(() => {
+      readFile("./dist/index.d.ts", "utf-8", (e, d) => {
+        if (e) throw e;
+        writeFile("./dist/index.d.ts", details + d, (e) => {
+          if (e) throw e;
+        });
+      });
+      console.log("done");
+    }, 8_000);
   },
   // target: "esnext",
   // target: "es2015",

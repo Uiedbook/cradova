@@ -6,12 +6,16 @@ License at http://www.apache.org/licenses/LICENSE-2.0
 
 See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
-***************************************************************************** */
+********************************************************************************/
 
-import { VJSType, VJS_params_TYPE, VJS_props_TYPE } from "./types";
-import { isNode, reference, Rhoda, CradovaEvent, Ref } from "./parts";
-import { createSignal } from "./Signal";
-import { Router } from "./Router";
+import {
+  VJS_Child_TYPE,
+  VJS_params_TYPE,
+  VJS_props_TYPE,
+  VJSType,
+} from "./types";
+import { Ref, reference, createSignal, CradovaEvent } from "./classes";
+import { Router } from "./classes";
 
 export const makeElement = <E extends HTMLElement>(
   element: E & HTMLElement,
@@ -33,7 +37,7 @@ export const makeElement = <E extends HTMLElement>(
       }
 
       // appending child
-      if (isNode(child)) {
+      if (child instanceof HTMLElement || child instanceof DocumentFragment) {
         element.appendChild(child as Node);
         continue;
       }
@@ -230,93 +234,231 @@ export const make = function (descriptor: any) {
   return [tag, IDs[0], classes.join(" "), innerValue];
 };
 
-const cra = <E extends HTMLElement>(tag: string) => {
+export const cra = <E extends HTMLElement>(tag: string) => {
   const extend = (...Children_and_Properties: VJSType<E>[]): E =>
     makeElement<E>(document.createElement(tag) as E, Children_and_Properties);
   return extend as VJSType<E>;
 };
 
-export const a = cra<HTMLAnchorElement>("a");
-// export const area = cra<HTMLAreaElement>("area");
-export const article = cra<HTMLElement>("article");
-// export const aside = cra<HTMLElement>("aside");
-export const audio = cra<HTMLAudioElement>("audio");
-// export const b = cra<HTMLElement>("b");
-// export const base = cra<HTMLBaseElement>("base");
-// export const blockquote = cra<HTMLElement>("blockquote");
-export const br = cra<HTMLBRElement>("br");
-export const button = cra<HTMLButtonElement>("button");
-export const canvas = cra<HTMLCanvasElement>("canvas");
-export const caption = cra<HTMLTableCaptionElement>("caption");
-// export const code = cra<HTMLElement>("code");
-export const col = cra<HTMLTableColElement>("col");
-export const colgroup = cra<HTMLOptGroupElement>("colgroup");
-// export const data = cra<HTMLDataElement>("data");
-export const datalist = cra<HTMLDataListElement>("datalist");
-export const details = cra<HTMLDetailsElement>("details");
-export const dialog = cra<HTMLDialogElement>("dialog");
-export const div = cra<HTMLDivElement>("div");
-export const em = cra<HTMLElement>("em");
-export const embed = cra<HTMLEmbedElement>("embed");
-export const figure = cra<HTMLElement>("figure");
-export const footer = cra<HTMLElement>("footer");
-export const form = cra<HTMLFormElement>("form");
-export const h1 = cra<HTMLHeadingElement>("h1");
-export const h2 = cra<HTMLHeadingElement>("h2");
-export const h3 = cra<HTMLHeadingElement>("h3");
-export const h4 = cra<HTMLHeadingElement>("h4");
-export const h5 = cra<HTMLHeadingElement>("h5");
-export const h6 = cra<HTMLHeadingElement>("h6");
-export const head = cra<HTMLHeadElement>("head");
-export const header = cra<HTMLHeadElement>("header");
-export const hr = cra<HTMLHRElement>("hr");
-export const i = cra<HTMLLIElement>("i");
-export const iframe = cra<HTMLIFrameElement>("iframe");
-export const img = cra<HTMLImageElement>("img");
-export const input = cra<HTMLInputElement>("input");
-export const label = cra<HTMLLabelElement>("label");
-// export const legend = cra<HTMLLegendElement>("legend");
-export const li = cra<HTMLLIElement>("li");
-// export const link = cra<HTMLLinkElement>("link");
-export const main = cra<HTMLElement>("main");
-// export const menu = cra<HTMLMenuElement>("menu");
-export const nav = cra<HTMLElement>("nav");
-// export const object = cra<HTMLObjectElement>("object");
-export const ol = cra<HTMLOListElement>("ol");
-export const optgroup = cra<HTMLOptGroupElement>("optgroup");
-export const option = cra<HTMLOptionElement>("option");
-export const p = cra<HTMLParagraphElement>("p");
-// export const pre = cra<HTMLPreElement>("pre");
-export const progress = cra<HTMLProgressElement>("progress");
-export const q = cra<HTMLQuoteElement>("q");
-export const section = cra<HTMLElement>("section");
-export const select = cra<HTMLSelectElement>("select");
-export const source = cra<HTMLSourceElement>("source");
-export const span = cra<HTMLSpanElement>("span");
-export const strong = cra<HTMLElement>("strong");
-export const summary = cra<HTMLElement>("summary");
-export const table = cra<HTMLTableElement>("table");
-export const tbody = cra<HTMLTableColElement>("tbody");
-export const td = cra<HTMLTableCellElement>("td");
-export const template = cra<HTMLTemplateElement>("template");
-export const textarea = cra<HTMLTextAreaElement>("textarea");
-export const th = cra<HTMLTableSectionElement>("th");
-export const title = cra<HTMLTitleElement>("title");
-export const tr = cra<HTMLTableRowElement>("tr");
-export const track = cra<HTMLTrackElement>("track");
-export const u = cra<HTMLUListElement>("u");
-export const ul = cra<HTMLUListElement>("ul");
-export const video = cra<HTMLVideoElement>("video");
-export const svg = (
-  svg: string,
-  properties?: VJS_props_TYPE
-): HTMLSpanElement => {
-  const span = document.createElement("span");
-  span.innerHTML = svg;
-  return makeElement<HTMLSpanElement>(span, [properties]);
+export function Rhoda(
+  l: VJSType<HTMLElement>[] | (() => any)[] | Ref<unknown>[] | HTMLElement[]
+) {
+  const fg = new DocumentFragment();
+  for (let ch of l) {
+    if (Array.isArray(ch)) {
+      fg.appendChild(Rhoda(ch));
+    } else {
+      if (ch instanceof Ref) {
+        ch = ch.render(undefined) as HTMLElement;
+      }
+      if (typeof ch === "function") {
+        ch = ch() as VJSType<HTMLElement>;
+        if (typeof ch === "function") {
+          ch = ch() as VJSType<HTMLElement>;
+        }
+      }
+      if (typeof ch === "string" || typeof ch === "number") {
+        fg.appendChild(document.createTextNode(ch as string));
+        continue;
+      }
+      if (ch instanceof HTMLElement || ch instanceof DocumentFragment) {
+        fg.appendChild(ch as unknown as HTMLElement);
+      } else {
+        if (typeof ch !== "undefined") {
+          throw new Error(
+            "  ✘  Cradova err:  invalid child type: " +
+              ch +
+              " (" +
+              typeof ch +
+              ")"
+          );
+        }
+      }
+    }
+  }
+  return fg;
+}
+
+export function css(identifier: string | TemplateStringsArray) {
+  /*This is for creating
+ css styles using JavaScript*/
+  if (Array.isArray(identifier)) {
+    identifier = identifier[0];
+  }
+  if (typeof identifier === "string") {
+    let styTag = document.querySelector("style");
+    if (styTag !== null) {
+      styTag.textContent = identifier + styTag.textContent!;
+      return;
+    }
+    styTag = document.createElement("style");
+    styTag.textContent = identifier;
+    document.head.appendChild(styTag);
+  }
+}
+
+/**
+ *
+ * @param {expression} condition
+ * @param {function} elements[]
+ */
+
+export function $if<Type>(
+  condition: boolean,
+  ...elements: VJS_Child_TYPE<Type | HTMLElement>[]
+) {
+  if (condition) {
+    return elements as HTMLElement[];
+  }
+  return undefined;
+}
+
+export function $ifelse<Type>(
+  condition: boolean,
+  ifTrue:
+    | VJS_Child_TYPE<Type | HTMLElement>
+    | VJS_Child_TYPE<Type | HTMLElement>[],
+  ifFalse:
+    | VJS_Child_TYPE<Type | HTMLElement>
+    | VJS_Child_TYPE<Type | HTMLElement>[]
+) {
+  if (condition) {
+    return ifTrue;
+  }
+  return ifFalse;
+}
+
+export function $case<Type>(
+  value: any,
+  ...elements: VJS_Child_TYPE<Type | HTMLElement>[]
+) {
+  return (key: any) => {
+    if (key === value) {
+      return elements as HTMLElement[];
+    }
+    return undefined;
+  };
+}
+export function $switch(
+  key: unknown,
+  ...cases: ((key: any) => HTMLElement[] | undefined)[]
+) {
+  if (cases.length) {
+    for (let i = 0; i < cases.length; i++) {
+      const case_N = cases[i];
+      const elements = case_N(key);
+      if (elements) {
+        return elements;
+      }
+    }
+  }
+  return undefined;
+}
+
+type LoopData<Type> = Type[];
+
+export function loop<Type>(
+  datalist: LoopData<Type>,
+  component: (
+    value: Type,
+    index?: number,
+    array?: LoopData<Type>
+  ) => HTMLElement | DocumentFragment | undefined
+) {
+  if (typeof component !== "function") {
+    throw new Error(
+      " ✘  Cradova err :  Invalid component type, must be a function that returns html  "
+    );
+  }
+  return Array.isArray(datalist)
+    ? (datalist.map(component) as unknown as HTMLElement[])
+    : undefined;
+}
+
+/**  Calculate a simple numerical representation of the URL */
+export let SNRU: string;
+export function memo_SNRU() {
+  let key = 0;
+  const url = window.location.href;
+  for (let i = 0; i < url.length; i++) {
+    key += url.charCodeAt(i);
+  }
+  SNRU = key.toString();
+}
+
+/**
+ * Document fragment
+ * @param children
+ * @returns
+ */
+
+export const frag = function (children: VJSType<HTMLElement>[]) {
+  const par = document.createDocumentFragment();
+  // building it's children tree.
+  for (let i = 0; i < children.length; i++) {
+    let html: any = children[i];
+    if (typeof html === "function") {
+      html = html() as HTMLElement;
+    }
+    if (html instanceof HTMLElement || html instanceof DocumentFragment) {
+      par.appendChild(html);
+      continue;
+    }
+    if (html instanceof String) {
+      par.appendChild(document.createTextNode(html as unknown as string));
+      continue;
+    }
+    console.error(" ✘  Cradova err:   wrong element type" + html);
+    throw new TypeError(" ✘  Cradova err:   invalid element");
+  }
+  return par;
 };
-export const raw = (html: string): HTMLElement[] => {
-  const div = document.createElement("div");
-  div.innerHTML = html;
-  return Array.from(div.children) as HTMLElement[];
-};
+
+// hooks
+
+/**
+ * Cradova
+ * ---
+ *  Allows functional components to manage state by providing a state value and a function to update it.
+ * @param initialValue
+ * @param ActiveRef
+ * @returns [state, setState]
+ */
+export function useState<S = unknown>(
+  initialValue: S,
+  ActiveRef: Ref<unknown>
+): [S, (newState: S) => void] {
+  ActiveRef._roll_state(initialValue, false, true);
+  /**
+   * cradova
+   * ---
+   * set new state and re-renders Ref
+   * @param newState
+   */
+  function setState(newState: S) {
+    if (!ActiveRef._first_stated) {
+      ActiveRef._first_stated = true;
+    }
+    ActiveRef._roll_state(newState, true);
+  }
+  return [ActiveRef._roll_state(null) as S, setState];
+}
+/**
+ * Cradova
+ * ---
+Allows side effects to be performed in functional components (Refs), such as fetching data or subscribing to events.
+ * @param effect
+ * @returns 
+ */
+export function useEffect(effect: () => void, ActiveRef: Ref<unknown>) {
+  ActiveRef._effect(effect);
+}
+/**
+ * Cradova
+ * ---
+Returns a mutable reference object of dom elements that persists across component renders.
+ * @returns reference 
+ */
+export function useRef() {
+  return new reference() as unknown as Record<string, HTMLElement | undefined>;
+}

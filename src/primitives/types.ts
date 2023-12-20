@@ -9,8 +9,7 @@ and limitations under the License.
 ***************************************************************************** */
 
 import * as CSS from "csstype";
-import { Screen } from "./Screen";
-import { Ref, reference } from "./parts";
+import { Ref, reference } from "./classes";
 
 type DataAttributes = { [key: `data-${string}`]: string };
 type AriaAttributes = { [key: `aria-${string}`]: string };

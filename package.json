@@ -13,8 +13,8 @@
     "url": "git+https://github.com/FridayCandour/cradova.git"
   },
   "scripts": {
-    "build": "tsup lib/index.ts",
-    "pub": "tsup lib/index.ts && npm publish",
+    "build": "tsup src/index.ts",
+    "pub": "tsup src/index.ts && npm publish",
     "lint": "eslint . --fix"
   },
   "keywords": [

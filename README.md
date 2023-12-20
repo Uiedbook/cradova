@@ -72,7 +72,7 @@ Cradova is a web development framework for building Single Page Applications and
 
 It's a fast and simple framework, it provides an easy to use state management and router system.
 
-Cradova follows the [VJS specification](https://github.com/uiedbook/cradova/blob/main/VJS_spec/spec.md)
+Cradova follows the [VJS specification](https://github.com/uiedbook/cradova/blob/main/VJS_spec/specification.md)
 
 ## What's the benefit?
 
@@ -129,10 +129,9 @@ const html = div(Hello("peter"), Hello("joe"));
 document.body.append(html);
 ```
 
-## working with state:
+## Basic Samples:
 
-this a collection of basic examples
-you can choose any that best suite what problem you want to solve
+this a collection of basic examples that can give you some ideas
 
 ```js
 import _, { button, createSignal, Ref, reference, h1, br, div } from "cradova";
@@ -225,7 +224,7 @@ Let's see a simple TodoList example
 
 ```js
 import _, {
-  // elements
+  // tags
   div,
   button,
   main,
@@ -235,8 +234,6 @@ import _, {
   createSignal,
   // dom ref
   useRef(),
-  // useState
-  // useEffect
   // dynamic component class
   Ref,
   css,
@@ -468,7 +465,7 @@ We are currently working to [set](https://github.com/uiedbook/cradova/blob/main/
 
 - building Cradova CLI (in progress)
 - Cradova Documentation Website
-- UI component libraries for cradova
+- UI component libraries for cradova (The Sacho Project)
 - Sample projects
 - maintenance and promotion
 
@@ -481,12 +478,18 @@ We are currently working to [set](https://github.com/uiedbook/cradova/blob/main/
     ╚═════╝   ╚═╝  ╚═╝  ╚═╝  ╚═╝   ╚══════╝     ╚════╝        ╚══╝    ╚═╝  ╚═╝
 ```
 
-## Sponsor
+## Apache Lincenced
 
-Your contribution(s) is a good force for change anytime you do it, you can ensure Cradova's growth and improvement by contributing a re-occuring or fixed donations to:
+Opensourced And Free.
 
-https://www.buymeacoffee.com/fridaycandour
+Uiedbook is an open source team of web focused engineers, their vision is to make the web better, improving and innovating infrastructures for a better web experience.
 
-Or Click.
+Join Us on [telegram]("https://t.me/UiedbookHQ").
 
-<a href="https://www.buymeacoffee.com/fridaycandour"><img src="https://img.buymeacoffee.com/button-api/?text=Buy us a coffee&emoji=&slug=fridaycandour&button_colour=FFDD00&font_colour=000000&outline_colour=000000&coffee_colour=ffffff" /></a>
+### Contribution and License Agreement
+
+If you contribute code to this project, you are implicitly allowing your code to be distributed under the MIT license. You are also implicitly verifying that all code is your original work.
+
+## Supporting Exabase development
+
+Your Support is a good force for change anytime you do it, you can ensure Exabase growth and improvement by making a re-occuring or fixed sponsorship to my [github sponsors](https://github.com/sponsors/FridayCandour): or crypto using etheruen: `0xD7DDD4312A4e514751A582AF725238C7E6dF206c`, Bitcoin: `bc1q5548kdanwyd3y07nyjjzt5zkdxqec4nqqrd760` or LTC: `ltc1qgqn6nqq6x555rpj3pw847402aw6kw7a25dc29w`.

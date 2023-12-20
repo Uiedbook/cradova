@@ -14,9 +14,9 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": false,
-    "isolatedModules": true, 
+    "isolatedModules": true,
     "noEmit": true
   },
-  "exclude": ["node_modules", "lib/types"],
-  "include": ["lib", "lib/ajax.ts"]
+  "exclude": ["node_modules", "src/types"],
+  "include": ["src", "src/ajax.ts"]
 }
