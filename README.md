@@ -482,14 +482,14 @@ We are currently working to [set](https://github.com/uiedbook/cradova/blob/main/
 
 Opensourced And Free.
 
-Uiedbook is an open source team of web focused engineers, their vision is to make the web better, improving and innovating infrastructures for a better web experience.
+Uiedbook is an open source team of web focused engineers, Our vision is to make the web better, improving and innovating infrastructures for a better web experience.
 
 Join Us on [telegram]("https://t.me/UiedbookHQ").
 
 ### Contribution and License Agreement
 
-If you contribute code to this project, you are implicitly allowing your code to be distributed under the MIT license. You are also implicitly verifying that all code is your original work.
+If you contribute code to this project, you are implicitly allowing your code to be distributed under same license. You are also implicitly verifying that all code is your original work.
 
 ## Supporting Exabase development
 
-Your Support is a good force for change anytime you do it, you can ensure Exabase growth and improvement by making a re-occuring or fixed sponsorship to my [github sponsors](https://github.com/sponsors/FridayCandour): or crypto using etheruen: `0xD7DDD4312A4e514751A582AF725238C7E6dF206c`, Bitcoin: `bc1q5548kdanwyd3y07nyjjzt5zkdxqec4nqqrd760` or LTC: `ltc1qgqn6nqq6x555rpj3pw847402aw6kw7a25dc29w`.
+Your Support is a good force for change anytime you do it, you can ensure Our projects, growth, Cradova, Exabase, JetPath etc, growth and improvement by making a re-occuring or fixed sponsorship to my [github sponsors](https://github.com/sponsors/FridayCandour): or crypto using etheruen: `0xD7DDD4312A4e514751A582AF725238C7E6dF206c`, Bitcoin: `bc1q5548kdanwyd3y07nyjjzt5zkdxqec4nqqrd760` or LTC: `ltc1qgqn6nqq6x555rpj3pw847402aw6kw7a25dc29w`.
