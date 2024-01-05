@@ -9,5 +9,4 @@
 
 ##### Cradova community
 
-[Discord](https://discord.gg/b7fvMg38)
-[Telegram](https://t.me/cradovaframework)
+[Telegram](https://t.me/uiedbookHQ)

@@ -6,9 +6,9 @@ Updated / August 25, 2023 by friday candour
 
 ## VJS
 
-Vanilla JavaScript spec (VJS) is particularly normal JavaScript and nothing more, but a stack of function calls defining a Document Object Model (DOM) structure.
+Vanilla JavaScript spec (VJS) is particularly normal JavaScript and nothing more, as a stack of function calls defining a Document Object Model (DOM) structure.
 
-It is naturally ECMAScript compliant and doesn't require any preprocessor (transpilers), which means it works on all engines and browsers.
+It is naturally ECMAScript compliant and require no preprocessor (transpilers), which means it works on all engines and browsers.
 
 In VJS the first parameter is the template for the HTML element which can consists of a class name, id and inner text in a single string, other properties are the HTML element attributes in an object syntax and its children.
 

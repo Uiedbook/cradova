@@ -45,7 +45,7 @@ const details = `
     ╚═════╝   ╚═╝  ╚═╝  ╚═╝  ╚═╝   ╚══════╝     ╚════╝        ╚══╝    ╚═╝  ╚═╝ 
 =============================================================================
 Cradova
-@version  3.3.0
+@version  3.3.1
 License: Apache V2
 Copyright 2022 Friday Candour. 
 Repository - https://github.com/fridaycandour/cradova

@@ -24,7 +24,7 @@ function TodoList() {
   // creating a store
   const todoStore = new createSignal([
     "take bath",
-    "code code code",
+    "code coded",
     "take a break",
   ]);
 

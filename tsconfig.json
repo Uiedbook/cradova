@@ -17,6 +17,6 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "exclude": ["node_modules", "src/types"],
-  "include": ["src", "src/ajax.ts"]
+  "exclude": ["node_modules"],
+  "include": ["src"]
 }
