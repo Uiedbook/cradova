@@ -21,8 +21,8 @@ export type VJSType<T> = (
     | string
     | HTMLElement
     | HTMLElement[]
-    | Ref<unknown>
-    | Ref<unknown>[]
+    | Ref
+    | Ref[]
     | DocumentFragment
     | DocumentFragment[]
     | TemplateStringsArray
@@ -47,8 +47,8 @@ export type VJS_params_TYPE<T> =
     | string
     | HTMLElement
     | HTMLElement[]
-    | Ref<unknown>
-    | Ref<unknown>[]
+    | Ref
+    | Ref[]
     | DocumentFragment
     | DocumentFragment[]
     | TemplateStringsArray

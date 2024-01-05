@@ -99,7 +99,7 @@ export const makeElement = <E extends HTMLElement>(
         // signal
         if ((value! as unknown[])[0] instanceof createSignal) {
           ((value! as unknown[])![0] as createSignal<{}>).bindRef(
-            element as unknown as Ref<unknown>,
+            element as unknown as Ref,
             {
               _element_property: prop,
               signalProperty: (value! as unknown[])![1] as string,
@@ -241,7 +241,7 @@ export const cra = <E extends HTMLElement>(tag: string) => {
 };
 
 export function Rhoda(
-  l: VJSType<HTMLElement>[] | (() => any)[] | Ref<unknown>[] | HTMLElement[]
+  l: VJSType<HTMLElement>[] | (() => any)[] | Ref[] | HTMLElement[]
 ) {
   const fg = new DocumentFragment();
   for (let ch of l) {
@@ -426,9 +426,14 @@ export const frag = function (children: VJSType<HTMLElement>[]) {
  */
 export function useState<S = unknown>(
   initialValue: S,
-  ActiveRef: Ref<unknown>
+  ActiveRef: Ref
 ): [S, (newState: S) => void] {
-  ActiveRef._roll_state(initialValue, false, true);
+  ActiveRef._state_index += 1;
+  const idx = ActiveRef._state_index;
+  if (!ActiveRef._state_track[idx]) {
+    ActiveRef._roll_state(initialValue, idx);
+    ActiveRef._state_track[idx] = true;
+  }
   /**
    * cradova
    * ---
@@ -436,12 +441,10 @@ export function useState<S = unknown>(
    * @param newState
    */
   function setState(newState: S) {
-    if (!ActiveRef._first_stated) {
-      ActiveRef._first_stated = true;
-    }
-    ActiveRef._roll_state(newState, true);
+    ActiveRef._roll_state(newState, idx);
+    ActiveRef.updateState();
   }
-  return [ActiveRef._roll_state(null) as S, setState];
+  return [ActiveRef._roll_state(null as S, idx, true) as S, setState];
 }
 /**
  * Cradova
@@ -450,7 +453,7 @@ Allows side effects to be performed in functional components (Refs), such as fet
  * @param effect
  * @returns 
  */
-export function useEffect(effect: () => void, ActiveRef: Ref<unknown>) {
+export function useEffect(effect: () => void, ActiveRef: Ref) {
   ActiveRef._effect(effect);
 }
 /**

@@ -62,28 +62,34 @@ export const CradovaEvent = new cradovaEvent();
  * create dynamic components
  */
 
-export class Ref<D> {
-  private component: (this: Ref<D>, data: D) => HTMLElement | DocumentFragment;
+export class Ref<Prop extends Record<string, any> = any> {
+  private component: (
+    this: Ref<Prop>,
+    data: Prop
+  ) => HTMLElement | DocumentFragment;
   private effects: (() => Promise<void> | void)[] = [];
-  private effectuate: ((this: Ref<D>) => void) | null = null;
+  private effectuate: ((this: Ref<Prop>) => void) | null = null;
+  public methods: Record<string, Function> = {};
   private rendered = false;
   private published = false;
   private preRendered: HTMLElement | null = null;
   private reference: reference = new reference();
   Signal: createSignal<any> | undefined;
   //? hooks management
-  _state?: D;
-  _first_state?: D;
-  _first_stated: boolean = false;
+  _state: Prop[] = [];
+  _state_track: { [x: number]: boolean } = {};
+  _state_index = 0;
+
   //? public testName = null;
-  public stash: D | undefined;
+  public stash: Prop | undefined;
   constructor(
-    component: (this: Ref<D>, data: D) => HTMLElement | DocumentFragment
+    component: (this: Ref<Prop>, data: Prop) => HTMLElement | DocumentFragment
     // options?: { active: boolean } | boolean
   ) {
     this.component = component.bind(this);
     CradovaEvent.addActiveEventListener("active-Refs", () => {
-      this._first_stated = false;
+      this._state_index = 0;
+      this.published = false;
       // if (options && (options === true || options.active)) {
       // ? we can only send stash data
       // this.updateState(this.stash);
@@ -91,12 +97,9 @@ export class Ref<D> {
     });
   }
 
-  preRender(data?: D, stash?: boolean) {
+  preRender(data?: Prop, stash?: boolean) {
     // ? parking
-    this.reference._appendDomForce(
-      "html",
-      this.render(data, stash) as HTMLElement
-    );
+    this.preRendered = this.render(data, stash) as HTMLElement;
   }
   destroyPreRendered() {
     this.preRendered = null;
@@ -110,14 +113,13 @@ export class Ref<D> {
    * @param method
    * @returns  void
    */
-  define(methodName: string, method: () => void) {
+  define(methodName: string, method: (this: this, ...arg: any) => void) {
     if (
       typeof methodName == "string" &&
       typeof method == "function" &&
       !Object.prototype.hasOwnProperty.call(this, methodName)
     ) {
-      (this as unknown as Record<string, Function>)[methodName] =
-        method.bind(this);
+      this.methods[methodName] = method.bind(this);
     } else {
       console.error(" ✘  Cradova err :  Invalid Ref.define parameters");
     }
@@ -130,29 +132,34 @@ export class Ref<D> {
    * @param data
    * @returns () => HTMLElement
    */
-  render(data?: D, stash?: boolean) {
+  render(data?: Prop, stash?: boolean) {
     this.effects = [];
     this.rendered = false;
-    let html = this.component(data as D);
-    // parking
-    if (typeof html === "function") {
-      html = (html as Function)();
-    }
-    if (!html) {
-      html = this.preRendered as unknown as HTMLElement;
-    }
     if (stash) {
       this.stash = data;
     }
-    if (html instanceof HTMLElement || html instanceof DocumentFragment) {
-      this.reference._appendDomForce("html", html as unknown as HTMLElement);
-      this.effector.apply(this);
-      this.rendered = true;
-      this.published = true;
+    if (!this.preRendered) {
+      const html = this.component(data as Prop);
+      // parking
+      // ! boohoo
+      // if (typeof html === "function") {
+      //   html = (html as Function)();
+      // }
+
+      if (html instanceof HTMLElement || html instanceof DocumentFragment) {
+        this.reference._appendDomForce("html", html as unknown as HTMLElement);
+        this.effector.apply(this);
+        this.rendered = true;
+        this.published = true;
+      } else {
+        console.error(
+          " ✘  Cradova err :  Invalid html content, got  - " + html
+        );
+      }
+      return html as HTMLElement | DocumentFragment;
     } else {
-      console.error(" ✘  Cradova err :  Invalid html content, got  - " + html);
+      return this.preRendered;
     }
-    return html as HTMLElement | DocumentFragment;
   }
   instance() {
     return this.reference.current("html");
@@ -160,14 +167,11 @@ export class Ref<D> {
   _setExtra(Extra: createSignal<any>) {
     this.Signal = Extra;
   }
-  _roll_state(data?: D, get?: boolean, first?: boolean) {
-    if (get) {
-      this._state = data;
-      this.updateState(data);
+  _roll_state(data: any, idx: number, get = false) {
+    if (!get) {
+      this._state[idx] = data;
     }
-    if (first) this._first_state = data;
-    if (!this._first_stated) this._state = this._first_state;
-    return this._state;
+    return this._state[idx];
   }
   _effect(fn: () => Promise<void> | void) {
     if (!this.rendered) {
@@ -197,7 +201,7 @@ export class Ref<D> {
    * @returns
    */
 
-  updateState(data?: D, stash?: boolean) {
+  updateState(data?: Prop, stash?: boolean) {
     if (!this.rendered) {
       this.effectuate = () => {
         if (this.published) {
@@ -214,16 +218,16 @@ export class Ref<D> {
     }
   }
 
-  private async Activate(data?: D) {
-    // this._state_index = 0;
+  private async Activate(data?: Prop) {
+    this._state_index = 0;
     this.published = false;
     if (!this.rendered) {
       return;
     }
-    let html = this.component(data as D);
-    if (typeof html === "function") {
-      html = (html as Function)();
-    }
+    const html = this.component(data as Prop);
+    // if (typeof html === "function") {
+    //   html = (html as Function)();
+    // }
     if (html instanceof HTMLElement || html instanceof DocumentFragment) {
       const node = this.reference.current("html");
       if (node) {
@@ -325,12 +329,12 @@ const localTree = new reference();
  * @constructor initial: unknown, props: {useHistory, persist}
  */
 
-export class createSignal<Type extends Record<string, unknown>> {
+export class createSignal<Type extends Record<string, any>> {
   private callback: undefined | ((newValue: Type) => void);
   private persistName: string | undefined = "";
   private actions: Record<string, (data?: Type) => Type | void> = {};
   private ref: {
-    ref: Ref<unknown>;
+    ref: Ref;
     _event?: string;
     _signalProperty?: string;
     _element_property?: string;
@@ -542,7 +546,7 @@ export class createSignal<Type extends Record<string, unknown>> {
    * @param path a property in the object to send to attached ref
    */
   bindRef(
-    ref: Partial<Ref<unknown>>,
+    ref: Partial<Ref>,
     binding: {
       event?: string;
       signalProperty: string;
@@ -559,7 +563,7 @@ export class createSignal<Type extends Record<string, unknown>> {
     if (ref && ref.updateState) {
       // it's an element binding, not ref, not event(fire action events)
       this.ref.push({
-        ref: ref as Ref<unknown>,
+        ref: ref as Ref<{}>,
         _signalProperty: binding.signalProperty,
         _element_property: binding._element_property,
         _event: binding.event,
@@ -870,7 +874,7 @@ class RouterBoxClass {
           if (typeof this.errorHandler === "function") {
             this.errorHandler(Error);
           } else {
-            console.error(Error);
+            console.error(error);
             throw new Error(
               " ✘  Cradova err:  consider adding error boundary to the specific screen  "
             );
@@ -1191,7 +1195,7 @@ export class Router {
     } else {
       localTree._appendDomForceGlobal("doc", doc as HTMLElement);
     }
-    window.addEventListener("pageshow", RouterBox.router);
+    window.addEventListener("pageshow", () => RouterBox.router());
     window.addEventListener("popstate", (_e) => {
       _e.preventDefault();
       RouterBox.router();

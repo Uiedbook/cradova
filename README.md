@@ -27,7 +27,28 @@
 [![npm Downloads](https://img.shields.io/npm/dm/cradova.svg)](https://www.npmjs.com/package/cradova)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cradova/cradova.js/blob/next/contributing.md)![Forks](https://img.shields.io/github/forks/uiedbook/cradova?style=social) ![Stargazers](https://img.shields.io/github/stars/uiedbook/cradova?style=social)
 
-## What's New? Conditionals!
+## 2024 - What's New? Ref methods!
+
+```js
+type dataType = { year: string, age: string };
+
+const Header =
+  new Ref() <
+  dataType >
+  function (data = { year: "2023", age: "2" }) {
+    return header(h1("Cradova is " + data.age + " in " + data.year));
+  };
+
+Header.define("increase", function (isNewYear) {
+  if (isNewYear) {
+    this.updateState({ year: "2024", age: "3" });
+  }
+});
+document.body.appendChild(Header.render());
+Header.methods.increase(true);
+```
+
+## 2023 - What's New? Conditionals!
 
 ```js
 import { div, h1, $if, $ifelse, $case, $switch } from "cradova";
@@ -492,4 +513,9 @@ If you contribute code to this project, you are implicitly allowing your code to
 
 ## Supporting Exabase development
 
-Your Support is a good force for change anytime you do it, you can ensure Our projects, growth, Cradova, Exabase, JetPath etc, growth and improvement by making a re-occuring or fixed sponsorship to my [github sponsors](https://github.com/sponsors/FridayCandour): or crypto using etheruen: `0xD7DDD4312A4e514751A582AF725238C7E6dF206c`, Bitcoin: `bc1q5548kdanwyd3y07nyjjzt5zkdxqec4nqqrd760` or LTC: `ltc1qgqn6nqq6x555rpj3pw847402aw6kw7a25dc29w`.
+Your Support is a good force for change anytime you do it, you can ensure Our projects, growth, Cradova, Exabase, JetPath etc, growth and improvement by making a re-occuring or fixed sponsorship
+to [github sponsors](https://github.com/sponsors/FridayCandour):
+or crypto using
+etheruen: `0xD7DDD4312A4e514751A582AF725238C7E6dF206c`,
+Bitcoin: `bc1q5548kdanwyd3y07nyjjzt5zkdxqec4nqqrd760` or
+LTC: `ltc1qgqn6nqq6x555rpj3pw847402aw6kw7a25dc29w`.
