@@ -36,7 +36,7 @@ const Header =
   new Ref() <
   dataType >
   function (data = { year: "2023", age: "2" }) {
-    return header(h1("Cradova is " + data.age + " in " + data.year));
+    return header(h1("Cradova is " + data.age + " yrs old in " + data.year));
   };
 
 Header.define("increase", function (isNewYear) {
