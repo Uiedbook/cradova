@@ -203,3 +203,7 @@ and we went along with it.
 - tested in production across serveral persoanl projects and did some custom testing
 - introduced the raw tag, just put in raw html strings if you need to for static contents/makeup,
   better for seo and faster render of none-dynamic contents.
+
+# v3.3.1
+
+- fixed speed, types, improvements and the define method
