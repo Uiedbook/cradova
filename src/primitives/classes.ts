@@ -74,6 +74,7 @@ export class Ref<Prop extends Record<string, any> = any> {
   private published = false;
   private preRendered: HTMLElement | null = null;
   private reference: reference = new reference();
+  private evented: boolean = false;
   Signal: createSignal<any> | undefined;
   //? hooks management
   _state: Prop[] = [];
@@ -146,9 +147,15 @@ export class Ref<Prop extends Record<string, any> = any> {
       //   html = (html as Function)();
       // }
 
+      if (!this.evented) {
+        CradovaEvent.addEventListener("onmountEvent", () =>
+          this.effector.apply(this)
+        );
+        this.evented = true;
+      }
+
       if (html instanceof HTMLElement || html instanceof DocumentFragment) {
         this.reference._appendDomForce("html", html as unknown as HTMLElement);
-        this.effector.apply(this);
         this.rendered = true;
         this.published = true;
       } else {

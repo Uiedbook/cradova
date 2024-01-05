@@ -8,5 +8,4 @@ coverage
 **/.github/README.md
 
 node_modules/
-dist/
-/manual_tests
+dist/ 
