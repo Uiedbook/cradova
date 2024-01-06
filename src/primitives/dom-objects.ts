@@ -82,17 +82,4 @@ export const raw = (html: string): HTMLElement[] => {
   const div = document.createElement("div");
   div.innerHTML = html;
   return Array.from(div.children) as HTMLElement[];
-};
-//? removed tags
-// export const area = cra<HTMLAreaElement>("area");
-// export const b = cra<HTMLElement>("b");
-// export const aside = cra<HTMLElement>("aside");
-// export const base = cra<HTMLBaseElement>("base");
-// export const blockquote = cra<HTMLElement>("blockquote");
-// export const code = cra<HTMLElement>("code");
-// export const legend = cra<HTMLLegendElement>("legend");
-// export const link = cra<HTMLLinkElement>("link");
-// export const menu = cra<HTMLMenuElement>("menu");
-// export const object = cra<HTMLObjectElement>("object");
-// export const pre = cra<HTMLPreElement>("pre");
-// export const data = cra<HTMLDataElement>("data");
+}; 

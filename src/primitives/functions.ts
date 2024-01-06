@@ -376,16 +376,17 @@ export function loop<Type>(
 }
 
 /**  Calculate a simple numerical representation of the URL */
-export let SNRU: string;
-export function memo_SNRU() {
-  let key = 0;
-  const url = window.location.href;
-  for (let i = 0; i < url.length; i++) {
-    key += url.charCodeAt(i);
-  }
-  SNRU = key.toString();
-}
-
+export const SNRU = {
+  snru: "",
+  memo_SNRU() {
+    let key = 0;
+    const url = window.location.href;
+    for (let i = 0; i < url.length; i++) {
+      key += url.charCodeAt(i);
+    }
+    this.snru = key.toString();
+  },
+};
 /**
  * Document fragment
  * @param children

@@ -8,7 +8,7 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ********************************************************************************/
 
-import { memo_SNRU, SNRU } from "./functions";
+import { SNRU } from "./functions";
 import { CradovaScreenType } from "./types";
 
 /**
@@ -45,9 +45,9 @@ class cradovaEvent {
    * @param eventArgs
    */
   async dispatchActiveEvent(eventName: string, eventArgs?: unknown) {
-    const eventListeners = this.listeners[eventName] || [];
-    // ? change snru value
-    eventListeners.length && memo_SNRU();
+    const eventListeners = this.active_listeners[eventName] || [];
+    // ? change snru.snru value
+    eventListeners.length && SNRU.memo_SNRU();
     for (let i = 0; i < eventListeners.length; i++) {
       eventListeners[i](eventArgs);
     }
@@ -74,7 +74,7 @@ export class Ref<Prop extends Record<string, any> = any> {
   private published = false;
   private preRendered: HTMLElement | null = null;
   private reference: reference = new reference();
-  private evented: boolean = false;
+  // private evented: boolean = false;
   Signal: createSignal<any> | undefined;
   //? hooks management
   _state: Prop[] = [];
@@ -147,15 +147,20 @@ export class Ref<Prop extends Record<string, any> = any> {
       //   html = (html as Function)();
       // }
 
-      if (!this.evented) {
-        CradovaEvent.addEventListener("onmountEvent", () =>
-          this.effector.apply(this)
-        );
-        this.evented = true;
-      }
-
       if (html instanceof HTMLElement || html instanceof DocumentFragment) {
         this.reference._appendDomForce("html", html as unknown as HTMLElement);
+        // if (!this.evented) {
+        //   CradovaEvent.addActiveEventListener("onmountEvent", () => {
+        //     if (this.rendered) {
+        //       this.rendered = false;
+        //       this.published = false;
+        //       console.log(`yoohoo 3`);
+        //     }
+        //     console.log(`yoohoo 1`);
+        //   });
+        //   this.evented = true;
+        // }
+        this.effector.apply(this);
         this.rendered = true;
         this.published = true;
       } else {
@@ -187,12 +192,13 @@ export class Ref<Prop extends Record<string, any> = any> {
   }
 
   private async effector() {
-    if (!this.rendered) {
-      for (let i = 0; i < this.effects.length; i++) {
-        await this.effects[i].apply(this);
-      }
-      this.effects = [];
+    console.log("yoohoo 2");
+    // if (!this.rendered) {
+    for (let i = 0; i < this.effects.length; i++) {
+      await this.effects[i].apply(this);
     }
+    this.effects = [];
+    // }
     // first update
     if (this.effectuate) {
       this.effectuate();
@@ -297,8 +303,8 @@ export class reference {
    * @param name - The name of the referenced DOM element.
    */
   current<ElementType extends HTMLElement = HTMLElement>(name: string) {
-    if (this.tree[SNRU]) {
-      return this.tree[SNRU][name] as ElementType;
+    if (this.tree[SNRU.snru]) {
+      return this.tree[SNRU.snru][name] as ElementType;
     }
     return null as unknown as ElementType;
   }
@@ -309,11 +315,11 @@ export class reference {
    * @param element - The DOM element to reference.
    */
   _appendDomForce(name: string, Element: HTMLElement) {
-    if (this.tree[SNRU]) {
-      this.tree[SNRU][name] = Element;
+    if (this.tree[SNRU.snru]) {
+      this.tree[SNRU.snru][name] = Element;
     } else {
-      this.tree[SNRU] = {};
-      this.tree[SNRU][name] = Element;
+      this.tree[SNRU.snru] = {};
+      this.tree[SNRU.snru][name] = Element;
     }
   }
   _appendDomForceGlobal(name: string, Element: HTMLElement) {
@@ -699,6 +705,7 @@ export class Screen {
   }
 
   async _package() {
+    SNRU.memo_SNRU();
     if (typeof this._html === "function") {
       let html = await this._html.apply(this);
       if (typeof html === "function") {
@@ -741,8 +748,6 @@ export class Screen {
       return;
     }
     // packaging the screen dom
-
-    memo_SNRU();
     // ? tell all active Refs to re-render
     CradovaEvent.dispatchActiveEvent("active-Refs");
     if (!this._persist || force || !this._packed) {
@@ -753,6 +758,8 @@ export class Screen {
     localTree.globalTree.doc.innerHTML = "";
     localTree.globalTree.doc.appendChild(this._template as Node);
     CradovaEvent.dispatchEvent("onmountEvent");
+    // CradovaEvent.dispatchActiveEvent("onmountEvent");
+
     window.scrollTo({
       top: 0,
       left: 0,

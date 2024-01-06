@@ -8,5 +8,5 @@ echo ""
 npm run build
 echo  "  Packing ... "
 npm pack
-mv cradova-3.3.1.tgz ~/
+mv cradova-3.3.2.tgz ~/
 echo  "done!"
