@@ -8,20 +8,15 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ********************************************************************************/
 
-import {
-  VJS_Child_TYPE,
-  VJS_params_TYPE,
-  VJS_props_TYPE,
-  VJSType,
-} from "./types";
+import { VJS_params_TYPE } from "./types";
 import { Ref, reference, createSignal, CradovaEvent } from "./classes";
 import { Router } from "./classes";
 
 export const makeElement = <E extends HTMLElement>(
   element: E & HTMLElement,
-  ElementChildrenAndPropertyList: VJS_params_TYPE<E>
+  ElementChildrenAndPropertyList: VJS_params_TYPE
 ) => {
-  let props: VJS_props_TYPE = {},
+  let props: any = {},
     text: string | number | null = null;
   //? getting children ready
   if (ElementChildrenAndPropertyList.length !== 0) {
@@ -176,73 +171,13 @@ export const makeElement = <E extends HTMLElement>(
   return element as E;
 };
 
-export const make = function (descriptor: any) {
-  if (Array.isArray(descriptor)) {
-    descriptor = descriptor[0];
-  }
-  if (typeof descriptor !== "string") {
-    return [];
-  }
-  let innerValue = "";
-  if (descriptor.includes("|")) {
-    [descriptor, innerValue] = descriptor.split("|");
-    if (!descriptor) {
-      return ["P", undefined, undefined, innerValue];
-    }
-  }
-  let tag;
-  if (!descriptor.includes("#")) {
-    descriptor = descriptor.split(".");
-    tag = descriptor.shift();
-    if (!tag) {
-      tag = "DIV";
-    }
-    return [tag, undefined, descriptor.join(" "), innerValue];
-  } else {
-    if (!descriptor.includes(".")) {
-      descriptor = descriptor.split("#");
-      tag = descriptor.shift();
-      if (!tag) {
-        tag = "DIV";
-      }
-      if (descriptor[0].includes(" ")) {
-        descriptor = [descriptor[0].split(" ")[1]];
-      }
-      return [tag, descriptor[0], undefined, innerValue];
-    }
-  }
-  descriptor = descriptor.split(".");
-  const classes = [];
-  const IDs = [];
-  tag = !descriptor[0].includes("#") && descriptor.shift();
-  if (!tag) {
-    tag = "DIV";
-  }
-  for (let i = 0; i < descriptor.length; i++) {
-    if (descriptor[i].includes("#")) {
-      const item = descriptor[i].split("#");
-      IDs.push(item[1]);
-      if (i === 0) {
-        tag = item[0];
-        continue;
-      }
-      classes.push(item[0]);
-      continue;
-    }
-    classes.push(descriptor[i]);
-  }
-  return [tag, IDs[0], classes.join(" "), innerValue];
-};
-
 export const cra = <E extends HTMLElement>(tag: string) => {
-  const extend = (...Children_and_Properties: VJSType<E>[]): E =>
+  const extend = (...Children_and_Properties: VJS_params_TYPE): E =>
     makeElement<E>(document.createElement(tag) as E, Children_and_Properties);
-  return extend as VJSType<E>;
+  return extend;
 };
 
-export function Rhoda(
-  l: VJSType<HTMLElement>[] | (() => any)[] | Ref[] | HTMLElement[]
-) {
+export function Rhoda(l: VJS_params_TYPE) {
   const fg = new DocumentFragment();
   for (let ch of l) {
     if (Array.isArray(ch)) {
@@ -252,9 +187,9 @@ export function Rhoda(
         ch = ch.render(undefined) as HTMLElement;
       }
       if (typeof ch === "function") {
-        ch = ch() as VJSType<HTMLElement>;
+        ch = ch();
         if (typeof ch === "function") {
-          ch = ch() as VJSType<HTMLElement>;
+          ch = (ch as any)();
         }
       }
       if (typeof ch === "string" || typeof ch === "number") {
@@ -303,24 +238,17 @@ export function css(identifier: string | TemplateStringsArray) {
  * @param {function} elements[]
  */
 
-export function $if<Type>(
-  condition: boolean,
-  ...elements: VJS_Child_TYPE<Type | HTMLElement>[]
-) {
+export function $if(condition: boolean, ...elements: VJS_params_TYPE) {
   if (condition) {
     return elements as HTMLElement[];
   }
   return undefined;
 }
 
-export function $ifelse<Type>(
+export function $ifelse(
   condition: boolean,
-  ifTrue:
-    | VJS_Child_TYPE<Type | HTMLElement>
-    | VJS_Child_TYPE<Type | HTMLElement>[],
-  ifFalse:
-    | VJS_Child_TYPE<Type | HTMLElement>
-    | VJS_Child_TYPE<Type | HTMLElement>[]
+  ifTrue: VJS_params_TYPE,
+  ifFalse: VJS_params_TYPE
 ) {
   if (condition) {
     return ifTrue;
@@ -328,10 +256,7 @@ export function $ifelse<Type>(
   return ifFalse;
 }
 
-export function $case<Type>(
-  value: any,
-  ...elements: VJS_Child_TYPE<Type | HTMLElement>[]
-) {
+export function $case(value: any, ...elements: VJS_params_TYPE) {
   return (key: any) => {
     if (key === value) {
       return elements as HTMLElement[];
@@ -393,7 +318,7 @@ export const SNRU = {
  * @returns
  */
 
-export const frag = function (children: VJSType<HTMLElement>[]) {
+export const frag = function (children: VJS_params_TYPE) {
   const par = document.createDocumentFragment();
   // building it's children tree.
   for (let i = 0; i < children.length; i++) {

@@ -2,10 +2,7 @@
 Copyright 2022 Friday Candour. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0
-
-See the Apache Version 2.0 License for specific language governing permissions
-and limitations under the License.
+License at http://www.apache.org/licenses/LICENSE-2.0 
 ***************************************************************************** */
 
 import * as CSS from "csstype";
@@ -14,33 +11,7 @@ import { Ref, reference } from "./classes";
 type DataAttributes = { [key: `data-${string}`]: string };
 type AriaAttributes = { [key: `aria-${string}`]: string };
 
-export type VJSType<T> = (
-  ...VJS: // children type
-  (
-    | undefined
-    | string
-    | HTMLElement
-    | HTMLElement[]
-    | Ref
-    | Ref[]
-    | DocumentFragment
-    | DocumentFragment[]
-    | TemplateStringsArray
-    // property type
-    | Partial<T>
-    | (() => HTMLElement)
-    | Partial<DataAttributes>
-    | Partial<AriaAttributes>
-    | CSS.Properties
-    | {
-        style?: CSS.Properties;
-        onmount?: (this: T) => void;
-        reference?: reference;
-      }
-  )[]
-) => T;
-
-export type VJS_params_TYPE<T> =
+export type VJS_params_TYPE =
   // children type
   (
     | undefined
@@ -53,7 +24,7 @@ export type VJS_params_TYPE<T> =
     | DocumentFragment[]
     | TemplateStringsArray
     // property type
-    | Partial<T>
+    | Partial<HTMLElement>
     | (() => HTMLElement)
     | Partial<DataAttributes>
     | Partial<AriaAttributes>
@@ -75,18 +46,10 @@ export type VJS_params_TYPE<T> =
         required?: string;
         frameBorder?: string;
         style?: CSS.Properties;
-        onmount?: (this: T) => void;
+        onmount?: (this: HTMLElement) => void;
         reference?: reference;
       }
   )[];
-
-export type VJS_Child_TYPE<T> = undefined | string | T | (() => T);
-
-export type VJS_props_TYPE = {
-  style?: CSS.Properties;
-  onmount?: () => void;
-  reference?: reference;
-};
 
 export type stateType =
   | string
@@ -99,7 +62,6 @@ export type stateType =
     });
 
 export interface RouterRouteObject {
-  // _name?: string;
   _html:
     | ((this: Screen, data?: unknown) => HTMLElement | DocumentFragment)
     | HTMLElement
@@ -137,14 +99,6 @@ export type CradovaScreenType<T = unknown> = {
    * .
    */
   name?: string;
-  /**
-   * Cradova screen
-   * ---
-   * a css className to add to screen when rendering it
-   * Usually for adding css transitions
-   * .
-   */
-  // transition?: string;
   /**
    * Cradova screen
    * ---

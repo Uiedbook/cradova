@@ -1,6 +1,6 @@
 Draft / February 18, 2023 by friday candour
 
-Updated / August 25, 2023 by friday candour
+Updated / January 10, 2024 by friday candour
 
 # Introduction
 
@@ -16,9 +16,7 @@ Another type of VJS syntax is the tag name as a function in lowercase, while its
 
 VJS should be completely typed to support HTML attributes for each element type where possible.
 
-It is required that second parameter to be the Attributes object of the element type if needed, but it can appear at any position of the parameter list.
-
-If the first parameter is not a template or string it is considered as a document fragment if it's not a tag function. in the type VJS() not div().
+It is required that first parameter to be the Attributes object of the element type if needed, but it can appear at any position of the parameter list.
 
 Every other thing on the parameter list which is not the first string parameter or a normal JavaScript object is considered as a child of the element if valid.
 
@@ -35,7 +33,7 @@ Syntax
 ```
 VJS( => template, => props, => ...children)
 
-// VJS tags
+//   tags
 
 TAG( => props, => ...children)
 
@@ -53,26 +51,7 @@ VJS(template);
 div();
 // examples
 
-// classes
-VJS("div.button-red.m10");
-
 div({ className: "button-red m10" });
-
-// classes and ID
-VJS("main#container.flex-container.white-bg");
-
-// classes and ID and innerText
-VJS("p.blue#para| blue text paragraph");
-
-// without tags defaults to a div
-VJS(".blue-bg#div| blue background div with innerText");
-
-// avoiding the pipe format
-VJS("p", "hello world");
-
-// using javascript template literals
-VJS`p| hello world `;
-// this javascript template literal example cannot have more parameters
 ```
 
 ### VJS attributes
@@ -80,20 +59,12 @@ VJS`p| hello world `;
 Syntax
 
 ```js
-// attributes should be verified available on the element
-
-VJS("div", { foo: "bar" }); //should throws error
-VJS("div", (style: { foo: "bar" })); // should throw error
 
 // VJS tags
 
 div( { style: { foo: "bar" }} ) // should throw and error
 
-VJS("div", { id: "bar" }); // valid
 div( { { id: "bar" }} ) // valid
-VJS("div", { style: { backgroundColor: "aqua" } }); // valid
-VJS("label", { for: "bar" });
-VJS("div", (style: { $age: "bar" })); // data-age
 ```
 
 ### VJS Children
@@ -103,23 +74,9 @@ Syntax
 ```js
 // A child can be the VJS function call, HTML element or a document fragment.
 
-VJS(
-  "div",
-  VJS("p", "history is a ..."),
-  VJS("p", "chemistry is the study ...")
-);
-
-div(p("history is a ..."), p("chemistry is the study ..."));
-
 // looping
 
 const names = ["john", "paul"];
-
-VJS(
-  "div",
-  names.map((name) => VJS("p", "hello " + name))
-);
-
 div(names.map((name) => p("hello " + name)));
 
 // conditional rendering
@@ -137,26 +94,7 @@ Syntax
 
 ```js
 function Hello(name) {
-  return VJS("h1", "Hello " + name);
-}
-
-function Hello(name) {
   return H1("Hello " + name);
-}
-```
-
-### VJS Fragment
-
-Syntax
-
-```js
-// VJS() return a document fragment
-
-function paragraphs(name) {
-  return VJS(
-    VJS("p", "history is a ..."),
-    VJS("p", "chemistry is the study ...")
-  );
 }
 ```
 

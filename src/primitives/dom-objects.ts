@@ -8,8 +8,8 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ********************************************************************************/
 
-import { VJS_props_TYPE } from "./types";
 import { cra, makeElement } from "./functions";
+import { VJS_params_TYPE } from "./types";
 
 export const a = cra<HTMLAnchorElement>("a");
 export const article = cra<HTMLElement>("article");
@@ -72,14 +72,16 @@ export const ul = cra<HTMLUListElement>("ul");
 export const video = cra<HTMLVideoElement>("video");
 export const svg = (
   svg: string,
-  properties?: VJS_props_TYPE
+  properties?: VJS_params_TYPE
 ): HTMLSpanElement => {
   const span = document.createElement("span");
   span.innerHTML = svg;
-  return makeElement<HTMLSpanElement>(span, [properties]);
+  return makeElement<HTMLSpanElement>(span, properties!);
 };
-export const raw = (html: string): HTMLElement[] => {
+export const raw = (html: string): DocumentFragment => {
   const div = document.createElement("div");
   div.innerHTML = html;
-  return Array.from(div.children) as HTMLElement[];
-}; 
+  const df = new DocumentFragment();
+  df.append(...Array.from(div.children));
+  return df;
+};

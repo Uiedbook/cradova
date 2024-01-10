@@ -29,9 +29,6 @@ class cradovaEvent {
     }
     this.active_listeners[eventName].push(callback);
   }
-  // removeEventListener(eventName: string, num: number) {
-  //   this.listeners[eventName].splice(num, 1);
-  // }
   async dispatchEvent(eventName: string, eventArgs?: unknown) {
     const eventListeners = this.listeners[eventName] || [];
     for (; eventListeners.length !== 0; ) {
@@ -506,7 +503,7 @@ export class createSignal<Type extends Record<string, any>> {
         if (ent._event === name) {
           //
           if (ent._element_property && ent._signalProperty) {
-            ent.ref?.updateState({
+            ent.ref.updateState({
               [ent._element_property]: data[ent._signalProperty],
             });
             return;
@@ -556,37 +553,25 @@ export class createSignal<Type extends Record<string, any>> {
    *  set a auto - rendering component for this store
    *
    * @param Ref component to bind to.
-   * @param path a property in the object to send to attached ref
    */
   bindRef(
-    ref: Partial<Ref>,
+    ref: Ref,
     binding: {
       event?: string;
       signalProperty: string;
       _element_property: string;
     } = { signalProperty: "", _element_property: "" }
   ) {
-    //
-    if (ref.render) {
-      ref.render = ref.render.bind(ref, this.value);
-    }
-    if (ref._setExtra) {
-      ref._setExtra(this);
-    }
-    if (ref && ref.updateState) {
-      // it's an element binding, not ref, not event(fire action events)
-      this.ref.push({
-        ref: ref as Ref<{}>,
-        _signalProperty: binding.signalProperty,
-        _element_property: binding._element_property,
-        _event: binding.event,
-      });
-      return;
-    }
+    ref.render = ref.render.bind(ref, this.value);
 
-    throw new Error(
-      "✘  Cradova err :  Invalid parameters for binding ref to Signal"
-    );
+    ref._setExtra(this);
+    // it's an element binding, not ref, not event(fire action events)
+    this.ref.push({
+      ref: ref,
+      _signalProperty: binding.signalProperty,
+      _element_property: binding._element_property,
+      _event: binding.event,
+    });
   }
 
   /**
@@ -796,7 +781,7 @@ class RouterBoxClass {
         this.pageevents[ci](url);
       }
       // always starts events a moment later
-    }, 100);
+    }, 50);
   }
 
   route(path: string, screen: Screen) {
@@ -980,16 +965,13 @@ const RouterBox = new RouterBoxClass();
  */
 
 export class Router {
-  /** cradova router
+  /**
+   * cradova router
    * ---
    * Registers a route.
    *
-   * accepts an object containing
-   *
-   * @param {string}   path     Route path.
-   * @param  screen the cradova screen.
+   * accepts an object containing pat and screen
    */
-
   static BrowserRoutes(obj: Record<string, any>) {
     for (const path in obj) {
       let screen = obj[path];
@@ -1002,7 +984,6 @@ export class Router {
           screen = await (typeof screen === "function"
             ? await screen()
             : await screen);
-          // const s = await screen;
           return RouterBox.route(path, screen?.default || screen);
         };
       } else {
@@ -1077,24 +1058,6 @@ export class Router {
       RouterBox.params.data = data;
       RouterBox.router(null, force);
     }
-  }
-  /**
-   * Cradova Router
-   * ------
-   *
-   * Navigates to a designated screen in your app by loading a seperate page;
-   *
-   * @param pathname string
-   */
-  static navigateNauturally(pathname: string) {
-    if (typeof pathname !== "string") {
-      throw new TypeError(
-        " ✘  Cradova err:  pathname must be a defined path but got " +
-          pathname +
-          " instead"
-      );
-    }
-    window.location.pathname = pathname;
   }
 
   /**
@@ -1176,7 +1139,7 @@ export class Router {
    */
 
   static getParams() {
-    return RouterBox["params"];
+    return RouterBox.params;
   }
 
   /**

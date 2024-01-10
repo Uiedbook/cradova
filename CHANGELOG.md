@@ -207,3 +207,8 @@ and we went along with it.
 # v3.3.1
 
 - fixed speed, types, improvements and the define method
+
+# v3.4.0
+
+- fixed type system, removed templating \_, more perfomanc, fixed perfomance in routing system, screens, and ref
+- more standard and speed.
