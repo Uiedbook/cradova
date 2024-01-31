@@ -1,65 +1,53 @@
-/*! *****************************************************************************
-Copyright 2022 Friday Candour. All rights reserved.
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0 
-***************************************************************************** */
-
 import * as CSS from "csstype";
-import { Ref, reference } from "./classes";
+import { Ref, Screen, reference } from "./classes";
 
 type DataAttributes = { [key: `data-${string}`]: string };
 type AriaAttributes = { [key: `aria-${string}`]: string };
 
+type Attributes = {
+  src?: string;
+  alt?: string;
+  for?: string;
+  rel?: string;
+  href?: string;
+  type?: string;
+  name?: string;
+  rows?: string;
+  value?: string;
+  accept: string;
+  action?: string;
+  target?: string;
+  method?: string;
+  checked?: boolean;
+  required?: string;
+  frameBorder?: string;
+  placeholder?: string;
+  reference?: reference;
+  autocomplete?: string;
+  style?: CSS.Properties;
+  updateState?: (P: any) => void;
+  onmount?: (this: HTMLElement & Attributes) => void;
+};
+
 export type VJS_params_TYPE =
   // children type
   (
-    | undefined
-    | string
-    | HTMLElement
-    | HTMLElement[]
     | Ref
     | Ref[]
+    | string
+    | undefined
+    | HTMLElement
+    | HTMLElement[]
     | DocumentFragment
-    | DocumentFragment[]
-    | TemplateStringsArray
     // property type
-    | Partial<HTMLElement>
+    | Attributes
     | (() => HTMLElement)
+    | Partial<Attributes>
+    | Partial<HTMLDivElement>
     | Partial<DataAttributes>
     | Partial<AriaAttributes>
     | CSS.Properties<string | number>
-    | {
-        src?: string;
-        href?: string;
-        placeholder?: string;
-        type?: string;
-        action?: string;
-        name?: string;
-        alt?: string;
-        for?: string;
-        method?: string;
-        rows?: string;
-        value?: string;
-        target?: string;
-        rel?: string;
-        required?: string;
-        frameBorder?: string;
-        style?: CSS.Properties;
-        onmount?: (this: HTMLElement) => void;
-        reference?: reference;
-      }
   )[];
-
-export type stateType =
-  | string
-  | HTMLElement
-  | HTMLElement[]
-  | ((() => HTMLElement) & {
-      style?: CSS.Properties;
-      reference?: reference;
-      tree?: HTMLElement | (() => HTMLElement);
-    });
 
 export interface RouterRouteObject {
   _html:
@@ -91,7 +79,7 @@ export interface RouterRouteObject {
   }): unknown;
 }
 
-export type CradovaScreenType<T = unknown> = {
+export type CradovaScreenType = {
   /**
    * Cradova screen
    * ---
@@ -107,11 +95,7 @@ export type CradovaScreenType<T = unknown> = {
    * @returns void
    * .
    */
-  template:
-    | ((this: Screen, data?: T | unknown) => HTMLElement | DocumentFragment)
-    | HTMLElement
-    | DocumentFragment
-    | Ref<any>;
+  template: (this: Screen) => Element | Ref;
   /**
    * Cradova screen
    * ---

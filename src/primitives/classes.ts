@@ -1,15 +1,5 @@
-/*! *****************************************************************************
-Copyright 2022 Friday Candour. All rights reserved.
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0
-
-See the Apache Version 2.0 License for specific language governing permissions
-and limitations under the License.
-********************************************************************************/
-
 import { SNRU } from "./functions";
-import { CradovaScreenType } from "./types";
+import { type CradovaScreenType } from "./types";
 
 /**
  * Cradova event
@@ -60,10 +50,7 @@ export const CradovaEvent = new cradovaEvent();
  */
 
 export class Ref<Prop extends Record<string, any> = any> {
-  private component: (
-    this: Ref<Prop>,
-    data: Prop
-  ) => HTMLElement | DocumentFragment;
+  private component: (this: Ref<Prop>, data: Prop) => HTMLElement;
   private effects: (() => Promise<void> | void)[] = [];
   private effectuate: ((this: Ref<Prop>) => void) | null = null;
   public methods: Record<string, Function> = {};
@@ -81,7 +68,7 @@ export class Ref<Prop extends Record<string, any> = any> {
   //? public testName = null;
   public stash: Prop | undefined;
   constructor(
-    component: (this: Ref<Prop>, data: Prop) => HTMLElement | DocumentFragment
+    component: (this: Ref<Prop>, data: Prop) => HTMLElement
     // options?: { active: boolean } | boolean
   ) {
     this.component = component.bind(this);
@@ -137,7 +124,7 @@ export class Ref<Prop extends Record<string, any> = any> {
       this.stash = data;
     }
     if (!this.preRendered) {
-      const html = this.component(data as Prop);
+      const html = this.component(data as Prop) as any;
       // parking
       // ! boohoo
       // if (typeof html === "function") {
@@ -165,7 +152,7 @@ export class Ref<Prop extends Record<string, any> = any> {
           " ✘  Cradova err :  Invalid html content, got  - " + html
         );
       }
-      return html as HTMLElement | DocumentFragment;
+      return html;
     } else {
       return this.preRendered;
     }
@@ -189,7 +176,7 @@ export class Ref<Prop extends Record<string, any> = any> {
   }
 
   private async effector() {
-    console.log("yoohoo 2");
+    // console.log("yoohoo 2");
     // if (!this.rendered) {
     for (let i = 0; i < this.effects.length; i++) {
       await this.effects[i].apply(this);
@@ -234,7 +221,7 @@ export class Ref<Prop extends Record<string, any> = any> {
     if (!this.rendered) {
       return;
     }
-    const html = this.component(data as Prop);
+    const html = this.component(data as Prop) as any;
     // if (typeof html === "function") {
     //   html = (html as Function)();
     // }
@@ -718,7 +705,7 @@ export class Screen {
     this._deCallBack = cb;
   }
   async _deActivate() {
-    this._deCallBack && (await this._deCallBack(localTree.globalTree.doc));
+    this._deCallBack && (await this._deCallBack(localTree.globalTree["doc"]));
   }
   drop(state?: boolean) {
     if (typeof state === "boolean") {
@@ -740,8 +727,8 @@ export class Screen {
       this._packed = true;
     }
     document.title = this._name;
-    localTree.globalTree.doc.innerHTML = "";
-    localTree.globalTree.doc.appendChild(this._template as Node);
+    localTree.globalTree["doc"].innerHTML = "";
+    localTree.globalTree["doc"].appendChild(this._template as Node);
     CradovaEvent.dispatchEvent("onmountEvent");
     // CradovaEvent.dispatchActiveEvent("onmountEvent");
 
@@ -751,7 +738,7 @@ export class Screen {
       // @ts-ignore
       behavior: "instant",
     });
-    this._callBack && (await this._callBack(localTree.globalTree.doc));
+    this._callBack && (await this._callBack(localTree.globalTree["doc"]));
   }
 }
 
@@ -770,7 +757,7 @@ class RouterBoxClass {
   pageHide = null;
   errorHandler?: Function;
   loadingScreen: any = null;
-  params: Record<string, unknown> = {};
+  params: any = {};
   routes: Record<string, Screen | (() => Promise<Screen | undefined>)> = {};
   pageevents: Function[] = [];
   // tarcking paused state of navigation
@@ -871,7 +858,7 @@ class RouterBoxClass {
           route._errorHandler(error);
         } else {
           if (typeof this.errorHandler === "function") {
-            this.errorHandler(Error);
+            this.errorHandler(error);
           } else {
             console.error(error);
             throw new Error(
@@ -887,6 +874,85 @@ class RouterBoxClass {
       }
     }
   }
+
+  // checker = (method: methods, url: string) => {
+  //   const routes = _JetPath_paths[method];
+  //   if (url[0] !== "/") {
+  //     url = url.slice(url.indexOf("/", 7));
+  //   }
+  //   if (routes[url]) {
+  //     return routes[url];
+  //   }
+  //   if (typeof routes === "function") {
+  //     (routes as Function)();
+  //     return;
+  //   }
+  //   //? check for extra / in the route
+  //   if (routes[url + "/"]) {
+  //     return routes[url];
+  //   }
+  //   //? check for search in the route
+  //   if (url.includes("/?")) {
+  //     const sraw = [...new URLSearchParams(url).entries()];
+  //     const search: Record<string, string> = {};
+  //     for (const idx in sraw) {
+  //       search[
+  //         sraw[idx][0].includes("?") ? sraw[idx][0].split("?")[1] : sraw[idx][0]
+  //       ] = sraw[idx][1];
+  //     }
+  //     return [routes[url.split("/?")[0] + "/?"], , search];
+  //   }
+
+  //   //? place holder & * route checks
+  //   for (const path in routes) {
+  //     // ? placeholder check
+  //     if (path.includes(":")) {
+  //       const urlFixtures = url.split("/");
+  //       const pathFixtures = path.split("/");
+  //       //? check for extra / in the route by normalize before checking
+  //       if (url.endsWith("/")) {
+  //         urlFixtures.pop();
+  //       }
+  //       let fixturesX = 0;
+  //       let fixturesY = 0;
+  //       //? length check of / (backslash)
+  //       if (pathFixtures.length === urlFixtures.length) {
+  //         for (let i = 0; i < pathFixtures.length; i++) {
+  //           //? let's jump place holders in the path since we can't determine from them
+  //           //? we increment that we skipped a position because we need the count later
+  //           if (pathFixtures[i].includes(":")) {
+  //             fixturesY++;
+  //             continue;
+  //           }
+  //           //? if it is part of the path then let increment a value for it
+  //           //? we will need it later
+  //           if (urlFixtures[i] === pathFixtures[i]) {
+  //             fixturesX++;
+  //           }
+  //         }
+  //         //? if after the checks it all our count are equal then we got it correctly
+  //         if (fixturesX + fixturesY === pathFixtures.length) {
+  //           const routesParams: Record<string, string> = {};
+  //           for (let i = 0; i < pathFixtures.length; i++) {
+  //             if (pathFixtures[i].includes(":")) {
+  //               routesParams[pathFixtures[i].split(":")[1]] = urlFixtures[i];
+  //             }
+  //           }
+  //           return [routes[path], routesParams];
+  //         }
+  //       }
+  //     }
+  //     // ? * check
+  //     if (path.includes("*")) {
+  //       const p = path.slice(0, -1);
+  //       if (url.startsWith(p)) {
+  //         return [routes[path], { extraPath: url.slice(p.length) }];
+  //       }
+  //     }
+  //   }
+  //   return;
+  // };
+
   checker(url: string): [Screen | (() => Promise<Screen | undefined>), any] {
     // first strict check
     if (this.routes[url]) {
@@ -945,7 +1011,7 @@ class RouterBoxClass {
               routesParams[pathFixtures[i].split(":")[1]] = urlFixtures[i];
             }
           }
-          routesParams._path = path;
+          routesParams["_path"] = path;
           return [this.routes[path], routesParams];
         }
       }
@@ -1138,7 +1204,7 @@ export class Router {
    * .
    */
 
-  static getParams() {
+  static get Params() {
     return RouterBox.params;
   }
 

@@ -1,14 +1,4 @@
-/*! *****************************************************************************
-Copyright 2022 Friday Candour. All rights reserved.
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0
-
-See the Apache Version 2.0 License for specific language governing permissions
-and limitations under the License.
-********************************************************************************/
-
-import { VJS_params_TYPE } from "./types";
+import { type VJS_params_TYPE } from "./types";
 import { Ref, reference, createSignal, CradovaEvent } from "./classes";
 import { Router } from "./classes";
 
@@ -238,18 +228,13 @@ export function css(identifier: string | TemplateStringsArray) {
  * @param {function} elements[]
  */
 
-export function $if(condition: boolean, ...elements: VJS_params_TYPE) {
+export function $if(condition: any, ...elements: VJS_params_TYPE): any {
   if (condition) {
-    return elements as HTMLElement[];
+    return elements;
   }
-  return undefined;
 }
 
-export function $ifelse(
-  condition: boolean,
-  ifTrue: VJS_params_TYPE,
-  ifFalse: VJS_params_TYPE
-) {
+export function $ifelse(condition: any, ifTrue: any, ifFalse?: any) {
   if (condition) {
     return ifTrue;
   }
@@ -259,7 +244,7 @@ export function $ifelse(
 export function $case(value: any, ...elements: VJS_params_TYPE) {
   return (key: any) => {
     if (key === value) {
-      return elements as HTMLElement[];
+      return elements;
     }
     return undefined;
   };

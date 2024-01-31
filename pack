@@ -2,11 +2,9 @@
 #!/bin/bash
 
 
-echo ""
-echo "running build!"
-echo ""
-npm run build
-echo  "  Packing ... "
+echo "" 
+echo "" 
+echo  "  Packing ...."
+tsc --emitDeclarationOnly
 npm pack
-mv cradova-3.3.3.tgz ~/
-echo  "done!"
+mv **.tgz ~/
