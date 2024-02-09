@@ -511,9 +511,9 @@ Join Us on [telegram](https://t.me/UiedbookHQ).
 
 If you contribute code to this project, you are implicitly allowing your code to be distributed under same license. You are also implicitly verifying that all code is your original work.
 
-## Supporting Exabase development
+## Supporting Cradova development
 
-Your Support is a good force for change anytime you do it, you can ensure Our projects, growth, Cradova, Exabase, JetPath etc, growth and improvement by making a re-occuring or fixed sponsorship
+Your Support is a good force for change anytime you do it, you can ensure Our projects, growth, Cradova, Cradova, JetPath etc, growth and improvement by making a re-occuring or fixed sponsorship
 to [github sponsors](https://github.com/sponsors/FridayCandour):
 or crypto using
 etheruen: `0xD7DDD4312A4e514751A582AF725238C7E6dF206c`,

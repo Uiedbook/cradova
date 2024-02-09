@@ -68,42 +68,6 @@ export const makeElement = <E extends HTMLElement>(
         continue;
       }
 
-      if (Array.isArray(value)) {
-        // reference
-        if (
-          prop == "reference" &&
-          (value! as unknown[])![0] instanceof reference
-        ) {
-          ((value! as unknown[])![0] as reference)._appendDomForce(
-            (value! as unknown[])![1] as string,
-            element
-          );
-          continue;
-        }
-
-        // signal
-        if ((value! as unknown[])[0] instanceof createSignal) {
-          ((value! as unknown[])![0] as createSignal<{}>).bindRef(
-            element as unknown as Ref,
-            {
-              _element_property: prop,
-              signalProperty: (value! as unknown[])![1] as string,
-            }
-          );
-          continue;
-        }
-      }
-
-      // setting onmount event;
-      if (prop === "onmount" && typeof props["onmount"] === "function") {
-        const ev = () => {
-          props.onmount?.apply(element);
-          props!["onmount"] = undefined;
-        };
-        CradovaEvent.addEventListener("onmountEvent", ev);
-        continue;
-      }
-
       // data-(s)
       if (prop.includes("data-")) {
         element.setAttribute(prop, value as string);
@@ -146,9 +110,43 @@ export const makeElement = <E extends HTMLElement>(
         prop !== "src"
       ) {
         element.style[prop as unknown as number] = value as string;
-        // throw new Error("boohoo");
         continue;
       }
+            if (Array.isArray(value)) {
+              // reference
+              if (
+                prop == "reference" &&
+                (value! as unknown[])![0] instanceof reference
+              ) {
+                ((value! as unknown[])![0] as reference)._appendDomForce(
+                  (value! as unknown[])![1] as string,
+                  element
+                );
+                continue;
+              }
+
+              // signal
+              if ((value! as unknown[])[0] instanceof createSignal) {
+                ((value! as unknown[])![0] as createSignal<{}>).bindRef(
+                  element as unknown as Ref,
+                  {
+                    _element_property: prop,
+                    signalProperty: (value! as unknown[])![1] as string,
+                  }
+                );
+                continue;
+              }
+            }
+
+            // setting onmount event;
+            if (prop === "onmount" && typeof props["onmount"] === "function") {
+              const ev = () => {
+                props.onmount?.apply(element);
+                props!["onmount"] = undefined;
+              };
+              CradovaEvent.addEventListener("onmountEvent", ev);
+              continue;
+            }
 
       // trying to set other values
       (element as unknown as Record<string, unknown>)[prop] = value;
@@ -204,23 +202,23 @@ export function Rhoda(l: VJS_params_TYPE) {
   return fg;
 }
 
-export function css(identifier: string | TemplateStringsArray) {
-  /*This is for creating
- css styles using JavaScript*/
-  if (Array.isArray(identifier)) {
-    identifier = identifier[0];
-  }
-  if (typeof identifier === "string") {
-    let styTag = document.querySelector("style");
-    if (styTag !== null) {
-      styTag.textContent = identifier + styTag.textContent!;
-      return;
-    }
-    styTag = document.createElement("style");
-    styTag.textContent = identifier;
-    document.head.appendChild(styTag);
-  }
-}
+// export function css(identifier: string | TemplateStringsArray) {
+//   /*This is for creating
+//  css styles using JavaScript*/
+//   if (Array.isArray(identifier)) {
+//     identifier = identifier[0];
+//   }
+//   if (typeof identifier === "string") {
+//     let styTag = document.querySelector("style");
+//     if (styTag !== null) {
+//       styTag.textContent = identifier + styTag.textContent!;
+//       return;
+//     }
+//     styTag = document.createElement("style");
+//     styTag.textContent = identifier;
+//     document.head.appendChild(styTag);
+//   }
+// }
 
 /**
  *
