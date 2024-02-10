@@ -66,7 +66,7 @@ export const svg = (
 ): HTMLSpanElement => {
   const span = document.createElement("span");
   span.innerHTML = svg;
-  return makeElement<HTMLSpanElement>(span, properties!);
+  return makeElement<HTMLSpanElement>(span, properties || []);
 };
 export const raw = (html: string): DocumentFragment => {
   const div = document.createElement("div");

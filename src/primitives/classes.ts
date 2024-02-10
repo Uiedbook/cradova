@@ -630,10 +630,10 @@ export class Screen {
     this._template.setAttribute("id", "cradova-screen-set");
     if (renderInParallel === true) {
       this._delegatedRoutesCount = 0;
-      this._persist = false!;
+      this._persist = false;
     } else {
       if (typeof persist === "boolean") {
-        this._persist = persist!;
+        this._persist = persist;
       }
     }
   }
@@ -835,11 +835,11 @@ class RouterBoxClass {
           }
         }
         //? delegation causing parallel rendering sequence
-        if (route!._delegatedRoutes !== -1) {
-          route!._delegatedRoutes = 1;
+        if (route._delegatedRoutes !== -1) {
+          route._delegatedRoutes = 1;
           const a = route._derive();
           route = new Screen({
-            template: route!._html as any,
+            template: route._html as any,
           });
           route._apply_derivation(a);
           this.routes[url] = route;
