@@ -1,0 +1,5 @@
+{
+  "name": "@uiedbook/cradova",
+  "version": "3.3.8",
+  "exports": "./dist"
+}
