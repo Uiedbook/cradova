@@ -95,7 +95,7 @@ export type CradovaScreenType = {
    * @returns void
    * .
    */
-  template: (this: Screen) => Element | Ref;
+  template: (this: Screen) => Element;
   /**
    * Cradova screen
    * ---
