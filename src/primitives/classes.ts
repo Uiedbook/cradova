@@ -1,42 +1,32 @@
 import { SNRU } from "./functions";
-import { type CradovaScreenType } from "./types";
+import { type CradovaPageType } from "./types";
 
 /**
  * Cradova event
  */
 class cradovaEvent {
-  private listeners: Record<string, Function[]> = {};
-  private active_listeners: Record<string, Function[]> = {};
-  async addEventListener(eventName: string, callback: () => void) {
-    if (!this.listeners[eventName]) {
-      this.listeners[eventName] = [];
+  private afterMount: Function[] = [];
+  private beforeMountActive: Function[] = [];
+  async addAfterMount(callback: () => void) {
+    if (!this.addAfterMount) {
+      this.afterMount = [];
     }
-    this.listeners[eventName].push(callback);
+    this.afterMount.push(callback);
   }
-  async addActiveEventListener(eventName: string, callback: () => void) {
-    if (!this.active_listeners[eventName]) {
-      this.active_listeners[eventName] = [];
+  async addBeforeMountActive(callback: () => void) {
+    if (!this.beforeMountActive) {
+      this.beforeMountActive = [];
     }
-    this.active_listeners[eventName].push(callback);
+    this.beforeMountActive.push(callback);
   }
-  async dispatchEvent(eventName: string, eventArgs?: unknown) {
-    const eventListeners = this.listeners[eventName] || [];
-    for (; eventListeners.length !== 0; ) {
-      eventListeners.shift()!(eventArgs);
-    }
-  }
-  /**
-   * Active refs is a concept for delegated screens to keep their active refs alive
-   * even in the case of naviagtion
-   * @param eventName
-   * @param eventArgs
-   */
-  async dispatchActiveEvent(eventName: string, eventArgs?: unknown) {
-    const eventListeners = this.active_listeners[eventName] || [];
-    // ? change snru.snru value
-    eventListeners.length && SNRU.memo_SNRU();
+  dispatchEvent(eventName: "beforeMountActive" | "afterMount") {
+    const eventListeners = this[eventName] || [];
     for (let i = 0; i < eventListeners.length; i++) {
-      eventListeners[i](eventArgs);
+      if (eventName.includes("Active")) {
+        eventListeners[i]();
+      } else {
+        eventListeners.shift()!();
+      }
     }
   }
 }
@@ -44,106 +34,61 @@ class cradovaEvent {
 export const CradovaEvent = new cradovaEvent();
 
 /**
- * Cradova Ref
+ * Cradova Comp
  * -------
  * create dynamic components
+ * 
  */
-
-export class Ref<Prop extends Record<string, any> = any> {
-  private component: (this: Ref<Prop>, data: Prop) => HTMLElement;
+export class Comp<Prop extends Record<string, any> = any> {
+  private component: (this: Comp<Prop>) => HTMLElement;
   private effects: (() => Promise<void> | void)[] = [];
-  private effectuate: ((this: Ref<Prop>) => void) | null = null;
-  public methods: Record<string, Function> = {};
+  private effectuate: ((this: Comp<Prop>) => void) | null = null;
   private rendered = false;
   private published = false;
   private preRendered: HTMLElement | null = null;
-  private reference: reference = new reference();
-  // private evented: boolean = false;
+  private reference: __raw_ref = new __raw_ref();
   Signal: createSignal<any> | undefined;
   //? hooks management
   _state: Prop[] = [];
   _state_track: { [x: number]: boolean } = {};
   _state_index = 0;
 
-  //? public testName = null;
-  public stash: Prop | undefined;
+  //? public testName = null; 
   constructor(
-    component: (this: Ref<Prop>, data: Prop) => HTMLElement
-    // options?: { active: boolean } | boolean
+    component: (this: Comp<Prop>) => HTMLElement
   ) {
     this.component = component.bind(this);
-    CradovaEvent.addActiveEventListener("active-Refs", () => {
-      this._state_index = 0;
+    CradovaEvent.addBeforeMountActive(() => {
       this.published = false;
-      // if (options && (options === true || options.active)) {
-      // ? we can only send stash data
-      // this.updateState(this.stash);
-      // }
     });
   }
 
-  preRender(data?: Prop, stash?: boolean) {
+  preRender() {
     // ? parking
-    this.preRendered = this.render(data, stash) as HTMLElement;
-  }
-  destroyPreRendered() {
-    this.preRendered = null;
+    this.preRendered = this.render() as HTMLElement;
   }
 
-  /**
-   * Cradova Ref
-   * ---
-   * construct to add custom methods to Refs
-   * @param methodName
-   * @param method
-   * @returns  void
-   */
-  define(methodName: string, method: (this: this, ...arg: any) => void) {
-    if (
-      typeof methodName == "string" &&
-      typeof method == "function" &&
-      !Object.prototype.hasOwnProperty.call(this, methodName)
-    ) {
-      this.methods[methodName] = method.bind(this);
-    } else {
-      console.error(" ✘  Cradova err :  Invalid Ref.define parameters");
-    }
-  }
 
   /**
-   * Cradova Ref
+   * Cradova Comp
    * ---
    * returns html with cradova reference
    * @param data
    * @returns () => HTMLElement
    */
-  render(data?: Prop, stash?: boolean) {
+  render() {
     this.effects = [];
     this.rendered = false;
-    if (stash) {
-      this.stash = data;
-    }
+
     if (!this.preRendered) {
-      const html = this.component(data as Prop) as any;
-      // parking
-      // ! boohoo
-      // if (typeof html === "function") {
-      //   html = (html as Function)();
-      // }
+      const html = this.component() as any;
+      // parking 
 
       if (html instanceof HTMLElement || html instanceof DocumentFragment) {
         this.reference._appendDomForce("html", html as unknown as HTMLElement);
-        // if (!this.evented) {
-        //   CradovaEvent.addActiveEventListener("onmountEvent", () => {
-        //     if (this.rendered) {
-        //       this.rendered = false;
-        //       this.published = false;
-        //       console.log(`yoohoo 3`);
-        //     }
-        //     console.log(`yoohoo 1`);
-        //   });
-        //   this.evented = true;
-        // }
+        //   CradovaEvent.addActiveEventListener("afterMountEvent", () => {
+        //       this.rendered = false; 
+        //   }); 
         this.effector.apply(this);
         this.rendered = true;
         this.published = true;
@@ -163,11 +108,17 @@ export class Ref<Prop extends Record<string, any> = any> {
   _setExtra(Extra: createSignal<any>) {
     this.Signal = Extra;
   }
-  _roll_state(data: any, idx: number, get = false) {
+  _roll_state<S>(data: any, idx: number, get = false) {
     if (!get) {
+      if (idx !== 0) {
+        // ? destroy provious state first
+        this._state[idx - 1] = undefined as any;
+      }
+      // ? set new state at new index
       this._state[idx] = data;
     }
-    return this._state[idx];
+    // ? current state
+    return this._state[idx] as unknown as S;
   }
   _effect(fn: () => Promise<void> | void) {
     if (!this.rendered) {
@@ -176,7 +127,6 @@ export class Ref<Prop extends Record<string, any> = any> {
   }
 
   private async effector() {
-    // console.log("yoohoo 2");
     // if (!this.rendered) {
     for (let i = 0; i < this.effects.length; i++) {
       await this.effects[i].apply(this);
@@ -191,40 +141,35 @@ export class Ref<Prop extends Record<string, any> = any> {
   }
 
   /**
-   * Cradova Ref
+   * Cradova Comp
    * ---
-   * update ref component with new data and update the dom.
+   * update comp component with new data and update the dom.
    * @param data
    * @returns
    */
 
-  updateState(data?: Prop, stash?: boolean) {
+  recall() {
     if (!this.rendered) {
       this.effectuate = () => {
         if (this.published) {
-          this.Activate(data);
+          this.activate();
         }
       };
     } else {
       if (this.published) {
-        this.Activate(data);
+        this.activate();
       }
     }
-    if (stash) {
-      this.stash = data;
-    }
+
   }
 
-  private async Activate(data?: Prop) {
+  private async activate() {
     this._state_index = 0;
     this.published = false;
     if (!this.rendered) {
       return;
     }
-    const html = this.component(data as Prop) as any;
-    // if (typeof html === "function") {
-    //   html = (html as Function)();
-    // }
+    const html = this.component() as any;
     if (html instanceof HTMLElement || html instanceof DocumentFragment) {
       const node = this.reference.current("html");
       if (node) {
@@ -233,9 +178,9 @@ export class Ref<Prop extends Record<string, any> = any> {
       }
       this.published = true;
       this.reference._appendDomForce("html", html as unknown as HTMLElement);
-      CradovaEvent.dispatchEvent("onmountEvent");
+      CradovaEvent.dispatchEvent("afterMount");
     } else {
-      console.error(" ✘  Cradova err :  Invalid html content, got  - " + html);
+      console.error(" ✘  Cradova err :  Invalid html, got  - " + html);
     }
   }
 }
@@ -271,7 +216,8 @@ export class lazy<Type> {
  * make reference to dom elements
  */
 
-export class reference {
+export class __raw_ref {
+
   tree: Record<string, any> = {};
   globalTree: Record<string, HTMLElement> = {};
   /**
@@ -279,7 +225,7 @@ export class reference {
    * @param name - The name to reference the DOM element by.
    */
   bindAs(name: string) {
-    return [this, name] as unknown as reference;
+    return [this, name] as unknown as __raw_ref;
   }
 
   /**
@@ -306,11 +252,17 @@ export class reference {
       this.tree[SNRU.snru][name] = Element;
     }
   }
+
   _appendDomForceGlobal(name: string, Element: HTMLElement) {
     this.globalTree[name] = Element;
   }
 }
-const localTree = new reference();
+const localTree = new __raw_ref();
+
+
+
+
+
 /**
  *  Cradova Signal
  * ----
@@ -318,20 +270,20 @@ const localTree = new reference();
  *  Features:
  * - create a store
  * - create actions and fire them
- * - bind a Ref and elements
+ * - bind a Comp and elements
  * - listen to updates
  * - set object keys instead of all values
  * - persist changes to localStorage
- * - update a cradova Ref automatically
+ * - update a cradova Comp automatically
  * @constructor initial: unknown, props: {useHistory, persist}
  */
 
 export class createSignal<Type extends Record<string, any>> {
   private callback: undefined | ((newValue: Type) => void);
   private persistName: string | undefined = "";
-  private actions: Record<string, (data?: Type) => Type | void> = {};
-  private ref: {
-    ref: Ref;
+  private actions: Record<string, (data?: unknown) => void> = {};
+  private comp: {
+    comp: Comp;
     _event?: string;
     _signalProperty?: string;
     _element_property?: string;
@@ -372,8 +324,8 @@ export class createSignal<Type extends Record<string, any>> {
     if (this.persistName) {
       localStorage.setItem(this.persistName, JSON.stringify(this.value));
     }
-    if (this.ref.length && shouldRefRender !== false) {
-      this._updateState();
+    if (this.comp.length && shouldRefRender !== false) {
+      this.updateState();
     }
     if (this.callback) {
       this.callback(this.value);
@@ -398,8 +350,8 @@ export class createSignal<Type extends Record<string, any>> {
       if (this.persistName) {
         localStorage.setItem(this.persistName, JSON.stringify(this.value));
       }
-      if (this.ref.length && shouldRefRender !== false) {
-        this._updateState();
+      if (this.comp.length && shouldRefRender !== false) {
+        this.updateState();
       }
       if (this.callback) {
         this.callback(this.value);
@@ -408,7 +360,7 @@ export class createSignal<Type extends Record<string, any>> {
       throw new Error(
         `✘  Cradova err : can't set key ${String(
           key
-        )} . store.value is not a javascript object`
+        )} store.value is not an object`
       );
     }
   }
@@ -421,10 +373,10 @@ export class createSignal<Type extends Record<string, any>> {
    */
   createAction(name: string, action: (data?: unknown) => void) {
     if (typeof name === "string" && typeof action === "function") {
-      this.actions[name] = action;
+      this.actions[name] = action.bind(this);
     } else {
       throw new Error(
-        `✘  Cradova err : can't create action, ${name} is not a function`
+        `✘  Cradova err : can't create action ${name}, check values`
       );
     }
   }
@@ -441,7 +393,7 @@ export class createSignal<Type extends Record<string, any>> {
         this.actions[name] = action;
       } else {
         throw new Error(
-          `✘  Cradova err : can't create action, ${name} is not a function`
+          `✘  Cradova err : can't create action ${name} check values`
         );
       }
     }
@@ -451,12 +403,12 @@ export class createSignal<Type extends Record<string, any>> {
    * ----
    *  fires an action if available
    * @param key - string key of the action
-   * @param data - data for the action
+   * @param data - data for the action 
    */
-  fireAction(key: string, data?: Type) {
-    this._updateState(key, data as Type);
+  fireAction(key: string, data?: unknown) {
     if (typeof this.actions[key] === "function") {
-      return this.actions[key].call(this, data) as Type;
+      this.updateState(key, data as Type);
+      return this.actions[key].call(this, data);
     } else {
       throw Error("✘  Cradova err : action " + key + "  does not exist!");
     }
@@ -465,7 +417,7 @@ export class createSignal<Type extends Record<string, any>> {
   /**
    * Cradova
    * ---
-   * is used to bind signal data to elements and Refs
+   * is used to bind signal data to elements and Comps
    *
    * @param prop
    * @returns something
@@ -484,50 +436,42 @@ export class createSignal<Type extends Record<string, any>> {
     }
   }
 
-  private _updateState(name?: string, data?: Type) {
+  private updateState(name?: string, data?: Type) {
     if (name && data) {
-      this.ref.map((ent) => {
+      this.comp.map((ent) => {
         if (ent._event === name) {
           //
           if (ent._element_property && ent._signalProperty) {
-            ent.ref.updateState({
-              [ent._element_property]: data[ent._signalProperty],
-            });
+            ent.comp.recall();
             return;
           }
           if (ent._element_property) {
-            ent.ref.updateState({
-              [ent._element_property]: data,
-            });
+            ent.comp.recall();
             return;
           }
           if (ent._signalProperty) {
-            ent.ref.updateState(data[ent._signalProperty]);
+            ent.comp.recall();
             return;
           }
         }
       });
     } else {
-      for (let i = 0; i < this.ref.length; i++) {
-        const ent = this.ref[i];
+      for (let i = 0; i < this.comp.length; i++) {
+        const ent = this.comp[i];
         if (ent._element_property && ent._signalProperty) {
-          ent.ref.updateState({
-            [ent._element_property]: this.value[ent._signalProperty],
-          });
+          ent.comp.recall();
           continue;
         }
         if (ent._element_property) {
-          ent.ref.updateState({
-            [ent._element_property]: this.value,
-          });
+          ent.comp.recall();
           continue;
         }
         if (ent._signalProperty) {
-          ent.ref.updateState(this.value[ent._signalProperty]);
+          ent.comp.recall();
           continue;
         }
         if (!ent._element_property && !ent._signalProperty) {
-          ent.ref.updateState(this.value);
+          ent.comp.recall();
           continue;
         }
       }
@@ -539,22 +483,22 @@ export class createSignal<Type extends Record<string, any>> {
    * ----
    *  set a auto - rendering component for this store
    *
-   * @param Ref component to bind to.
+   * @param Comp component to bind to.
    */
   bindRef(
-    ref: Ref,
+    comp: Comp,
     binding: {
       event?: string;
       signalProperty: string;
       _element_property: string;
     } = { signalProperty: "", _element_property: "" }
   ) {
-    ref.render = ref.render.bind(ref, this.value);
+    comp.render = comp.render.bind(comp);
 
-    ref._setExtra(this);
-    // it's an element binding, not ref, not event(fire action events)
-    this.ref.push({
-      ref: ref,
+    comp._setExtra(this);
+    // it's an element binding, not comp, not event(fire action events)
+    this.comp.push({
+      comp: comp,
       _signalProperty: binding.signalProperty,
       _element_property: binding._element_property,
       _event: binding.event,
@@ -584,120 +528,48 @@ export class createSignal<Type extends Record<string, any>> {
 }
 
 /**
- *  Cradova Screen
+ *  Cradova Page
  * ---
  * create instances of manageable pages
  * @param name
  * @param template
  */
 
-export class Screen {
+export class Page {
   /**
    * used internally
    */
   private _name: string;
   /**
-   * this should be a cradova screen component
+   * this should be a cradova page component
    */
   public _html:
-    | ((this: Screen, data?: unknown) => HTMLElement | DocumentFragment)
-    | HTMLElement
-    | DocumentFragment;
-  public _packed = false;
+    | ((this: Page) => HTMLElement)
   private _template = document.createElement("div");
   private _callBack:
-    | ((cradovaScreenSet: HTMLElement) => Promise<void> | void)
+    | ((cradovaPageSet: HTMLElement) => Promise<void> | void)
     | undefined;
   private _deCallBack:
-    | ((cradovaScreenSet: HTMLElement) => Promise<void> | void)
+    | ((cradovaPageSet: HTMLElement) => Promise<void> | void)
     | undefined;
-  private _persist = true;
-  private _delegatedRoutesCount = -1;
   private _dropped = false;
   /**
-   * error handler for the screen
+   * error handler for the page
    */
   public _errorHandler: ((err: unknown) => void) | null = null;
-  constructor(cradova_screen_initials: CradovaScreenType) {
-    const { template, name, persist, renderInParallel } =
-      cradova_screen_initials;
-    if (template instanceof Ref) {
-      this._html = () => template.render({});
-    } else {
-      this._html = template as any;
-    }
+  constructor(cradova_page_initials: CradovaPageType) {
+    const { template, name } =
+      cradova_page_initials;
+    this._html = template;
     this._name = name || "Document";
-    this._template.setAttribute("id", "cradova-screen-set");
-    if (renderInParallel === true) {
-      this._delegatedRoutesCount = 0;
-      this._persist = false;
-    } else {
-      if (typeof persist === "boolean") {
-        this._persist = persist;
-      }
-    }
+    this._template.setAttribute("id", "page");
   }
 
-  _derive() {
-    return {
-      _name: this._name,
-      _callBack: this._callBack,
-      _deCallBack: this._deCallBack,
-    };
-  }
-  _apply_derivation(derivation: {
-    _name: string;
-    _callBack:
-      | ((cradovaScreenSet: HTMLElement) => void | Promise<void>)
-      | undefined;
-    _deCallBack:
-      | ((cradovaScreenSet: HTMLElement) => void | Promise<void>)
-      | undefined;
-  }) {
-    this._name = derivation._name;
-    this._callBack = derivation._callBack;
-    this._deCallBack = derivation._deCallBack;
-  }
 
-  get _delegatedRoutes() {
-    if (this._delegatedRoutesCount > 100) {
-      return -1;
-    }
-    return this._delegatedRoutesCount;
-  }
-
-  set _delegatedRoutes(count: number) {
-    if (count) {
-      this._delegatedRoutesCount += 1;
-    }
-  }
-
-  setErrorHandler(errorHandler: (err: unknown) => void) {
+  set errorHandler(errorHandler: (err: unknown) => void) {
     this._errorHandler = errorHandler;
   }
 
-  async _package() {
-    SNRU.memo_SNRU();
-    if (typeof this._html === "function") {
-      let html = await this._html.apply(this);
-      if (typeof html === "function") {
-        html = (html as () => any)();
-        if (html instanceof HTMLElement || html instanceof DocumentFragment) {
-          this._template.innerHTML = "";
-          this._template.appendChild(html);
-        }
-      } else {
-        if (html instanceof HTMLElement || html instanceof DocumentFragment) {
-          this._template.innerHTML = "";
-          this._template.appendChild(html);
-        } else {
-          throw new Error(
-            ` ✘  Cradova err:  template function for the screen with name '${this._name}' returned ${html} instead of html`
-          );
-        }
-      }
-    }
-  }
   onActivate(cb: () => Promise<void> | void) {
     this._callBack = cb;
   }
@@ -713,25 +585,31 @@ export class Screen {
       return undefined;
     } else return this._dropped;
   }
-  async _Activate(force: boolean = false) {
-    // check if the screen is dropped
+  async _activate() {
+    //? check if the page is dropped
     if (this._dropped) {
       history.go(-1);
       return;
     }
-    // packaging the screen dom
-    // ? tell all active Refs to re-render
-    CradovaEvent.dispatchActiveEvent("active-Refs");
-    if (!this._persist || force || !this._packed) {
-      await this._package();
-      this._packed = true;
+    //? packaging the page dom
+    SNRU.memo_SNRU();
+    //? parking
+    let html = this._html.apply(this);
+    if (html instanceof HTMLElement) {
+      this._template.innerHTML = "";
+      this._template.appendChild(html);
+    } else {
+      throw new Error(
+        ` ✘  Cradova err:  template function for the page returned ${html} instead of html`
+      );
     }
+    // ? 
     document.title = this._name;
     localTree.globalTree["doc"].innerHTML = "";
+    // ? tell all Comps to re-render 
+    CradovaEvent.dispatchEvent("beforeMountActive")
     localTree.globalTree["doc"].appendChild(this._template as Node);
-    CradovaEvent.dispatchEvent("onmountEvent");
-    // CradovaEvent.dispatchActiveEvent("onmountEvent");
-
+    CradovaEvent.dispatchEvent("afterMount");
     window.scrollTo({
       top: 0,
       left: 0,
@@ -750,15 +628,15 @@ export class Screen {
  */
 
 class RouterBoxClass {
-  lastNavigatedRouteController?: Screen;
-  nextRouteController?: Screen;
+  lastNavigatedRouteController?: Page;
+  nextRouteController?: Page;
   lastNavigatedRoute?: string;
   pageShow = null;
   pageHide = null;
   errorHandler?: Function;
-  loadingScreen: any = null;
+  loadingPage: any = null;
   params: any = {};
-  routes: Record<string, Screen | (() => Promise<Screen | undefined>)> = {};
+  routes: Record<string, Page | (() => Promise<Page | undefined>)> = {};
   pageevents: Function[] = [];
   // tarcking paused state of navigation
   paused = false;
@@ -771,16 +649,16 @@ class RouterBoxClass {
     }, 50);
   }
 
-  route(path: string, screen: Screen) {
+  route(path: string, page: Page) {
     // undefined is an option  here for auth routes
-    if (typeof screen !== "undefined") {
-      if (screen && !screen) {
-        console.error(" ✘  Cradova err:  not a valid screen  ", screen);
+    if (typeof page !== "undefined") {
+      if (page && !page) {
+        console.error(" ✘  Cradova err:  not a valid page  ", page);
         throw new Error(
-          " ✘  Cradova err:  Not a valid cradova screen component"
+          " ✘  Cradova err:  Not a valid cradova page component"
         );
       }
-      return (this.routes[path] = screen);
+      return (this.routes[path] = page);
     }
     return undefined;
   }
@@ -799,7 +677,7 @@ class RouterBoxClass {
 
   async router(_e?: unknown, _force?: boolean) {
     let url = window.location.pathname,
-      route: Screen,
+      route: Page,
       params;
     // ? abort navigation when router is paused
     if (this.paused) {
@@ -814,16 +692,16 @@ class RouterBoxClass {
       route = this.nextRouteController;
       this.nextRouteController = undefined;
     } else {
-      [route, params] = this.checker(url) as [Screen, any];
+      [route, params] = this.checker(url) as [Page, any];
     }
 
     if (typeof route !== "undefined") {
       // we need to caught any error and propagate to the app
       try {
-        // lazy loaded screens
+        // lazy loaded pages
         if (typeof route === "function") {
-          if (this.loadingScreen instanceof Screen) {
-            await this.loadingScreen._Activate();
+          if (this.loadingPage instanceof Page) {
+            await this.loadingPage._activate();
           }
           route = await (route as Function)();
           // ! bad operation let's drop it
@@ -834,20 +712,10 @@ class RouterBoxClass {
             return;
           }
         }
-        //? delegation causing parallel rendering sequence
-        if (route._delegatedRoutes !== -1) {
-          route._delegatedRoutes = 1;
-          const a = route._derive();
-          route = new Screen({
-            template: route._html as any,
-          });
-          route._apply_derivation(a);
-          this.routes[url] = route;
-        }
         if (params) {
           this.params.params = params;
         }
-        await route!._Activate(_force);
+        await route!._activate();
         this.start_pageevents(url);
         this.lastNavigatedRouteController &&
           this.lastNavigatedRouteController._deActivate();
@@ -862,7 +730,7 @@ class RouterBoxClass {
           } else {
             console.error(error);
             throw new Error(
-              " ✘  Cradova err:  consider adding error boundary to the specific screen  "
+              " ✘  Cradova err:  consider adding error boundary to the specific page  "
             );
           }
         }
@@ -870,154 +738,85 @@ class RouterBoxClass {
     } else {
       // or 404
       if (this.routes["*"]) {
-        await (this.routes["*"] as Screen)._Activate(_force);
+        await (this.routes["*"] as Page)._activate();
       }
     }
   }
 
-  // checker = (method: methods, url: string) => {
-  //   const routes = _JetPath_paths[method];
-  //   if (url[0] !== "/") {
-  //     url = url.slice(url.indexOf("/", 7));
-  //   }
-  //   if (routes[url]) {
-  //     return routes[url];
-  //   }
-  //   if (typeof routes === "function") {
-  //     (routes as Function)();
-  //     return;
-  //   }
-  //   //? check for extra / in the route
-  //   if (routes[url + "/"]) {
-  //     return routes[url];
-  //   }
-  //   //? check for search in the route
-  //   if (url.includes("/?")) {
-  //     const sraw = [...new URLSearchParams(url).entries()];
-  //     const search: Record<string, string> = {};
-  //     for (const idx in sraw) {
-  //       search[
-  //         sraw[idx][0].includes("?") ? sraw[idx][0].split("?")[1] : sraw[idx][0]
-  //       ] = sraw[idx][1];
-  //     }
-  //     return [routes[url.split("/?")[0] + "/?"], , search];
-  //   }
-
-  //   //? place holder & * route checks
-  //   for (const path in routes) {
-  //     // ? placeholder check
-  //     if (path.includes(":")) {
-  //       const urlFixtures = url.split("/");
-  //       const pathFixtures = path.split("/");
-  //       //? check for extra / in the route by normalize before checking
-  //       if (url.endsWith("/")) {
-  //         urlFixtures.pop();
-  //       }
-  //       let fixturesX = 0;
-  //       let fixturesY = 0;
-  //       //? length check of / (backslash)
-  //       if (pathFixtures.length === urlFixtures.length) {
-  //         for (let i = 0; i < pathFixtures.length; i++) {
-  //           //? let's jump place holders in the path since we can't determine from them
-  //           //? we increment that we skipped a position because we need the count later
-  //           if (pathFixtures[i].includes(":")) {
-  //             fixturesY++;
-  //             continue;
-  //           }
-  //           //? if it is part of the path then let increment a value for it
-  //           //? we will need it later
-  //           if (urlFixtures[i] === pathFixtures[i]) {
-  //             fixturesX++;
-  //           }
-  //         }
-  //         //? if after the checks it all our count are equal then we got it correctly
-  //         if (fixturesX + fixturesY === pathFixtures.length) {
-  //           const routesParams: Record<string, string> = {};
-  //           for (let i = 0; i < pathFixtures.length; i++) {
-  //             if (pathFixtures[i].includes(":")) {
-  //               routesParams[pathFixtures[i].split(":")[1]] = urlFixtures[i];
-  //             }
-  //           }
-  //           return [routes[path], routesParams];
-  //         }
-  //       }
-  //     }
-  //     // ? * check
-  //     if (path.includes("*")) {
-  //       const p = path.slice(0, -1);
-  //       if (url.startsWith(p)) {
-  //         return [routes[path], { extraPath: url.slice(p.length) }];
-  //       }
-  //     }
-  //   }
-  //   return;
-  // };
-
-  checker(url: string): [Screen | (() => Promise<Screen | undefined>), any] {
-    // first strict check
+  checker(url: string): [Page | (() => Promise<Page | undefined>), Record<string, any>] {
+    if (url[0] !== "/") {
+      url = url.slice(url.indexOf("/", 7));
+    }
     if (this.routes[url]) {
       return [this.routes[url], { path: url }];
     }
-    // check for extra / in the route
+
+    //? check for extra / in the route
     if (this.routes[url + "/"]) {
-      return [this.routes[url], { path: url }];
+      return [this.routes[url + "/"], { path: url }];
     }
-    // place holder route check
+    //? check for search in the route
+    if (url.includes("/?")) {
+      const sraw = [...new URLSearchParams(url).entries()];
+      const search: Record<string, string> = {};
+      for (const idx in sraw) {
+        search[
+          sraw[idx][0].includes("?") ? sraw[idx][0].split("?")[1] : sraw[idx][0]
+        ] = sraw[idx][1];
+      }
+      const path = url.slice(0, url.indexOf("/?") + 2)
+      return [this.routes[path], { path, search }];
+    }
+
+    //? place holder & * route checks
     for (const path in this.routes) {
-      if (!path.includes(":")) {
-        continue;
-      }
-      // if (url.endsWith("/")) {
-      //   url = url.slice(0, path.length - 2);
-      // }
-      const urlFixtures = url.split("/");
-      const pathFixtures = path.split("/");
-      // check for extra / in the route by normalize before checking
-      if (url.endsWith("/")) {
-        urlFixtures.pop();
-      }
-      let fixturesX = 0;
-      let fixturesY = 0;
-      // remove empty string after split operation
-      urlFixtures.shift();
-      pathFixtures.shift();
-      // length check of / (backslash)
-      if (pathFixtures.length === urlFixtures.length) {
-        const routesParams = { _path: "" } as Record<string, string>;
-        for (let i = 0; i < pathFixtures.length; i++) {
-          // let's jump place holders in the path since we can't determine from them
-          // we increment that we skipped a position because we need the count later
-          if (pathFixtures[i].includes(":")) {
-            fixturesY++;
-            // fixturesY += 1;
-            continue;
-          }
-          // if it is part of the path then let increment a value for it
-          // we will need it later
-          if (
-            urlFixtures[i] === pathFixtures[i]
-            // &&
-            // pathFixtures.indexOf(urlFixtures[i]) ===
-            //   pathFixtures.lastIndexOf(urlFixtures[i])
-          ) {
-            // fixturesX+=1;
-            fixturesX++;
-          }
+      // ? placeholder check
+      if (path.includes(":")) {
+        const urlFixtures = url.split("/");
+        const pathFixtures = path.split("/");
+        //? check for extra / in the route by normalize before checking
+        if (url.endsWith("/")) {
+          urlFixtures.pop();
         }
-        // if after the checks it all our count are equal then we got it correctly
-        if (fixturesX + fixturesY === pathFixtures.length) {
+        let fixturesX = 0;
+        let fixturesY = 0;
+        //? length check of / (backslash)
+        if (pathFixtures.length === urlFixtures.length) {
           for (let i = 0; i < pathFixtures.length; i++) {
+            //? let's jump place holders in the path since we can't determine from them
+            //? we increment that we skipped a position because we need the count later
             if (pathFixtures[i].includes(":")) {
-              routesParams[pathFixtures[i].split(":")[1]] = urlFixtures[i];
+              fixturesY++;
+              continue;
+            }
+            //? if it is part of the path then let increment a value for it
+            //? we will need it later
+            if (urlFixtures[i] === pathFixtures[i]) {
+              fixturesX++;
             }
           }
-          routesParams["_path"] = path;
-          return [this.routes[path], routesParams];
+          //? if after the checks it all our count are equal then we got it correctly
+          if (fixturesX + fixturesY === pathFixtures.length) {
+            const routesParams: Record<string, string> = {};
+            for (let i = 0; i < pathFixtures.length; i++) {
+              if (pathFixtures[i].includes(":")) {
+                routesParams[pathFixtures[i].split(":")[1]] = urlFixtures[i];
+              }
+            }
+            return [this.routes[path], { param: routesParams }];
+          }
+        }
+      }
+      // ? * check
+      if (path.includes("*")) {
+        const p = path.slice(0, -1);
+        if (url.startsWith(p)) {
+          return [this.routes[path], { extraPath: url.slice(p.length) }];
         }
       }
     }
-    return [] as unknown as [Screen, any];
-  }
+    return [] as unknown as [Page, any];
+  };
 }
 
 const RouterBox = new RouterBoxClass();
@@ -1027,7 +826,7 @@ const RouterBox = new RouterBoxClass();
  * Registers a route.
  *
  * @param {string}   path     Route path.
- * @param  screen the cradova document tree for the route.
+ * @param  page the cradova document tree for the route.
  */
 
 export class Router {
@@ -1036,24 +835,24 @@ export class Router {
    * ---
    * Registers a route.
    *
-   * accepts an object containing pat and screen
+   * accepts an object containing pat and page
    */
   static BrowserRoutes(obj: Record<string, any>) {
     for (const path in obj) {
-      let screen = obj[path];
+      let page = obj[path];
       if (
-        (typeof screen === "object" && typeof screen.then === "function") ||
-        typeof screen === "function"
+        (typeof page === "object" && typeof page.then === "function") ||
+        typeof page === "function"
       ) {
         // creating the lazy
         RouterBox.routes[path] = async () => {
-          screen = await (typeof screen === "function"
-            ? await screen()
-            : await screen);
-          return RouterBox.route(path, screen?.default || screen);
+          page = await (typeof page === "function"
+            ? await page()
+            : await page);
+          return RouterBox.route(path, page?.default || page);
         };
       } else {
-        RouterBox.route(path, screen);
+        RouterBox.route(path, page);
       }
     }
     Router._mount();
@@ -1089,7 +888,7 @@ export class Router {
    * Cradova Router
    * ------
    *
-   * Navigates to a designated screen in your app
+   * Navigates to a designated page in your app
    *
    * @param href string
    * @param data object
@@ -1097,19 +896,18 @@ export class Router {
    */
   static navigate(
     href: string,
-    data: Record<string, unknown> | null = null,
-    force = false
+    data: Record<string, unknown> | null = null
   ) {
     if (typeof href !== "string") {
       throw new TypeError(
         " ✘  Cradova err:  href must be a defined path but got " +
-          href +
-          " instead"
+        href +
+        " instead"
       );
     }
     let route = null,
       params;
-    if (href.includes("://")) {
+    if (href.includes(".")) {
       window.location.href = href;
     } else {
       if (href === window.location.pathname) {
@@ -1117,30 +915,30 @@ export class Router {
       }
       [route, params] = RouterBox.checker(href);
       if (route) {
-        RouterBox.nextRouteController = route as Screen;
+        RouterBox.nextRouteController = route as Page;
         window.history.pushState({}, "", href);
       }
       RouterBox.params.params = params;
       RouterBox.params.data = data;
-      RouterBox.router(null, force);
+      RouterBox.router(null);
     }
   }
 
   /**
    * Cradova
    * ---
-   * Loading screen for your app
+   * Loading page for your app
    *
    * lazy loaded loading use
    *
-   * @param screen
+   * @param page
    */
-  static setLoadingScreen(screen: Screen) {
-    if (screen instanceof Screen) {
-      RouterBox.loadingScreen = screen;
+  static setLoadingPage(page: Page) {
+    if (page instanceof Page) {
+      RouterBox.loadingPage = page;
     } else {
       throw new Error(
-        " ✘  Cradova err:  Loading Screen should be a cradova screen class"
+        " ✘  Cradova err:  Loading Page should be a cradova page class"
       );
     }
   }
@@ -1161,39 +959,6 @@ export class Router {
     }
   }
 
-  /** cradova router
-   * ---
-   * get a screen ready before time.
-   *
-   * @param {string}   path Route path.
-   * @param  data data for the screen.
-   */
-  static async packageScreen(path: string) {
-    if (!RouterBox.routes[path]) {
-      console.error(" ✘  Cradova err:  no screen with path " + path);
-      throw new Error(
-        " ✘  Cradova err:  cradova err: Not a defined screen path"
-      );
-    }
-    let [route] = RouterBox.checker(path);
-    if (typeof route === "function") {
-      route = (await route()) as Screen;
-    }
-
-    //? delegation causing parallel rendering sequence
-    if (route!._delegatedRoutes !== -1) {
-      route!._delegatedRoutes = 1;
-      const a = route._derive();
-      route = new Screen({
-        template: route!._html as any,
-      });
-      route._apply_derivation(a);
-      RouterBox.routes[path] = route;
-    }
-    // handled asynchronously
-    route._package();
-    route._packed = true;
-  }
 
   /**
    * Cradova Router

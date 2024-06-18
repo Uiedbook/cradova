@@ -2,25 +2,23 @@ Draft / February 18, 2023 by friday candour
 
 Updated / January 10, 2024 by friday candour
 
+updated / June 18, 2024 by friday candour
+
 # Introduction
 
 ## VJS
 
-Vanilla JavaScript spec (VJS) is particularly normal JavaScript and nothing more, as a stack of function calls defining a Document Object Model (DOM) structure.
+Vanilla JavaScript spec (VJS) is particularly JavaScript functions and nothing more, VJS as a stack of function calls defining a Document Object Model (DOM) structure.
 
 It is naturally ECMAScript compliant and require no preprocessor (transpilers), which means it works on all engines and browsers.
 
-In VJS the first parameter is the template for the HTML element which can consists of a class name, id and inner text in a single string, other properties are the HTML element attributes in an object syntax and its children.
+VJS syntax consist of the tag name as a function in lowercase, while its parameters will then consists it's children if any and an attributes list in an object syntax.
 
-Another type of VJS syntax is the tag name as a function in lowercase, while its parameters will then consists the HTML element attribute in an object syntax and its children.
-
-VJS should be completely typed to support HTML attributes for each element type where possible.
+VJS tags should be completely typed to support HTML attributes for each element type where possible.
 
 It is required that first parameter to be the Attributes object of the element type if needed, but it can appear at any position of the parameter list.
 
-Every other thing on the parameter list which is not the first string parameter or a normal JavaScript object is considered as a child of the element if valid.
-
-Valid VJS children are string, valid HTML, VJS functions, functions that return valid HTML or string and undefined.
+Valid VJS children are string, valid HTML elements, VJS functions, functions that return valid HTML or string and undefined.
 
 # Rationale
 
@@ -31,9 +29,6 @@ The VJS specification is to define a concise and familiar syntax for defining tr
 Syntax
 
 ```
-VJS( => template, => props, => ...children)
-
-//   tags
 
 TAG( => props, => ...children)
 
@@ -44,14 +39,10 @@ TAG( => props, => ...children)
 Syntax
 
 ```js
-// template may include tag, classes, a tag and interText
-
-VJS(template);
-// VJS tags
-div();
 // examples
-
+div();
 div({ className: "button-red m10" });
+div({ className: "btn" }, p("hello world"));
 ```
 
 ### VJS attributes
@@ -59,12 +50,11 @@ div({ className: "button-red m10" });
 Syntax
 
 ```js
-
 // VJS tags
-
-div( { style: { foo: "bar" }} ) // should throw and error
-
+span()
 div( { { id: "bar" }} ) // valid
+table( { style: { color: "red" }} ) // should throw and error
+ // and all html elements
 ```
 
 ### VJS Children
@@ -72,20 +62,16 @@ div( { { id: "bar" }} ) // valid
 Syntax
 
 ```js
-// A child can be the VJS function call, HTML element or a document fragment.
+// A child can be string, HTML element and document fragment.
 
 // looping
-
 const names = ["john", "paul"];
 div(names.map((name) => p("hello " + name)));
 
 // conditional rendering
 
 let age = 12;
-
-VJS(age > 16 ? p("let me get bear") : p("let me get you yoghurt"));
-
-.
+div(age > 16 ? p("let me get bear") : p("let me get you yoghurt"));
 ```
 
 ### VJS Components
@@ -94,7 +80,7 @@ Syntax
 
 ```js
 function Hello(name) {
-  return H1("Hello " + name);
+  return h1("Hello " + name);
 }
 ```
 
@@ -102,15 +88,15 @@ function Hello(name) {
 
 ## JSX
 
-[JSX](https://facebook.github.io/jsx/#sec-prior-art) is a standard in abundant use, and Another alternative would be to use object initializers like the JXON spec.
+[JSX](https://facebook.github.io/jsx/#sec-prior-art) is a standard in abundant use, and another alternative would be to use object initializers like the JXON spec.
 
-In JSX adding attributes and values to elements using netted curly braces lacks ability to send a single value to the resulting component or HTML markup function.
+In JSX adding attributes and values to elements using curly braces lacks ability to send a single value to the resulting component or HTML markup function.
 
 this is an opinionated syntax that tied to transpilation benefits which jsx is heavily based on.
 
-JSX relies heavily on preprocessor (transpilers) like Babel which has a time cost in development cycle and system resources.
+JSX relies heavily on preprocessor (transpilers) like Babel which has a time and build cost in development cycles.
 
-It is not made impossible to assign JSX directly to variables without retaining them from a function which in static cases is not needed.
+It is not possible to assign JSX directly to variables without retaining them from a function which in static cases is not needed.
 
 in the case of
 
@@ -142,7 +128,7 @@ In the [JXON](https://htmlpreview.github.io/?https://github.com/mdn/archived-con
 
 - It is possible to assign variables to VJS in static cases easily as seen above.
 
-- Adding attributes to elements is possible with a - regular JavaScript object or available template string scheme.
+- Adding attributes to elements is possible with a - regular JavaScript object.
 
 VJS can be a standard for more concise web development uses cases where interoperability with vanilla JavaScript is important, to achieve better developer experience and creativity and faster web apps due to its design.
 

@@ -1,13 +1,13 @@
 import { type VJS_params_TYPE } from "./types";
-import { Ref, reference, createSignal, CradovaEvent } from "./classes";
+import { Comp, createSignal, CradovaEvent, __raw_ref } from "./classes";
 import { Router } from "./classes";
 
 export const makeElement = <E extends HTMLElement>(
   element: E & HTMLElement,
-  ElementChildrenAndPropertyList: VJS_params_TYPE
+  ElementChildrenAndPropertyList: VJS_params_TYPE<E>
 ) => {
-  let props: any = {},
-    text: string | number | null = null;
+  const props: Record<string, any> = {};
+  let text: string | undefined = undefined;
   //? getting children ready
   if (ElementChildrenAndPropertyList.length !== 0) {
     for (let i = 0; i < ElementChildrenAndPropertyList.length; i++) {
@@ -16,11 +16,10 @@ export const makeElement = <E extends HTMLElement>(
       if (typeof child === "function") {
         child = child();
       }
-      // Ref as child
-      if (child instanceof Ref) {
+      // Comp as child
+      if (child instanceof Comp) {
         child = child.render();
       }
-
       // appending child
       if (child instanceof HTMLElement || child instanceof DocumentFragment) {
         element.appendChild(child as Node);
@@ -34,25 +33,17 @@ export const makeElement = <E extends HTMLElement>(
       }
 
       // getting innerText
-      if (typeof child === "string" || typeof child === "number") {
+      if (typeof child === "string") {
         text = child;
         continue;
       }
 
       // getting props
       if (typeof child === "object") {
-        props = Object.assign(props, child);
+        Object.assign(props, child);
         continue;
       }
 
-      // throw an error
-      // ! seems pointless
-      // if (typeof child !== "undefined") {
-      //   console.error(" ✘  Cradova err:   got", { child });
-      //   throw new Error(
-      //     "  ✘  Cradova err:  invalid child type: " + "(" + typeof child + ")"
-      //   );
-      // }
     }
   } else {
     return element;
@@ -68,6 +59,66 @@ export const makeElement = <E extends HTMLElement>(
         continue;
       }
 
+
+      // A tags (the only special tag)
+      if (prop === "href") {
+        const href = (value || "") as string;
+        if (!href.includes("://")) {
+          element.addEventListener(
+            "click",
+            (e: { preventDefault: () => void }) => {
+              e.preventDefault();
+              Router.navigate(
+                (element as unknown as HTMLAnchorElement).pathname
+              );
+              //? get url hash here and scroll into view
+              if (href.includes("#")) {
+                const l = href.split("#").at(-1);
+                document.getElementById("#" + l)?.scrollIntoView();
+              }
+            }
+          );
+        }
+        element.setAttribute(prop, value as string);
+        continue;
+      }
+
+      if (Array.isArray(value)) {
+        // reference
+        if (
+          prop == "reference" &&
+          (value! as unknown[])![0] instanceof __raw_ref
+        ) {
+          ((value! as unknown[])![0] as __raw_ref)._appendDomForce(
+            (value! as unknown[])![1] as string,
+            element
+          );
+          continue;
+        }
+        // signal
+        if ((value! as unknown[])[0] instanceof createSignal) {
+          ((value! as unknown[])![0] as createSignal<{}>).bindRef(
+            element as unknown as Comp,
+            {
+              _element_property: prop,
+              signalProperty: (value! as unknown[])![1] as string,
+            }
+          );
+          continue;
+        }
+      }
+
+      // setting onmount event;
+      if (prop === "onmount" && typeof props["onmount"] === "function") {
+        const ev = () => {
+          props["onmount"]?.apply(element);
+          props!["onmount"] = undefined;
+        };
+        CradovaEvent.addAfterMount(ev);
+        continue;
+      }
+
+
       // data-(s)
       if (prop.includes("data-")) {
         element.setAttribute(prop, value as string);
@@ -80,99 +131,30 @@ export const makeElement = <E extends HTMLElement>(
         continue;
       }
 
-      // A tags (the only special tag)
-      if (prop === "href" && typeof value === "string") {
-        const href = (value || "") as string;
-        if (!href.includes("://")) {
-          element.addEventListener(
-            "click",
-            (e: { preventDefault: () => void }) => {
-              e.preventDefault();
-              Router.navigate(
-                (element as unknown as HTMLAnchorElement).pathname
-              );
-              //! get url hash here and scroll into view
-              if (href.includes("#")) {
-                // ! needs testing
-                const l = href.split("#").at(-1);
-                document.getElementById("#" + l)?.scrollIntoView();
-              }
-            }
-          );
-        }
-        element.setAttribute(prop, value as string);
-        continue;
-      }
-
-      // for compatibility
-      if (
-        typeof element.style[prop as unknown as number] !== "undefined" &&
-        prop !== "src"
-      ) {
-        element.style[prop as unknown as number] = value as string;
-        continue;
-      }
-            if (Array.isArray(value)) {
-              // reference
-              if (
-                prop == "reference" &&
-                (value! as unknown[])![0] instanceof reference
-              ) {
-                ((value! as unknown[])![0] as reference)._appendDomForce(
-                  (value! as unknown[])![1] as string,
-                  element
-                );
-                continue;
-              }
-
-              // signal
-              if ((value! as unknown[])[0] instanceof createSignal) {
-                ((value! as unknown[])![0] as createSignal<{}>).bindRef(
-                  element as unknown as Ref,
-                  {
-                    _element_property: prop,
-                    signalProperty: (value! as unknown[])![1] as string,
-                  }
-                );
-                continue;
-              }
-            }
-
-            // setting onmount event;
-            if (prop === "onmount" && typeof props["onmount"] === "function") {
-              const ev = () => {
-                props.onmount?.apply(element);
-                props!["onmount"] = undefined;
-              };
-              CradovaEvent.addEventListener("onmountEvent", ev);
-              continue;
-            }
-
       // trying to set other values
+
       (element as unknown as Record<string, unknown>)[prop] = value;
-      // event of error and it checking has been removed, because this happens at runtime
     }
   }
-  if (text) {
+  if (text !== undefined) {
     element.appendChild(document.createTextNode(text as string));
   }
   return element as E;
 };
 
 export const cra = <E extends HTMLElement>(tag: string) => {
-  const extend = (...Children_and_Properties: VJS_params_TYPE): E =>
+  return (...Children_and_Properties: VJS_params_TYPE<E>): E =>
     makeElement<E>(document.createElement(tag) as E, Children_and_Properties);
-  return extend;
 };
 
-export function Rhoda(l: VJS_params_TYPE) {
+export function Rhoda(l: VJS_params_TYPE<HTMLElement>) {
   const fg = new DocumentFragment();
   for (let ch of l) {
     if (Array.isArray(ch)) {
       fg.appendChild(Rhoda(ch));
     } else {
-      if (ch instanceof Ref) {
-        ch = ch.render(undefined) as HTMLElement;
+      if (ch instanceof Comp) {
+        ch = ch.render() as HTMLElement;
       }
       if (typeof ch === "function") {
         ch = ch();
@@ -180,45 +162,18 @@ export function Rhoda(l: VJS_params_TYPE) {
           ch = (ch as any)();
         }
       }
-      if (typeof ch === "string" || typeof ch === "number") {
-        fg.appendChild(document.createTextNode(ch as string));
-        continue;
-      }
       if (ch instanceof HTMLElement || ch instanceof DocumentFragment) {
         fg.appendChild(ch as unknown as HTMLElement);
-      } else {
-        if (typeof ch !== "undefined") {
-          throw new Error(
-            "  ✘  Cradova err:  invalid child type: " +
-              ch +
-              " (" +
-              typeof ch +
-              ")"
-          );
-        }
+        continue;
+      }
+      if (typeof ch === "string") {
+        fg.appendChild(document.createTextNode(ch as string));
       }
     }
   }
   return fg;
 }
 
-// export function css(identifier: string | TemplateStringsArray) {
-//   /*This is for creating
-//  css styles using JavaScript*/
-//   if (Array.isArray(identifier)) {
-//     identifier = identifier[0];
-//   }
-//   if (typeof identifier === "string") {
-//     let styTag = document.querySelector("style");
-//     if (styTag !== null) {
-//       styTag.textContent = identifier + styTag.textContent!;
-//       return;
-//     }
-//     styTag = document.createElement("style");
-//     styTag.textContent = identifier;
-//     document.head.appendChild(styTag);
-//   }
-// }
 
 /**
  *
@@ -226,7 +181,7 @@ export function Rhoda(l: VJS_params_TYPE) {
  * @param {function} elements[]
  */
 
-export function $if(condition: any, ...elements: VJS_params_TYPE): any {
+export function $if<E>(condition: any, ...elements: VJS_params_TYPE<E>): any {
   if (condition) {
     return elements;
   }
@@ -239,7 +194,7 @@ export function $ifelse(condition: any, ifTrue: any, ifFalse?: any) {
   return ifFalse;
 }
 
-export function $case(value: any, ...elements: VJS_params_TYPE) {
+export function $case<E>(value: any, ...elements: VJS_params_TYPE<E>) {
   return (key: any) => {
     if (key === value) {
       return elements;
@@ -301,7 +256,7 @@ export const SNRU = {
  * @returns
  */
 
-export const frag = function (children: VJS_params_TYPE) {
+export const frag = function (children: VJS_params_TYPE<HTMLElement>) {
   const par = document.createDocumentFragment();
   // building it's children tree.
   for (let i = 0; i < children.length; i++) {
@@ -330,47 +285,50 @@ export const frag = function (children: VJS_params_TYPE) {
  * ---
  *  Allows functional components to manage state by providing a state value and a function to update it.
  * @param initialValue
- * @param ActiveRef
+ * @param Comp
  * @returns [state, setState]
  */
 export function useState<S = unknown>(
   initialValue: S,
-  ActiveRef: Ref
+  Comp: Comp
 ): [S, (newState: S) => void] {
-  ActiveRef._state_index += 1;
-  const idx = ActiveRef._state_index;
-  if (!ActiveRef._state_track[idx]) {
-    ActiveRef._roll_state(initialValue, idx);
-    ActiveRef._state_track[idx] = true;
+  Comp._state_index += 1;
+  const idx = Comp._state_index;
+  if (!Comp._state_track[idx]) {
+    Comp._roll_state<S>(initialValue, idx);
+    Comp._state_track[idx] = true;
   }
   /**
    * cradova
    * ---
-   * set new state and re-renders Ref
+   * set new state and re-renders Comp
    * @param newState
    */
   function setState(newState: S) {
-    ActiveRef._roll_state(newState, idx);
-    ActiveRef.updateState();
+    Comp._roll_state<S>(newState, idx);
+    Comp.recall();
   }
-  return [ActiveRef._roll_state(null as S, idx, true) as S, setState];
+  return [Comp._roll_state<S>(null as S, idx, true) as S, setState];
 }
 /**
  * Cradova
  * ---
-Allows side effects to be performed in functional components (Refs), such as fetching data or subscribing to events.
+Allows side effects to be performed in functional components (Comps), such as fetching data or subscribing to events.
  * @param effect
  * @returns 
  */
-export function useEffect(effect: () => void, ActiveRef: Ref) {
-  ActiveRef._effect(effect);
+export function useEffect(effect: () => void, Comp: Comp) {
+  Comp._effect(effect);
 }
+
+
+
 /**
  * Cradova
  * ---
-Returns a mutable reference object of dom elements that persists across component renders.
+Returns a mutable reference object of dom elements.
  * @returns reference 
  */
 export function useRef() {
-  return new reference() as unknown as Record<string, HTMLElement | undefined>;
+  return new __raw_ref();
 }

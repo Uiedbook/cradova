@@ -10,8 +10,8 @@
     // Bundler mode
     "moduleResolution": "bundler",
     "verbatimModuleSyntax": true,
-    // "noEmit": true,
     "declaration": true,
+    // "noEmit": true,
 
     // Best practices
     "strict": true,
@@ -25,6 +25,5 @@
     "noPropertyAccessFromIndexSignature": true,
     "outDir": "./dist"
   },
-  "exclude": ["node_modules"],
   "include": ["src"]
 }

@@ -2,21 +2,15 @@ import { cra, makeElement } from "./functions";
 import { type VJS_params_TYPE } from "./types";
 
 export const a = cra<HTMLAnchorElement>("a");
-export const article = cra<HTMLElement>("article");
 export const audio = cra<HTMLAudioElement>("audio");
 export const br = cra<HTMLBRElement>("br");
 export const button = cra<HTMLButtonElement>("button");
 export const canvas = cra<HTMLCanvasElement>("canvas");
 export const caption = cra<HTMLTableCaptionElement>("caption");
-export const col = cra<HTMLTableColElement>("col");
-export const colgroup = cra<HTMLOptGroupElement>("colgroup");
 export const datalist = cra<HTMLDataListElement>("datalist");
 export const details = cra<HTMLDetailsElement>("details");
 export const dialog = cra<HTMLDialogElement>("dialog");
 export const div = cra<HTMLDivElement>("div");
-// export const em = cra<HTMLElement>("em");
-// export const embed = cra<HTMLEmbedElement>("embed");
-export const figure = cra<HTMLElement>("figure");
 export const footer = cra<HTMLElement>("footer");
 export const form = cra<HTMLFormElement>("form");
 export const h1 = cra<HTMLHeadingElement>("h1");
@@ -51,26 +45,41 @@ export const summary = cra<HTMLElement>("summary");
 export const table = cra<HTMLTableElement>("table");
 export const tbody = cra<HTMLTableColElement>("tbody");
 export const td = cra<HTMLTableCellElement>("td");
-export const template = cra<HTMLTemplateElement>("template");
 export const textarea = cra<HTMLTextAreaElement>("textarea");
 export const th = cra<HTMLTableSectionElement>("th");
 export const title = cra<HTMLTitleElement>("title");
 export const tr = cra<HTMLTableRowElement>("tr");
-export const track = cra<HTMLTrackElement>("track");
 export const u = cra<HTMLUListElement>("u");
 export const ul = cra<HTMLUListElement>("ul");
 export const video = cra<HTMLVideoElement>("video");
+// export const template = cra<HTMLTemplateElement>("template");
+// export const track = cra<HTMLTrackElement>("track");
+// export const figure = cra<HTMLElement>("figure");
+// export const article = cra<HTMLElement>("article");
+// export const col = cra<HTMLTableColElement>("col");
+// export const colgroup = cra<HTMLOptGroupElement>("colgroup");
+// export const em = cra<HTMLElement>("em");
+// export const embed = cra<HTMLEmbedElement>("embed");
 export const svg = (
   svg: string,
-  properties?: VJS_params_TYPE
+  properties?: VJS_params_TYPE<HTMLSpanElement>
 ): HTMLSpanElement => {
   const span = document.createElement("span");
   span.innerHTML = svg;
-  return makeElement<HTMLSpanElement>(span, properties || []);
+  return makeElement<HTMLSpanElement>(span, properties || [] as any);
 };
-export const raw = (html: string): DocumentFragment => {
+
+
+export const raw = (html: string | TemplateStringsArray): DocumentFragment => {
   const div = document.createElement("div");
-  div.innerHTML = html;
+  if (Array.isArray(html)) {
+    div.innerHTML = html[0];
+  } else {
+    if (typeof html === "string") {
+      div.innerHTML = html;
+    }
+  }
+
   const df = new DocumentFragment();
   df.append(...Array.from(div.children));
   return df;

@@ -1,3 +1,6 @@
+node_modules/
+dist/
+
 dist
 .parcel-cache
 .npmignore
@@ -6,6 +9,4 @@ dist
 **/.eslintignore
 coverage
 **/.github/README.md
-
-node_modules/
-dist/ 
+package-lock.json

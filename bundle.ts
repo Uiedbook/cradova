@@ -8,5 +8,4 @@ if (!res.success) {
   console.log(...res.logs);
 } else {
   Bun.spawn(["./pack"]);
-}
-export {};
+} 

@@ -81,26 +81,26 @@ and we went along with it.
 - unlocked more speed by reducing work done by router
 - battle testing green
 - added error boundary
-- Ref working as wanted
+- Comp working as wanted
 
 ## v1.4.1
 
-- fix effect on cradova screens
+- fix effect on cradova pages
 
 ## v1.5.0
 
-- made cradova Ref to have Stash hold component state change
-- stable Ref effect and updateState compliant to the spec
+- made cradova Comp to have Stash hold component state change
+- stable Comp effect and recall compliant to the spec
 
 ## v2.0.0
 
 - export all html tags prebuilt and fully typed for more performance
-- removed effect and updateState from cradova screen class
+- removed effect and recall from cradova page class
 - remove unnecessary useHistory option from createSignal
 - removed ability to add styles that appears as normal props
 - removed event object from router params
-- added pre-rendering capability to Ref components
-- fixed effect bug on Ref
+- added pre-rendering capability to Comp components
+- fixed effect bug on Comp
 - added assert to cradova elements
 - fixed error boundary bug
 - setup hybrid server side rendering test using vite ssr
@@ -110,7 +110,7 @@ and we went along with it.
 - added loop
 - allow custom mount point
 - fixed data-prop attributes
-- fixed type for screens
+- fixed type for pages
 - writing tests for more speed improvement index
 - fixed createAction callback type
 
@@ -128,12 +128,12 @@ and we went along with it.
 
 - big performance boost using new methods of handling function calls so they get cached
 - added lazy loading to cradova routes
-- fixed Ref state flow with tests in ./manual_tests
+- fixed Comp state flow with tests in ./manual_tests
 - added the lazy class to load components when needed
-- added parallel rendering to cradova screens
+- added parallel rendering to cradova pages
 - redefining what global dispatcher can do.
 - fix routing bug
-- fix screen not persisting bug
+- fix page not persisting bug
 - proof tests
 - battle testing used and tested in production
 
@@ -157,8 +157,8 @@ and we went along with it.
 - created references as a way to point to dom elements
 - used reference internally to remove cradova-ids that appeared on the dom before.
 - completed tests
-- cradova now helps you with Ref.render() calls
-- Ref can be used as screens directly
+- cradova now helps you with Comp.render() calls
+- Comp can be used as pages directly
 
 # v2.3.1
 
@@ -168,12 +168,12 @@ and we went along with it.
 
 - Redefined types
 - removed afterMount and beforeMount events from cradova elements
-- added the onmount event that get's called when the screen tree or ref get's updated
+- added the onmount event that get's called when the page tree or comp get's updated
 - disabled the global dispatcher because it's no longer a need for reactivity
 - production tests
 - the cradova \_ function now has types
 - fixes and more speed gain for your apps when you update cradova.
-- added a solution for setting a loading screen
+- added a solution for setting a loading page
 - production tests for parallel rendering completed
 
 # v3.1.1
@@ -184,22 +184,22 @@ and we went along with it.
 
 # v3.1.4
 
-- fixed bug parallel rendering in ref by managing screen id events
-  making them more powerful by also now reactiving to screen changes
+- fixed bug parallel rendering in comp by managing page id events
+  making them more powerful by also now reactiving to page changes
 - other optimisations in prerendering
 
 # v3.2.0
 
 - introduced a more standardised reference class for manageing dom references update the previous implementations.
-- fixed more bug parallel rendering in ref by managing screen id events
-  making them more powerful by also now reactiving to screen changes
+- fixed more bug parallel rendering in comp by managing page id events
+  making them more powerful by also now reactiving to page changes
 - other optimisations in prerendering
 
 # v3.3.0
 
-- introduced Ref.define construct to add custom methods to Refs
+- introduced Comp.define construct to add custom methods to Comps
 - introduced more refined conditional rendering of $switch & $case, $if and $ifelse.
-- introduced active option in Refs to fine tune multi-rendered Refs mostly in parallel rendered situations, hence further making parallel rendering more stable and rock solid with this new feature.
+- introduced active option in Comps to fine tune multi-rendered Comps mostly in parallel rendered situations, hence further making parallel rendering more stable and rock solid with this new feature.
 - tested in production across serveral persoanl projects and did some custom testing
 - introduced the raw tag, just put in raw html strings if you need to for static contents/makeup,
   better for seo and faster render of none-dynamic contents.
@@ -210,5 +210,9 @@ and we went along with it.
 
 # v3.4.0
 
-- fixed type system, removed templating \_, more perfomanc, fixed perfomance in routing system, screens, and ref
+- fixed type system, removed templating more perfomance, fixed perfomance in routing system, pages, and comp
 - more standard and speed.
+
+# v4.0.0
+
+- removed & renamed a lot of things, lighter, faster and more smaller.

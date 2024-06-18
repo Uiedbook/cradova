@@ -7,7 +7,7 @@
   <h1 align="center">Cradova</h1>
 
   <p align="center">
-    Cradova is a JavaScript framework for building Single Page Applications and PWAs.
+Build Powerful ⚡ Web Apps with Ease
     <br/>
     <br/>
     <a href="https://github.com/uiedbook/cradova#examples"><strong>Explore the 🎙️ docs »</strong></a>
@@ -27,25 +27,22 @@
 [![npm Downloads](https://img.shields.io/npm/dm/cradova.svg)](https://www.npmjs.com/package/cradova)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cradova/cradova.js/blob/next/contributing.md)![Forks](https://img.shields.io/github/forks/uiedbook/cradova?style=social) ![Stargazers](https://img.shields.io/github/stars/uiedbook/cradova?style=social)
 
-## 2024 - What's New? Ref methods!
+# Cradova is 3
 
 ```js
-type dataType = { year: string, age: string };
+const Cradova = new Comp(function () {
+  const [year, setYear] = useState(3, this);
 
-const Header =
-  new Ref() <
-  dataType >
-  function (data = { year: "2023", age: "2" }) {
-    return header(h1("Cradova is " + data.age + " yrs old in " + data.year));
-  };
-
-Header.define("increase", function (isNewYear) {
-  if (isNewYear) {
-    this.updateState({ year: "2024", age: "3" });
-  }
+  return h1("Cradova is " + year + " yrs old in ", {
+    onclick() {
+      setYear((lastYear) => {
+        return lastYear + 1;
+      });
+    },
+  });
 });
-document.body.appendChild(Header.render());
-Header.methods.increase(true);
+
+document.body.appendChild(Cradova.render());
 ```
 
 ## 2023 - What's New? Conditionals!
@@ -91,24 +88,20 @@ document.body.append(html, whatsAllowed({ age: 26 }));
 
 Cradova is a web development framework for building Single Page Applications and PWAs.
 
-It's a fast and simple framework, it provides an easy to use state management and router system.
-
 Cradova follows the [VJS specification](https://github.com/uiedbook/cradova/blob/main/VJS_spec/specification.md)
 
 ## What's the benefit?
 
-Cradova is aimed to be fast and simple with and fewer abstractions and yet easily composable.
+Fast and simple with and fewer abstractions and yet easily composable.
 
 Cradova is not built on virtual DOM or diff algorithms.
-Instead, State management is done more elegantly with a simple predictive model, simple and easy with all the speed.
+Instead, State management is done in a way that is simple, easy and fast.
 
 ## Is this a big benefit?
 
 Undoubtedly, this provides a significant advantage.
 
-Cradova has already been utilized in multiple production projects, and we will continuously update this page to showcase our advancements as we keep improving.
-
-[current version changes](https://github.com/uiedbook/cradova/blob/main/CHANGELOG.md#v330)
+[current version changes](https://github.com/uiedbook/cradova/blob/main/CHANGELOG.md#v400)
 
 ## Installation
 
@@ -129,7 +122,7 @@ npm i cradova
 
 ## Examples
 
-Many aspects of Cradova are not reflected in the following example. More functionality will be entailed in future docs.
+Some aspects of Cradova are not reflected in the following example. More functionality will be entailed in future docs.
 
 ## A basic component in Cradova:
 
@@ -152,48 +145,32 @@ document.body.append(html);
 
 ## Basic Samples:
 
-this a collection of basic examples that can give you some ideas
+This a collection of basic examples that can give you some ideas
 
 ```js
-import _, { button, createSignal, Ref, reference, h1, br, div } from "cradova";
+import {
+  button,
+  createSignal,
+  Comp,
+  reference,
+  h1,
+  br,
+  div,
+  useRef,
+} from "cradova";
 
-
-const count = new Ref(function () {
+const count = new Comp(function () {
   const [count, setCounter] = useState(0, this);
   setTimeout(() => {
     setCounter(count + 1);
   }, 1000);
-  return h1(" the current count is = " + count);
+  return h1(" count: " + count);
 });
-
-function counter() {
-  let num = 0;
-  return _("h1| 0", {
-    onclick() {
-      num++;
-      this.innerText = num;
-    },
-  });
-}
-
-// Another example with data- attribute
-
-function dataCounter() {
-  return _("h1| 0", {
-    "data-num": "0",
-    onclick() {
-      const num = this.getAttribute("data-num") * 1 + 1;
-      this.setAttribute("data-num",  num });
-      this.innerText = num;
-    },
-  });
-}
 
 // hello message
 
 function HelloMessage() {
-  return div({
-    text: "Click to get a greeting",
+  return div("Click to get a greeting", {
     onclick() {
       const name = prompt("what are your names");
       this.innerText = name ? "hello " + name : "Click to get a greeting";
@@ -203,15 +180,16 @@ function HelloMessage() {
 
 // using CradovaRef
 
-const nameRef = new Ref(function (name) {
-  const self = this;
-  return _("div.foo#bar", {
-    text: name
-      ? "hello " + (name || " user 2")
-      : "Click to get a second greeting",
+const nameRef = new Comp(function () {
+  const [name, setName] = (useState < string) | (undefined > (undefined, this));
+  return div(name ? "hello " + name : "Click to get a second greeting", {
     onclick() {
       const name = prompt();
-      self.updateState(name);
+      if (name) {
+        setName(name);
+      } else {
+        alert("Please provide a valid name");
+      }
     },
   });
 });
@@ -219,21 +197,20 @@ const nameRef = new Ref(function (name) {
 // reference (not state)
 
 function typingExample() {
-  const re = new reference();
-  return _(
-    "div",
+  const ref = useRef();
+  return div(
     input({
       oninput() {
-        re.text.innerText = this.value;
+        ref.current("text").innerText = this.value;
       },
       placeholder: "typing simulation",
     }),
-    p(" no thing typed yet!", { reference: re.bindAs("text") })
+    p(" no thing typed yet!", { reference: ref.bindAs("text") })
   );
 }
 
 function App() {
-  return div(count, counter, dataCounter, HelloMessage, br, nameRef);
+  return div(count, typingExample, HelloMessage, nameRef);
 }
 
 document.body.append(App());
@@ -244,21 +221,18 @@ document.body.append(App());
 Let's see a simple TodoList example
 
 ```js
-import _, {
-  // tags
-  div,
+import {
   button,
+  createSignal,
+  useState,
+  div,
+  input,
   main,
   p,
-  input,
-  // allows you to create powerful data stores
-  createSignal,
-  // dom ref
-  useRef(),
-  // dynamic component class
-  Ref,
-  css,
-} from "cradova";
+  Comp,
+  h1,
+  useRef,
+} from "../dist/index.js";
 
 function TodoList() {
   // can be used to hold multiple references
@@ -267,7 +241,7 @@ function TodoList() {
   // creating a store
   const todoStore = new createSignal([
     "take bath",
-    "code code code",
+    "code coded",
     "take a break",
   ]);
 
@@ -282,12 +256,12 @@ function TodoList() {
     this.set(this.value);
   });
 
-  // bind Ref to Signal
+  // bind Comp to Signal
   todoStore.bindRef(todoList);
 
   // markup
   return main(
-    _`|Todo List`,
+    p(`|Todo List`),
     div(
       input({
         placeholder: "type in todo",
@@ -295,8 +269,11 @@ function TodoList() {
       }),
       button("Add todo", {
         onclick() {
-          todoStore.fireAction("add-todo", referenceSet.todoInput.value);
-          referenceSet.todoInput.value = "";
+          todoStore.fireAction(
+            "add-todo",
+            referenceSet.current("todoInput").value
+          );
+          referenceSet.current("todoInput").value = "";
         },
       })
     ),
@@ -304,7 +281,7 @@ function TodoList() {
   );
 }
 
-const todoList = new Ref(function () {
+const todoList = new Comp(function () {
   const self = this;
   return div(
     self.Signal.value.map((item) =>
@@ -317,81 +294,63 @@ const todoList = new Ref(function () {
     )
   );
 });
-
 document.body.appendChild(TodoList());
-
-css`
-  body {
-    box-sizing: border-box;
-    display: flex;
-  }
-  main {
-    margin: auto;
-  }
-  main > p {
-    font-size: 2rem;
-  }
-`;
 ```
 
-## working with screen and Router:
+## working with page and Router:
 
-unlike just appending stuff to the DOM,
+Unlike just appending stuff to the DOM,
 a better to build apps is to use a routing system.
 
 Cradova Router is a module that allows you do the following:
 
 Create specified routes in you application
-help you orchestrate navigation
-render a screen on a route
-pre-render a screen in the background if you want to.
+help you handle navigation
+render a page on a route
 listen to Navigation changes
-create error boundary at screen level.
-persist rendered screens by default
-allow parallel screen rendering for every unique route scheme
+create error boundary at page level apart from Comp level.
 
 let's try an example.
 
 ```js
-import _, { Screen, Router } from "cradova";
+import { Page, Router } from "cradova";
 
-// Ref can be used as screens
+// Comp can be used as page template this way
 
-const template = new Ref(function (name) {
-  // an effect run once after screen renders
+const template = new Comp(function (name) {
+  // an effect run once after page renders
   const self = this;
   self.effect(() => {
     const name = new Promise((res) => {
       res("john doe");
     });
     setTimeout(async () => {
-      self.updateState(await name);
+      self.recall(await name);
     }, 1000);
   });
   // effects can be used to make api calls needed for the page
-  return _("div", name ? ">>>>>>>>  Hello  " + name : "  loading...");
+  return div(name ? ">>>>>>>>  Hello  " + name : "  loading...");
 });
 
-const home = new Screen({
+const home = new Page({
   name: "home page", // page title
-  template,
+  template: () => div(template),
 });
 
 // in your routes.ts file
 Router.BrowserRoutes({
+  // Ways to use paths and Pages
+  "*": home,
   "/home": home,
+  "/home?": home,
+  "/home/:name": home,
+  // will be lazy loaded
   "/lazy-loaded-home": async () => await import("./home"),
 });
 // creates these routes
 
-Router.packageScreen("/home", data);
-// get the page ready in the background
-
 Router.navigate("/home", data);
 // navigates to that page
-
-Router.getParams();
-// get route params for this current page
 
 Router.onPageEvent((lastRoute, newRoute) => {
   console.log(lastRoute, newRoute);
@@ -417,41 +376,34 @@ so if you want to use your own mount point then create a div with data-wrapper="
 
 ---
 
-More info on Cradova screens
+More info on Cradova pages
 
 ---
 
-screens are rendered once by default to hack
-responsiveness making your app work fast as user navigates.
-
-this behavior can be override
-by passing
-persist: false
-in the constructor
-
-Cradova screens has
+Cradova pages has
 onActivate() and
 onDeactivate() methods which is also available in the
 component function on the this variable bound to it.
 
 this allow you manage rendering
-circle for each screen in your app
+circle for each page in your app
 
 ---
 
-More info on Cradova Ref
+More info on Cradova Comp
 
 ---
 
-Cradova Ref is a dynamic component class, which ships simple abstractions like:
+Cradova Comp is a dynamic component class, which ships simple abstractions like:
 
-- Effects
-- stash
+- recall
+- useEffect
+- useState
+- useRef
 - preRender
-- updateState
 
 these behaviors allow you manage rendering
-circle for refs in your app
+circle for Comps in your app
 
 ---
 
@@ -465,12 +417,12 @@ with ability to:
 
 - create store
 - create actions and fire them
-- bind a Ref
+- bind a Comp
 - listen to changes
 - persist changes to localStorage
-- update a CradovaRef and bindings automatically
+- update a Comp and bindings automatically
 
-With these simple and easy abstractions, you can use datastores with powerful convenience.
+With these simple and easy abstractions, you can write datastores with so much convenience.
 
 ## Documentation
 
@@ -478,7 +430,7 @@ At the moment, we're in the process of creating a documentation website for Crad
 
 ## Getting Help
 
-To get further insights and help on Cradova, visit our [Discord](https://discord.gg/b7fvMg38) and [Telegram](https://t.me/uiedbookHQ) Community Chats.
+To get further insights and help on Cradova, visit the [Discord](https://discord.gg/b7fvMg38) and [Telegram](https://t.me/uiedbookHQ) Community Chats.
 
 ## Contributing
 
@@ -503,8 +455,6 @@ We are currently working to [set](https://github.com/uiedbook/cradova/blob/main/
 
 Opensourced And Free.
 
-Uiedbook is an open source team of web focused engineers, Our vision is to make the web better, improving and innovating infrastructures for a better web experience.
-
 Join Us on [telegram](https://t.me/UiedbookHQ).
 
 ### Contribution and License Agreement
@@ -515,7 +465,12 @@ If you contribute code to this project, you are implicitly allowing your code to
 
 Your Support is a good force for change anytime you do it, you can ensure Our projects, growth, Cradova, Cradova, JetPath etc, growth and improvement by making a re-occuring or fixed sponsorship
 to [github sponsors](https://github.com/sponsors/FridayCandour):
-or crypto using
-etheruen: `0xD7DDD4312A4e514751A582AF725238C7E6dF206c`,
-Bitcoin: `bc1q5548kdanwyd3y07nyjjzt5zkdxqec4nqqrd760` or
-LTC: `ltc1qgqn6nqq6x555rpj3pw847402aw6kw7a25dc29w`.
+
+Support via cryptos -
+
+- BTC: `bc1q228fnx44ha9y5lvtku70pjgaeh2jj3f867nwye`
+- ETH: `0xd067560fDed3B1f3244d460d5E3011BC42C4E5d7`
+- LTC: `ltc1quvc04rpmsurvss6ll54fvdgyh95p5kf74wppa6`
+- TRX: `THag6WuG4EoiB911ce9ELgN3p7DibtS6vP`
+
+Build Powerful ⚡ Web Apps with Ease.

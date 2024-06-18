@@ -1,7 +1,7 @@
 {
   "name": "cradova",
   "version": "3.3.8",
-  "description": "Web framework for building powerful web apps",
+  "description": "Build Powerful ⚡ Web Apps with Ease",
   "main": "dist/index.js",
   "type": "module",
   "files": [
@@ -14,8 +14,8 @@
     "url": "git+https://github.com/FridayCandour/cradova.git"
   },
   "scripts": {
-    "build": "tsup src/index.ts",
-    "pub": "tsup src/index.ts && npm publish",
+    "build": "bun bundle.ts",
+    "pub": "bun bundle.ts && npm publish",
     "lint": "eslint . --fix"
   },
   "keywords": [
@@ -24,8 +24,7 @@
     "parallel rendering",
     "conditionals",
     "prerendering",
-    "cradova elements",
-    "Refs",
+    "Comps",
     "createSignal",
     "VJS",
     "vjs specification",

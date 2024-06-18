@@ -1,10 +1,9 @@
 #!/usr/bin/env sh
 #!/bin/bash
 
-
+ 
 echo "" 
-echo "" 
-echo  "  Packing ...."
+echo  "Packing Cradova ...."
 tsc --emitDeclarationOnly
 npm pack
 mv **.tgz ~/
