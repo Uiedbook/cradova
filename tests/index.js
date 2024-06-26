@@ -11,6 +11,9 @@ import {
   Comp,
   h1,
   useRef,
+  Page,
+  Router,
+  a,
 } from "../dist/index.js";
 
 function TodoList() {
@@ -40,7 +43,7 @@ function TodoList() {
 
   // markup
   return main(
-    p(`|Todo List`),
+    h1(`Todo List`),
     div(
       input({
         placeholder: "type in todo",
@@ -75,17 +78,6 @@ const todoList = new Comp(function () {
 });
 document.body.appendChild(TodoList());
 
-// import {
-//   button,
-//   createSignal,
-//   Comp,
-//   reference,
-//   h1,
-//   br,
-//   div,
-//   useRef,
-// } from "cradova";
-
 const count = new Comp(function () {
   const [count, setCounter] = useState(0, this);
   setTimeout(() => {
@@ -93,8 +85,6 @@ const count = new Comp(function () {
   }, 1000);
   return h1(" count: " + count);
 });
-
-// hello message
 
 function HelloMessage() {
   return div("Click to get a greeting", {
@@ -108,7 +98,7 @@ function HelloMessage() {
 // using CradovaRef
 
 const nameRef = new Comp(function () {
-  const [name, setName] = (useState < string) | (undefined > (undefined, this));
+  const [name, setName] = useState(undefined, this);
   return div(name ? "hello " + name : "Click to get a second greeting", {
     onclick() {
       const name = prompt();
@@ -132,12 +122,25 @@ function typingExample() {
       },
       placeholder: "typing simulation",
     }),
-    p(" no thing typed yet!", { reference: ref.bindAs("text") })
+    p(" no thing typed yet!", { reference: ref.bindAs("text") }),
+    a({ href: "/p" }, "log lol in the console")
   );
 }
 
 function App() {
-  return div(count, typingExample, HelloMessage, nameRef);
+  return div(count, HelloMessage, nameRef, typingExample);
 }
 
 document.body.append(App());
+
+Router.BrowserRoutes({
+  "/p": new Page({
+    template() {
+      return div({
+        onmount() {
+          console.log("lol");
+        },
+      });
+    },
+  }),
+});

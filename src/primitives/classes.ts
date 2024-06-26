@@ -1,5 +1,5 @@
 import { SNRU } from "./functions";
-import { type CradovaPageType } from "./types";
+import { type CradovaPageType, type promisedPage } from "./types";
 
 /**
  * Cradova event
@@ -547,10 +547,10 @@ export class Page {
     | ((this: Page) => HTMLElement)
   private _template = document.createElement("div");
   private _callBack:
-    | ((cradovaPageSet: HTMLElement) => Promise<void> | void)
+    | (() => Promise<void> | void)
     | undefined;
   private _deCallBack:
-    | ((cradovaPageSet: HTMLElement) => Promise<void> | void)
+    | (() => Promise<void> | void)
     | undefined;
   private _dropped = false;
   /**
@@ -577,7 +577,7 @@ export class Page {
     this._deCallBack = cb;
   }
   async _deActivate() {
-    this._deCallBack && (await this._deCallBack(localTree.globalTree["doc"]));
+    this._deCallBack && (await this._deCallBack());
   }
   drop(state?: boolean) {
     if (typeof state === "boolean") {
@@ -607,8 +607,9 @@ export class Page {
     document.title = this._name;
     localTree.globalTree["doc"].innerHTML = "";
     // ? tell all Comps to re-render 
-    CradovaEvent.dispatchEvent("beforeMountActive")
-    localTree.globalTree["doc"].appendChild(this._template as Node);
+    CradovaEvent.dispatchEvent("beforeMountActive");
+    localTree.globalTree["doc"].appendChild(this._template);
+    // ? call any onmount event added in the cradova event loop 
     CradovaEvent.dispatchEvent("afterMount");
     window.scrollTo({
       top: 0,
@@ -616,7 +617,7 @@ export class Page {
       // @ts-ignore
       behavior: "instant",
     });
-    this._callBack && (await this._callBack(localTree.globalTree["doc"]));
+    this._callBack && (await this._callBack());
   }
 }
 
@@ -837,11 +838,12 @@ export class Router {
    *
    * accepts an object containing pat and page
    */
-  static BrowserRoutes(obj: Record<string, any>) {
+  static BrowserRoutes(obj: Record<string, Page | promisedPage>) {
+    // ! remove these as any later
     for (const path in obj) {
       let page = obj[path];
       if (
-        (typeof page === "object" && typeof page.then === "function") ||
+        (typeof page === "object" && typeof (page as any).then === "function") ||
         typeof page === "function"
       ) {
         // creating the lazy
@@ -849,7 +851,7 @@ export class Router {
           page = await (typeof page === "function"
             ? await page()
             : await page);
-          return RouterBox.route(path, page?.default || page);
+          return RouterBox.route(path, (page as any)?.default || page);
         };
       } else {
         RouterBox.route(path, page);

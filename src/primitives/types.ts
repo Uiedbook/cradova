@@ -39,6 +39,7 @@ export type VJS_params_TYPE<E = HTMLElement> =
     | HTMLElement
     | HTMLElement[]
     | DocumentFragment
+    | DocumentFragment[]
     // property type
     | Attributes
     | (() => HTMLElement)
@@ -99,3 +100,5 @@ export type CradovaPageType = {
   template: (this: Page) => HTMLElement;
 
 };
+
+export type promisedPage = (() => Promise<Page>)
