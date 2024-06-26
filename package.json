@@ -14,8 +14,8 @@
     "url": "git+https://github.com/FridayCandour/cradova.git"
   },
   "scripts": {
-    "build": "bun bundle.ts",
-    "pub": "bun bundle.ts && npm publish",
+    "compile": "bun bundle.ts",
+    "pub:patch": " git add . && git commit -m 'new version' && bun bundle.ts && npm version patch && npm publish && git push && git push --tags",
     "lint": "eslint . --fix"
   },
   "keywords": [
