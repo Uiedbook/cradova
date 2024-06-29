@@ -677,7 +677,7 @@ class RouterBoxClass {
    */
 
   async router(_e?: unknown, _force?: boolean) {
-    let url = window.location.pathname,
+    let url = window.location.href,
       route: Page,
       params;
     // ? abort navigation when router is paused
@@ -748,27 +748,35 @@ class RouterBoxClass {
     if (url[0] !== "/") {
       url = url.slice(url.indexOf("/", 7));
     }
+
     if (this.routes[url]) {
       return [this.routes[url], { path: url }];
     }
-
-    //? check for extra / in the route
-    if (this.routes[url + "/"]) {
-      return [this.routes[url + "/"], { path: url }];
-    }
+    // ! {2} this is commented out because it's has been handled by the navigating method
     //? check for search in the route
-    if (url.includes("/?")) {
-      const sraw = [...new URLSearchParams(url).entries()];
-      const search: Record<string, string> = {};
-      for (const idx in sraw) {
-        search[
-          sraw[idx][0].includes("?") ? sraw[idx][0].split("?")[1] : sraw[idx][0]
-        ] = sraw[idx][1];
+    // if (url.includes("/?")) {
+    //   const sraw = [...new URLSearchParams(url).entries()];
+    //   const search: Record<string, string> = {};
+    //   for (const idx in sraw) {
+    //     search[
+    //       sraw[idx][0].includes("?") ? sraw[idx][0].split("?")[1] : sraw[idx][0]
+    //     ] = sraw[idx][1];
+    //   }
+    //   const path = url.slice(0, url.indexOf("/?") + 2)
+    //   return [this.routes[path], { path, search }];
+    // }
+    //  ! {2} that's why we handle it differently.
+    if (url.includes("?")) {
+      let search;
+      const params: Record<string, string> = {};
+      [url, search] = url.split("?");
+      new URLSearchParams(search).forEach((val, key) => {
+        params[key] = val;
+      })
+      if (this.routes[url]) {
+        return [this.routes[url], { data: params, path: url }];
       }
-      const path = url.slice(0, url.indexOf("/?") + 2)
-      return [this.routes[path], { path, search }];
     }
-
     //? place holder & * route checks
     for (const path in this.routes) {
       // ? placeholder check
@@ -900,6 +908,7 @@ export class Router {
     href: string,
     data: Record<string, unknown> | null = null
   ) {
+
     if (typeof href !== "string") {
       throw new TypeError(
         " ✘  Cradova err:  href must be a defined path but got " +
@@ -912,7 +921,7 @@ export class Router {
     if (href.includes(".")) {
       window.location.href = href;
     } else {
-      if (href === window.location.pathname) {
+      if (href === window.location.href) {
         return;
       }
       [route, params] = RouterBox.checker(href);

@@ -68,8 +68,9 @@ export const makeElement = <E extends HTMLElement>(
             "click",
             (e: { preventDefault: () => void }) => {
               e.preventDefault();
+
               Router.navigate(
-                (element as unknown as HTMLAnchorElement).pathname
+                (element as unknown as HTMLAnchorElement).href
               );
               //? get url hash here and scroll into view
               if (href.includes("#")) {

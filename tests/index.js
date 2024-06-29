@@ -136,11 +136,16 @@ document.body.append(App());
 Router.BrowserRoutes({
   "/p": new Page({
     template() {
-      return div({
-        onmount() {
-          console.log("lol");
-        },
-      });
+      return div(
+        a("let's test link naviagate", { href: "/a?name=friday" }),
+        {}
+      );
+    },
+  }),
+  "/a": new Page({
+    template() {
+      console.log(Router.Params);
+      return div(p("lol ----------------"), {});
     },
   }),
 });
