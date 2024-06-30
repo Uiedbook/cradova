@@ -7,18 +7,34 @@ import { type CradovaPageType, type promisedPage } from "./types";
 class cradovaEvent {
   private afterMount: Function[] = [];
   private beforeMountActive: Function[] = [];
+  /**
+   *  add an event to an exhaustible list of events
+   * the events runs only once and removed.
+   * these event are call and removed once when when a comp is rendered to the dom
+   * @param callback
+   */
   async addAfterMount(callback: () => void) {
     if (!this.addAfterMount) {
       this.afterMount = [];
     }
     this.afterMount.push(callback);
   }
+  /**
+   *  add an event to a list of events
+   * the events runs many times.
+   * these event are called before a comp is rendered to the dom
+   * @param callback
+   */
   async addBeforeMountActive(callback: () => void) {
     if (!this.beforeMountActive) {
       this.beforeMountActive = [];
     }
     this.beforeMountActive.push(callback);
   }
+  /**
+   * Dispatch any event
+   * @param eventName
+   */
   dispatchEvent(eventName: "beforeMountActive" | "afterMount") {
     const eventListeners = this[eventName] || [];
     for (let i = 0; i < eventListeners.length; i++) {
@@ -37,7 +53,7 @@ export const CradovaEvent = new cradovaEvent();
  * Cradova Comp
  * -------
  * create dynamic components
- * 
+ *
  */
 export class Comp<Prop extends Record<string, any> = any> {
   private component: (this: Comp<Prop>) => HTMLElement;
@@ -53,13 +69,15 @@ export class Comp<Prop extends Record<string, any> = any> {
   _state_track: { [x: number]: boolean } = {};
   _state_index = 0;
 
-  //? public testName = null; 
-  constructor(
-    component: (this: Comp<Prop>) => HTMLElement
-  ) {
+  //? public testName = null;
+  constructor(component: (this: Comp<Prop>) => HTMLElement) {
     this.component = component.bind(this);
     CradovaEvent.addBeforeMountActive(() => {
-      this.published = false;
+      // this.published = false;
+      this._state_index = 0;
+      this._state_track = {};
+      this._state = [];
+      // this.published = false;
     });
   }
 
@@ -67,7 +85,6 @@ export class Comp<Prop extends Record<string, any> = any> {
     // ? parking
     this.preRendered = this.render() as HTMLElement;
   }
-
 
   /**
    * Cradova Comp
@@ -82,13 +99,13 @@ export class Comp<Prop extends Record<string, any> = any> {
 
     if (!this.preRendered) {
       const html = this.component() as any;
-      // parking 
+      // parking
 
       if (html instanceof HTMLElement || html instanceof DocumentFragment) {
         this.reference._appendDomForce("html", html as unknown as HTMLElement);
         //   CradovaEvent.addActiveEventListener("afterMountEvent", () => {
-        //       this.rendered = false; 
-        //   }); 
+        //       this.rendered = false;
+        //   });
         this.effector.apply(this);
         this.rendered = true;
         this.published = true;
@@ -102,24 +119,13 @@ export class Comp<Prop extends Record<string, any> = any> {
       return this.preRendered;
     }
   }
-  instance() {
-    return this.reference.current("html");
-  }
+  // instance() {
+  //   return this.reference.current("html");
+  // }
   _setExtra(Extra: createSignal<any>) {
     this.Signal = Extra;
   }
-  _roll_state<S>(data: any, idx: number, get = false) {
-    if (!get) {
-      if (idx !== 0) {
-        // ? destroy provious state first
-        this._state[idx - 1] = undefined as any;
-      }
-      // ? set new state at new index
-      this._state[idx] = data;
-    }
-    // ? current state
-    return this._state[idx] as unknown as S;
-  }
+
   _effect(fn: () => Promise<void> | void) {
     if (!this.rendered) {
       this.effects.push(fn.bind(this));
@@ -160,7 +166,6 @@ export class Comp<Prop extends Record<string, any> = any> {
         this.activate();
       }
     }
-
   }
 
   private async activate() {
@@ -179,6 +184,11 @@ export class Comp<Prop extends Record<string, any> = any> {
       this.published = true;
       this.reference._appendDomForce("html", html as unknown as HTMLElement);
       CradovaEvent.dispatchEvent("afterMount");
+      (async () => {
+        if (!document.contains(html)) {
+          this.rendered = false;
+        }
+      })();
     } else {
       console.error(" ✘  Cradova err :  Invalid html, got  - " + html);
     }
@@ -217,7 +227,6 @@ export class lazy<Type> {
  */
 
 export class __raw_ref {
-
   tree: Record<string, any> = {};
   globalTree: Record<string, HTMLElement> = {};
   /**
@@ -258,10 +267,6 @@ export class __raw_ref {
   }
 }
 const localTree = new __raw_ref();
-
-
-
-
 
 /**
  *  Cradova Signal
@@ -403,7 +408,7 @@ export class createSignal<Type extends Record<string, any>> {
    * ----
    *  fires an action if available
    * @param key - string key of the action
-   * @param data - data for the action 
+   * @param data - data for the action
    */
   fireAction(key: string, data?: unknown) {
     if (typeof this.actions[key] === "function") {
@@ -543,28 +548,21 @@ export class Page {
   /**
    * this should be a cradova page component
    */
-  public _html:
-    | ((this: Page) => HTMLElement)
+  public _html: (this: Page) => HTMLElement;
   private _template = document.createElement("div");
-  private _callBack:
-    | (() => Promise<void> | void)
-    | undefined;
-  private _deCallBack:
-    | (() => Promise<void> | void)
-    | undefined;
+  private _callBack: (() => Promise<void> | void) | undefined;
+  private _deCallBack: (() => Promise<void> | void) | undefined;
   private _dropped = false;
   /**
    * error handler for the page
    */
   public _errorHandler: ((err: unknown) => void) | null = null;
   constructor(cradova_page_initials: CradovaPageType) {
-    const { template, name } =
-      cradova_page_initials;
+    const { template, name } = cradova_page_initials;
     this._html = template;
     this._name = name || "Document";
     this._template.setAttribute("id", "page");
   }
-
 
   set errorHandler(errorHandler: (err: unknown) => void) {
     this._errorHandler = errorHandler;
@@ -603,13 +601,13 @@ export class Page {
         ` ✘  Cradova err:  template function for the page returned ${html} instead of html`
       );
     }
-    // ? 
+    // ?
     document.title = this._name;
     localTree.globalTree["doc"].innerHTML = "";
-    // ? tell all Comps to re-render 
+    // ? tell all Comps to re-render
     CradovaEvent.dispatchEvent("beforeMountActive");
     localTree.globalTree["doc"].appendChild(this._template);
-    // ? call any onmount event added in the cradova event loop 
+    // ? call any onmount event added in the cradova event loop
     CradovaEvent.dispatchEvent("afterMount");
     window.scrollTo({
       top: 0,
@@ -655,9 +653,7 @@ class RouterBoxClass {
     if (typeof page !== "undefined") {
       if (page && !page) {
         console.error(" ✘  Cradova err:  not a valid page  ", page);
-        throw new Error(
-          " ✘  Cradova err:  Not a valid cradova page component"
-        );
+        throw new Error(" ✘  Cradova err:  Not a valid cradova page component");
       }
       return (this.routes[path] = page);
     }
@@ -744,7 +740,9 @@ class RouterBoxClass {
     }
   }
 
-  checker(url: string): [Page | (() => Promise<Page | undefined>), Record<string, any>] {
+  checker(
+    url: string
+  ): [Page | (() => Promise<Page | undefined>), Record<string, any>] {
     if (url[0] !== "/") {
       url = url.slice(url.indexOf("/", 7));
     }
@@ -772,7 +770,7 @@ class RouterBoxClass {
       [url, search] = url.split("?");
       new URLSearchParams(search).forEach((val, key) => {
         params[key] = val;
-      })
+      });
       if (this.routes[url]) {
         return [this.routes[url], { data: params, path: url }];
       }
@@ -825,7 +823,7 @@ class RouterBoxClass {
       }
     }
     return [] as unknown as [Page, any];
-  };
+  }
 }
 
 const RouterBox = new RouterBoxClass();
@@ -851,14 +849,13 @@ export class Router {
     for (const path in obj) {
       let page = obj[path];
       if (
-        (typeof page === "object" && typeof (page as any).then === "function") ||
+        (typeof page === "object" &&
+          typeof (page as any).then === "function") ||
         typeof page === "function"
       ) {
         // creating the lazy
         RouterBox.routes[path] = async () => {
-          page = await (typeof page === "function"
-            ? await page()
-            : await page);
+          page = await (typeof page === "function" ? await page() : await page);
           return RouterBox.route(path, (page as any)?.default || page);
         };
       } else {
@@ -904,16 +901,12 @@ export class Router {
    * @param data object
    * @param force boolean
    */
-  static navigate(
-    href: string,
-    data: Record<string, unknown> | null = null
-  ) {
-
+  static navigate(href: string, data: Record<string, unknown> | null = null) {
     if (typeof href !== "string") {
       throw new TypeError(
         " ✘  Cradova err:  href must be a defined path but got " +
-        href +
-        " instead"
+          href +
+          " instead"
       );
     }
     let route = null,
@@ -969,7 +962,6 @@ export class Router {
       );
     }
   }
-
 
   /**
    * Cradova Router

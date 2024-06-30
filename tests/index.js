@@ -14,6 +14,7 @@ import {
   Page,
   Router,
   a,
+  $if,
 } from "../dist/index.js";
 
 function TodoList() {
@@ -80,7 +81,7 @@ document.body.appendChild(TodoList());
 
 const count = new Comp(function () {
   const [count, setCounter] = useState(0, this);
-  setTimeout(() => {
+  setInterval(() => {
     setCounter(count + 1);
   }, 1000);
   return h1(" count: " + count);
@@ -145,7 +146,52 @@ Router.BrowserRoutes({
   "/a": new Page({
     template() {
       console.log(Router.Params);
-      return div(p("lol ----------------"), {});
+      return div(a("go to comp as page", { href: "/comp-as-page" }));
     },
   }),
+  "/comp-as-page": new Page({
+    template: () =>
+      div(
+        new Comp(function () {
+          const [state1, setState1] = useState("yes", this);
+          const [state2, setState2] = useState("yes", this);
+          return div(
+            {
+              style: {
+                display: "flex",
+                flexDirection: "column",
+              },
+            },
+            $if(state2 === true, () =>
+              a("link to code", { href: "/p", color: "red", display: "block" })
+            ),
+            button("can we code today?: " + state1),
+            {
+              style: {
+                marginTop: "3rem",
+              },
+              onclick() {
+                setState1(state1 === "yes" ? "no" : "yes");
+                setState2(state1 === "yes");
+              },
+            }
+          );
+        })
+      ),
+  }),
 });
+
+// const a = new Comp(function () {
+//   const [state1, setState1] = useState("yes", this);
+//   const [state2, setState2] = useState("yes", this);
+//   return div(
+//     $if(state2 === true, () => a("link to code")),
+//     button("can we code today?: " + state1),
+//     {
+//       onclick() {
+//         setState1(state1 === "yes" ? "no" : "yes");
+//         setState2(state1 === "yes");
+//       },
+//     }
+//   );
+// });

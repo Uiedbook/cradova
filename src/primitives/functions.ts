@@ -43,7 +43,6 @@ export const makeElement = <E extends HTMLElement>(
         Object.assign(props, child);
         continue;
       }
-
     }
   } else {
     return element;
@@ -59,7 +58,6 @@ export const makeElement = <E extends HTMLElement>(
         continue;
       }
 
-
       // A tags (the only special tag)
       if (prop === "href") {
         const href = (value || "") as string;
@@ -69,9 +67,7 @@ export const makeElement = <E extends HTMLElement>(
             (e: { preventDefault: () => void }) => {
               e.preventDefault();
 
-              Router.navigate(
-                (element as unknown as HTMLAnchorElement).href
-              );
+              Router.navigate((element as unknown as HTMLAnchorElement).href);
               //? get url hash here and scroll into view
               if (href.includes("#")) {
                 const l = href.split("#").at(-1);
@@ -118,7 +114,6 @@ export const makeElement = <E extends HTMLElement>(
         CradovaEvent.addAfterMount(ev);
         continue;
       }
-
 
       // data-(s)
       if (prop.includes("data-")) {
@@ -174,7 +169,6 @@ export function Rhoda(l: VJS_params_TYPE<HTMLElement>) {
   }
   return fg;
 }
-
 
 /**
  *
@@ -290,13 +284,13 @@ export const frag = function (children: VJS_params_TYPE<HTMLElement>) {
  * @returns [state, setState]
  */
 export function useState<S = unknown>(
-  initialValue: S,
+  newState: S,
   Comp: Comp
 ): [S, (newState: S) => void] {
   Comp._state_index += 1;
   const idx = Comp._state_index;
   if (!Comp._state_track[idx]) {
-    Comp._roll_state<S>(initialValue, idx);
+    Comp._state[idx] = newState;
     Comp._state_track[idx] = true;
   }
   /**
@@ -306,10 +300,10 @@ export function useState<S = unknown>(
    * @param newState
    */
   function setState(newState: S) {
-    Comp._roll_state<S>(newState, idx);
+    Comp._state[idx] = newState;
     Comp.recall();
   }
-  return [Comp._roll_state<S>(null as S, idx, true) as S, setState];
+  return [Comp._state[idx] as S, setState];
 }
 /**
  * Cradova
@@ -321,8 +315,6 @@ Allows side effects to be performed in functional components (Comps), such as fe
 export function useEffect(effect: () => void, Comp: Comp) {
   Comp._effect(effect);
 }
-
-
 
 /**
  * Cradova
