@@ -597,7 +597,6 @@ export class Page {
     if (html instanceof HTMLElement) {
       this._template.innerHTML = "";
       this._template.appendChild(html);
-      console.log("boohoo 2", html);
     } else {
       throw new Error(
         ` ✘  Cradova err:  template function for the page returned ${html} instead of html`
@@ -693,6 +692,7 @@ class RouterBoxClass {
     } else {
       [route, params] = this.checker(url) as [Page, any];
     }
+    console.log({ url, route });
 
     if (typeof route !== "undefined") {
       // we need to caught any error and propagate to the app
@@ -746,7 +746,11 @@ class RouterBoxClass {
     url: string
   ): [Page | (() => Promise<Page | undefined>), Record<string, any>] {
     if (url[0] !== "/") {
-      url = url.slice(url.indexOf("/", 7));
+      console.log(url, 1);
+      // if (url.includes(location.origin)) {
+      url = url.slice(url.indexOf("/", 8));
+      // }
+      console.log(url, 2);
     }
 
     if (this.routes[url]) {
