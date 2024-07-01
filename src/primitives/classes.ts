@@ -562,7 +562,6 @@ export class Page {
     this._html = template;
     this._name = name || "Document";
     this._template.setAttribute("id", "page");
-    console.log("boohoo 1");
   }
 
   set errorHandler(errorHandler: (err: unknown) => void) {
@@ -585,6 +584,7 @@ export class Page {
     } else return this._dropped;
   }
   async _activate() {
+    console.log("boohoo 1");
     //? check if the page is dropped
     if (this._dropped) {
       history.go(-1);
@@ -597,6 +597,7 @@ export class Page {
     if (html instanceof HTMLElement) {
       this._template.innerHTML = "";
       this._template.appendChild(html);
+      console.log("boohoo 2", html);
     } else {
       throw new Error(
         ` ✘  Cradova err:  template function for the page returned ${html} instead of html`
@@ -845,8 +846,7 @@ export class Router {
    *
    * accepts an object containing pat and page
    */
-  BrowserRoutes(obj: Record<string, Page | promisedPage>) {
-    console.log("boohoo 3");
+  static BrowserRoutes(obj: Record<string, Page | promisedPage>) {
     // ! remove these as any later
     for (const path in obj) {
       let page = obj[path];
@@ -864,6 +864,7 @@ export class Router {
         RouterBox.route(path, page);
       }
     }
+    console.log(RouterBox.routes);
     Router._mount();
   }
   /** 
@@ -998,8 +999,6 @@ export class Router {
   }
 
   static _mount() {
-    console.log("boohoo 2");
-
     // creating mount point
     let doc = document.querySelector("[data-wrapper=app]");
     if (!doc) {
