@@ -756,6 +756,7 @@ class RouterBoxClass {
     if (this.routes[url]) {
       return [this.routes[url], { path: url }];
     }
+    console.log(url);
     // ! {2} this is commented out because it's has been handled by the navigating method
     //? check for search in the route
     // if (url.includes("/?")) {
