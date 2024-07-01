@@ -66,8 +66,8 @@ export class Comp<Prop extends Record<string, any> = any> {
   Signal: createSignal<any> | undefined;
   //? hooks management
   _state: Prop[] = [];
-  _state_track: { [x: number]: boolean } = {};
   _state_index = 0;
+  test?: string;
 
   //? public testName = null;
   constructor(component: (this: Comp<Prop>) => HTMLElement) {
@@ -75,7 +75,6 @@ export class Comp<Prop extends Record<string, any> = any> {
     CradovaEvent.addBeforeMountActive(() => {
       // this.published = false;
       this._state_index = 0;
-      this._state_track = {};
       this._state = [];
       // this.published = false;
     });
@@ -170,6 +169,7 @@ export class Comp<Prop extends Record<string, any> = any> {
 
   private async activate() {
     this._state_index = 0;
+    //
     this.published = false;
     if (!this.rendered) {
       return;

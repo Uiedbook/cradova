@@ -289,10 +289,15 @@ export function useState<S = unknown>(
 ): [S, (newState: S) => void] {
   Comp._state_index += 1;
   const idx = Comp._state_index;
-  if (!Comp._state_track[idx]) {
+  if (idx >= Comp._state.length) {
     Comp._state[idx] = newState;
-    Comp._state_track[idx] = true;
   }
+  // if (Comp.test) {
+  //   console.log({
+  //     state: Comp._state,
+  //     idx: Comp._state_index,
+  //   });
+  // }
   /**
    * cradova
    * ---

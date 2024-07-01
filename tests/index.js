@@ -153,10 +153,16 @@ Router.BrowserRoutes({
     template: () =>
       div(
         new Comp(function () {
+          this.test = "boohoo";
           const [state1, setState1] = useState("yes", this);
           const [state2, setState2] = useState("yes", this);
           return div(
             {
+              onmount() {
+                if (state1 === "yes") {
+                  document.body.style.backgroundColor = "#000";
+                }
+              },
               style: {
                 display: "flex",
                 flexDirection: "column",
@@ -165,7 +171,7 @@ Router.BrowserRoutes({
             $if(state2 === true, () =>
               a("link to code", { href: "/p", color: "red", display: "block" })
             ),
-            button("can we code today?: " + state1),
+            button("turn off the lights?  : " + state1),
             {
               style: {
                 marginTop: "3rem",
@@ -173,6 +179,11 @@ Router.BrowserRoutes({
               onclick() {
                 setState1(state1 === "yes" ? "no" : "yes");
                 setState2(state1 === "yes");
+                if (state1 !== "yes") {
+                  document.body.style.backgroundColor = "#000";
+                } else {
+                  document.body.style.backgroundColor = "#fff";
+                }
               },
             }
           );
