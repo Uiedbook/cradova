@@ -562,6 +562,7 @@ export class Page {
     this._html = template;
     this._name = name || "Document";
     this._template.setAttribute("id", "page");
+    console.log("boohoo 1");
   }
 
   set errorHandler(errorHandler: (err: unknown) => void) {
@@ -844,7 +845,8 @@ export class Router {
    *
    * accepts an object containing pat and page
    */
-  static BrowserRoutes(obj: Record<string, Page | promisedPage>) {
+  BrowserRoutes(obj: Record<string, Page | promisedPage>) {
+    console.log("boohoo 3");
     // ! remove these as any later
     for (const path in obj) {
       let page = obj[path];
@@ -996,6 +998,8 @@ export class Router {
   }
 
   static _mount() {
+    console.log("boohoo 2");
+
     // creating mount point
     let doc = document.querySelector("[data-wrapper=app]");
     if (!doc) {
