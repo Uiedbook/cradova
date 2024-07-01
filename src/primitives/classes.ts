@@ -584,7 +584,6 @@ export class Page {
     } else return this._dropped;
   }
   async _activate() {
-    console.log("boohoo 1");
     //? check if the page is dropped
     if (this._dropped) {
       history.go(-1);
@@ -692,8 +691,6 @@ class RouterBoxClass {
     } else {
       [route, params] = this.checker(url) as [Page, any];
     }
-    console.log({ url, route });
-
     if (typeof route !== "undefined") {
       // we need to caught any error and propagate to the app
       try {
@@ -746,17 +743,12 @@ class RouterBoxClass {
     url: string
   ): [Page | (() => Promise<Page | undefined>), Record<string, any>] {
     if (url[0] !== "/") {
-      console.log(url, 1);
-      // if (url.includes(location.origin)) {
       url = url.slice(url.indexOf("/", 8));
-      // }
-      console.log(url, 2);
     }
 
     if (this.routes[url]) {
       return [this.routes[url], { path: url }];
     }
-    console.log(url);
     // ! {2} this is commented out because it's has been handled by the navigating method
     //? check for search in the route
     // if (url.includes("/?")) {
@@ -869,7 +861,6 @@ export class Router {
         RouterBox.route(path, page);
       }
     }
-    console.log(RouterBox.routes);
     Router._mount();
   }
   /** 
