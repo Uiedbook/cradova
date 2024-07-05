@@ -274,7 +274,7 @@ export const frag = function (children: VJS_params_TYPE<HTMLElement>) {
 export function useState<S = unknown>(
   newState: S,
   Comp: Comp
-): [S, (newState: S) => void] {
+): [S, (newState: S | ((preS: S) => S)) => void] {
   Comp._state_index += 1;
   const idx = Comp._state_index;
   if (idx >= Comp._state.length) {
