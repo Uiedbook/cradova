@@ -146,16 +146,17 @@ Router.BrowserRoutes({
   "/a": new Page({
     template() {
       console.log(Router.Params);
-      return div(a("go to comp as page", { href: "/comp-as-page" }));
+      return div(a("go to comp as page", { href: "/comppage-1" }));
     },
   }),
-  "/comp-as-page": new Page({
+  "/comppage-1": new Page({
     template: () =>
       div(
         new Comp(function () {
           this.test = "boohoo";
           const [state1, setState1] = useState("yes", this);
           const [state2, setState2] = useState("yes", this);
+          console.log(state1, state2);
           return div(
             {
               onmount() {

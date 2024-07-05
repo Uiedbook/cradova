@@ -1,4 +1,3 @@
-import { SNRU } from "./functions";
 import { type CradovaPageType, type promisedPage } from "./types";
 
 /**
@@ -62,7 +61,7 @@ export class Comp<Prop extends Record<string, any> = any> {
   private rendered = false;
   private published = false;
   private preRendered: HTMLElement | null = null;
-  private reference: __raw_ref = new __raw_ref();
+  private reference: HTMLElement | null = null;
   Signal: createSignal<any> | undefined;
   //? hooks management
   _state: Prop[] = [];
@@ -72,12 +71,6 @@ export class Comp<Prop extends Record<string, any> = any> {
   //? public testName = null;
   constructor(component: (this: Comp<Prop>) => HTMLElement) {
     this.component = component.bind(this);
-    CradovaEvent.addBeforeMountActive(() => {
-      // this.published = false;
-      this._state_index = 0;
-      this._state = [];
-      // this.published = false;
-    });
   }
 
   preRender() {
@@ -95,16 +88,13 @@ export class Comp<Prop extends Record<string, any> = any> {
   render() {
     this.effects = [];
     this.rendered = false;
-
     if (!this.preRendered) {
+      this._state_index = 0;
       const html = this.component() as any;
       // parking
 
-      if (html instanceof HTMLElement || html instanceof DocumentFragment) {
-        this.reference._appendDomForce("html", html as unknown as HTMLElement);
-        //   CradovaEvent.addActiveEventListener("afterMountEvent", () => {
-        //       this.rendered = false;
-        //   });
+      if (html instanceof HTMLElement) {
+        this.reference = html;
         this.effector.apply(this);
         this.rendered = true;
         this.published = true;
@@ -118,9 +108,6 @@ export class Comp<Prop extends Record<string, any> = any> {
       return this.preRendered;
     }
   }
-  // instance() {
-  //   return this.reference.current("html");
-  // }
   _setExtra(Extra: createSignal<any>) {
     this.Signal = Extra;
   }
@@ -168,21 +155,21 @@ export class Comp<Prop extends Record<string, any> = any> {
   }
 
   private async activate() {
-    this._state_index = 0;
     //
     this.published = false;
     if (!this.rendered) {
       return;
     }
+    this._state_index = 0;
     const html = this.component() as any;
-    if (html instanceof HTMLElement || html instanceof DocumentFragment) {
-      const node = this.reference.current("html");
+    if (html instanceof HTMLElement) {
+      const node = this.reference;
       if (node) {
         node.insertAdjacentElement("beforebegin", html as Element);
         node.remove();
       }
       this.published = true;
-      this.reference._appendDomForce("html", html as unknown as HTMLElement);
+      this.reference = html;
       CradovaEvent.dispatchEvent("afterMount");
       (async () => {
         if (!document.contains(html)) {
@@ -228,7 +215,6 @@ export class lazy<Type> {
 
 export class __raw_ref {
   tree: Record<string, any> = {};
-  globalTree: Record<string, HTMLElement> = {};
   /**
    * Bind a DOM element to a reference name.
    * @param name - The name to reference the DOM element by.
@@ -236,16 +222,12 @@ export class __raw_ref {
   bindAs(name: string) {
     return [this, name] as unknown as __raw_ref;
   }
-
   /**
    * Retrieve a referenced DOM element.
    * @param name - The name of the referenced DOM element.
    */
   current<ElementType extends HTMLElement = HTMLElement>(name: string) {
-    if (this.tree[SNRU.snru]) {
-      return this.tree[SNRU.snru][name] as ElementType;
-    }
-    return null as unknown as ElementType;
+    return this.tree[name] as ElementType | undefined;
   }
 
   /**
@@ -253,20 +235,10 @@ export class __raw_ref {
    * @param name - The name to reference the DOM element by.
    * @param element - The DOM element to reference.
    */
-  _appendDomForce(name: string, Element: HTMLElement) {
-    if (this.tree[SNRU.snru]) {
-      this.tree[SNRU.snru][name] = Element;
-    } else {
-      this.tree[SNRU.snru] = {};
-      this.tree[SNRU.snru][name] = Element;
-    }
-  }
-
-  _appendDomForceGlobal(name: string, Element: HTMLElement) {
-    this.globalTree[name] = Element;
+  _append(name: string, Element: HTMLElement) {
+    this.tree[name] = Element;
   }
 }
-const localTree = new __raw_ref();
 
 /**
  *  Cradova Signal
@@ -590,7 +562,6 @@ export class Page {
       return;
     }
     //? packaging the page dom
-    SNRU.memo_SNRU();
     //? parking
     let html = this._html.apply(this);
     if (html instanceof HTMLElement) {
@@ -603,10 +574,10 @@ export class Page {
     }
     // ?
     document.title = this._name;
-    localTree.globalTree["doc"].innerHTML = "";
+    RouterBox.doc!.innerHTML = "";
     // ? tell all Comps to re-render
     CradovaEvent.dispatchEvent("beforeMountActive");
-    localTree.globalTree["doc"].appendChild(this._template);
+    RouterBox.doc!.appendChild(this._template);
     // ? call any onmount event added in the cradova event loop
     CradovaEvent.dispatchEvent("afterMount");
     window.scrollTo({
@@ -627,6 +598,7 @@ export class Page {
  */
 
 class RouterBoxClass {
+  doc: null | HTMLElement = null;
   lastNavigatedRouteController?: Page;
   nextRouteController?: Page;
   lastNavigatedRoute?: string;
@@ -996,14 +968,14 @@ export class Router {
 
   static _mount() {
     // creating mount point
-    let doc = document.querySelector("[data-wrapper=app]");
+    let doc = document.querySelector("[data-wrapper=app]") as HTMLElement;
     if (!doc) {
       doc = document.createElement("div");
       doc.setAttribute("data-wrapper", "app");
       document.body.appendChild(doc);
-      localTree._appendDomForceGlobal("doc", doc as HTMLElement);
+      RouterBox.doc = doc;
     } else {
-      localTree._appendDomForceGlobal("doc", doc as HTMLElement);
+      RouterBox.doc = doc;
     }
     window.addEventListener("pageshow", () => RouterBox.router());
     window.addEventListener("popstate", (_e) => {

@@ -86,7 +86,7 @@ export const makeElement = <E extends HTMLElement>(
           prop == "reference" &&
           (value! as unknown[])![0] instanceof __raw_ref
         ) {
-          ((value! as unknown[])![0] as __raw_ref)._appendDomForce(
+          ((value! as unknown[])![0] as __raw_ref)._append(
             (value! as unknown[])![1] as string,
             element
           );
@@ -233,18 +233,6 @@ export function loop<Type>(
     : undefined;
 }
 
-/**  Calculate a simple numerical representation of the URL */
-export const SNRU = {
-  snru: "",
-  memo_SNRU() {
-    let key = 0;
-    const url = window.location.href;
-    for (let i = 0; i < url.length; i++) {
-      key += url.charCodeAt(i);
-    }
-    this.snru = key.toString();
-  },
-};
 /**
  * Document fragment
  * @param children
