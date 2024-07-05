@@ -90,6 +90,7 @@ export class Comp<Prop extends Record<string, any> = any> {
     this.rendered = false;
     if (!this.preRendered) {
       this._state_index = 0;
+      this._state = [];
       const html = this.component() as any;
       // parking
 
