@@ -292,7 +292,10 @@ export function useState<S = unknown>(
    * set new state and re-renders Comp
    * @param newState
    */
-  function setState(newState: S) {
+  function setState(newState: S | ((preS: S) => S)) {
+    if (typeof newState === "function") {
+      newState = (newState as (preS: S) => S)(Comp._state[idx]);
+    }
     Comp._state[idx] = newState;
     Comp.recall();
   }
