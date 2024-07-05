@@ -189,7 +189,10 @@ export function $ifelse(condition: any, ifTrue: any, ifFalse?: any) {
   return ifFalse;
 }
 
-export function $case<E>(value: any, ...elements: VJS_params_TYPE<E>) {
+export function $case<E = HTMLElement>(
+  value: any,
+  ...elements: VJS_params_TYPE<E>
+) {
   return (key: any) => {
     if (key === value) {
       return elements;
@@ -197,20 +200,17 @@ export function $case<E>(value: any, ...elements: VJS_params_TYPE<E>) {
     return undefined;
   };
 }
-export function $switch(
-  key: unknown,
-  ...cases: ((key: any) => HTMLElement[] | undefined)[]
-) {
+export function $switch(key: unknown, ...cases: ((key: any) => any)[]) {
+  let element;
   if (cases.length) {
     for (let i = 0; i < cases.length; i++) {
-      const case_N = cases[i];
-      const elements = case_N(key);
+      const elements = cases[i](key);
       if (elements) {
-        return elements;
+        break;
       }
     }
   }
-  return undefined;
+  return element;
 }
 
 type LoopData<Type> = Type[];
@@ -223,11 +223,11 @@ export function loop<Type>(
     array?: LoopData<Type>
   ) => HTMLElement | DocumentFragment | undefined
 ) {
-  if (typeof component !== "function") {
-    throw new Error(
-      " ✘  Cradova err :  Invalid component type, must be a function that returns html  "
-    );
-  }
+  // if (typeof component !== "function") {
+  //   throw new Error(
+  //     " ✘  Cradova err :  Invalid component type, must be a function that returns html  "
+  //   );
+  // }
   return Array.isArray(datalist)
     ? (datalist.map(component) as unknown as HTMLElement[])
     : undefined;
@@ -268,7 +268,7 @@ export const frag = function (children: VJS_params_TYPE<HTMLElement>) {
       continue;
     }
     console.error(" ✘  Cradova err:   wrong element type" + html);
-    throw new TypeError(" ✘  Cradova err:   invalid element");
+    // throw new TypeError(" ✘  Cradova err:   invalid element");
   }
   return par;
 };

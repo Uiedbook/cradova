@@ -653,7 +653,7 @@ class RouterBoxClass {
     if (typeof page !== "undefined") {
       if (page && !page) {
         console.error(" ✘  Cradova err:  not a valid page  ", page);
-        throw new Error(" ✘  Cradova err:  Not a valid cradova page component");
+        // throw new Error(" ✘  Cradova err:  Not a valid cradova page component");
       }
       return (this.routes[path] = page);
     }
@@ -682,9 +682,9 @@ class RouterBoxClass {
       return;
     }
     //? abort unneeded navigation
-    if (url === this.lastNavigatedRoute) {
-      return;
-    }
+    // if (url === this.lastNavigatedRoute) {
+    //   return;
+    // }
     if (this.nextRouteController) {
       route = this.nextRouteController;
       this.nextRouteController = undefined;
@@ -699,8 +699,8 @@ class RouterBoxClass {
           if (this.loadingPage instanceof Page) {
             await this.loadingPage._activate();
           }
-          route = await (route as Function)();
-          // ! bad operation let's drop it
+          route = await (route as () => Promise<any>)();
+          // ! bad operation let's drop it and revert
           if (!route) {
             if (this.lastNavigatedRoute) {
               history.pushState({}, url, this.lastNavigatedRoute);
@@ -902,7 +902,7 @@ export class Router {
    */
   static navigate(href: string, data: Record<string, unknown> | null = null) {
     if (typeof href !== "string") {
-      throw new TypeError(
+      console.error(
         " ✘  Cradova err:  href must be a defined path but got " +
           href +
           " instead"
@@ -913,9 +913,9 @@ export class Router {
     if (href.includes(".")) {
       window.location.href = href;
     } else {
-      if (href === window.location.href) {
-        return;
-      }
+      // if (href === window.location.href) {
+      //   return;
+      // }
       [route, params] = RouterBox.checker(href);
       if (route) {
         RouterBox.nextRouteController = route as Page;
