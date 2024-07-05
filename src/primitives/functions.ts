@@ -201,16 +201,16 @@ export function $case<E = HTMLElement>(
   };
 }
 export function $switch(key: unknown, ...cases: ((key: any) => any)[]) {
-  let element;
+  let elements;
   if (cases.length) {
     for (let i = 0; i < cases.length; i++) {
-      const elements = cases[i](key);
+      elements = cases[i](key);
       if (elements) {
         break;
       }
     }
   }
-  return element;
+  return elements;
 }
 
 type LoopData<Type> = Type[];
