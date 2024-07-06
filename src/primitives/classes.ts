@@ -28,7 +28,7 @@ class cradovaEvent {
    * Dispatch any event
    * @param eventName
    */
-  dispatchEvent(eventName: "beforeMountActive" | "afterMount") {
+  dispatchEvent(eventName: "beforeMountActive" | "afterMount"): void {
     const eventListeners = this[eventName];
     if (eventName.includes("Active")) {
       for (let i = 0; i < eventListeners.length; i++) {
