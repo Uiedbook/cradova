@@ -30,15 +30,17 @@ class cradovaEvent {
    */
   dispatchEvent(eventName: "beforeMountActive" | "afterMount") {
     const eventListeners = this[eventName];
-    console.log(eventName, this[eventName], "start");
-    for (let i = 0; i < eventListeners.length; i++) {
-      if (eventName.includes("Active")) {
+    if (eventName.includes("Active")) {
+      for (let i = 0; i < eventListeners.length; i++) {
         eventListeners[i]();
-      } else {
-        eventListeners.shift()!();
       }
+      return;
     }
-    console.log(eventName, this[eventName], "end");
+    console.log(eventListeners.length, "start");
+    while (eventListeners.length !== 0) {
+      eventListeners.shift()!();
+    }
+    console.log(eventListeners.length, "end");
   }
 }
 
