@@ -140,12 +140,12 @@ export const makeElement = <E extends HTMLElement>(
 
       //? setting onmount event;
       if (prop === "onmount") {
-        console.log(element.tagName);
         CradovaEvent.addAfterMount(() => {
+          console.log(element.tagName);
+          console.log(CradovaEvent.afterMount.length);
           typeof props["onmount"] === "function" &&
             props["onmount"].apply(element);
         });
-        console.log(CradovaEvent.afterMount.length);
         continue;
         //
       }
