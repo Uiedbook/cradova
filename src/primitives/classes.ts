@@ -209,39 +209,6 @@ export class lazy<Type> {
 }
 
 /**
- * Cradova
- * ---
- * make reference to dom elements
- */
-
-export class __raw_ref {
-  tree: Record<string, any> = {};
-  /**
-   * Bind a DOM element to a reference name.
-   * @param name - The name to reference the DOM element by.
-   */
-  bindAs(name: string) {
-    return [this, name] as unknown as __raw_ref;
-  }
-  /**
-   * Retrieve a referenced DOM element.
-   * @param name - The name of the referenced DOM element.
-   */
-  current<ElementType extends HTMLElement = HTMLElement>(name: string) {
-    return this.tree[name] as ElementType | undefined;
-  }
-
-  /**
-   * Append a DOM element to the reference, overwriting any existing reference.
-   * @param name - The name to reference the DOM element by.
-   * @param element - The DOM element to reference.
-   */
-  _append(name: string, Element: HTMLElement) {
-    this.tree[name] = Element;
-  }
-}
-
-/**
  *  Cradova Signal
  * ----
  *  Create stateful data store.
@@ -471,9 +438,10 @@ export class createSignal<Type extends Record<string, any>> {
       _element_property: string;
     } = { signalProperty: "", _element_property: "" }
   ) {
-    comp.render = comp.render.bind(comp);
-
-    comp._setExtra(this);
+    if (comp instanceof Comp) {
+      comp.render = comp.render.bind(comp);
+      comp._setExtra(this);
+    }
     // it's an element binding, not comp, not event(fire action events)
     this.comp.push({
       comp: comp,

@@ -1,6 +1,39 @@
 import { type VJS_params_TYPE } from "./types";
-import { Comp, createSignal, CradovaEvent, __raw_ref } from "./classes";
-import { Router } from "./classes";
+import { Comp, createSignal, CradovaEvent, Router } from "./classes";
+
+// ? NOTE: this class below is copied here for brevity
+/**
+ * Cradova
+ * ---
+ * make reference to dom elements
+ */
+
+class __raw_ref {
+  tree: Record<string, any> = {};
+  /**
+   * Bind a DOM element to a reference name.
+   * @param name - The name to reference the DOM element by.
+   */
+  bindAs(name: string) {
+    return [this, name] as unknown as __raw_ref;
+  }
+  /**
+   * Retrieve a referenced DOM element.
+   * @param name - The name of the referenced DOM element.
+   */
+  current<ElementType extends HTMLElement = HTMLElement>(name: string) {
+    return this.tree[name] as ElementType | undefined;
+  }
+
+  /**
+   * Append a DOM element to the reference, overwriting any existing reference.
+   * @param name - The name to reference the DOM element by.
+   * @param element - The DOM element to reference.
+   */
+  _append(name: string, Element: HTMLElement) {
+    this.tree[name] = Element;
+  }
+}
 
 export const makeElement = <E extends HTMLElement>(
   element: E & HTMLElement,
@@ -115,14 +148,8 @@ export const makeElement = <E extends HTMLElement>(
         continue;
       }
 
-      // data-(s)
-      if (prop.includes("data-")) {
-        element.setAttribute(prop, value as string);
-        continue;
-      }
-
-      // aria-(s)
-      if (prop.includes("aria-")) {
+      // data-(s) &  aria-(s)
+      if (prop.includes("data-") || prop.includes("aria-")) {
         element.setAttribute(prop, value as string);
         continue;
       }
@@ -223,11 +250,6 @@ export function loop<Type>(
     array?: LoopData<Type>
   ) => HTMLElement | DocumentFragment | undefined
 ) {
-  // if (typeof component !== "function") {
-  //   throw new Error(
-  //     " ✘  Cradova err :  Invalid component type, must be a function that returns html  "
-  //   );
-  // }
   return Array.isArray(datalist)
     ? (datalist.map(component) as unknown as HTMLElement[])
     : undefined;
