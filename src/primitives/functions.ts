@@ -145,7 +145,7 @@ export const makeElement = <E extends HTMLElement>(
           typeof props["onmount"] === "function" &&
             props["onmount"].apply(element);
         });
-        console.log(CradovaEvent.addAfterMount.length);
+        console.log(CradovaEvent.afterMount.length);
         continue;
         //
       }

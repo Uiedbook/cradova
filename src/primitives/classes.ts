@@ -4,8 +4,8 @@ import { type CradovaPageType, type promisedPage } from "./types";
  * Cradova event
  */
 class cradovaEvent {
-  private afterMount: Function[] = [];
-  private beforeMountActive: Function[] = [];
+  afterMount: Function[] = [];
+  beforeMountActive: Function[] = [];
   /**
    *  add an event to an exhaustible list of events
    * the events runs only once and removed.
@@ -22,9 +22,6 @@ class cradovaEvent {
    * @param callback
    */
   async addBeforeMountActive(callback: () => void) {
-    if (!this.beforeMountActive) {
-      this.beforeMountActive = [];
-    }
     this.beforeMountActive.push(callback);
   }
   /**
