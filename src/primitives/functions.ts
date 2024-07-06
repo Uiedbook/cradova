@@ -138,14 +138,15 @@ export const makeElement = <E extends HTMLElement>(
         }
       }
 
-      // setting onmount event;
-      if (prop === "onmount" && typeof props["onmount"] === "function") {
-        const ev = () => {
-          props["onmount"]?.apply(element);
-          props!["onmount"] = undefined;
-        };
-        CradovaEvent.addAfterMount(ev);
+      //? setting onmount event;
+      if (prop === "onmount") {
+        //
+        typeof props["onmount"] === "function" &&
+          CradovaEvent.addAfterMount(() => {
+            props["onmount"]?.apply(element);
+          });
         continue;
+        //
       }
 
       // data-(s) &  aria-(s)

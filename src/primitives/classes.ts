@@ -13,9 +13,6 @@ class cradovaEvent {
    * @param callback
    */
   async addAfterMount(callback: () => void) {
-    if (!this.addAfterMount) {
-      this.afterMount = [];
-    }
     this.afterMount.push(callback);
   }
   /**
@@ -35,7 +32,7 @@ class cradovaEvent {
    * @param eventName
    */
   dispatchEvent(eventName: "beforeMountActive" | "afterMount") {
-    const eventListeners = this[eventName] || [];
+    const eventListeners = this[eventName];
     for (let i = 0; i < eventListeners.length; i++) {
       if (eventName.includes("Active")) {
         eventListeners[i]();
