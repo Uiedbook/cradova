@@ -350,10 +350,10 @@ export class createSignal<Type extends Record<string, any>> {
    * @param key - string key of the action
    * @param data - data for the action
    */
-  fireAction(key: string, data?: unknown) {
+  fireAction(key: string) {
     if (typeof this.actions[key] === "function") {
-      this.updateState(key, data as Type);
-      return this.actions[key].call(this, data);
+      this.updateState(key);
+      return this.actions[key].call(this);
     } else {
       throw Error("✘  Cradova err : action " + key + "  does not exist!");
     }
@@ -381,45 +381,20 @@ export class createSignal<Type extends Record<string, any>> {
     }
   }
 
-  private updateState(name?: string, data?: Type) {
-    if (name && data) {
-      this.comp.map((ent) => {
-        if (ent._event === name) {
-          //
-          if (ent._element_property && ent._signalProperty) {
-            ent.comp.recall();
-            return;
-          }
-          if (ent._element_property) {
-            ent.comp.recall();
-            return;
-          }
-          if (ent._signalProperty) {
-            ent.comp.recall();
-            return;
-          }
-        }
-      });
-    } else {
-      for (let i = 0; i < this.comp.length; i++) {
-        const ent = this.comp[i];
-        if (ent._element_property && ent._signalProperty) {
-          ent.comp.recall();
-          continue;
-        }
-        if (ent._element_property) {
-          ent.comp.recall();
-          continue;
-        }
-        if (ent._signalProperty) {
-          ent.comp.recall();
-          continue;
-        }
-        if (!ent._element_property && !ent._signalProperty) {
-          ent.comp.recall();
-          continue;
-        }
+  private updateState(name?: string) {
+    for (let i = 0; i < this.comp.length; i++) {
+      const ent = this.comp[i];
+      if (ent._event && ent._event === name) {
+        continue;
       }
+      // ? for normal elements
+      if (ent._element_property && ent._signalProperty) {
+        ent.comp[ent._element_property as "render"] =
+          this.value[ent._signalProperty];
+        continue;
+      }
+      // ? for Comps
+      ent.comp.recall();
     }
   }
 
