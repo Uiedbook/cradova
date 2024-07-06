@@ -36,11 +36,9 @@ class cradovaEvent {
       }
       return;
     }
-    console.log(eventListeners.length, "start");
     while (eventListeners.length !== 0) {
       eventListeners.shift()!();
     }
-    console.log(eventListeners.length, "end");
   }
 }
 
