@@ -153,7 +153,9 @@ export class Comp<Prop extends Record<string, any> = any> {
       };
     } else {
       if (this.published) {
-        this.activate();
+        setTimeout(() => {
+          this.activate();
+        });
       }
     }
   }
