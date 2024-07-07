@@ -1,5 +1,5 @@
 import * as CSS from "csstype";
-import { Comp, Page, __raw_ref } from "./classes";
+import { Comp, Page } from "./classes";
 
 type DataAttributes = { [key: `data-${string}`]: string };
 type AriaAttributes = { [key: `aria-${string}`]: string };
@@ -22,7 +22,7 @@ type Attributes = {
   required?: string;
   frameBorder?: string;
   placeholder?: string;
-  reference?: __raw_ref;
+  reference?: [any, string];
   autocomplete?: string;
   style?: CSS.Properties;
   recall?: (P: any) => void;
@@ -53,9 +53,9 @@ export type VJS_params_TYPE<E = HTMLElement> =
 
 export interface RouterRouteObject {
   _html:
-  | ((this: Page, data?: unknown) => HTMLElement | DocumentFragment)
-  | HTMLElement
-  | DocumentFragment;
+    | ((this: Page, data?: unknown) => HTMLElement | DocumentFragment)
+    | HTMLElement
+    | DocumentFragment;
   _delegatedRoutes: number | boolean;
   _Activate: (force: boolean) => Promise<void>;
   _deActivate: (params: object) => void;
@@ -64,20 +64,20 @@ export interface RouterRouteObject {
   _derive(): {
     _name: string;
     _callBack:
-    | ((cradovaPageSet: HTMLElement) => void | Promise<void>)
-    | undefined;
+      | ((cradovaPageSet: HTMLElement) => void | Promise<void>)
+      | undefined;
     _deCallBack:
-    | ((cradovaPageSet: HTMLElement) => void | Promise<void>)
-    | undefined;
+      | ((cradovaPageSet: HTMLElement) => void | Promise<void>)
+      | undefined;
   };
   _apply_derivation(data: {
     _name: string;
     _callBack:
-    | ((cradovaPageSet: HTMLElement) => void | Promise<void>)
-    | undefined;
+      | ((cradovaPageSet: HTMLElement) => void | Promise<void>)
+      | undefined;
     _deCallBack:
-    | ((cradovaPageSet: HTMLElement) => void | Promise<void>)
-    | undefined;
+      | ((cradovaPageSet: HTMLElement) => void | Promise<void>)
+      | undefined;
   }): unknown;
 }
 
@@ -98,7 +98,6 @@ export type CradovaPageType = {
    * .
    */
   template: (this: Page) => HTMLElement;
-
 };
 
-export type promisedPage = (() => Promise<Page>)
+export type promisedPage = () => Promise<Page>;

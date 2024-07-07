@@ -4,6 +4,7 @@ import { type CradovaPageType, type promisedPage } from "./types";
  * Cradova event
  */
 class cradovaEvent {
+  static refid: 0;
   /**
    * the events runs only once and removed.
    * these event are call and removed once when when a comp is rendered to the dom
@@ -52,6 +53,7 @@ export const CradovaEvent = new cradovaEvent();
  *
  */
 export class Comp<Prop extends Record<string, any> = any> {
+  id: number;
   private component: (this: Comp<Prop>) => HTMLElement;
   private effects: (() => Promise<void> | void)[] = [];
   private effectuate: ((this: Comp<Prop>) => void) | null = null;
@@ -68,6 +70,7 @@ export class Comp<Prop extends Record<string, any> = any> {
   //? public testName = null;
   constructor(component: (this: Comp<Prop>) => HTMLElement) {
     this.component = component.bind(this);
+    this.id = cradovaEvent.refid + 1;
   }
 
   preRender() {
@@ -414,10 +417,13 @@ export class Signal<Type extends Record<string, any>> {
     } = { signalProperty: "", _element_property: "" }
   ) {
     if (comp instanceof Comp) {
+      // ? avoid adding a specific comp repeatedly to a Signal
+      if (this.comp.find((cmp) => cmp.comp?.id === comp.id)) return;
+      // ? add binding
       comp.render = comp.render.bind(comp);
       comp._setExtra(this);
     }
-    // it's an element binding, not comp, not event(fire action events)
+    // ? it's an element binding, not comp, not event(fire action events)
     this.comp.push({
       comp: comp,
       _signalProperty: binding.signalProperty,
