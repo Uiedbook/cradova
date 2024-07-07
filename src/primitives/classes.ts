@@ -412,9 +412,9 @@ export class Signal<Type extends Record<string, any>> {
     comp: Comp,
     binding: {
       event?: string;
-      signalProperty: string;
-      _element_property: string;
-    } = { signalProperty: "", _element_property: "" }
+      signalProperty?: string;
+      _element_property?: string;
+    } = {}
   ) {
     if (comp instanceof Comp) {
       // ? avoid adding a specific comp repeatedly to a Signal
