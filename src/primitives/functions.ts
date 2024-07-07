@@ -127,7 +127,7 @@ export const makeElement = <E extends HTMLElement>(
         }
         // signal
         if ((value! as unknown[])[0] instanceof Signal) {
-          ((value! as unknown[])![0] as Signal<any>).bindRef(
+          ((value! as unknown[])![0] as Signal<any>).bindComp(
             element as unknown as Comp,
             {
               _element_property: prop,

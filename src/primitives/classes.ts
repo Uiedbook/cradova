@@ -262,7 +262,7 @@ export class Signal<Type extends Record<string, any>> {
    * @param value - signal value
    * @returns void
    */
-  set(value: Type | ((value: Type) => Type), shouldRefRender?: boolean) {
+  set(value: Type | ((value: Type) => Type), shouldCompRender?: boolean) {
     if (typeof value === "function") {
       // value could be a promise
       this.value = value(this.value);
@@ -272,7 +272,7 @@ export class Signal<Type extends Record<string, any>> {
     if (this.persistName) {
       localStorage.setItem(this.persistName, JSON.stringify(this.value));
     }
-    if (this.comp.length && shouldRefRender !== false) {
+    if (this.comp.length && shouldCompRender !== false) {
       this.updateState();
     }
     if (this.callback) {
@@ -291,14 +291,14 @@ export class Signal<Type extends Record<string, any>> {
   setKey<k extends keyof Type>(
     key: k,
     value: unknown,
-    shouldRefRender?: boolean
+    shouldCompRender?: boolean
   ) {
     if (typeof this.value === "object" && !Array.isArray(this.value)) {
       this.value[key] = value as any;
       if (this.persistName) {
         localStorage.setItem(this.persistName, JSON.stringify(this.value));
       }
-      if (this.comp.length && shouldRefRender !== false) {
+      if (this.comp.length && shouldCompRender !== false) {
         this.updateState();
       }
       if (this.callback) {
@@ -408,7 +408,7 @@ export class Signal<Type extends Record<string, any>> {
    *
    * @param Comp component to bind to.
    */
-  bindRef(
+  bindComp(
     comp: Comp,
     binding: {
       event?: string;
