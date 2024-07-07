@@ -410,11 +410,11 @@ export class Signal<Type extends Record<string, any>> {
    */
   bindComp(
     comp: Comp,
-    binding: {
+    binding?: {
       event?: string;
       signalProperty?: string;
       _element_property?: string;
-    } = {}
+    }
   ) {
     if (comp instanceof Comp) {
       // ? avoid adding a specific comp repeatedly to a Signal
@@ -426,9 +426,9 @@ export class Signal<Type extends Record<string, any>> {
     // ? it's an element binding, not comp, not event(fire action events)
     this.comp.push({
       comp: comp,
-      _signalProperty: binding.signalProperty,
-      _element_property: binding._element_property,
-      _event: binding.event,
+      _signalProperty: binding?.signalProperty,
+      _element_property: binding?._element_property,
+      _event: binding?.event,
     });
   }
 
