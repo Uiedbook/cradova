@@ -1,5 +1,5 @@
 import { type VJS_params_TYPE } from "./types";
-import { Comp, createSignal, CradovaEvent, Router } from "./classes";
+import { Comp, Signal, CradovaEvent, Router } from "./classes";
 
 // ? NOTE: this class below is copied here for brevity
 /**
@@ -126,8 +126,8 @@ export const makeElement = <E extends HTMLElement>(
           continue;
         }
         // signal
-        if ((value! as unknown[])[0] instanceof createSignal) {
-          ((value! as unknown[])![0] as createSignal<any>).bindRef(
+        if ((value! as unknown[])[0] instanceof Signal) {
+          ((value! as unknown[])![0] as Signal<any>).bindRef(
             element as unknown as Comp,
             {
               _element_property: prop,
@@ -140,7 +140,7 @@ export const makeElement = <E extends HTMLElement>(
 
       //? setting onmount event;
       if (prop === "onmount") {
-        CradovaEvent.addAfterMount(() => {
+        CradovaEvent.afterMount.push(() => {
           typeof props["onmount"] === "function" &&
             props["onmount"].apply(element);
         });
@@ -295,7 +295,7 @@ export const frag = function (children: VJS_params_TYPE<HTMLElement>) {
  */
 export function useState<S = unknown>(
   newState: S,
-  Comp: Comp
+  Comp: Comp<any>
 ): [S, (newState: S | ((preS: S) => S)) => void] {
   Comp._state_index += 1;
   const idx = Comp._state_index;

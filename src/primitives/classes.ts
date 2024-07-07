@@ -4,31 +4,32 @@ import { type CradovaPageType, type promisedPage } from "./types";
  * Cradova event
  */
 class cradovaEvent {
-  afterMount: Function[] = [];
-  beforeMountActive: Function[] = [];
   /**
-   *  add an event to an exhaustible list of events
    * the events runs only once and removed.
    * these event are call and removed once when when a comp is rendered to the dom
    * @param callback
    */
-  async addAfterMount(callback: () => void) {
-    this.afterMount.push(callback);
-  }
+  afterMount: Function[] = [];
   /**
-   *  add an event to a list of events
    * the events runs many times.
    * these event are called before a comp is rendered to the dom
    * @param callback
    */
-  async addBeforeMountActive(callback: () => void) {
-    this.beforeMountActive.push(callback);
-  }
+  beforeMountActive: Function[] = [];
+  /**
+   * the events runs once after comps unmounts.
+   * these event are called before a comp is rendered to the dom
+   * @param callback
+   */
+  afterDeactivate: Function[] = [];
+
   /**
    * Dispatch any event
    * @param eventName
    */
-  dispatchEvent(eventName: "beforeMountActive" | "afterMount"): void {
+  dispatchEvent(
+    eventName: "beforeMountActive" | "afterMount" | "afterDeactivate"
+  ): void {
     const eventListeners = this[eventName];
     if (eventName.includes("Active")) {
       for (let i = 0; i < eventListeners.length; i++) {
@@ -58,7 +59,7 @@ export class Comp<Prop extends Record<string, any> = any> {
   private published = false;
   private preRendered: HTMLElement | null = null;
   private reference: HTMLElement | null = null;
-  Signal: createSignal<any> | undefined;
+  Signal: Signal<Prop> | undefined;
   //? hooks management
   _state: Prop[] = [];
   _state_index = 0;
@@ -105,7 +106,7 @@ export class Comp<Prop extends Record<string, any> = any> {
       return this.preRendered;
     }
   }
-  _setExtra(Extra: createSignal<any>) {
+  _setExtra(Extra: Signal<any>) {
     this.Signal = Extra;
   }
 
@@ -118,7 +119,10 @@ export class Comp<Prop extends Record<string, any> = any> {
   private async effector() {
     // if (!this.rendered) {
     for (let i = 0; i < this.effects.length; i++) {
-      await this.effects[i].apply(this);
+      const fn: any = await this.effects[i].apply(this);
+      if (typeof fn === "function") {
+        CradovaEvent.afterDeactivate.push(fn);
+      }
     }
     this.effects = [];
     // }
@@ -219,7 +223,7 @@ export class lazy<Type> {
  * @constructor initial: unknown, props: {useHistory, persist}
  */
 
-export class createSignal<Type extends Record<string, any>> {
+export class Signal<Type extends Record<string, any>> {
   private callback: undefined | ((newValue: Type) => void);
   private persistName: string | undefined = "";
   private actions: Record<string, (data?: unknown) => void> = {};
@@ -527,6 +531,8 @@ export class Page {
       behavior: "instant",
     });
     this._callBack && (await this._callBack());
+    // ? call all return functions of useEffects
+    CradovaEvent.dispatchEvent("afterDeactivate");
   }
 }
 
