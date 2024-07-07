@@ -4,7 +4,7 @@ import { type CradovaPageType, type promisedPage } from "./types";
  * Cradova event
  */
 class cradovaEvent {
-  static refid: 0;
+  static refid = 0;
   /**
    * the events runs only once and removed.
    * these event are call and removed once when when a comp is rendered to the dom
@@ -67,10 +67,10 @@ export class Comp<Prop extends Record<string, any> = any> {
   _state_index = 0;
   test?: string;
 
-  //? public testName = null;
   constructor(component: (this: Comp<Prop>) => HTMLElement) {
     this.component = component.bind(this);
-    this.id = cradovaEvent.refid + 1;
+    cradovaEvent.refid += 1;
+    this.id = cradovaEvent.refid;
   }
 
   preRender() {
