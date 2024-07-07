@@ -165,23 +165,24 @@ export class Comp<Prop extends Record<string, any> = any> {
       return;
     }
     this._state_index = 0;
-    const html = this.component() as any;
-    if (html instanceof HTMLElement) {
-      const node = this.reference;
-      if (node) {
-        node.insertAdjacentElement("beforebegin", html as Element);
-        node.remove();
+    const node = this.reference;
+    // ? check if this comp element is still in the dom
+    if (document.contains(node)) {
+      // ? compile the comp again
+      const html = this.component() as any;
+      if (html instanceof HTMLElement) {
+        // ? replace the comp element with the new comp element
+        node!.insertAdjacentElement("beforebegin", html as Element);
+        node!.remove();
+        this.published = true;
+        this.reference = html;
+        CradovaEvent.dispatchEvent("afterMount");
+      } else {
+        console.error(" ✘  Cradova err :  Invalid html, got  - " + html);
       }
-      this.published = true;
-      this.reference = html;
-      CradovaEvent.dispatchEvent("afterMount");
-      (async () => {
-        if (!document.contains(html)) {
-          this.rendered = false;
-        }
-      })();
     } else {
-      console.error(" ✘  Cradova err :  Invalid html, got  - " + html);
+      this.reference = null;
+      this.rendered = false;
     }
   }
 }
