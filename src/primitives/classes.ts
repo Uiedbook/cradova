@@ -639,7 +639,7 @@ class RouterBoxClass {
           }
         }
         if (params) {
-          this.params.params = params;
+          this.params.Params = params;
         }
         await route!._activate();
         this.start_pageevents(url);
