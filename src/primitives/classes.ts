@@ -709,7 +709,7 @@ class RouterBoxClass {
         params[key] = val;
       });
       if (this.routes[url]) {
-        return [this.routes[url], { data: params, path: url }];
+        return [this.routes[url], { data: params }];
       }
     }
     //? place holder & * route checks
@@ -742,7 +742,6 @@ class RouterBoxClass {
           //? if after the checks it all our count are equal then we got it correctly
           if (fixturesX + fixturesY === pathFixtures.length) {
             const routesParams: Record<string, string> = {};
-            console.log({ pathFixtures, urlFixtures, url, path });
             for (let i = 0; i < pathFixtures.length; i++) {
               if (pathFixtures[i].includes(":")) {
                 routesParams[pathFixtures[i].split(":")[1]] = urlFixtures[i];
