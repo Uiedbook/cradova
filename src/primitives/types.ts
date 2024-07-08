@@ -100,4 +100,7 @@ export type CradovaPageType = {
   template: (this: Page) => HTMLElement;
 };
 
-export type browserPageType = Page | Promise<Page> | (() => Promise<Page>);
+export type browserPageType<importType = Page> =
+  | importType
+  | Promise<importType>
+  | (() => Promise<importType>);
