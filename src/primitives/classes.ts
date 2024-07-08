@@ -756,7 +756,7 @@ export class Router {
    *
    * accepts an object containing pat and page
    */
-  static BrowserRoutes(obj: Record<string, browserPageType>) {
+  static BrowserRoutes(obj: Record<string, browserPageType<Page | unknown>>) {
     // ! remove these as any later
     for (const path in obj) {
       const page = obj[path];
