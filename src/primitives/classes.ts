@@ -758,7 +758,7 @@ export class Router {
    */
   static BrowserRoutes(obj: Record<string, browserPageType<Page | unknown>>) {
     for (const path in obj) {
-      const page = obj[path];
+      const page = obj[path] as browserPageType;
       if (
         (typeof page === "object" &&
           typeof (page as any).then === "function") ||
