@@ -566,7 +566,6 @@ class RouterBoxClass {
   loadingPage: any = null;
   pageData: {
     location: {
-      search?: string;
       params?: Record<string, string>;
     };
     data?: Record<string, any>;
@@ -709,7 +708,7 @@ class RouterBoxClass {
         params[key] = val;
       });
       if (this.routes[url]) {
-        return [this.routes[url], { data: params }];
+        return [this.routes[url], params];
       }
     }
     //? place holder & * route checks
@@ -747,7 +746,7 @@ class RouterBoxClass {
                 routesParams[pathFixtures[i].split(":")[1]] = urlFixtures[i];
               }
             }
-            return [this.routes[path], { param: routesParams }];
+            return [this.routes[path], routesParams];
           }
         }
       }
