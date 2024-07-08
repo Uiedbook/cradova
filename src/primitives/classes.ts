@@ -564,7 +564,15 @@ class RouterBoxClass {
   pageHide = null;
   errorHandler?: Function;
   loadingPage: any = null;
-  params: any = {};
+  pageData: {
+    location: {
+      search?: string;
+      params?: Record<string, string>;
+    };
+    data?: Record<string, any>;
+  } = {
+    location: {},
+  };
   routes: Record<string, Page | (() => Promise<Page | undefined>)> = {};
   pageevents: Function[] = [];
   // tarcking paused state of navigation
@@ -639,7 +647,7 @@ class RouterBoxClass {
           }
         }
         if (params) {
-          this.params.Params = params;
+          this.pageData.location.params = params;
         }
         await route!._activate();
         this.start_pageevents(url);
@@ -834,7 +842,7 @@ export class Router {
    * @param data object
    * @param force boolean
    */
-  static navigate(href: string, data: Record<string, unknown> | null = null) {
+  static navigate(href: string, data?: Record<string, any>) {
     if (typeof href !== "string") {
       console.error(
         " ✘  Cradova err:  href must be a defined path but got " +
@@ -855,8 +863,8 @@ export class Router {
         RouterBox.nextRouteController = route as Page;
         window.history.pushState({}, "", href);
       }
-      RouterBox.params.params = params;
-      RouterBox.params.data = data;
+      RouterBox.pageData.location.params = params;
+      RouterBox.pageData.data = data;
       RouterBox.router(null);
     }
   }
@@ -905,8 +913,8 @@ export class Router {
    * .
    */
 
-  static get Params() {
-    return RouterBox.params;
+  static get PageData() {
+    return RouterBox.pageData;
   }
 
   /**
