@@ -1,29 +1,14 @@
 // Simple todo list
 
-import {
-  button,
-  createSignal,
-  useState,
-  div,
-  input,
-  main,
-  p,
-  Comp,
-  h1,
-  useRef,
-  Page,
-  Router,
-  a,
-  $if,
-  $ifelse,
-} from "../dist/index.js";
+import { button, useState, div, Comp, Page, Router } from "../dist/index.js";
 
 Router.BrowserRoutes({
-  "/*": new Page({
+  "/product/select/:id/:item": new Page({
     template: () =>
       div(
         new Comp(function () {
           this.test = "boohoo";
+          console.log(Router.Params);
           const [state1, setState1] = useState("yes", this);
           const [state2, setState2] = useState(state1, this);
           const [state3, setState3] = useState(state2, this);

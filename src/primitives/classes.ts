@@ -110,6 +110,9 @@ export class Comp<Prop extends Record<string, any> = any> {
     }
   }
   _setExtra(Extra: Signal<any>) {
+    if (this.Signal) {
+      Extra.value = this.Signal.value;
+    }
     this.Signal = Extra;
   }
 
@@ -689,7 +692,7 @@ class RouterBoxClass {
     //   const path = url.slice(0, url.indexOf("/?") + 2)
     //   return [this.routes[path], { path, search }];
     // }
-    //  ! {2} that's why we handle it differently.
+    //  ? {2} that's why we handle it differently.
     if (url.includes("?")) {
       let search;
       const params: Record<string, string> = {};
@@ -731,6 +734,7 @@ class RouterBoxClass {
           //? if after the checks it all our count are equal then we got it correctly
           if (fixturesX + fixturesY === pathFixtures.length) {
             const routesParams: Record<string, string> = {};
+            console.log({ pathFixtures, urlFixtures });
             for (let i = 0; i < pathFixtures.length; i++) {
               if (pathFixtures[i].includes(":")) {
                 routesParams[pathFixtures[i].split(":")[1]] = urlFixtures[i];
@@ -773,16 +777,19 @@ export class Router {
   static BrowserRoutes(obj: Record<string, Page | promisedPage>) {
     // ! remove these as any later
     for (const path in obj) {
-      let page = obj[path];
+      const page = obj[path];
       if (
         (typeof page === "object" &&
           typeof (page as any).then === "function") ||
         typeof page === "function"
       ) {
+        const pagep = page as promisedPage;
         // creating the lazy
         RouterBox.routes[path] = async () => {
-          page = await (typeof page === "function" ? await page() : await page);
-          return RouterBox.route(path, (page as any)?.default || page);
+          const pagepp: Page =
+            typeof pagep === "function" ? await pagep() : await (pagep as any);
+          await pagepp;
+          return RouterBox.route(path, (pagepp as any)?.default || pagepp);
         };
       } else {
         RouterBox.route(path, page);

@@ -6,4 +6,5 @@ echo ""
 echo  "Packing Cradova ...."
 tsc --emitDeclarationOnly
 npm pack
-mv **.tgz ~/
+mv **.tgz ~/zips/
+
