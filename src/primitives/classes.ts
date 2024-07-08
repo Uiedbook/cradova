@@ -757,7 +757,6 @@ export class Router {
    * accepts an object containing pat and page
    */
   static BrowserRoutes(obj: Record<string, browserPageType<Page | unknown>>) {
-    // ! remove these as any later
     for (const path in obj) {
       const page = obj[path];
       if (
@@ -765,7 +764,7 @@ export class Router {
           typeof (page as any).then === "function") ||
         typeof page === "function"
       ) {
-        // creating the lazy
+        // ? creating the lazy
         RouterBox.routes[path] = async () => {
           const pagepp: Page =
             typeof page === "function" ? await page() : await page;
