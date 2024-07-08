@@ -565,9 +565,9 @@ class RouterBoxClass {
   errorHandler?: Function;
   loadingPage: any = null;
   pageData: {
-    params?: Record<string, string>;
+    params: Record<string, string>;
     data?: Record<string, any>;
-  } = {};
+  } = { params: {} };
   routes: Record<string, Page | (() => Promise<Page | undefined>)> = {};
   pageevents: Function[] = [];
   // tarcking paused state of navigation
