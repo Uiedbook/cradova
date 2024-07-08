@@ -8,7 +8,7 @@ Router.BrowserRoutes({
       div(
         new Comp(function () {
           this.test = "boohoo";
-          console.log(Router.Params);
+          console.log(Router.PageData);
           const [state1, setState1] = useState("yes", this);
           const [state2, setState2] = useState(state1, this);
           const [state3, setState3] = useState(state2, this);

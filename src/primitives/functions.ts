@@ -277,8 +277,7 @@ export const frag = function (children: VJS_params_TYPE<HTMLElement>) {
       par.appendChild(document.createTextNode(html as unknown as string));
       continue;
     }
-    console.error(" ✘  Cradova err:   wrong element type" + html);
-    // throw new TypeError(" ✘  Cradova err:   invalid element");
+    console.error(" ✘  Cradova err:   wrong element type" + html); 
   }
   return par;
 };

@@ -275,14 +275,14 @@ export class Signal<Type extends Record<string, any>> {
     } else {
       this.value = value;
     }
-    if (this.persistName) {
-      localStorage.setItem(this.persistName, JSON.stringify(this.value));
-    }
     if (this.comp.length && shouldCompRender !== false) {
       this.updateState();
     }
     if (this.callback) {
       this.callback(this.value);
+    }
+    if (this.persistName) {
+      localStorage.setItem(this.persistName, JSON.stringify(this.value));
     }
   }
   /**
@@ -299,16 +299,16 @@ export class Signal<Type extends Record<string, any>> {
     value: unknown,
     shouldCompRender?: boolean
   ) {
-    if (typeof this.value === "object" && !Array.isArray(this.value)) {
+    if (typeof this.value === "object") {
       this.value[key] = value as any;
-      if (this.persistName) {
-        localStorage.setItem(this.persistName, JSON.stringify(this.value));
-      }
       if (this.comp.length && shouldCompRender !== false) {
         this.updateState();
       }
       if (this.callback) {
         this.callback(this.value);
+      }
+      if (this.persistName) {
+        localStorage.setItem(this.persistName, JSON.stringify(this.value));
       }
     } else {
       throw new Error(
@@ -481,19 +481,11 @@ export class Page {
   private _callBack: (() => Promise<void> | void) | undefined;
   private _deCallBack: (() => Promise<void> | void) | undefined;
   private _dropped = false;
-  /**
-   * error handler for the page
-   */
-  public _errorHandler: ((err: unknown) => void) | null = null;
   constructor(cradova_page_initials: CradovaPageType) {
     const { template, name } = cradova_page_initials;
     this._html = template;
     this._name = name || "Document";
     this._template.setAttribute("id", "page");
-  }
-
-  set errorHandler(errorHandler: (err: unknown) => void) {
-    this._errorHandler = errorHandler;
   }
 
   onActivate(cb: () => Promise<void> | void) {
@@ -586,7 +578,6 @@ class RouterBoxClass {
     if (typeof page !== "undefined") {
       if (page && !page) {
         console.error(" ✘  Cradova err:  not a valid page  ", page);
-        // throw new Error(" ✘  Cradova err:  Not a valid cradova page component");
       }
       return (this.routes[path] = page);
     }
@@ -606,9 +597,8 @@ class RouterBoxClass {
    */
 
   async router(_e?: unknown, _force?: boolean) {
-    let url = window.location.href,
-      route: Page,
-      params;
+    const url = window.location.href;
+    let route: Page, params;
     // ? abort navigation when router is paused
     if (this.paused) {
       window.location.hash = "paused";
@@ -651,17 +641,10 @@ class RouterBoxClass {
         this.lastNavigatedRoute = url;
         this.lastNavigatedRouteController = route;
       } catch (error) {
-        if (route && route["_errorHandler"]) {
-          route._errorHandler(error);
+        if (typeof this.errorHandler === "function") {
+          this.errorHandler(error, url);
         } else {
-          if (typeof this.errorHandler === "function") {
-            this.errorHandler(error);
-          } else {
-            console.error(error);
-            throw new Error(
-              " ✘  Cradova err:  consider adding error boundary to the specific page  "
-            );
-          }
+          console.error(error);
         }
       }
     } else {
@@ -893,7 +876,7 @@ export class Router {
       RouterBox["pageevents"].push(callback);
     } else {
       throw new Error(
-        " ✘  Cradova err:  callback for pageShow event is not a function"
+        " ✘  Cradova err:  callback for page events event is not a function"
       );
     }
   }
@@ -920,7 +903,7 @@ export class Router {
    * @param path? page path
    */
 
-  static addErrorHandler(callback: (err: unknown) => void) {
+  static addErrorHandler(callback: (err?: unknown, pagePath?: string) => void) {
     if (typeof callback === "function") {
       RouterBox["errorHandler"] = callback;
     } else {
