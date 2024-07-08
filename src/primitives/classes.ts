@@ -1,4 +1,4 @@
-import { type CradovaPageType, type promisedPage } from "./types";
+import { type CradovaPageType, type browserPageType } from "./types";
 
 /**
  * Cradova event
@@ -575,13 +575,10 @@ class RouterBoxClass {
 
   route(path: string, page: Page) {
     // undefined is an option  here for auth routes
-    if (typeof page !== "undefined") {
-      if (page && !page) {
-        console.error(" ✘  Cradova err:  not a valid page  ", page);
-      }
-      return (this.routes[path] = page);
+    if (!page) {
+      console.error(" ✘  Cradova err:  not a valid page  ", page);
     }
-    return undefined;
+    return (this.routes[path] = page);
   }
 
   /**
@@ -759,7 +756,7 @@ export class Router {
    *
    * accepts an object containing pat and page
    */
-  static BrowserRoutes(obj: Record<string, Page | promisedPage>) {
+  static BrowserRoutes(obj: Record<string, browserPageType>) {
     // ! remove these as any later
     for (const path in obj) {
       const page = obj[path];
@@ -768,16 +765,14 @@ export class Router {
           typeof (page as any).then === "function") ||
         typeof page === "function"
       ) {
-        const pagep = page as promisedPage;
         // creating the lazy
         RouterBox.routes[path] = async () => {
           const pagepp: Page =
-            typeof pagep === "function" ? await pagep() : await (pagep as any);
-          await pagepp;
+            typeof page === "function" ? await page() : await page;
           return RouterBox.route(path, (pagepp as any)?.default || pagepp);
         };
       } else {
-        RouterBox.route(path, page);
+        RouterBox.route(path, page as Page);
       }
     }
     Router._mount();
