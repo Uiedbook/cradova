@@ -565,13 +565,9 @@ class RouterBoxClass {
   errorHandler?: Function;
   loadingPage: any = null;
   pageData: {
-    location: {
-      params?: Record<string, string>;
-    };
+    params?: Record<string, string>;
     data?: Record<string, any>;
-  } = {
-    location: {},
-  };
+  } = {};
   routes: Record<string, Page | (() => Promise<Page | undefined>)> = {};
   pageevents: Function[] = [];
   // tarcking paused state of navigation
@@ -646,7 +642,7 @@ class RouterBoxClass {
           }
         }
         if (params) {
-          this.pageData.location.params = params;
+          this.pageData.params = params;
         }
         await route!._activate();
         this.start_pageevents(url);
@@ -861,7 +857,7 @@ export class Router {
         RouterBox.nextRouteController = route as Page;
         window.history.pushState({}, "", href);
       }
-      RouterBox.pageData.location.params = params;
+      RouterBox.pageData.params = params;
       RouterBox.pageData.data = data;
       RouterBox.router(null);
     }
