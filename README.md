@@ -1,7 +1,7 @@
 <br/>
 <p align="center">
   <a href="https://github.com/uiedbook/cradova">
-    <img src="cradova.png" alt="Logo" width="80" height="80">
+    <img src="icon.png" alt="Logo" width="80" height="80">
   </a>
 
   <h1 align="center">Cradova</h1>
