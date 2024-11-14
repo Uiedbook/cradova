@@ -18,9 +18,8 @@
 
 ## v1.0.4
 
-this version never existed
-"npm version patch" was mistakenly entered twice
-and we went along with it.
+this version never existed "npm version patch" was mistakenly entered twice and
+we went along with it.
 
 ## v1.0.5
 
@@ -30,9 +29,8 @@ and we went along with it.
 
 ## v1.0.6
 
-- introducing scaffold - a simple way to render page components
-  without url manipulation.
-  this brings app experience
+- introducing scaffold - a simple way to render page components without url
+  manipulation. this brings app experience
 - bug fixes
 - more performance
 - battle testing green
@@ -126,7 +124,8 @@ and we went along with it.
 
 ## v2.2.0
 
-- big performance boost using new methods of handling function calls so they get cached
+- big performance boost using new methods of handling function calls so they get
+  cached
 - added lazy loading to cradova routes
 - fixed Comp state flow with tests in ./manual_tests
 - added the lazy class to load components when needed
@@ -153,9 +152,11 @@ and we went along with it.
 
 # v2.3.0
 
-- created CradovaEvent switched from the CustomEvent class (for more speed and node compatibility journey)
+- created CradovaEvent switched from the CustomEvent class (for more speed and
+  node compatibility journey)
 - created references as a way to point to dom elements
-- used reference internally to remove cradova-ids that appeared on the dom before.
+- used reference internally to remove cradova-ids that appeared on the dom
+  before.
 - completed tests
 - cradova now helps you with Comp.render() calls
 - Comp can be used as pages directly
@@ -168,7 +169,8 @@ and we went along with it.
 
 - Redefined types
 - removed afterMount and beforeMount events from cradova elements
-- added the onmount event that get's called when the page tree or comp get's updated
+- added the onmount event that get's called when the page tree or comp get's
+  updated
 - disabled the global dispatcher because it's no longer a need for reactivity
 - production tests
 - the cradova \_ function now has types
@@ -184,25 +186,30 @@ and we went along with it.
 
 # v3.1.4
 
-- fixed bug parallel rendering in comp by managing page id events
-  making them more powerful by also now reactiving to page changes
+- fixed bug parallel rendering in comp by managing page id events making them
+  more powerful by also now reactiving to page changes
 - other optimisations in prerendering
 
 # v3.2.0
 
-- introduced a more standardised reference class for manageing dom references update the previous implementations.
-- fixed more bug parallel rendering in comp by managing page id events
-  making them more powerful by also now reactiving to page changes
+- introduced a more standardised reference class for manageing dom references
+  update the previous implementations.
+- fixed more bug parallel rendering in comp by managing page id events making
+  them more powerful by also now reactiving to page changes
 - other optimisations in prerendering
 
 # v3.3.0
 
 - introduced Comp.define construct to add custom methods to Comps
-- introduced more refined conditional rendering of $switch & $case, $if and $ifelse.
-- introduced active option in Comps to fine tune multi-rendered Comps mostly in parallel rendered situations, hence further making parallel rendering more stable and rock solid with this new feature.
-- tested in production across serveral persoanl projects and did some custom testing
-- introduced the raw tag, just put in raw html strings if you need to for static contents/makeup,
-  better for seo and faster render of none-dynamic contents.
+- introduced more refined conditional rendering of $switch & $case, $if and
+  $ifelse.
+- introduced active option in Comps to fine tune multi-rendered Comps mostly in
+  parallel rendered situations, hence further making parallel rendering more
+  stable and rock solid with this new feature.
+- tested in production across serveral persoanl projects and did some custom
+  testing
+- introduced the raw tag, just put in raw html strings if you need to for static
+  contents/makeup, better for seo and faster render of none-dynamic contents.
 
 # v3.3.1
 
@@ -210,7 +217,8 @@ and we went along with it.
 
 # v3.4.0
 
-- fixed type system, removed templating more perfomance, fixed perfomance in routing system, pages, and comp
+- fixed type system, removed templating more perfomance, fixed perfomance in
+  routing system, pages, and comp
 - more standard and speed.
 
 # v4.0.0

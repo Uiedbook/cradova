@@ -4,9 +4,9 @@
     <img src="icon.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h1 align="center">Cradova</h1>
+<h1 align="center">Cradova</h1>
 
-  <p align="center">
+<p align="center">
 Build Powerful ⚡ Web Apps with Ease
     <br/>
     <br/>
@@ -21,11 +21,15 @@ Build Powerful ⚡ Web Apps with Ease
   </p>
 </p>
 
-![Contributors](https://img.shields.io/github/contributors/uiedbook/cradova?color=dark-green) ![Issues](https://img.shields.io/github/issues/uiedbook/cradova) ![License](https://img.shields.io/github/license/uiedbook/cradova)
+![Contributors](https://img.shields.io/github/contributors/uiedbook/cradova?color=dark-green)
+![Issues](https://img.shields.io/github/issues/uiedbook/cradova)
+![License](https://img.shields.io/github/license/uiedbook/cradova)
 [![npm Version](https://img.shields.io/npm/v/cradova.svg)](https://www.npmjs.com/package/cradova)
 [![License](https://img.shields.io/npm/l/cradova.svg)](https://github.com/cradova/cradova.js/blob/next/LICENSE)
 [![npm Downloads](https://img.shields.io/npm/dm/cradova.svg)](https://www.npmjs.com/package/cradova)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cradova/cradova.js/blob/next/contributing.md)![Forks](https://img.shields.io/github/forks/uiedbook/cradova?style=social) ![Stargazers](https://img.shields.io/github/stars/uiedbook/cradova?style=social)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cradova/cradova.js/blob/next/contributing.md)
+![Forks](https://img.shields.io/github/forks/uiedbook/cradova?style=social)
+![Stargazers](https://img.shields.io/github/stars/uiedbook/cradova?style=social)
 
 # Cradova is 3
 
@@ -48,13 +52,13 @@ document.body.appendChild(Cradova.render());
 ## 2023 - What's New? Conditionals!
 
 ```js
-import { div, h1, $if, $ifelse, $case, $switch } from "cradova";
+import { $case, $if, $ifelse, $switch, div, h1 } from "cradova";
 
 function Hello({ name }) {
   return div(
     $if(name === "john", h1("Hello john")),
     $if(name === "paul", h1("Goodbye paul")),
-    $ifelse(name === "john", h1("Hello john"), h1("Hello Paul"))
+    $ifelse(name === "john", h1("Hello john"), h1("Hello Paul")),
   );
 }
 
@@ -66,8 +70,8 @@ function whatsAllowed({ age }) {
       age,
       $case(12, h1("too young")),
       $case(26, h1("you are welcome")),
-      $case(52, h1("too old"))
-    )
+      $case(52, h1("too old")),
+    ),
   );
 }
 
@@ -86,16 +90,18 @@ document.body.append(html, whatsAllowed({ age: 26 }));
 
 ## What is Cradova?
 
-Cradova is a web development framework for building Single Page Applications and PWAs.
+Cradova is a web development framework for building Single Page Applications and
+PWAs.
 
-Cradova follows the [VJS specification](https://github.com/uiedbook/cradova/blob/main/VJS_spec/specification.md)
+Cradova follows the
+[VJS specification](https://github.com/uiedbook/cradova/blob/main/VJS_spec/specification.md)
 
 ## What's the benefit?
 
 Fast and simple with and fewer abstractions and yet easily composable.
 
-Cradova is not built on virtual DOM or diff algorithms.
-Instead, State management is done in a way that is simple, easy and fast.
+Cradova is not built on virtual DOM or diff algorithms. Instead, State
+management is done in a way that is simple, easy and fast.
 
 ## Is this a big benefit?
 
@@ -122,7 +128,8 @@ npm i cradova
 
 ## Examples
 
-Some aspects of Cradova are not reflected in the following example. More functionality will be entailed in future docs.
+Some aspects of Cradova are not reflected in the following example. More
+functionality will be entailed in future docs.
 
 ## A basic component in Cradova:
 
@@ -149,13 +156,13 @@ This a collection of basic examples that can give you some ideas
 
 ```js
 import {
-  button,
-  createSignal,
-  Comp,
-  reference,
-  h1,
   br,
+  button,
+  Comp,
+  createSignal,
   div,
+  h1,
+  reference,
   useRef,
 } from "cradova";
 
@@ -205,7 +212,7 @@ function typingExample() {
       },
       placeholder: "typing simulation",
     }),
-    p(" no thing typed yet!", { reference: ref.bindAs("text") })
+    p(" no thing typed yet!", { reference: ref.bindAs("text") }),
   );
 }
 
@@ -223,15 +230,15 @@ Let's see a simple TodoList example
 ```js
 import {
   button,
+  Comp,
   createSignal,
-  useState,
   div,
+  h1,
   input,
   main,
   p,
-  Comp,
-  h1,
   useRef,
+  useState,
 } from "../dist/index.js";
 
 function TodoList() {
@@ -271,13 +278,13 @@ function TodoList() {
         onclick() {
           todoStore.fireAction(
             "add-todo",
-            referenceSet.current("todoInput").value
+            referenceSet.current("todoInput").value,
           );
           referenceSet.current("todoInput").value = "";
         },
-      })
+      }),
     ),
-    todoList.render
+    todoList.render,
   );
 }
 
@@ -291,7 +298,7 @@ const todoList = new Comp(function () {
           self.Signal.fireAction("remove-todo", item);
         },
       })
-    )
+    ),
   );
 });
 document.body.appendChild(TodoList());
@@ -299,16 +306,14 @@ document.body.appendChild(TodoList());
 
 ## working with page and Router:
 
-Unlike just appending stuff to the DOM,
-a better to build apps is to use a routing system.
+Unlike just appending stuff to the DOM, a better to build apps is to use a
+routing system.
 
 Cradova Router is a module that allows you do the following:
 
-Create specified routes in you application
-help you handle navigation
-render a page on a route
-listen to Navigation changes
-create error boundary at page level apart from Comp level.
+Create specified routes in you application help you handle navigation render a
+page on a route listen to Navigation changes create error boundary at page level
+apart from Comp level.
 
 let's try an example.
 
@@ -372,7 +377,8 @@ if it already exist Cradova will use it instead.
 
 Cradova will create a div with data-wrapper="app" if it doesn't exists already.
 
-so if you want to use your own mount point then create a div with data-wrapper="app".
+so if you want to use your own mount point then create a div with
+data-wrapper="app".
 
 ---
 
@@ -380,13 +386,10 @@ More info on Cradova pages
 
 ---
 
-Cradova pages has
-onActivate() and
-onDeactivate() methods which is also available in the
-component function on the this variable bound to it.
+Cradova pages has onActivate() and onDeactivate() methods which is also
+available in the component function on the this variable bound to it.
 
-this allow you manage rendering
-circle for each page in your app
+this allow you manage rendering circle for each page in your app
 
 ---
 
@@ -402,8 +405,7 @@ Cradova Comp is a dynamic component class, which ships simple abstractions like:
 - useRef
 - preRender
 
-these behaviors allow you manage rendering
-circle for Comps in your app
+these behaviors allow you manage rendering circle for Comps in your app
 
 ---
 
@@ -422,19 +424,27 @@ with ability to:
 - persist changes to localStorage
 - update a Comp and bindings automatically
 
-With these simple and easy abstractions, you can write datastores with so much convenience.
+With these simple and easy abstractions, you can write datastores with so much
+convenience.
 
 ## Documentation
 
-At the moment, we're in the process of creating a documentation website for Cradova, and we have limited resources. If you're interested in lending a hand, we invite you to join our community, gain firsthand experience, and contribute to the advancement of Cradova.
+At the moment, we're in the process of creating a documentation website for
+Cradova, and we have limited resources. If you're interested in lending a hand,
+we invite you to join our community, gain firsthand experience, and contribute
+to the advancement of Cradova.
 
 ## Getting Help
 
-To get further insights and help on Cradova, visit the [Discord](https://discord.gg/b7fvMg38) and [Telegram](https://t.me/uiedbookHQ) Community Chats.
+To get further insights and help on Cradova, visit the
+[Discord](https://discord.gg/b7fvMg38) and [Telegram](https://t.me/uiedbookHQ)
+Community Chats.
 
 ## Contributing
 
-We are currently working to [set](https://github.com/uiedbook/cradova/blob/main/contributing.md) up the following:
+We are currently working to
+[set](https://github.com/uiedbook/cradova/blob/main/contributing.md) up the
+following:
 
 - building Cradova CLI (in progress)
 - Cradova Documentation Website
@@ -443,12 +453,12 @@ We are currently working to [set](https://github.com/uiedbook/cradova/blob/main/
 - maintenance and promotion
 
 ```
-    ██████╗   ██████╗    █████═╗   ███████╗    ███████╗    ██╗   ██╗  █████╗
-   ██╔════╝   ██╔══██╗  ██╔═╗██║   █      ██  ██╔═════╝█   ██║   ██║  ██╔═╗██
-   ██║        ██████╔╝  ███████║   █      ██  ██║     ██   ██║   ██║  ██████╗
-   ██║        ██╔══██╗  ██║  ██║   █      ██  ██║     ██   ╚██╗ ██╔╝  ██║  ██╗
-   ╚██████╗   ██║  ██║  ██║  ██║   ███████╔╝   ████████      ╚███╔╝   ██║  ██║
-    ╚═════╝   ╚═╝  ╚═╝  ╚═╝  ╚═╝   ╚══════╝     ╚════╝        ╚══╝    ╚═╝  ╚═╝
+ ██████╗   ██████╗    █████═╗   ███████╗    ███████╗    ██╗   ██╗  █████╗
+██╔════╝   ██╔══██╗  ██╔═╗██║   █      ██  ██╔═════╝█   ██║   ██║  ██╔═╗██
+██║        ██████╔╝  ███████║   █      ██  ██║     ██   ██║   ██║  ██████╗
+██║        ██╔══██╗  ██║  ██║   █      ██  ██║     ██   ╚██╗ ██╔╝  ██║  ██╗
+╚██████╗   ██║  ██║  ██║  ██║   ███████╔╝   ████████      ╚███╔╝   ██║  ██║
+ ╚═════╝   ╚═╝  ╚═╝  ╚═╝  ╚═╝   ╚══════╝     ╚════╝        ╚══╝    ╚═╝  ╚═╝
 ```
 
 ## Apache Lincenced
@@ -459,12 +469,16 @@ Join Us on [telegram](https://t.me/UiedbookHQ).
 
 ### Contribution and License Agreement
 
-If you contribute code to this project, you are implicitly allowing your code to be distributed under same license. You are also implicitly verifying that all code is your original work.
+If you contribute code to this project, you are implicitly allowing your code to
+be distributed under same license. You are also implicitly verifying that all
+code is your original work.
 
 ## Supporting Cradova development
 
-Your Support is a good force for change anytime you do it, you can ensure Our projects, growth, Cradova, Cradova, JetPath etc, growth and improvement by making a re-occuring or fixed sponsorship
-to [github sponsors](https://github.com/sponsors/FridayCandour):
+Your Support is a good force for change anytime you do it, you can ensure Our
+projects, growth, Cradova, Cradova, JetPath etc, growth and improvement by
+making a re-occuring or fixed sponsorship to
+[github sponsors](https://github.com/sponsors/FridayCandour):
 
 Support via cryptos -
 

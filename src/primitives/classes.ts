@@ -1,4 +1,4 @@
-import { type CradovaPageType, type browserPageType } from "./types";
+import { type browserPageType, type CradovaPageType } from "./types";
 
 /**
  * Cradova event
@@ -20,7 +20,7 @@ class cradovaEvent {
   /**
    * the events runs once after comps unmounts.
    * these event are called before a comp is rendered to the dom
-   * @param callback
+   * @param callback 
    */
   afterDeactivate: Function[] = [];
 
@@ -29,7 +29,7 @@ class cradovaEvent {
    * @param eventName
    */
   dispatchEvent(
-    eventName: "beforeMountActive" | "afterMount" | "afterDeactivate"
+    eventName: "beforeMountActive" | "afterMount" | "afterDeactivate",
   ): void {
     const eventListeners = this[eventName];
     if (eventName.includes("Active")) {
@@ -50,7 +50,6 @@ export const CradovaEvent = new cradovaEvent();
  * Cradova Comp
  * -------
  * create dynamic components
- *
  */
 export class Comp<Prop extends Record<string, any> = any> {
   id: number;
@@ -72,7 +71,9 @@ export class Comp<Prop extends Record<string, any> = any> {
     cradovaEvent.refid += 1;
     this.id = cradovaEvent.refid;
   }
-
+  clone() {
+    return new Comp(this.component);
+}
   preRender() {
     // ? parking
     this.preRendered = this.render() as HTMLElement;
@@ -101,7 +102,7 @@ export class Comp<Prop extends Record<string, any> = any> {
         this.published = true;
       } else {
         console.error(
-          " ✘  Cradova err :  Invalid html content, got  - " + html
+          " ✘  Cradova err :  Invalid html content, got  - " + html,
         );
       }
       return html;
@@ -297,7 +298,7 @@ export class Signal<Type extends Record<string, any>> {
   setKey<k extends keyof Type>(
     key: k,
     value: unknown,
-    shouldCompRender?: boolean
+    shouldCompRender?: boolean,
   ) {
     if (typeof this.value === "object") {
       this.value[key] = value as any;
@@ -312,9 +313,11 @@ export class Signal<Type extends Record<string, any>> {
       }
     } else {
       throw new Error(
-        `✘  Cradova err : can't set key ${String(
-          key
-        )} store.value is not an object`
+        `✘  Cradova err : can't set key ${
+          String(
+            key,
+          )
+        } store.value is not an object`,
       );
     }
   }
@@ -330,7 +333,7 @@ export class Signal<Type extends Record<string, any>> {
       this.actions[name] = action.bind(this);
     } else {
       throw new Error(
-        `✘  Cradova err : can't create action ${name}, check values`
+        `✘  Cradova err : can't create action ${name}, check values`,
       );
     }
   }
@@ -347,7 +350,7 @@ export class Signal<Type extends Record<string, any>> {
         this.actions[name] = action;
       } else {
         throw new Error(
-          `✘  Cradova err : can't create action ${name} check values`
+          `✘  Cradova err : can't create action ${name} check values`,
         );
       }
     }
@@ -385,7 +388,7 @@ export class Signal<Type extends Record<string, any>> {
       return [this, prop];
     } else {
       throw new Error(
-        "✘  Cradova err : can't bind an unavailable property!  " + prop
+        "✘  Cradova err : can't bind an unavailable property!  " + prop,
       );
     }
   }
@@ -420,7 +423,7 @@ export class Signal<Type extends Record<string, any>> {
       event?: string;
       signalProperty?: string;
       _element_property?: string;
-    }
+    },
   ) {
     if (comp instanceof Comp) {
       // ? avoid adding a specific comp repeatedly to a Signal
@@ -451,7 +454,6 @@ export class Signal<Type extends Record<string, any>> {
    *  Cradova Signal
    * ----
    * clear the history on local storage
-   *
    */
   clearPersist() {
     if (this.persistName) {
@@ -517,7 +519,7 @@ export class Page {
       this._template.appendChild(html);
     } else {
       throw new Error(
-        ` ✘  Cradova err:  template function for the page returned ${html} instead of html`
+        ` ✘  Cradova err:  template function for the page returned ${html} instead of html`,
       );
     }
     // ?
@@ -653,7 +655,7 @@ class RouterBoxClass {
   }
 
   checker(
-    url: string
+    url: string,
   ): [Page | (() => Promise<Page | undefined>), Record<string, any>] {
     if (url[0] !== "/") {
       url = url.slice(url.indexOf("/", 8));
@@ -766,8 +768,9 @@ export class Router {
       ) {
         // ? creating the lazy
         RouterBox.routes[path] = async () => {
-          const pagepp: Page =
-            typeof page === "function" ? await page() : await page;
+          const pagepp: Page = typeof page === "function"
+            ? await page()
+            : await page;
           return RouterBox.route(path, (pagepp as any)?.default || pagepp);
         };
       } else {
@@ -776,26 +779,26 @@ export class Router {
     }
     Router._mount();
   }
-  /** 
+  /**
     Go back in Navigation history
     */
   static back() {
     history.go(-1);
   }
-  /** 
+  /**
     Go forward in Navigation history
     */
   static forward() {
     history.go(1);
   }
-  /** 
+  /**
     Pause navigation
     */
   static pauseNaviagtion() {
     RouterBox["paused"] = true;
     window.location.hash = "paused";
   }
-  /** 
+  /**
    resume navigation
   */
   static resumeNaviagtion() {
@@ -818,7 +821,7 @@ export class Router {
       console.error(
         " ✘  Cradova err:  href must be a defined path but got " +
           href +
-          " instead"
+          " instead",
       );
     }
     let route = null,
@@ -854,7 +857,7 @@ export class Router {
       RouterBox.loadingPage = page;
     } else {
       throw new Error(
-        " ✘  Cradova err:  Loading Page should be a cradova page class"
+        " ✘  Cradova err:  Loading Page should be a cradova page class",
       );
     }
   }
@@ -870,7 +873,7 @@ export class Router {
       RouterBox["pageevents"].push(callback);
     } else {
       throw new Error(
-        " ✘  Cradova err:  callback for page events event is not a function"
+        " ✘  Cradova err:  callback for page events event is not a function",
       );
     }
   }
@@ -902,7 +905,7 @@ export class Router {
       RouterBox["errorHandler"] = callback;
     } else {
       throw new Error(
-        " ✘  Cradova err:  callback for error event is not a function"
+        " ✘  Cradova err:  callback for error event is not a function",
       );
     }
   }

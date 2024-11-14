@@ -62,13 +62,12 @@ export const video = cra<HTMLVideoElement>("video");
 // export const embed = cra<HTMLEmbedElement>("embed");
 export const svg = (
   svg: string,
-  properties?: VJS_params_TYPE<HTMLSpanElement>
+  properties?: VJS_params_TYPE<HTMLSpanElement>,
 ): HTMLSpanElement => {
   const span = document.createElement("span");
   span.innerHTML = svg;
   return makeElement<HTMLSpanElement>(span, properties || [] as any);
 };
-
 
 export const raw = (html: string | TemplateStringsArray): DocumentFragment => {
   const div = document.createElement("div");

@@ -1,20 +1,20 @@
 // Simple todo list
 
 import {
+  $if,
+  a,
   button,
+  Comp,
   createSignal,
-  useState,
   div,
+  h1,
   input,
   main,
   p,
-  Comp,
-  h1,
-  useRef,
   Page,
   Router,
-  a,
-  $if,
+  useRef,
+  useState,
 } from "../dist/index.js";
 
 function TodoList() {
@@ -54,13 +54,13 @@ function TodoList() {
         onclick() {
           todoStore.fireAction(
             "add-todo",
-            referenceSet.current("todoInput").value
+            referenceSet.current("todoInput").value,
           );
           referenceSet.current("todoInput").value = "";
         },
-      })
+      }),
     ),
-    todoList.render
+    todoList.render,
   );
 }
 
@@ -74,7 +74,7 @@ const todoList = new Comp(function () {
           self.Signal.fireAction("remove-todo", item);
         },
       })
-    )
+    ),
   );
 });
 document.body.appendChild(TodoList());
@@ -124,7 +124,7 @@ function typingExample() {
       placeholder: "typing simulation",
     }),
     p(" no thing typed yet!", { reference: ref.bindAs("text") }),
-    a({ href: "/p" }, "log lol in the console")
+    a({ href: "/p" }, "log lol in the console"),
   );
 }
 
@@ -139,7 +139,7 @@ Router.BrowserRoutes({
     template() {
       return div(
         a("let's test link naviagate", { href: "/a?name=friday" }),
-        {}
+        {},
       );
     },
   }),
@@ -170,8 +170,11 @@ Router.BrowserRoutes({
               },
             },
             $if(state2 === true, () =>
-              a("link to code", { href: "/p", color: "red", display: "block" })
-            ),
+              a("link to code", {
+                href: "/p",
+                color: "red",
+                display: "block",
+              })),
             button("turn off the lights?  : " + state1),
             {
               style: {
@@ -186,9 +189,9 @@ Router.BrowserRoutes({
                   document.body.style.backgroundColor = "#fff";
                 }
               },
-            }
+            },
           );
-        })
+        }),
       ),
   }),
 });

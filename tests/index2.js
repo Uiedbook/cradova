@@ -1,6 +1,6 @@
 // Simple todo list
 
-import { button, useState, div, Comp, Page, Router } from "../dist/index.js";
+import { button, Comp, div, Page, Router, useState } from "../dist/index.js";
 
 Router.BrowserRoutes({
   "/product/select/:id/:item": new Page({
@@ -40,9 +40,9 @@ Router.BrowserRoutes({
                   document.body.style.backgroundColor = "#fff";
                 }
               },
-            }
+            },
           );
-        })
+        }),
       ),
   }),
 });

@@ -7,7 +7,7 @@ export function benchSuit(code, runs = 1_000_000) {
   console.log(
     `Code took ${totalTime} ms on ${runs} runs with an average of ${
       totalTime / runs
-    } ms per operation`
+    } ms per operation`,
   );
   return totalTime;
 }

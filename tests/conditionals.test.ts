@@ -1,4 +1,4 @@
-import { $switch, $case, $if, $ifelse } from "../dist/index.js";
+import { $case, $if, $ifelse, $switch } from "../dist/index.js";
 import { expect, test } from "bun:test";
 
 test("switch cases", () => {

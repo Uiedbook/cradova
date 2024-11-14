@@ -1,5 +1,5 @@
 import { type VJS_params_TYPE } from "./types";
-import { Comp, Signal, CradovaEvent, Router } from "./classes";
+import { Comp, CradovaEvent, Router, Signal } from "./classes";
 
 // ? NOTE: this class below is copied here for brevity
 /**
@@ -37,7 +37,7 @@ class __raw_ref {
 
 export const makeElement = <E extends HTMLElement>(
   element: E & HTMLElement,
-  ElementChildrenAndPropertyList: VJS_params_TYPE<E>
+  ElementChildrenAndPropertyList: VJS_params_TYPE<E>,
 ) => {
   const props: Record<string, any> = {};
   let text: string | undefined = undefined;
@@ -106,7 +106,7 @@ export const makeElement = <E extends HTMLElement>(
                 const l = href.split("#").at(-1);
                 document.getElementById("#" + l)?.scrollIntoView();
               }
-            }
+            },
           );
         }
         element.setAttribute(prop, value as string);
@@ -121,7 +121,7 @@ export const makeElement = <E extends HTMLElement>(
         ) {
           ((value! as unknown[])![0] as __raw_ref)._append(
             (value! as unknown[])![1] as string,
-            element
+            element,
           );
           continue;
         }
@@ -132,7 +132,7 @@ export const makeElement = <E extends HTMLElement>(
             {
               _element_property: prop,
               signalProperty: (value! as unknown[])![1] as string,
-            }
+            },
           );
           continue;
         }
@@ -198,7 +198,6 @@ export function Rhoda(l: VJS_params_TYPE<HTMLElement>) {
 }
 
 /**
- *
  * @param {expression} condition
  * @param {function} elements[]
  */
@@ -247,8 +246,8 @@ export function loop<Type>(
   component: (
     value: Type,
     index?: number,
-    array?: LoopData<Type>
-  ) => HTMLElement | DocumentFragment | undefined
+    array?: LoopData<Type>,
+  ) => HTMLElement | DocumentFragment | undefined,
 ) {
   return Array.isArray(datalist)
     ? (datalist.map(component) as unknown as HTMLElement[])
@@ -277,7 +276,7 @@ export const frag = function (children: VJS_params_TYPE<HTMLElement>) {
       par.appendChild(document.createTextNode(html as unknown as string));
       continue;
     }
-    console.error(" ✘  Cradova err:   wrong element type" + html); 
+    console.error(" ✘  Cradova err:   wrong element type" + html);
   }
   return par;
 };
@@ -294,7 +293,7 @@ export const frag = function (children: VJS_params_TYPE<HTMLElement>) {
  */
 export function useState<S = unknown>(
   newState: S,
-  Comp: Comp<any>
+  Comp: Comp<any>,
 ): [S, (newState: S | ((preS: S) => S)) => void] {
   Comp._state_index += 1;
   const idx = Comp._state_index;
@@ -327,7 +326,7 @@ export function useState<S = unknown>(
  * ---
 Allows side effects to be performed in functional components (Comps), such as fetching data or subscribing to events.
  * @param effect
- * @returns 
+ * @returns
  */
 export function useEffect(effect: () => void, Comp: Comp) {
   Comp._effect(effect);
@@ -337,7 +336,7 @@ export function useEffect(effect: () => void, Comp: Comp) {
  * Cradova
  * ---
 Returns a mutable reference object of dom elements.
- * @returns reference 
+ * @returns reference
  */
 export function useRef() {
   return new __raw_ref();
