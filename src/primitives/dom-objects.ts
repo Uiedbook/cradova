@@ -55,10 +55,7 @@ export const video = cra<HTMLVideoElement>("video");
 // export const template = cra<HTMLTemplateElement>("template");
 // export const track = cra<HTMLTrackElement>("track");
 // export const figure = cra<HTMLElement>("figure");
-// export const article = cra<HTMLElement>("article");
-// export const col = cra<HTMLTableColElement>("col");
-// export const colgroup = cra<HTMLOptGroupElement>("colgroup");
-// export const em = cra<HTMLElement>("em");
+// export const article = cra<HTMLElement>("article"); 
 // export const embed = cra<HTMLEmbedElement>("embed");
 export const svg = (
   svg: string,
@@ -83,3 +80,5 @@ export const raw = (html: string | TemplateStringsArray): DocumentFragment => {
   df.append(...Array.from(div.children));
   return df;
 };
+
+ 
