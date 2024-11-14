@@ -24,6 +24,13 @@ class __raw_ref {
   current<ElementType extends HTMLElement = HTMLElement>(name: string) {
     return this.tree[name] as ElementType | undefined;
   }
+  /**
+   * Swap referenced DOM element. 
+   */
+  swap(name1: string, name2:string) {
+    [this.tree[name1],this.tree[name2]] =
+      [this.tree[name2],this.tree[name1]];
+  }
 
   /**
    * Append a DOM element to the reference, overwriting any existing reference.

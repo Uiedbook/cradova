@@ -71,9 +71,7 @@ export class Comp<Prop extends Record<string, any> = any> {
     cradovaEvent.refid += 1;
     this.id = cradovaEvent.refid;
   }
-  clone() {
-    return new Comp(this.component);
-}
+   
   preRender() {
     // ? parking
     this.preRendered = this.render() as HTMLElement;
