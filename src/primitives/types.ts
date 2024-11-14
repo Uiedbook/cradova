@@ -46,6 +46,7 @@ export type VJS_params_TYPE<E = HTMLElement> =
     | Partial<Attributes>
     | Partial<E>
     | Record<string, (this: E) => void>
+    | { [K in keyof HTMLElementEventMap]?: (this: E, e: HTMLElementEventMap[K]) => void }  
     | Partial<DataAttributes>
     | Partial<AriaAttributes>
     | CSS.Properties<string | number>
