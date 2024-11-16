@@ -186,13 +186,12 @@ export class Comp<Prop extends Record<string, any> = any> {
 /**
  *  Cradova Signal
  * ----
- *  Create stateful data store.
+ *  Create a pub&sub store.
  *  Features:
  * - create a store
- * - subscribe components to events
- * - set object keys instead of all values
+ * - subscribe components to events 
  * - persist changes to localStorage
- * @constructor initial: unknown, props: {useHistory, persist}
+ * @constructor initial: Record<string, any>, props: {persist}
  */
 
 export class Signal<Type extends Record<string, any>> {
