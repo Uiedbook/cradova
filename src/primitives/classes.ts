@@ -253,6 +253,9 @@ export class Signal<Type extends Record<string, any>> {
       } else {
         this.subs![eventName].push(comp);
       }
+      if (this.pipe[eventName]) {
+        comp.subData = this.pipe[eventName];
+      }
     }
   }
 
