@@ -1,5 +1,5 @@
 import { type VJS_params_TYPE } from "./types";
-import { Comp, CradovaEvent, Router, Signal } from "./classes";
+import { Comp, CradovaEvent, Router } from "./classes";
 
 // ? NOTE: this class below is copied here for brevity
 /**
@@ -21,17 +21,19 @@ class __raw_ref {
    * Retrieve a referenced DOM element.
    * @param name - The name of the referenced DOM element.
    */
-  current<ElementType extends HTMLElement = HTMLElement>(name: string) {
-    return this.tree[name] as ElementType | undefined;
+  elem<ElementType extends HTMLElement = HTMLElement>(name: string) {
+    const elem = this.tree[name];
+    if (document.contains(elem)) {
+      return elem as ElementType | undefined;
+    }
+    this.tree[name] = undefined;
   }
   /**
-   * Swap referenced DOM element. 
+   * Swap referenced DOM element.
    */
-  swap(name1: string, name2:string) {
-    [this.tree[name1],this.tree[name2]] =
-      [this.tree[name2],this.tree[name1]];
+  swap(name1: string, name2: string) {
+    [this.tree[name1], this.tree[name2]] = [this.tree[name2], this.tree[name1]];
   }
-
   /**
    * Append a DOM element to the reference, overwriting any existing reference.
    * @param name - The name to reference the DOM element by.
@@ -132,17 +134,6 @@ export const makeElement = <E extends HTMLElement>(
           );
           continue;
         }
-        // signal
-        if ((value! as unknown[])[0] instanceof Signal) {
-          ((value! as unknown[])![0] as Signal<any>).bindComp(
-            element as unknown as Comp,
-            {
-              _element_property: prop,
-              signalProperty: (value! as unknown[])![1] as string,
-            },
-          );
-          continue;
-        }
       }
 
       //? setting onmount event;
@@ -160,9 +151,7 @@ export const makeElement = <E extends HTMLElement>(
         element.setAttribute(prop, value as string);
         continue;
       }
-
       // trying to set other values
-
       (element as unknown as Record<string, unknown>)[prop] = value;
     }
   }
@@ -209,7 +198,10 @@ export function Rhoda(l: VJS_params_TYPE<HTMLElement>) {
  * @param {function} elements[]
  */
 
-export function $if<E>(condition: any, ...elements: VJS_params_TYPE<E>): any {
+export function $if<E extends HTMLElement>(
+  condition: any,
+  ...elements: VJS_params_TYPE<E>
+): any {
   if (condition) {
     return elements;
   }
@@ -222,7 +214,7 @@ export function $ifelse(condition: any, ifTrue: any, ifFalse?: any) {
   return ifFalse;
 }
 
-export function $case<E = HTMLElement>(
+export function $case<E extends HTMLElement = HTMLElement>(
   value: any,
   ...elements: VJS_params_TYPE<E>
 ) {

@@ -29,9 +29,6 @@ type Attributes = {
   onmount?: (this: HTMLElement & Attributes) => void;
 };
 
- 
-
-
 export type VJS_params_TYPE<E extends HTMLElement> =
   // children type
   (
@@ -51,7 +48,7 @@ export type VJS_params_TYPE<E extends HTMLElement> =
     | Record<string, (this: E) => void>
     | Partial<DataAttributes>
     | Partial<AriaAttributes>
-    | CSS.Properties<string | number> 
+    | CSS.Properties<string | number>
   )[];
 
 export interface RouterRouteObject {

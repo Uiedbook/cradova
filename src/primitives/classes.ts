@@ -20,7 +20,7 @@ class cradovaEvent {
   /**
    * the events runs once after comps unmounts.
    * these event are called before a comp is rendered to the dom
-   * @param callback 
+   * @param callback
    */
   afterDeactivate: Function[] = [];
 
@@ -60,7 +60,7 @@ export class Comp<Prop extends Record<string, any> = any> {
   private published = false;
   private preRendered: HTMLElement | null = null;
   private reference: HTMLElement | null = null;
-  Signal: Signal<Prop> | undefined;
+  subData: Prop | null = null;
   //? hooks management
   _state: Prop[] = [];
   _state_index = 0;
@@ -71,7 +71,7 @@ export class Comp<Prop extends Record<string, any> = any> {
     cradovaEvent.refid += 1;
     this.id = cradovaEvent.refid;
   }
-   
+
   preRender() {
     // ? parking
     this.preRendered = this.render() as HTMLElement;
@@ -108,19 +108,11 @@ export class Comp<Prop extends Record<string, any> = any> {
       return this.preRendered;
     }
   }
-  _setExtra(Extra: Signal<any>) {
-    if (this.Signal) {
-      Extra.value = this.Signal.value;
-    }
-    this.Signal = Extra;
-  }
-
   _effect(fn: () => Promise<void> | void) {
     if (!this.rendered) {
       this.effects.push(fn.bind(this));
     }
   }
-
   private async effector() {
     // if (!this.rendered) {
     for (let i = 0; i < this.effects.length; i++) {
@@ -192,164 +184,36 @@ export class Comp<Prop extends Record<string, any> = any> {
 }
 
 /**
- * cradova
- * ---
- * lazy load a file
- */
-export class lazy<Type> {
-  public content: Type | undefined;
-  private _cb: () => Promise<unknown>;
-  constructor(cb: () => Promise<unknown>) {
-    this._cb = cb;
-  }
-  async load() {
-    let content = await this._cb();
-    if (typeof content === "function") {
-      content = await content();
-    } else {
-      content = await content;
-    }
-    const def = content as { default: unknown };
-    if (def.default) {
-      this.content = def?.default as Type;
-    }
-  }
-}
-
-/**
  *  Cradova Signal
  * ----
  *  Create stateful data store.
  *  Features:
  * - create a store
- * - create actions and fire them
- * - bind a Comp and elements
- * - listen to updates
+ * - subscribe components to events
  * - set object keys instead of all values
  * - persist changes to localStorage
- * - update a cradova Comp automatically
  * @constructor initial: unknown, props: {useHistory, persist}
  */
 
 export class Signal<Type extends Record<string, any>> {
-  private callback: undefined | ((newValue: Type) => void);
-  private persistName: string | undefined = "";
-  private actions: Record<string, (data?: unknown) => void> = {};
-  private comp: {
-    comp: Comp;
-    _event?: string;
-    _signalProperty?: string;
-    _element_property?: string;
-  }[] = [];
-
-  value: Type;
+  private pn?: string;
+  private subs?: Record<keyof Type, Comp[]>;
+  pipe: Type;
   constructor(initial: Type, props?: { persistName?: string | undefined }) {
-    this.value = initial;
+    this.pipe = initial;
+    this.subs = {} as any;
     if (props && props.persistName) {
-      this.persistName = props.persistName;
+      this.pn = props.persistName;
       const key = localStorage.getItem(props.persistName);
       if (key && key !== "undefined") {
-        this.value = JSON.parse(key);
+        this.pipe = JSON.parse(key);
       }
       if (typeof initial === "object") {
         for (const key in initial) {
-          if (!Object.prototype.hasOwnProperty.call(this.value, key)) {
-            this.value[key] = initial[key];
+          if (!Object.prototype.hasOwnProperty.call(this.pipe, key)) {
+            this.pipe[key] = initial[key];
           }
         }
-      }
-    }
-  }
-  /**
-   *  Cradova Signal
-   * ----
-   *  set signal value
-   * @param value - signal value
-   * @returns void
-   */
-  set(value: Type | ((value: Type) => Type), shouldCompRender?: boolean) {
-    if (typeof value === "function") {
-      // value could be a promise
-      this.value = value(this.value);
-    } else {
-      this.value = value;
-    }
-    if (this.comp.length && shouldCompRender !== false) {
-      this.updateState();
-    }
-    if (this.callback) {
-      this.callback(this.value);
-    }
-    if (this.persistName) {
-      localStorage.setItem(this.persistName, JSON.stringify(this.value));
-    }
-  }
-  /**
-   *  Cradova Signal
-   * ----
-   *  set a key value if it's an object
-   * @param key - key of the key
-   * @param value - value of the key
-   * @returns void
-   */
-
-  setKey<k extends keyof Type>(
-    key: k,
-    value: unknown,
-    shouldCompRender?: boolean,
-  ) {
-    if (typeof this.value === "object") {
-      this.value[key] = value as any;
-      if (this.comp.length && shouldCompRender !== false) {
-        this.updateState();
-      }
-      if (this.callback) {
-        this.callback(this.value);
-      }
-      if (this.persistName) {
-        localStorage.setItem(this.persistName, JSON.stringify(this.value));
-      }
-    } else {
-      throw new Error(
-        `✘  Cradova err : can't set key ${
-          String(
-            key,
-          )
-        } store.value is not an object`,
-      );
-    }
-  }
-  /**
-   *  Cradova Signal
-   * ----
-   *  set a key to signal an action
-   * @param name - name of the action
-   * @param action function to execute
-   */
-  createAction(name: string, action: (data?: unknown) => void) {
-    if (typeof name === "string" && typeof action === "function") {
-      this.actions[name] = action.bind(this);
-    } else {
-      throw new Error(
-        `✘  Cradova err : can't create action ${name}, check values`,
-      );
-    }
-  }
-  /**
-   *  Cradova Signal
-   * ----
-   *  creates man y actions at a time
-   * @param name - name of the action
-   * @param action function to execute
-   */
-  createActions(Actions: Record<string, (data?: unknown) => void>) {
-    for (const [name, action] of Object.entries(Actions)) {
-      if (typeof name === "string" && typeof action === "function") {
-        this.actions[name] = action;
-      } else {
-        throw new Error(
-          `✘  Cradova err : can't create action ${name} check values`,
-        );
       }
     }
   }
@@ -360,102 +224,47 @@ export class Signal<Type extends Record<string, any>> {
    * @param key - string key of the action
    * @param data - data for the action
    */
-  fireAction(key: string) {
-    if (typeof this.actions[key] === "function") {
-      this.updateState(key);
-      return this.actions[key].call(this);
-    } else {
-      throw Error("✘  Cradova err : action " + key + "  does not exist!");
+  publish<T extends keyof Type>(eventName: T, data: Type[T]) {
+    this.pipe[eventName] = data;
+    const subs = this.subs![eventName as string] || [];
+    for (let i = 0; i < subs.length; i++) {
+      const comp = subs[i];
+      comp.subData = data;
+      comp.recall();
+    }
+    if (this.pn) {
+      localStorage.setItem(this.pn, JSON.stringify(this.pipe));
     }
   }
-
-  /**
-   * Cradova
-   * ---
-   * is used to bind signal data to elements and Comps
-   *
-   * @param prop
-   * @returns something
-   */
-
-  bind(prop: string): any {
-    if (
-      typeof this.value === "object" &&
-      typeof this.value[prop] !== "undefined"
-    ) {
-      return [this, prop];
-    } else {
-      throw new Error(
-        "✘  Cradova err : can't bind an unavailable property!  " + prop,
-      );
-    }
-  }
-
-  private updateState(name?: string) {
-    for (let i = 0; i < this.comp.length; i++) {
-      const ent = this.comp[i];
-      if (ent._event && ent._event === name) {
-        continue;
-      }
-      // ? for normal elements
-      if (ent._element_property && ent._signalProperty) {
-        ent.comp[ent._element_property as "render"] =
-          this.value[ent._signalProperty];
-        continue;
-      }
-      // ? for Comps
-      ent.comp.recall();
-    }
-  }
-
   /**
    *  Cradova Signal
    * ----
-   *  set a auto - rendering component for this store
+   *  subscribe to an event
    *
    * @param Comp component to bind to.
    */
-  bindComp(
-    comp: Comp,
-    binding?: {
-      event?: string;
-      signalProperty?: string;
-      _element_property?: string;
-    },
-  ) {
+  subscribe<T extends keyof Type>(eventName: T, comp: Comp) {
     if (comp instanceof Comp) {
       // ? avoid adding a specific comp repeatedly to a Signal
-      if (this.comp.find((cmp) => cmp.comp?.id === comp.id)) return;
-      // ? add binding
-      comp.render = comp.render.bind(comp);
-      comp._setExtra(this);
+      if (this.subs![eventName].find((cmp) => cmp.id === comp.id)) {
+        return;
+      }
+      if (!this.subs![eventName]) {
+        this.subs![eventName] = [comp];
+      } else {
+        this.subs![eventName].push(comp);
+      }
     }
-    // ? it's an element binding, not comp, not event(fire action events)
-    this.comp.push({
-      comp: comp,
-      _signalProperty: binding?.signalProperty,
-      _element_property: binding?._element_property,
-      _event: binding?.event,
-    });
   }
 
-  /**
-   *  Cradova Signal
-   * ----
-   *  set a update listener on value changes
-   * @param callback
-   */
-  listen(callback: (a: Type) => void) {
-    this.callback = callback;
-  }
   /**
    *  Cradova Signal
    * ----
    * clear the history on local storage
    */
   clearPersist() {
-    if (this.persistName) {
-      localStorage.removeItem(this.persistName);
+    if (this.pn) {
+      localStorage.removeItem(this.pn);
     }
   }
 }
