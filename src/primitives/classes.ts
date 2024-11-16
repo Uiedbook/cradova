@@ -246,7 +246,7 @@ export class Signal<Type extends Record<string, any>> {
   subscribe<T extends keyof Type>(eventName: T, comp: Comp) {
     if (comp instanceof Comp) {
       // ? avoid adding a specific comp repeatedly to a Signal
-      if (this.subs![eventName].find((cmp) => cmp.id === comp.id)) {
+      if (this.subs![eventName]?.find((cmp) => cmp.id === comp.id)) {
         return;
       }
       if (!this.subs![eventName]) {
