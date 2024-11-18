@@ -1,5 +1,5 @@
-import { type VJS_params_TYPE } from "./types";
-import { Comp, CradovaEvent, Router } from "./classes";
+import { type VJS_params_TYPE } from "./types.js";
+import { Comp, CradovaEvent, Router } from "./classes.js";
 
 // ? NOTE: this class below is copied here for brevity
 /**

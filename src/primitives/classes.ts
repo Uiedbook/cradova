@@ -1,4 +1,4 @@
-import { type browserPageType, type CradovaPageType } from "./types";
+import { type browserPageType, type CradovaPageType } from "./types.js";
 
 /**
  * Cradova event
@@ -28,8 +28,9 @@ class cradovaEvent {
    * Dispatch any event
    * @param eventName
    */
+
   dispatchEvent(
-    eventName: "beforeMountActive" | "afterMount" | "afterDeactivate",
+    eventName: "beforeMountActive" | "afterMount" | "afterDeactivate"
   ): void {
     const eventListeners = this[eventName];
     if (eventName.includes("Active")) {
@@ -90,9 +91,8 @@ export class Comp<Prop extends Record<string, any> = any> {
     if (!this.preRendered) {
       this._state_index = 0;
       this._state = [];
-      const html = this.component() as any;
+      const html = this.component();
       // parking
-
       if (html instanceof HTMLElement) {
         this.reference = html;
         this.effector.apply(this);
@@ -100,7 +100,7 @@ export class Comp<Prop extends Record<string, any> = any> {
         this.published = true;
       } else {
         console.error(
-          " ✘  Cradova err :  Invalid html content, got  - " + html,
+          " ✘  Cradova err :  Invalid html content, got  - " + html
         );
       }
       return html;
@@ -189,7 +189,7 @@ export class Comp<Prop extends Record<string, any> = any> {
  *  Create a pub&sub store.
  *  Features:
  * - create a store
- * - subscribe components to events 
+ * - subscribe components to events
  * - persist changes to localStorage
  * @constructor initial: Record<string, any>, props: {persist}
  */
@@ -292,13 +292,47 @@ export class Page {
   private _callBack: (() => Promise<void> | void) | undefined;
   private _deCallBack: (() => Promise<void> | void) | undefined;
   private _dropped = false;
-  constructor(cradova_page_initials: CradovaPageType) {
-    const { template, name } = cradova_page_initials;
+  private _snapshot: boolean;
+  private _snapshot_html?: string;
+  constructor(pageParams: CradovaPageType) {
+    const { template, name } = pageParams;
     this._html = template;
     this._name = name || "Document";
     this._template.setAttribute("id", "page");
+    this._snapshot = pageParams.snapshotIsolation || false;
   }
-
+  private async _takeSnapShot() {
+    //? Prevent snapshot if already exists
+    if (RouterBox.doc!.dataset["snapshot"] === "true") return;
+    try {
+      const response = await fetch(location.href);
+      if (!response.ok) throw new Error("Failed to fetch the page");
+      const html = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      doc.title = this._name;
+      const wrapper = doc.querySelector('[data-wrapper="app"]');
+      if (wrapper) {
+        wrapper.setAttribute("data-snapshot", "true");
+        wrapper.innerHTML = this._snapshot_html!;
+      } else {
+        console.error("Wrapper or template is not found");
+        return;
+      }
+      const snapshot = doc.documentElement.outerHTML;
+      await fetch(`${location.origin}`, {
+        body: snapshot,
+        method: "POST",
+        headers: {
+          "Content-Type": "text/html",
+          "cradova-snapshot": location.href,
+        },
+      });
+    } catch (error) {
+      console.error("Snapshot error:", error);
+    }
+    this._snapshot_html = undefined;
+  }
   onActivate(cb: () => Promise<void> | void) {
     this._callBack = cb;
   }
@@ -328,7 +362,7 @@ export class Page {
       this._template.appendChild(html);
     } else {
       throw new Error(
-        ` ✘  Cradova err:  template function for the page returned ${html} instead of html`,
+        ` ✘  Cradova err:  template function for the page returned ${html} instead of html`
       );
     }
     // ?
@@ -336,6 +370,7 @@ export class Page {
     RouterBox.doc!.innerHTML = "";
     // ? tell all Comps to re-render
     CradovaEvent.dispatchEvent("beforeMountActive");
+    if (this._snapshot) this._snapshot_html = this._template.outerHTML;
     RouterBox.doc!.appendChild(this._template);
     // ? call any onmount event added in the cradova event loop
     CradovaEvent.dispatchEvent("afterMount");
@@ -348,6 +383,7 @@ export class Page {
     this._callBack && (await this._callBack());
     // ? call all return functions of useEffects
     CradovaEvent.dispatchEvent("afterDeactivate");
+    if (this._snapshot) this._takeSnapShot();
   }
 }
 
@@ -373,7 +409,7 @@ class RouterBoxClass {
   } = { params: {} };
   routes: Record<string, Page | (() => Promise<Page | undefined>)> = {};
   pageevents: Function[] = [];
-  // tarcking paused state of navigation
+  // tracking paused state of navigation
   paused = false;
   async start_pageevents(url: string) {
     setTimeout(() => {
@@ -464,7 +500,7 @@ class RouterBoxClass {
   }
 
   checker(
-    url: string,
+    url: string
   ): [Page | (() => Promise<Page | undefined>), Record<string, any>] {
     if (url[0] !== "/") {
       url = url.slice(url.indexOf("/", 8));
@@ -577,9 +613,8 @@ export class Router {
       ) {
         // ? creating the lazy
         RouterBox.routes[path] = async () => {
-          const pagepp: Page = typeof page === "function"
-            ? await page()
-            : await page;
+          const pagepp: Page =
+            typeof page === "function" ? await page() : await page;
           return RouterBox.route(path, (pagepp as any)?.default || pagepp);
         };
       } else {
@@ -603,14 +638,14 @@ export class Router {
   /**
     Pause navigation
     */
-  static pauseNaviagtion() {
+  static pauseNavigation() {
     RouterBox["paused"] = true;
     window.location.hash = "paused";
   }
   /**
    resume navigation
   */
-  static resumeNaviagtion() {
+  static resumeNavigation() {
     RouterBox["paused"] = false;
     window.location.replace(window.location.pathname + window.location.search);
     history.go(-1);
@@ -630,7 +665,7 @@ export class Router {
       console.error(
         " ✘  Cradova err:  href must be a defined path but got " +
           href +
-          " instead",
+          " instead"
       );
     }
     let route = null,
@@ -666,7 +701,7 @@ export class Router {
       RouterBox.loadingPage = page;
     } else {
       throw new Error(
-        " ✘  Cradova err:  Loading Page should be a cradova page class",
+        " ✘  Cradova err:  Loading Page should be a cradova page class"
       );
     }
   }
@@ -682,7 +717,7 @@ export class Router {
       RouterBox["pageevents"].push(callback);
     } else {
       throw new Error(
-        " ✘  Cradova err:  callback for page events event is not a function",
+        " ✘  Cradova err:  callback for page events event is not a function"
       );
     }
   }
@@ -714,7 +749,7 @@ export class Router {
       RouterBox["errorHandler"] = callback;
     } else {
       throw new Error(
-        " ✘  Cradova err:  callback for error event is not a function",
+        " ✘  Cradova err:  callback for error event is not a function"
       );
     }
   }
@@ -722,13 +757,12 @@ export class Router {
   static _mount() {
     // creating mount point
     let doc = document.querySelector("[data-wrapper=app]") as HTMLElement;
-    if (!doc) {
-      doc = document.createElement("div");
-      doc.setAttribute("data-wrapper", "app");
-      document.body.appendChild(doc);
+    if (doc) {
       RouterBox.doc = doc;
     } else {
-      RouterBox.doc = doc;
+      throw new Error(
+        `✘  Cradova err: please add '<div data-wrapper="app"></div>' to the body of your index.html file `
+      );
     }
     window.addEventListener("pageshow", () => RouterBox.router());
     window.addEventListener("popstate", (_e) => {

@@ -1,5 +1,5 @@
 import * as CSS from "csstype";
-import { Comp, Page } from "./classes";
+import { Comp, Page } from "./classes.js";
 
 type DataAttributes = { [key: `data-${string}`]: string };
 type AriaAttributes = { [key: `aria-${string}`]: string };
@@ -42,8 +42,8 @@ export type VJS_params_TYPE<E extends HTMLElement> =
     | DocumentFragment[]
     // property type
     | Attributes
-    | (() => HTMLElement)
     | Partial<Attributes>
+    | (() => HTMLElement)
     | Partial<E>
     | Record<string, (this: E) => void>
     | Partial<DataAttributes>
@@ -98,6 +98,16 @@ export type CradovaPageType = {
    * .
    */
   template: (this: Page) => HTMLElement;
+  /**
+   * Cradova page
+   * ---
+   * a snapshot is the initial render of a page.
+   * snapshot isolation allows for good SEO guarantee with the flexibility of client based rendering
+   * the origin server should accept post requesting to save a snapshot of this page for future use.
+   * the origin server should respond with the snapshot for future request to the page url
+   * the origin server should implement suitable mechanisms to invalidate it's caches
+   */
+  snapshotIsolation?: boolean;
 };
 
 export type browserPageType<importType = Page> =

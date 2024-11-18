@@ -10,6 +10,6 @@ and limitations under the License.
 *******************************************************************************
 */
 
-export * from "./primitives/classes";
-export * from "./primitives/functions";
-export * from "./primitives/dom-objects";
+export * from "./primitives/classes.js";
+export * from "./primitives/functions.js";
+export * from "./primitives/dom-objects.js";

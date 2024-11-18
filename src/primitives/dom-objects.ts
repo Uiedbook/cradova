@@ -1,5 +1,5 @@
-import { cra, makeElement } from "./functions";
-import { type VJS_params_TYPE } from "./types";
+import { cra, makeElement } from "./functions.js";
+import { type VJS_params_TYPE } from "./types.js";
 
 export const a = cra<HTMLAnchorElement>("a");
 export const audio = cra<HTMLAudioElement>("audio");
