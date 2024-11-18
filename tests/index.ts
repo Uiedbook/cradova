@@ -48,13 +48,13 @@ function TodoList() {
       button("Add todo", {
         onclick() {
           addTodo(
-            referenceSet.elem<HTMLInputElement>("todoInput")?.value || ""
+            referenceSet.elem<HTMLInputElement>("todoInput")?.value || "",
           );
           referenceSet.elem<HTMLInputElement>("todoInput")!.value = "";
         },
-      })
+      }),
     ),
-    todoList
+    todoList,
   );
 }
 
@@ -68,7 +68,7 @@ const todoList = new Comp(function () {
           removeTodo(item);
         },
       })
-    )
+    ),
   );
 });
 
@@ -119,7 +119,7 @@ function typingExample() {
       placeholder: "typing simulation",
     }),
     p(" no thing typed yet!", { reference: ref.bindAs("text") }),
-    a({ href: "/p" }, "log lol in the console")
+    a({ href: "/p" }, "log lol in the console"),
   );
 }
 
@@ -144,7 +144,7 @@ Router.BrowserRoutes({
           },
         }),
         TodoList,
-        App
+        App,
       );
     },
   }),
@@ -159,7 +159,7 @@ Router.BrowserRoutes({
           },
         }),
         TodoList,
-        App
+        App,
       );
     },
   }),

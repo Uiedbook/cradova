@@ -58,7 +58,7 @@ function Hello({ name }) {
   return div(
     $if(name === "john", h1("Hello john")),
     $if(name === "paul", h1("Goodbye paul")),
-    $ifelse(name === "john", h1("Hello john"), h1("Hello Paul")),
+    $ifelse(name === "john", h1("Hello john"), h1("Hello Paul"))
   );
 }
 
@@ -70,8 +70,8 @@ function whatsAllowed({ age }) {
       age,
       $case(12, h1("too young")),
       $case(26, h1("you are welcome")),
-      $case(52, h1("too old")),
-    ),
+      $case(52, h1("too old"))
+    )
   );
 }
 
@@ -166,14 +166,6 @@ import {
   useRef,
 } from "cradova";
 
-const count = new Comp(function () {
-  const [count, setCounter] = useState(0, this);
-  setTimeout(() => {
-    setCounter(count + 1);
-  }, 1000);
-  return h1(" count: " + count);
-});
-
 // hello message
 
 function HelloMessage() {
@@ -184,22 +176,6 @@ function HelloMessage() {
     },
   });
 }
-
-// using CradovaRef
-
-const nameRef = new Comp(function () {
-  const [name, setName] = (useState < string) | (undefined > (undefined, this));
-  return div(name ? "hello " + name : "Click to get a second greeting", {
-    onclick() {
-      const name = prompt();
-      if (name) {
-        setName(name);
-      } else {
-        alert("Please provide a valid name");
-      }
-    },
-  });
-});
 
 // reference (not state)
 
@@ -212,12 +188,12 @@ function typingExample() {
       },
       placeholder: "typing simulation",
     }),
-    p(" no thing typed yet!", { reference: ref.bindAs("text") }),
+    p(" no thing typed yet!", { reference: ref.bindAs("text") })
   );
 }
 
 function App() {
-  return div(count, typingExample, HelloMessage, nameRef);
+  return div(typingExample, HelloMessage);
 }
 
 document.body.append(App());
@@ -241,34 +217,31 @@ import {
   useState,
 } from "../dist/index.js";
 
+// creating a store
+const todoStore = new Signal({
+  todo: ["take bath", "code coded", "take a break"],
+});
+
+// create actions
+const addTodo = function (todo: string) {
+  todoStore.publish("todo", [...todoStore.pipe.todo, todo]);
+};
+
+const removeTodo = function (todo: string) {
+  const ind = todoStore.pipe.todo.indexOf(todo);
+  todoStore.pipe.todo.splice(ind, 1);
+  todoStore.publish("todo", todoStore.pipe.todo);
+};
+
+
 function TodoList() {
   // can be used to hold multiple references
   const referenceSet = useRef();
-
-  // creating a store
-  const todoStore = new createSignal([
-    "take bath",
-    "code coded",
-    "take a break",
-  ]);
-
-  // create actions
-  todoStore.createAction("add-todo", function (todo) {
-    this.set([...this.value, todo]);
-  });
-
-  todoStore.createAction("remove-todo", function (todo) {
-    const ind = this.value.indexOf(todo);
-    this.value.splice(ind, 1);
-    this.set(this.value);
-  });
-
   // bind Comp to Signal
-  todoStore.bindRef(todoList);
-
-  // markup
+  todoStore.subscribe("todo", todoList);
+  // vjs
   return main(
-    p(`|Todo List`),
+    h1(`Todo List`),
     div(
       input({
         placeholder: "type in todo",
@@ -276,29 +249,28 @@ function TodoList() {
       }),
       button("Add todo", {
         onclick() {
-          todoStore.fireAction(
-            "add-todo",
-            referenceSet.current("todoInput").value,
+          addTodo(
+            referenceSet.elem<HTMLInputElement>("todoInput")!.value || ""
           );
-          referenceSet.current("todoInput").value = "";
+          referenceSet.elem<HTMLInputElement>("todoInput")!.value = "";
         },
-      }),
+      })
     ),
-    todoList.render,
+    todoList
   );
 }
 
 const todoList = new Comp(function () {
-  const self = this;
+  const data = this.subData;
   return div(
-    self.Signal.value.map((item) =>
+    data.map((item: any) =>
       p(item, {
         title: "click to remove",
         onclick() {
-          self.Signal.fireAction("remove-todo", item);
+          removeTodo(item);
         },
       })
-    ),
+    )
   );
 });
 document.body.appendChild(TodoList());
