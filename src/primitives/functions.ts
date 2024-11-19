@@ -122,20 +122,6 @@ export const makeElement = <E extends HTMLElement>(
         continue;
       }
 
-      if (Array.isArray(value)) {
-        // reference
-        if (
-          prop == "reference" &&
-          (value! as unknown[])![0] instanceof __raw_ref
-        ) {
-          ((value! as unknown[])![0] as __raw_ref)._append(
-            (value! as unknown[])![1] as string,
-            element,
-          );
-          continue;
-        }
-      }
-
       //? setting onmount event;
       if (prop === "onmount") {
         CradovaEvent.afterMount.push(() => {
@@ -143,13 +129,23 @@ export const makeElement = <E extends HTMLElement>(
             props["onmount"].apply(element);
         });
         continue;
-        //
       }
 
       // data-(s) &  aria-(s)
       if (prop.includes("data-") || prop.includes("aria-")) {
         element.setAttribute(prop, value as string);
         continue;
+      }
+
+      if (Array.isArray(value)) {
+        // reference
+        if (prop == "ref" && (value! as unknown[])![0] instanceof __raw_ref) {
+          ((value! as unknown[])![0] as __raw_ref)._append(
+            (value! as unknown[])![1] as string,
+            element,
+          );
+          continue;
+        }
       }
       // trying to set other values
       (element as unknown as Record<string, unknown>)[prop] = value;

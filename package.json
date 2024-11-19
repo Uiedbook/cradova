@@ -11,21 +11,18 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FridayCandour/cradova.git"
+    "url": "git+https://github.com/Uieddbook/cradova.git"
   },
   "scripts": {
     "compile": "bun bundle.ts",
-    "pub:patch": " git add . && git commit -m 'new version' && bun bundle.ts && npm version patch && npm publish && git push && git push --tags",
     "lint": "eslint . --fix"
   },
   "keywords": [
     "PWA",
     "webapp",
-    "parallel rendering",
-    "conditionals",
-    "prerendering",
+    "SPA",
     "Comps",
-    "createSignal",
+    "Signal",
     "VJS",
     "vjs specification",
     "cradova"
@@ -48,25 +45,13 @@
     {
       "name": "friday candour",
       "url": "https://www.t.me/procal"
-    },
-    {
-      "name": "Thomas",
-      "url": "https://github.com/trgwii"
     }
   ],
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/FridayCandour/cradova/issues"
+    "url": "https://github.com/Uiedbook/cradova/issues"
   },
-  "homepage": "https://github.com/FridayCandour/cradova",
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.47.0",
-    "@typescript-eslint/parser": "^5.47.0",
-    "eslint": "^8.30.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "prettier": "^2.8.1"
-  },
+  "homepage": "https://github.com/Uiedbook/cradova",
   "dependencies": {
     "csstype": "^3.1.2"
   }

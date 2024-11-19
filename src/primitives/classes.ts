@@ -4,7 +4,7 @@ import { type browserPageType, type CradovaPageType } from "./types.js";
  * Cradova event
  */
 class cradovaEvent {
-  static refid = 0;
+  static compId = 0;
   /**
    * the events runs only once and removed.
    * these event are call and removed once when when a comp is rendered to the dom
@@ -44,9 +44,7 @@ class cradovaEvent {
     }
   }
 }
-
 export const CradovaEvent = new cradovaEvent();
-
 /**
  * Cradova Comp
  * -------
@@ -65,12 +63,12 @@ export class Comp<Prop extends Record<string, any> = any> {
   //? hooks management
   _state: Prop[] = [];
   _state_index = 0;
-  test?: string;
+  // test?: string;
 
   constructor(component: (this: Comp<Prop>) => HTMLElement) {
     this.component = component.bind(this);
-    cradovaEvent.refid += 1;
-    this.id = cradovaEvent.refid;
+    cradovaEvent.compId += 1;
+    this.id = cradovaEvent.compId;
   }
 
   preRender() {
@@ -289,11 +287,10 @@ export class Page {
    */
   public _html: (this: Page) => HTMLElement;
   private _template = document.createElement("div");
-  private _callBack: (() => Promise<void> | void) | undefined;
-  private _deCallBack: (() => Promise<void> | void) | undefined;
   private _dropped = false;
   private _snapshot: boolean;
   private _snapshot_html?: string;
+  _deCB?: () => Promise<void> | void;
   constructor(pageParams: CradovaPageType) {
     const { template, name } = pageParams;
     this._html = template;
@@ -333,14 +330,8 @@ export class Page {
     }
     this._snapshot_html = undefined;
   }
-  onActivate(cb: () => Promise<void> | void) {
-    this._callBack = cb;
-  }
-  onDeactivate(cb: () => Promise<void> | void) {
-    this._deCallBack = cb;
-  }
-  async _deActivate() {
-    this._deCallBack && (await this._deCallBack());
+  set onDeactivate(cb: () => Promise<void> | void) {
+    this._deCB = cb;
   }
   drop(state?: boolean) {
     if (typeof state === "boolean") {
@@ -380,7 +371,6 @@ export class Page {
       // @ts-ignore
       behavior: "instant",
     });
-    this._callBack && (await this._callBack());
     // ? call all return functions of useEffects
     CradovaEvent.dispatchEvent("afterDeactivate");
     if (this._snapshot) this._takeSnapShot();
@@ -408,17 +398,8 @@ class RouterBoxClass {
     data?: Record<string, any>;
   } = { params: {} };
   routes: Record<string, Page | (() => Promise<Page | undefined>)> = {};
-  pageevents: Function[] = [];
   // tracking paused state of navigation
   paused = false;
-  async start_pageevents(url: string) {
-    setTimeout(() => {
-      for (let ci = 0; ci < this.pageevents.length; ci++) {
-        this.pageevents[ci](url);
-      }
-      // always starts events a moment later
-    }, 50);
-  }
 
   route(path: string, page: Page) {
     // undefined is an option  here for auth routes
@@ -479,9 +460,8 @@ class RouterBoxClass {
           this.pageData.params = params;
         }
         await route!._activate();
-        this.start_pageevents(url);
         this.lastNavigatedRouteController &&
-          this.lastNavigatedRouteController._deActivate();
+          this.lastNavigatedRouteController._deCB?.();
         this.lastNavigatedRoute = url;
         this.lastNavigatedRouteController = route;
       } catch (error) {
@@ -613,28 +593,16 @@ export class Router {
       ) {
         // ? creating the lazy
         RouterBox.routes[path] = async () => {
-          const pagepp: Page = typeof page === "function"
+          const paged: Page = typeof page === "function"
             ? await page()
             : await page;
-          return RouterBox.route(path, (pagepp as any)?.default || pagepp);
+          return RouterBox.route(path, paged);
         };
       } else {
         RouterBox.route(path, page as Page);
       }
     }
     Router._mount();
-  }
-  /**
-    Go back in Navigation history
-    */
-  static back() {
-    history.go(-1);
-  }
-  /**
-    Go forward in Navigation history
-    */
-  static forward() {
-    history.go(1);
   }
   /**
     Pause navigation
@@ -703,22 +671,6 @@ export class Router {
     } else {
       throw new Error(
         " ✘  Cradova err:  Loading Page should be a cradova page class",
-      );
-    }
-  }
-
-  /** cradova router
-   * ---
-   * Listen for navigation events
-   *
-   * @param callback   () => void
-   */
-  static onPageEvent(callback: () => void) {
-    if (typeof callback === "function") {
-      RouterBox["pageevents"].push(callback);
-    } else {
-      throw new Error(
-        " ✘  Cradova err:  callback for page events event is not a function",
       );
     }
   }

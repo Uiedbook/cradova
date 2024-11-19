@@ -49,7 +49,7 @@ const Cradova = new Comp(function () {
 document.body.appendChild(Cradova.render());
 ```
 
-## 2023 - What's New? Conditionals!
+## 2023 - What's New? Conditionals
 
 ```js
 import { $case, $if, $ifelse, $switch, div, h1 } from "cradova";
@@ -131,7 +131,7 @@ npm i cradova
 Some aspects of Cradova are not reflected in the following example. More
 functionality will be entailed in future docs.
 
-## A basic component in Cradova:
+## A basic component in Cradova
 
 ```js
 import { div, h1 } from "cradova";
@@ -150,7 +150,7 @@ const html = div(Hello("peter"), Hello("joe"));
 document.body.append(html);
 ```
 
-## Basic Samples:
+## Basic Samples
 
 This a collection of basic examples that can give you some ideas
 
@@ -276,7 +276,7 @@ const todoList = new Comp(function () {
 document.body.appendChild(TodoList());
 ```
 
-## working with page and Router:
+## working with page and Router
 
 Unlike just appending stuff to the DOM, a better to build apps is to use a
 routing system.
@@ -371,7 +371,7 @@ More info on Cradova Comp
 
 Cradova Comp is a dynamic component class, which ships simple abstractions like:
 
-- recall
+- Signal
 - useEffect
 - useState
 - useRef
@@ -394,7 +394,6 @@ with ability to:
 - bind a Comp
 - listen to changes
 - persist changes to localStorage
-- update a Comp and bindings automatically
 
 With these simple and easy abstractions, you can write datastores with so much
 convenience.
@@ -420,7 +419,6 @@ following:
 
 - building Cradova CLI (in progress)
 - Cradova Documentation Website
-- UI component libraries for cradova (The Sacho Project)
 - Sample projects
 - maintenance and promotion
 
@@ -433,9 +431,9 @@ following:
  ╚═════╝   ╚═╝  ╚═╝  ╚═╝  ╚═╝   ╚══════╝     ╚════╝        ╚══╝    ╚═╝  ╚═╝
 ```
 
-## Apache Lincenced
+## MIT Licensed
 
-Opensourced And Free.
+Open sourced And Free.
 
 Join Us on [telegram](https://t.me/UiedbookHQ).
 
@@ -449,7 +447,7 @@ code is your original work.
 
 Your Support is a good force for change anytime you do it, you can ensure Our
 projects, growth, Cradova, Cradova, JetPath etc, growth and improvement by
-making a re-occuring or fixed sponsorship to
+making a re-occurring or fixed sponsorship to
 [github sponsors](https://github.com/sponsors/FridayCandour):
 
 Support via cryptos -

@@ -22,7 +22,7 @@ type Attributes = {
   required?: string;
   frameBorder?: string;
   placeholder?: string;
-  reference?: [any, string];
+  ref?: [any, string];
   autocomplete?: string;
   style?: CSS.Properties;
   recall?: (P: any) => void;
