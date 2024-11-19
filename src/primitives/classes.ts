@@ -322,7 +322,7 @@ export class Page {
         method: "POST",
         headers: {
           "Content-Type": "text/html",
-          "cradova-snapshot": location.href,
+          "cradova-snapshot": location.href.slice(location.origin.length),
         },
       });
     } catch (error) {
