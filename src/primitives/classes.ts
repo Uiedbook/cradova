@@ -448,8 +448,10 @@ class RouterBoxClass {
             await this.loadingPage._activate();
           }
           route = await (route as () => Promise<any>)();
-          // ! bad operation let's drop it and revert
+          //  @ts-ignore
+          if (route?.default) route = route.default;
           if (!route) {
+            // ! bad operation let's drop it and revert
             if (this.lastNavigatedRoute) {
               history.pushState({}, url, this.lastNavigatedRoute);
             }
