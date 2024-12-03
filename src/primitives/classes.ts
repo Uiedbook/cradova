@@ -51,7 +51,7 @@ export const CradovaEvent = new cradovaEvent();
  * create dynamic components
  */
 export class Comp<Prop extends Record<string, any> = any> {
-  id: number;
+  id: number = 0;
   private component: (this: Comp<Prop>) => HTMLElement;
   private effects: (() => Promise<void> | void)[] = [];
   private effectuate: ((this: Comp<Prop>) => void) | null = null;
@@ -67,8 +67,6 @@ export class Comp<Prop extends Record<string, any> = any> {
 
   constructor(component: (this: Comp<Prop>) => HTMLElement) {
     this.component = component.bind(this);
-    cradovaEvent.compId += 1;
-    this.id = cradovaEvent.compId;
   }
 
   preRender() {
@@ -84,6 +82,8 @@ export class Comp<Prop extends Record<string, any> = any> {
    * @returns () => HTMLElement
    */
   render() {
+    cradovaEvent.compId += 1;
+    this.id = cradovaEvent.compId;
     this.effects = [];
     this.rendered = false;
     if (!this.preRendered) {
