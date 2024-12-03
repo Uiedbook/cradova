@@ -50,28 +50,28 @@ export const CradovaEvent = new cradovaEvent();
  * -------
  * create dynamic components
  */
-export class Comp<Prop extends Record<string, any> = any> {
+export class Comp<Props extends Record<string, any> = any> {
   id: number = 0;
-  private component: (this: Comp<Prop>) => HTMLElement;
+  private component: (this: Comp<Props>, props?: Props) => HTMLElement;
   private effects: (() => Promise<void> | void)[] = [];
-  private effectuate: ((this: Comp<Prop>) => void) | null = null;
+  private effectuate: ((this: Comp<Props>) => void) | null = null;
   private rendered = false;
   private published = false;
   private preRendered: HTMLElement | null = null;
   private reference: HTMLElement | null = null;
-  subData: Prop | null = null;
+  subData: Props | null = null;
   //? hooks management
-  _state: Prop[] = [];
+  _state: Props[] = [];
   _state_index = 0;
   // test?: string;
 
-  constructor(component: (this: Comp<Prop>) => HTMLElement) {
+  constructor(component: (this: Comp<Props>) => HTMLElement) {
     this.component = component.bind(this);
   }
 
-  preRender() {
+  preRender(props: Props) {
     // ? parking
-    this.preRendered = this.render() as HTMLElement;
+    this.preRendered = this.render(props) as HTMLElement;
   }
 
   /**
@@ -81,7 +81,7 @@ export class Comp<Prop extends Record<string, any> = any> {
    * @param data
    * @returns () => HTMLElement
    */
-  render() {
+  render(props?: Props) {
     cradovaEvent.compId += 1;
     this.id = cradovaEvent.compId;
     this.effects = [];
@@ -89,7 +89,7 @@ export class Comp<Prop extends Record<string, any> = any> {
     if (!this.preRendered) {
       this._state_index = 0;
       this._state = [];
-      const html = this.component();
+      const html = this.component(props);
       // parking
       if (html instanceof HTMLElement) {
         this.reference = html;
@@ -136,23 +136,23 @@ export class Comp<Prop extends Record<string, any> = any> {
    * @returns
    */
 
-  recall() {
+  recall(props?: Props) {
     if (!this.rendered) {
       this.effectuate = () => {
         if (this.published) {
-          this.activate();
+          this.activate(props);
         }
       };
     } else {
       if (this.published) {
         setTimeout(() => {
-          this.activate();
+          this.activate(props);
         });
       }
     }
   }
 
-  private async activate() {
+  private async activate(props?: Props) {
     //
     this.published = false;
     if (!this.rendered) {
@@ -163,7 +163,7 @@ export class Comp<Prop extends Record<string, any> = any> {
     // ? check if this comp element is still in the dom
     if (document.contains(node)) {
       // ? compile the comp again
-      const html = this.component() as any;
+      const html = this.component(props) as any;
       if (html instanceof HTMLElement) {
         // ? replace the comp element with the new comp element
         node!.insertAdjacentElement("beforebegin", html as Element);
