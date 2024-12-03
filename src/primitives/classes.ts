@@ -65,7 +65,7 @@ export class Comp<Props extends Record<string, any> = any> {
   _state_index = 0;
   // test?: string;
 
-  constructor(component: (this: Comp<Props>) => HTMLElement) {
+  constructor(component: (this: Comp<Props>, data?: Props) => HTMLElement) {
     this.component = component.bind(this);
   }
 
