@@ -52,7 +52,7 @@ export const CradovaEvent = new cradovaEvent();
  */
 export class Comp<Props extends Record<string, any> = any> {
   id: number = 0;
-  private component: (this: Comp<Props>, props?: Props) => HTMLElement;
+  private component: (this: Comp<Props>) => HTMLElement;
   private effects: (() => Promise<void> | void)[] = [];
   private effectuate: ((this: Comp<Props>) => void) | null = null;
   private rendered = false;
@@ -60,18 +60,19 @@ export class Comp<Props extends Record<string, any> = any> {
   private preRendered: HTMLElement | null = null;
   private reference: HTMLElement | null = null;
   subData: Props | null = null;
+  publish: ((data: any) => void) | null = null;
   //? hooks management
   _state: Props[] = [];
   _state_index = 0;
   // test?: string;
 
-  constructor(component: (this: Comp<Props>, data?: Props) => HTMLElement) {
+  constructor(component: (this: Comp<Props>) => HTMLElement) {
     this.component = component.bind(this);
   }
 
-  preRender(props: Props) {
+  preRender() {
     // ? parking
-    this.preRendered = this.render(props) as HTMLElement;
+    this.preRendered = this.render() as HTMLElement;
   }
 
   /**
@@ -81,7 +82,7 @@ export class Comp<Props extends Record<string, any> = any> {
    * @param data
    * @returns () => HTMLElement
    */
-  render(props?: Props) {
+  render() {
     cradovaEvent.compId += 1;
     this.id = cradovaEvent.compId;
     this.effects = [];
@@ -89,7 +90,7 @@ export class Comp<Props extends Record<string, any> = any> {
     if (!this.preRendered) {
       this._state_index = 0;
       this._state = [];
-      const html = this.component(props);
+      const html = this.component();
       // parking
       if (html instanceof HTMLElement) {
         this.reference = html;
@@ -136,23 +137,23 @@ export class Comp<Props extends Record<string, any> = any> {
    * @returns
    */
 
-  recall(props?: Props) {
+  recall() {
     if (!this.rendered) {
       this.effectuate = () => {
         if (this.published) {
-          this.activate(props);
+          this.activate();
         }
       };
     } else {
       if (this.published) {
         setTimeout(() => {
-          this.activate(props);
+          this.activate();
         });
       }
     }
   }
 
-  private async activate(props?: Props) {
+  private async activate() {
     //
     this.published = false;
     if (!this.rendered) {
@@ -163,7 +164,7 @@ export class Comp<Props extends Record<string, any> = any> {
     // ? check if this comp element is still in the dom
     if (document.contains(node)) {
       // ? compile the comp again
-      const html = this.component(props) as any;
+      const html = this.component() as any;
       if (html instanceof HTMLElement) {
         // ? replace the comp element with the new comp element
         node!.insertAdjacentElement("beforebegin", html as Element);
@@ -253,6 +254,9 @@ export class Signal<Type extends Record<string, any>> {
       }
       if (this.pipe[eventName]) {
         comp.subData = this.pipe[eventName];
+        comp.publish = (data: Type[T]) => {
+          this.publish(eventName, data);
+        };
       }
     }
   }
@@ -448,15 +452,15 @@ class RouterBoxClass {
             await this.loadingPage._activate();
           }
           route = await (route as () => Promise<any>)();
-          //  @ts-ignore
-          if (route?.default) route = route.default;
-          if (!route) {
-            // ! bad operation let's drop it and revert
-            if (this.lastNavigatedRoute) {
-              history.pushState({}, url, this.lastNavigatedRoute);
-            }
-            return;
+        }
+        //  @ts-ignore
+        if (route?.default) route = route.default;
+        if (!route) {
+          // ! bad operation let's drop it and revert
+          if (this.lastNavigatedRoute) {
+            history.pushState({}, url, this.lastNavigatedRoute);
           }
+          return;
         }
         if (params) {
           this.pageData.params = params;

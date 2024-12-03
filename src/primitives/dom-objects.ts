@@ -34,6 +34,10 @@ export const span = cra<HTMLSpanElement>("span");
 export const textarea = cra<HTMLTextAreaElement>("textarea");
 export const ul = cra<HTMLUListElement>("ul");
 export const video = cra<HTMLVideoElement>("video");
+export const tbody = cra<HTMLTableElement>("table");
+export const table = cra<HTMLTableSectionElement>("tbody");
+export const td = cra<HTMLTableCellElement>("td");
+export const tr = cra<HTMLTableColElement>("tr");
 
 export const svg = (
   svg: string,
