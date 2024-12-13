@@ -64,7 +64,7 @@ export class Comp<Props extends Record<string, any> = any> {
   //? hooks management
   _state: Props[] = [];
   _state_index = 0;
-  // test?: string;
+  test?: string;
 
   constructor(component: (this: Comp<Props>) => HTMLElement) {
     this.component = component.bind(this);
@@ -227,7 +227,7 @@ export class Signal<Type extends Record<string, any>> {
     const subs = this.subs![eventName as string] || [];
     for (let i = 0; i < subs.length; i++) {
       const comp = subs[i];
-      comp.subData = data;
+      comp.subData = this.pipe;
       comp.recall();
     }
     if (this.pn) {
@@ -253,7 +253,7 @@ export class Signal<Type extends Record<string, any>> {
         this.subs![eventName].push(comp);
       }
       if (this.pipe[eventName]) {
-        comp.subData = this.pipe[eventName];
+        comp.subData = this.pipe;
         comp.publish = (data: Type[T]) => {
           this.publish(eventName, data);
         };

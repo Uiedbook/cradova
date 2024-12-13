@@ -23,10 +23,12 @@ class __raw_ref {
    */
   elem<ElementType extends HTMLElement = HTMLElement>(name: string) {
     const elem = this.tree[name];
-    if (document.contains(elem)) {
-      return elem as ElementType | undefined;
-    }
-    this.tree[name] = undefined;
+    // if (document.contains(elem)) {
+    return elem as ElementType | undefined;
+    // }
+    // console.log("boohoo", elem);
+
+    // this.tree[name] = undefined;
   }
   /**
    * Swap referenced DOM element.
@@ -46,7 +48,7 @@ class __raw_ref {
 
 export const makeElement = <E extends HTMLElement>(
   element: E & HTMLElement,
-  ElementChildrenAndPropertyList: VJS_params_TYPE<E>,
+  ElementChildrenAndPropertyList: VJS_params_TYPE<E>
 ) => {
   const props: Record<string, any> = {};
   let text: string | undefined = undefined;
@@ -115,7 +117,7 @@ export const makeElement = <E extends HTMLElement>(
                 const l = href.split("#").at(-1);
                 document.getElementById("#" + l)?.scrollIntoView();
               }
-            },
+            }
           );
         }
         element.setAttribute(prop, value as string);
@@ -139,10 +141,13 @@ export const makeElement = <E extends HTMLElement>(
 
       if (Array.isArray(value)) {
         // reference
-        if (prop == "ref" && (value! as unknown[])![0] instanceof __raw_ref) {
+        if (
+          prop == "reference" &&
+          (value! as unknown[])![0] instanceof __raw_ref
+        ) {
           ((value! as unknown[])![0] as __raw_ref)._append(
             (value! as unknown[])![1] as string,
-            element,
+            element
           );
           continue;
         }
@@ -241,8 +246,8 @@ export function loop<Type>(
   component: (
     value: Type,
     index?: number,
-    array?: LoopData<Type>,
-  ) => HTMLElement | DocumentFragment | undefined,
+    array?: LoopData<Type>
+  ) => HTMLElement | DocumentFragment | undefined
 ) {
   return Array.isArray(datalist)
     ? (datalist.map(component) as unknown as HTMLElement[])
@@ -288,7 +293,7 @@ export const frag = function (children: VJS_params_TYPE<HTMLElement>) {
  */
 export function useState<S = unknown>(
   newState: S,
-  Comp: Comp<any>,
+  Comp: Comp<any>
 ): [S, (newState: S | ((preS: S) => S)) => void] {
   Comp._state_index += 1;
   const idx = Comp._state_index;
