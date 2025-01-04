@@ -261,7 +261,7 @@ function TodoList() {
 }
 
 const todoList = new Comp(function () {
-  const data = this.subData;
+  const data = this.subPipe;
   return div(
     data.map((item: any) =>
       p(item, {

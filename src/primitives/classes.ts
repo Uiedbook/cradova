@@ -59,8 +59,8 @@ export class Comp<Props extends Record<string, any> = any> {
   private published = false;
   private preRendered: HTMLElement | null = null;
   private reference: HTMLElement | null = null;
-  subData: Props | null = null;
-  publish: ((data: any) => void) | null = null;
+  pipes = new Map<string, any>();
+
   //? hooks management
   _state: Props[] = [];
   _state_index = 0;
@@ -70,6 +70,15 @@ export class Comp<Props extends Record<string, any> = any> {
     this.component = component.bind(this);
   }
 
+  getPipe(name: string) {
+    return this.pipes.get(name)?.pipe;
+  }
+  publish(name: string, data: Props) {
+    const signal: Signal<Props> = this.pipes.get(name);
+    if (signal) {
+      signal.publish(name, data as any);
+    }
+  }
   preRender() {
     // ? parking
     this.preRendered = this.render() as HTMLElement;
@@ -225,11 +234,7 @@ export class Signal<Type extends Record<string, any>> {
   publish<T extends keyof Type>(eventName: T, data: Type[T]) {
     this.pipe[eventName] = data;
     const subs = this.subs![eventName as string] || [];
-    for (let i = 0; i < subs.length; i++) {
-      const comp = subs[i];
-      comp.subData = this.pipe;
-      comp.recall();
-    }
+    for (let i = 0; i < subs.length; i++) subs[i].recall();
     if (this.pn) {
       localStorage.setItem(this.pn, JSON.stringify(this.pipe));
     }
@@ -243,6 +248,15 @@ export class Signal<Type extends Record<string, any>> {
    */
   subscribe<T extends keyof Type>(eventName: T, comp: Comp) {
     if (comp instanceof Comp) {
+      if (this.pipe[eventName]) {
+        comp.pipes.set(eventName as string, this);
+      } else {
+        console.error(
+          ` ✘  Cradova err:  ${
+            eventName as string
+          } is not a valid event for this Signal`
+        );
+      }
       // ? avoid adding a specific comp repeatedly to a Signal
       if (this.subs![eventName]?.find((cmp) => cmp.id === comp.id)) {
         return;
@@ -252,12 +266,8 @@ export class Signal<Type extends Record<string, any>> {
       } else {
         this.subs![eventName].push(comp);
       }
-      if (this.pipe[eventName]) {
-        comp.subData = this.pipe;
-        comp.publish = (data: Type[T]) => {
-          this.publish(eventName, data);
-        };
-      }
+    } else {
+      console.error(` ✘  Cradova err:  ${comp} is not a valid component`);
     }
   }
 
