@@ -246,8 +246,32 @@ export class Signal<Type extends Record<string, any>> {
    *
    * @param Comp component to bind to.
    */
-  subscribe<T extends keyof Type>(eventName: T, comp: Comp) {
+  subscribe<T extends keyof Type>(eventName: T | T[], comp: Comp) {
     if (comp instanceof Comp) {
+      if (Array.isArray(eventName)) {
+        for (let i = 0; i < eventName.length; i++) {
+          const event = eventName[i];
+          if (this.pipe[event]) {
+            comp.pipes.set(event as string, this);
+          } else {
+            console.error(
+              ` ✘  Cradova err:  ${
+                event as string
+              } is not a valid event for this Signal`
+            );
+          }
+          // ? avoid adding a specific comp repeatedly to a Signal
+          if (this.subs![event]?.find((cmp) => cmp.id === comp.id)) {
+            return;
+          }
+          if (!this.subs![event]) {
+            this.subs![event] = [comp];
+          } else {
+            this.subs![event].push(comp);
+          }
+        }
+        return;
+      }
       if (this.pipe[eventName]) {
         comp.pipes.set(eventName as string, this);
       } else {
