@@ -1,5 +1,5 @@
 import * as CSS from "csstype";
-import { Comp, Page } from "./classes.js";
+import { __raw_ref, Page, Signal } from "./classes.js";
 
 type DataAttributes = { [key: `data-${string}`]: string };
 type AriaAttributes = { [key: `aria-${string}`]: string };
@@ -22,7 +22,7 @@ type Attributes = {
   required?: string;
   frameBorder?: string;
   placeholder?: string;
-  ref?: [any, string];
+  ref?: __raw_ref;
   autocomplete?: string;
   style?: CSS.Properties;
   recall?: (P: any) => void;
@@ -32,8 +32,6 @@ type Attributes = {
 export type VJS_params_TYPE<E extends HTMLElement> =
   // children type
   (
-    | Comp
-    | Comp[]
     | string
     | undefined
     | HTMLElement
@@ -114,3 +112,18 @@ export type browserPageType<importType = Page> =
   | importType
   | Promise<importType>
   | (() => Promise<importType>);
+
+export type CradovaFunc = {
+  (): HTMLElement;
+  id?: number;
+  rendered: boolean;
+  published: boolean;
+  reference: HTMLElement | null;
+  signals: Map<string, Signal<any>>;
+  pipes: Map<string, any>;
+  _state: unknown[];
+  _state_index: number;
+  effects: (() => Promise<void> | void)[];
+  effectuate: ((this: any) => void) | null;
+  // test?: string;
+};

@@ -31,7 +31,7 @@ const removeTodo = function (todo) {
 function TodoList() {
   // can be used to hold multiple references
   const referenceSet = useRef();
-  // bind Comp to Signal
+  // bind Function to Signal
   todoStore.subscribe("todo", todoList);
   // markup
   return main(
@@ -51,7 +51,7 @@ function TodoList() {
     todoList
   );
 }
-const todoList = new Comp(function () {
+const todoList = function () {
   const data = this.subPipe;
   return div(
     data.map((item) =>
@@ -63,8 +63,8 @@ const todoList = new Comp(function () {
       })
     )
   );
-});
-const count = new Comp(function () {
+};
+const count = function () {
   const [count, setCounter] = useState(0, this);
   useEffect(() => {
     setInterval(() => {
@@ -72,7 +72,7 @@ const count = new Comp(function () {
     }, 1000);
   }, this);
   return h1(" count: " + count);
-});
+};
 function HelloMessage() {
   return div("Click to get a greeting", {
     onclick() {
@@ -82,7 +82,7 @@ function HelloMessage() {
   });
 }
 // using CradovaRef
-const nameRef = new Comp(function () {
+const nameRef = function () {
   const [name, setName] = useState(null, this);
   return div(name ? "hello " + name : "Click to get a second greeting", {
     onclick() {
@@ -94,7 +94,7 @@ const nameRef = new Comp(function () {
       }
     },
   });
-});
+};
 // reference (not state)
 function typingExample() {
   const ref = useRef();
@@ -123,7 +123,7 @@ Router.BrowserRoutes({
     snapshotIsolation: true,
     template() {
       return div(
-        button("go to comp as page", {
+        button("go to Functionas page", {
           onclick() {
             Router.navigate("/p");
           },
@@ -138,7 +138,7 @@ Router.BrowserRoutes({
     name: "boohoo 2",
     template() {
       return div(
-        button("go to comp as page", {
+        button("go to Functionas page", {
           onclick() {
             Router.navigate("/p");
           },

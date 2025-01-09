@@ -226,3 +226,8 @@ we went along with it.
 - fixed type system, fixed performance in
   routing system, pages, and comp
 - more standard and more speed.
+
+# v3.6.0
+
+- removed Comp or Ref classes
+- Implemented a system to use function as functional components

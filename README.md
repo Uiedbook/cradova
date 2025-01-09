@@ -1,7 +1,7 @@
 <br/>
 <p align="center">
   <a href="https://github.com/uiedbook/cradova">
-    <img src="icon.png" alt="Logo" width="80" height="80">
+    <img src="https://raw.githubusercontent.com/Uiedbook/cradova/main/icon.png" alt="Logo" width="80" height="80">
   </a>
 
 <h1 align="center">Cradova</h1>
@@ -33,8 +33,14 @@ Build Powerful ⚡ Web Apps with Ease
 
 # Cradova is 3
 
+## 2025 - What's New? Function as reactive components
+
+this can't be better anywhere XD
+
 ```js
-const Cradova = new Comp(function () {
+// functional components
+
+const Cradova = function () {
   const [year, setYear] = useState(3, this);
 
   return h1("Cradova is " + year + " yrs old in ", {
@@ -44,9 +50,37 @@ const Cradova = new Comp(function () {
       });
     },
   });
-});
+};
 
-document.body.appendChild(Cradova.render());
+// NOTE: all cradova elements returns html elements
+
+// converts to html and append to the Dom
+document.body.appendChild(div(Cradova));
+```
+
+## 2024 - What's New? Signals pub/sub
+
+```js
+import { Signal, getSignal, $if, $ifelse, div, h1 } from "cradova";
+
+const signal = new Signal({ name: "john" });
+
+function Hello() {
+  const name = getSignal("name", this).name;
+  return div(
+    $if(name === "john", h1("Hello john")),
+    $if(name === "paul", h1("Goodbye paul")),
+    $ifelse(name === "john", h1("Hello john"), h1("Hello Paul"))
+  );
+}
+
+signal.bind("name", this);
+const html = div(Hello);
+document.body.append(html);
+
+setInterval(() => {
+  signal.publish("name", "paul");
+}, 5000);
 ```
 
 ## 2023 - What's New? Conditionals
@@ -77,6 +111,20 @@ function whatsAllowed({ age }) {
 
 document.body.append(html, whatsAllowed({ age: 26 }));
 ```
+
+## 2023 - What's New? Router
+
+```js
+Router.BrowserRoutes({
+  "/home": home,
+});
+// creates these routes
+Router.navigate("/home", data);
+```
+
+## 2021 - first version
+
+...
 
 # Contents
 
@@ -158,7 +206,7 @@ This a collection of basic examples that can give you some ideas
 import {
   br,
   button,
-  Comp,
+  Function,
   createSignal,
   div,
   h1,
@@ -206,7 +254,7 @@ Let's see a simple TodoList example
 ```js
 import {
   button,
-  Comp,
+  Function,
   createSignal,
   div,
   h1,
@@ -237,7 +285,7 @@ const removeTodo = function (todo: string) {
 function TodoList() {
   // can be used to hold multiple references
   const referenceSet = useRef();
-  // bind Comp to Signal
+  // bind Function to Signal
   todoStore.subscribe("todo", todoList);
   // vjs
   return main(
@@ -260,8 +308,8 @@ function TodoList() {
   );
 }
 
-const todoList = new Comp(function () {
-  const data = this.subPipe;
+const todoList =  function () {
+  const data = this.pipes.get("todo");
   return div(
     data.map((item: any) =>
       p(item, {
@@ -272,7 +320,7 @@ const todoList = new Comp(function () {
       })
     )
   );
-});
+};
 document.body.appendChild(TodoList());
 ```
 
@@ -285,29 +333,12 @@ Cradova Router is a module that allows you do the following:
 
 Create specified routes in you application help you handle navigation render a
 page on a route listen to Navigation changes create error boundary at page level
-apart from Comp level.
+apart from Function level.
 
 let's try an example.
 
 ```js
-import { Page, Router } from "cradova";
-
-// Comp can be used as page template this way
-
-const template = new Comp(function (name) {
-  // an effect run once after page renders
-  const self = this;
-  self.effect(() => {
-    const name = new Promise((res) => {
-      res("john doe");
-    });
-    setTimeout(async () => {
-      self.recall(await name);
-    }, 1000);
-  });
-  // effects can be used to make api calls needed for the page
-  return div(name ? ">>>>>>>>  Hello  " + name : "  loading...");
-});
+import { Page, Router, useEffect } from "cradova";
 
 const home = new Page({
   name: "home page", // page title
@@ -365,11 +396,11 @@ this allow you manage rendering circle for each page in your app
 
 ---
 
-More info on Cradova Comp
+More info on Cradova Function
 
 ---
 
-Cradova Comp is a dynamic component class, which ships simple abstractions like:
+Cradova Function is a dynamic component class, which ships simple abstractions like:
 
 - Signal
 - useEffect
@@ -377,7 +408,7 @@ Cradova Comp is a dynamic component class, which ships simple abstractions like:
 - useRef
 - preRender
 
-these behaviors allow you manage rendering circle for Comps in your app
+these behaviors allow you manage rendering circle for Functions in your app
 
 ---
 
@@ -391,7 +422,7 @@ with ability to:
 
 - create store
 - create actions and fire them
-- bind a Comp
+- bind a Function
 - listen to changes
 - persist changes to localStorage
 

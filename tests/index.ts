@@ -3,7 +3,6 @@
 import {
   a,
   button,
-  Comp,
   div,
   h1,
   input,
@@ -35,7 +34,7 @@ const removeTodo = function (todo: string) {
 function TodoList() {
   // can be used to hold multiple references
   const referenceSet = useRef();
-  // bind Comp to Signal
+  // bind Functionto Signal
   todoStore.subscribe("todo", todoList);
   // markup
   return main(
@@ -43,7 +42,7 @@ function TodoList() {
     div(
       input({
         placeholder: "type in todo",
-        reference: referenceSet.bindAs("todoInput"),
+        ref: referenceSet.bindAs("todoInput"),
       }),
       button("Add todo", {
         onclick() {
@@ -58,8 +57,8 @@ function TodoList() {
   );
 }
 
-const todoList = new Comp(function () {
-  const data = this.subPipe;
+const todoList = function () {
+  const data = this.pipes.get("todo");
   return div(
     data.map((item: any) =>
       p(item, {
@@ -70,9 +69,9 @@ const todoList = new Comp(function () {
       })
     )
   );
-});
+};
 
-const count = new Comp(function () {
+const count = function () {
   const [count, setCounter] = useState(0, this);
   useEffect(() => {
     setInterval(() => {
@@ -80,7 +79,7 @@ const count = new Comp(function () {
     }, 1000);
   }, this);
   return h1(" count: " + count);
-});
+};
 
 function HelloMessage() {
   return div("Click to get a greeting", {
@@ -93,7 +92,7 @@ function HelloMessage() {
 
 // using CradovaRef
 
-const nameRef = new Comp(function () {
+const nameRef = function () {
   const [name, setName] = useState<string | null>(null, this);
   return div(name ? "hello " + name : "Click to get a second greeting", {
     onclick() {
@@ -105,7 +104,7 @@ const nameRef = new Comp(function () {
       }
     },
   });
-});
+};
 
 // reference (not state)
 
@@ -118,7 +117,7 @@ function typingExample() {
       },
       placeholder: "typing simulation",
     }),
-    p(" no thing typed yet!", { reference: ref.bindAs("text") }),
+    p(" no thing typed yet!", { ref: ref.bindAs("text") }),
     a({ href: "/p" }, "log lol in the console")
   );
 }
@@ -138,7 +137,7 @@ Router.BrowserRoutes({
     snapshotIsolation: true,
     template() {
       return div(
-        button("go to comp as page", {
+        button("go to Function as page", {
           onclick() {
             Router.navigate("/p");
           },
@@ -153,7 +152,7 @@ Router.BrowserRoutes({
     name: "boohoo 2",
     template() {
       return div(
-        button("go to comp as page", {
+        button("go to Function as page", {
           onclick() {
             Router.navigate("/p");
           },

@@ -1,50 +1,5 @@
-import { type VJS_params_TYPE } from "./types.js";
-import { Comp, CradovaEvent, Router } from "./classes.js";
-
-// ? NOTE: this class below is copied here for brevity
-/**
- * Cradova
- * ---
- * make reference to dom elements
- */
-
-class __raw_ref {
-  tree: Record<string, any> = {};
-  /**
-   * Bind a DOM element to a reference name.
-   * @param name - The name to reference the DOM element by.
-   */
-  bindAs(name: string) {
-    return [this, name] as unknown as __raw_ref;
-  }
-  /**
-   * Retrieve a referenced DOM element.
-   * @param name - The name of the referenced DOM element.
-   */
-  elem<ElementType extends HTMLElement = HTMLElement>(name: string) {
-    const elem = this.tree[name];
-    // if (document.contains(elem)) {
-    return elem as ElementType | undefined;
-    // }
-    // console.log("boohoo", elem);
-
-    // this.tree[name] = undefined;
-  }
-  /**
-   * Swap referenced DOM element.
-   */
-  swap(name1: string, name2: string) {
-    [this.tree[name1], this.tree[name2]] = [this.tree[name2], this.tree[name1]];
-  }
-  /**
-   * Append a DOM element to the reference, overwriting any existing reference.
-   * @param name - The name to reference the DOM element by.
-   * @param element - The DOM element to reference.
-   */
-  _append(name: string, Element: HTMLElement) {
-    this.tree[name] = Element;
-  }
-}
+import type { VJS_params_TYPE, CradovaFunc } from "./types.js";
+import { CradovaEvent, Router, cradovaEvent, __raw_ref } from "./classes.js";
 
 export const makeElement = <E extends HTMLElement>(
   element: E & HTMLElement,
@@ -58,11 +13,7 @@ export const makeElement = <E extends HTMLElement>(
       let child = ElementChildrenAndPropertyList[i];
       // single child lane
       if (typeof child === "function") {
-        child = child();
-      }
-      // Comp as child
-      if (child instanceof Comp) {
-        child = child.render();
+        child = isArrowFunc(child) ? child() : toFunc(child);
       }
       // appending child
       if (child instanceof HTMLElement || child instanceof DocumentFragment) {
@@ -173,13 +124,10 @@ function unroll_child_list(l: VJS_params_TYPE<HTMLElement>) {
     if (Array.isArray(ch)) {
       fg.appendChild(unroll_child_list(ch));
     } else {
-      if (ch instanceof Comp) {
-        ch = ch.render() as HTMLElement;
-      }
       if (typeof ch === "function") {
-        ch = ch();
+        ch = isArrowFunc(ch) ? ch() : toFunc(ch);
         if (typeof ch === "function") {
-          ch = (ch as any)();
+          ch = isArrowFunc(ch) ? (ch as any)() : toFunc(ch);
         }
       }
       if (ch instanceof HTMLElement || ch instanceof DocumentFragment) {
@@ -288,48 +236,46 @@ export const frag = function (children: VJS_params_TYPE<HTMLElement>) {
  * ---
  *  Allows functional components to manage state by providing a state value and a function to update it.
  * @param initialValue
- * @param Comp
+ * @param Func
  * @returns [state, setState]
  */
 export function useState<S = unknown>(
   newState: S,
-  Comp: Comp<any>
+  self: any
 ): [S, (newState: S | ((preS: S) => S)) => void] {
-  Comp._state_index += 1;
-  const idx = Comp._state_index;
-  if (idx >= Comp._state.length) {
-    Comp._state[idx] = newState;
+  if (typeof self !== "function") return null as any;
+  const Func = self as CradovaFunc;
+  Func._state_index += 1;
+  const idx = Func._state_index;
+  if (idx >= Func._state.length) {
+    Func._state[idx] = newState;
   }
-  // if (Comp.test) {
-  //   console.log({
-  //     state: Comp._state,
-  //     idx: Comp._state_index,
-  //   });
-  // }
+
   /**
    * cradova
    * ---
-   * set new state and re-renders Comp
+   * set new state and re-renders Func
    * @param newState
    */
   function setState(newState: S | ((preS: S) => S)) {
     if (typeof newState === "function") {
-      newState = (newState as (preS: S) => S)(Comp._state[idx]);
+      newState = (newState as (preS: S) => S)(Func._state[idx] as any);
     }
-    Comp._state[idx] = newState;
-    Comp.recall();
+    Func._state[idx] = newState;
+    funcManager.recall(Func);
   }
-  return [Comp._state[idx] as S, setState];
+  return [Func._state[idx] as S, setState];
 }
 /**
  * Cradova
  * ---
-Allows side effects to be performed in functional components (Comps), such as fetching data or subscribing to events.
+Allows side effects to be performed in functional components, such as fetching data or subscribing to events.
  * @param effect
  * @returns
  */
-export function useEffect(effect: () => void, Comp: Comp) {
-  Comp._effect(effect);
+export function useEffect(effect: () => void, self: any) {
+  funcManager._effect(self as any, effect);
+  if (typeof self !== "function") return null as any;
 }
 
 /**
@@ -341,3 +287,115 @@ Returns a mutable reference object of dom elements.
 export function useRef() {
   return new __raw_ref();
 }
+
+export const getSignal = (func: CradovaFunc, name: string) => {
+  return func.pipes.get(name);
+};
+
+export const sendSignal = (func: CradovaFunc, name: string, data: any) => {
+  const signal = func.signals.get(name);
+  if (signal) {
+    signal.publish(name, data as any);
+  } else {
+    console.error(" ✘  Cradova err :  Invalid signal name " + name);
+  }
+};
+
+const isArrowFunc = (fn: Function) => !fn.hasOwnProperty("prototype");
+const toFunc = (func: any) => {
+  if (func.id) return funcManager.render(func);
+  cradovaEvent.compId += 1;
+  func.id = cradovaEvent.compId;
+  func.effects = [];
+  func.rendered = false;
+  func.published = false;
+  func.preRendered = null;
+  func.reference = null;
+  func.signals = new Map();
+  func.pipes = new Map();
+  func._state = [];
+  func._state_index = 0;
+  func.effectuate = null;
+  return funcManager.render(func);
+};
+
+export const funcManager = {
+  render(func: CradovaFunc) {
+    cradovaEvent.compId += 1;
+    func.id = cradovaEvent.compId;
+    func.effects = [];
+    func.rendered = false;
+    func._state_index = 0;
+    func._state = [];
+    const html = func.apply(func);
+    // parking
+    if (html instanceof HTMLElement) {
+      func.reference = html;
+      this.effector(func);
+      func.rendered = true;
+      func.published = true;
+    } else {
+      console.error(" ✘  Cradova err :  Invalid html content, got  - " + html);
+    }
+    return html;
+  },
+  _effect(func: CradovaFunc, fn: () => Promise<void> | void) {
+    if (!func.rendered) {
+      func.effects.push(fn);
+    }
+  },
+  async effector(func: CradovaFunc) {
+    for (let i = 0; i < func.effects.length; i++) {
+      const fn: any = await func.effects[i].apply(func);
+      if (typeof fn === "function") {
+        CradovaEvent.after_page_is_killed.push(fn);
+      }
+    }
+    func.effects = [];
+    if (func.effectuate) {
+      func.effectuate();
+      func.effectuate = null;
+    }
+  },
+  recall(func: CradovaFunc) {
+    if (!func.rendered) {
+      func.effectuate = () => {
+        if (func.published) {
+          this.activate(func);
+        }
+      };
+    } else {
+      if (func.published) {
+        setTimeout(() => {
+          this.activate(func);
+        });
+      }
+    }
+  },
+  async activate(func: CradovaFunc) {
+    func.published = false;
+    if (!func.rendered) {
+      return;
+    }
+    func._state_index = 0;
+    const node = func.reference;
+    // ? check if this Function element is still in the dom
+    if (document.contains(node)) {
+      // ? compile the Function again
+      const html = func.apply(func);
+      if (html instanceof HTMLElement) {
+        // ? replace the Function element with the Function element
+        node!.insertAdjacentElement("beforebegin", html as Element);
+        node!.remove();
+        func.published = true;
+        func.reference = html;
+        CradovaEvent.dispatchEvent("after_comp_is_mounted");
+      } else {
+        console.error(" ✘  Cradova err :  Invalid html, got  - " + html);
+      }
+    } else {
+      func.reference = null;
+      func.rendered = false;
+    }
+  },
+};

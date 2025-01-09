@@ -1,19 +1,21 @@
-import { type browserPageType, type CradovaPageType } from "./types.js";
+import { div } from "./dom-objects.js";
+import { funcManager } from "./functions.js";
+import type { browserPageType, CradovaFunc, CradovaPageType } from "./types.js";
 
 /**
  * Cradova event
  */
-class cradovaEvent {
+export class cradovaEvent {
   static compId = 0;
   /**
    * the events runs only once and removed to avoid duplication when added on the next rendering
-   * these event are call and removed once when when a comp is rendered to the dom
+   * these event are call and removed once when when a Function is rendered to the dom
    * @param callback
    */
   after_comp_is_mounted: Function[] = [];
   /**
    * the events runs once after comps unmounts.
-   * these event are called before a comp is rendered to the dom
+   * these event are called before a Function is rendered to the dom
    * @param callback
    */
   after_page_is_killed: Function[] = [];
@@ -39,154 +41,6 @@ class cradovaEvent {
   }
 }
 export const CradovaEvent = new cradovaEvent();
-/**
- * Cradova Comp
- * -------
- * create dynamic components
- */
-export class Comp<Props extends Record<string, any> = any> {
-  id: number = 0;
-  private component: (this: Comp<Props>) => HTMLElement;
-  private effects: (() => Promise<void> | void)[] = [];
-  private effectuate: ((this: Comp<Props>) => void) | null = null;
-  private rendered = false;
-  private published = false;
-  private preRendered: HTMLElement | null = null;
-  private reference: HTMLElement | null = null;
-  signals = new Map<string, Signal<any>>();
-  pipes = new Map<string, any>();
-  test?: string;
-  //? hooks management
-  _state: Props[] = [];
-  _state_index = 0;
-
-  constructor(component: (this: Comp<Props>) => HTMLElement) {
-    this.component = component.bind(this);
-    this.test = "";
-  }
-
-  getSignal(name: string) {
-    return this.pipes.get(name);
-  }
-  sendSignal(name: string, data: Props) {
-    const signal = this.signals.get(name);
-    if (signal) {
-      signal.publish(name, data as any);
-    } else {
-      console.error(" ✘  Cradova err :  Invalid signal name " + name);
-    }
-  }
-  preRender() {
-    // ? parking
-    this.preRendered = this.render() as HTMLElement;
-  }
-
-  /**
-   * Cradova Comp
-   * ---
-   * returns html with cradova reference
-   * @param data
-   * @returns () => HTMLElement
-   */
-  render() {
-    cradovaEvent.compId += 1;
-    this.id = cradovaEvent.compId;
-    this.effects = [];
-    this.rendered = false;
-    if (!this.preRendered) {
-      this._state_index = 0;
-      this._state = [];
-      const html = this.component();
-      // parking
-      if (html instanceof HTMLElement) {
-        this.reference = html;
-        this.effector.apply(this);
-        this.rendered = true;
-        this.published = true;
-      } else {
-        console.error(
-          " ✘  Cradova err :  Invalid html content, got  - " + html
-        );
-      }
-      return html;
-    } else {
-      return this.preRendered;
-    }
-  }
-  _effect(fn: () => Promise<void> | void) {
-    if (!this.rendered) {
-      this.effects.push(fn.bind(this));
-    }
-  }
-  private async effector() {
-    // if (!this.rendered) {
-    for (let i = 0; i < this.effects.length; i++) {
-      const fn: any = await this.effects[i].apply(this);
-      if (typeof fn === "function") {
-        CradovaEvent.after_page_is_killed.push(fn);
-      }
-    }
-    this.effects = [];
-    // }
-    // first update
-    if (this.effectuate) {
-      this.effectuate();
-      this.effectuate = null;
-    }
-  }
-
-  /**
-   * Cradova Comp
-   * ---
-   * update comp component with new data and update the dom.
-   * @param data
-   * @returns
-   */
-
-  recall() {
-    if (!this.rendered) {
-      this.effectuate = () => {
-        if (this.published) {
-          this.activate();
-        }
-      };
-    } else {
-      if (this.published) {
-        setTimeout(() => {
-          this.activate();
-        });
-      }
-    }
-  }
-
-  private async activate() {
-    //
-    this.published = false;
-    if (!this.rendered) {
-      return;
-    }
-    this._state_index = 0;
-    const node = this.reference;
-    // ? check if this comp element is still in the dom
-    if (document.contains(node)) {
-      // ? compile the comp again
-      const html = this.component() as any;
-      if (html instanceof HTMLElement) {
-        // ? replace the comp element with the new comp element
-        node!.insertAdjacentElement("beforebegin", html as Element);
-        node!.remove();
-        this.published = true;
-        this.reference = html;
-        CradovaEvent.dispatchEvent("after_comp_is_mounted");
-      } else {
-        console.error(" ✘  Cradova err :  Invalid html, got  - " + html);
-      }
-    } else {
-      this.reference = null;
-      this.rendered = false;
-    }
-  }
-}
 
 /**
  *  Cradova Signal
@@ -201,7 +55,7 @@ export class Comp<Props extends Record<string, any> = any> {
 
 export class Signal<Type extends Record<string, any>> {
   private pn?: string;
-  private subs?: Record<keyof Type, Comp[]>;
+  private subs?: Record<keyof Type, CradovaFunc[]>;
   pipe: Type;
   constructor(initial: Type, props?: { persistName?: string | undefined }) {
     this.pipe = initial;
@@ -234,7 +88,7 @@ export class Signal<Type extends Record<string, any>> {
     for (let i = 0; i < subs.length; i++) {
       const c = subs[i];
       c.pipes.set(eventName as string, this.pipe[eventName]);
-      c.recall();
+      funcManager.recall(c);
     }
     if (this.pn) {
       localStorage.setItem(this.pn, JSON.stringify(this.pipe));
@@ -271,10 +125,11 @@ export class Signal<Type extends Record<string, any>> {
    * ----
    *  subscribe to an event
    *
-   * @param Comp component to bind to.
+   * @param name of event.
+   * @param Func component to bind to.
    */
-  subscribe<T extends keyof Type>(eventName: T | T[], comp: Comp) {
-    if (comp instanceof Comp) {
+  subscribe<T extends keyof Type>(eventName: T | T[], comp: any) {
+    if (typeof Function === "function") {
       if (Array.isArray(eventName)) {
         for (let i = 0; i < eventName.length; i++) {
           const event = eventName[i];
@@ -288,7 +143,7 @@ export class Signal<Type extends Record<string, any>> {
               } is not a valid event for this Signal`
             );
           }
-          // ? avoid adding a specific comp repeatedly to a Signal
+          // ? avoid adding a specific Function repeatedly to a Signal
           if (this.subs![event]?.find((cmp) => cmp.id === comp.id)) {
             return;
           }
@@ -310,7 +165,7 @@ export class Signal<Type extends Record<string, any>> {
           } is not a valid event for this Signal`
         );
       }
-      // ? avoid adding a specific comp repeatedly to a Signal
+      // ? avoid adding a specific Functionrepeatedly to a Signal
       if (this.subs![eventName]?.find((cmp) => cmp.id === comp.id)) {
         return;
       }
@@ -353,16 +208,20 @@ export class Page {
    * this should be a cradova page component
    */
   public _html: (this: Page) => HTMLElement;
-  private _template = document.createElement("div");
+  public _template?: HTMLElement;
   private _dropped = false;
   private _snapshot: boolean;
   private _snapshot_html?: string;
   _deCB?: () => Promise<void> | void;
   constructor(pageParams: CradovaPageType) {
     const { template, name } = pageParams;
+    if (typeof template !== "function") {
+      throw new Error(
+        ` ✘  Cradova err:  template function for the page is not a function`
+      );
+    }
     this._html = template;
     this._name = name || document.title;
-    this._template.setAttribute("id", "page");
     this._snapshot = pageParams.snapshotIsolation || false;
   }
   private async _takeSnapShot() {
@@ -412,19 +271,10 @@ export class Page {
       history.go(-1);
       return;
     }
-    //? packaging the page dom
-    //? parking
-    let html = this._html.apply(this);
-    if (html instanceof HTMLElement) {
-      this._template.innerHTML = "";
-      this._template.appendChild(html);
-    } else {
-      throw new Error(
-        ` ✘  Cradova err:  template function for the page returned ${html} instead of html`
-      );
-    }
-    // ?
+    // ? setting title
     if (this._name) document.title = this._name;
+    //? packaging the page dom
+    this._template = div({ id: "page" }, this._html);
     RouterBox.doc!.innerHTML = "";
     // ? create save the snapshot html
     if (this._snapshot) this._snapshot_html = this._template.outerHTML;
@@ -789,5 +639,37 @@ export class Router {
       _e.preventDefault();
       RouterBox.router();
     });
+  }
+}
+
+/**
+ * Cradova
+ * ---
+ * make reference to dom elements
+ */
+
+export class __raw_ref {
+  tree: Record<string, any> = {};
+  /**
+   * Bind a DOM element to a reference name.
+   * @param name - The name to reference the DOM element by.
+   */
+  bindAs(name: string) {
+    return [this, name] as unknown as __raw_ref;
+  }
+  /**
+   * Retrieve a referenced DOM element.
+   * @param name - The name of the referenced DOM element.
+   */
+  elem<ElementType extends HTMLElement = HTMLElement>(name: string) {
+    return this.tree[name] as ElementType | undefined;
+  }
+  /**
+   * Append a DOM element to the reference, overwriting any existing reference.
+   * @param name - The name to reference the DOM element by.
+   * @param element - The DOM element to reference.
+   */
+  _append(name: string, Element: HTMLElement) {
+    this.tree[name] = Element;
   }
 }
