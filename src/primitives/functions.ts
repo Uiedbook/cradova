@@ -72,7 +72,7 @@ export const makeElement = <E extends HTMLElement>(
 
       // children array
       if (Array.isArray(child)) {
-        element.appendChild(Rhoda(child as HTMLElement[]));
+        element.appendChild(unroll_child_list(child as HTMLElement[]));
         continue;
       }
 
@@ -126,7 +126,7 @@ export const makeElement = <E extends HTMLElement>(
 
       //? setting onmount event;
       if (prop === "onmount") {
-        CradovaEvent.afterMount.push(() => {
+        CradovaEvent.after_comp_is_mounted.push(() => {
           typeof props["onmount"] === "function" &&
             props["onmount"].apply(element);
         });
@@ -167,11 +167,11 @@ export const cra = <E extends HTMLElement>(tag: string) => {
     makeElement<E>(document.createElement(tag) as E, Children_and_Properties);
 };
 
-export function Rhoda(l: VJS_params_TYPE<HTMLElement>) {
+function unroll_child_list(l: VJS_params_TYPE<HTMLElement>) {
   const fg = new DocumentFragment();
   for (let ch of l) {
     if (Array.isArray(ch)) {
-      fg.appendChild(Rhoda(ch));
+      fg.appendChild(unroll_child_list(ch));
     } else {
       if (ch instanceof Comp) {
         ch = ch.render() as HTMLElement;

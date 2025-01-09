@@ -6,23 +6,17 @@ import { type browserPageType, type CradovaPageType } from "./types.js";
 class cradovaEvent {
   static compId = 0;
   /**
-   * the events runs only once and removed.
+   * the events runs only once and removed to avoid duplication when added on the next rendering
    * these event are call and removed once when when a comp is rendered to the dom
    * @param callback
    */
-  afterMount: Function[] = [];
-  /**
-   * the events runs many times.
-   * these event are called before a comp is rendered to the dom
-   * @param callback
-   */
-  beforeMountActive: Function[] = [];
+  after_comp_is_mounted: Function[] = [];
   /**
    * the events runs once after comps unmounts.
    * these event are called before a comp is rendered to the dom
    * @param callback
    */
-  afterDeactivate: Function[] = [];
+  after_page_is_killed: Function[] = [];
 
   /**
    * Dispatch any event
@@ -30,7 +24,7 @@ class cradovaEvent {
    */
 
   dispatchEvent(
-    eventName: "beforeMountActive" | "afterMount" | "afterDeactivate"
+    eventName: "after_comp_is_mounted" | "after_page_is_killed"
   ): void {
     const eventListeners = this[eventName];
     if (eventName.includes("Active")) {
@@ -59,24 +53,27 @@ export class Comp<Props extends Record<string, any> = any> {
   private published = false;
   private preRendered: HTMLElement | null = null;
   private reference: HTMLElement | null = null;
+  signals = new Map<string, Signal<any>>();
   pipes = new Map<string, any>();
-
+  test?: string;
   //? hooks management
   _state: Props[] = [];
   _state_index = 0;
-  test?: string;
 
   constructor(component: (this: Comp<Props>) => HTMLElement) {
     this.component = component.bind(this);
+    this.test = "";
   }
 
-  getPipe(name: string) {
-    return this.pipes.get(name)?.pipe;
+  getSignal(name: string) {
+    return this.pipes.get(name);
   }
-  publish(name: string, data: Props) {
-    const signal: Signal<Props> = this.pipes.get(name);
+  sendSignal(name: string, data: Props) {
+    const signal = this.signals.get(name);
     if (signal) {
       signal.publish(name, data as any);
+    } else {
+      console.error(" ✘  Cradova err :  Invalid signal name " + name);
     }
   }
   preRender() {
@@ -126,7 +123,7 @@ export class Comp<Props extends Record<string, any> = any> {
     for (let i = 0; i < this.effects.length; i++) {
       const fn: any = await this.effects[i].apply(this);
       if (typeof fn === "function") {
-        CradovaEvent.afterDeactivate.push(fn);
+        CradovaEvent.after_page_is_killed.push(fn);
       }
     }
     this.effects = [];
@@ -180,7 +177,7 @@ export class Comp<Props extends Record<string, any> = any> {
         node!.remove();
         this.published = true;
         this.reference = html;
-        CradovaEvent.dispatchEvent("afterMount");
+        CradovaEvent.dispatchEvent("after_comp_is_mounted");
       } else {
         console.error(" ✘  Cradova err :  Invalid html, got  - " + html);
       }
@@ -234,7 +231,37 @@ export class Signal<Type extends Record<string, any>> {
   publish<T extends keyof Type>(eventName: T, data: Type[T]) {
     this.pipe[eventName] = data;
     const subs = this.subs![eventName as string] || [];
-    for (let i = 0; i < subs.length; i++) subs[i].recall();
+    for (let i = 0; i < subs.length; i++) {
+      const c = subs[i];
+      c.pipes.set(eventName as string, this.pipe[eventName]);
+      c.recall();
+    }
+    if (this.pn) {
+      localStorage.setItem(this.pn, JSON.stringify(this.pipe));
+    }
+  }
+  /**
+   *  Cradova Signal
+   * ----
+   *  fires an action if available
+   * @param key - string key of the action
+   * @param data - data for the action
+   */
+  publishObject<T extends keyof Type>(events: Record<T, Type[T]>) {
+    const s = new Map();
+    for (const [eventName, data] of Object.entries(events)) {
+      // @ts-ignore
+      this.pipe[eventName] = data;
+      const subs = this.subs![eventName as string] || [];
+      for (let i = 0; i < subs.length; i++) {
+        const c = subs[i];
+        c.pipes.set(eventName as string, this.pipe[eventName]);
+        s.set(c.id, c);
+      }
+    }
+    for (const [_, c] of s) {
+      c.recall();
+    }
     if (this.pn) {
       localStorage.setItem(this.pn, JSON.stringify(this.pipe));
     }
@@ -252,7 +279,8 @@ export class Signal<Type extends Record<string, any>> {
         for (let i = 0; i < eventName.length; i++) {
           const event = eventName[i];
           if (this.pipe[event]) {
-            comp.pipes.set(event as string, this);
+            comp.pipes.set(event as string, this.pipe[event]);
+            comp.signals.set(event as string, this);
           } else {
             console.error(
               ` ✘  Cradova err:  ${
@@ -273,7 +301,8 @@ export class Signal<Type extends Record<string, any>> {
         return;
       }
       if (this.pipe[eventName]) {
-        comp.pipes.set(eventName as string, this);
+        comp.pipes.set(eventName as string, this.pipe[eventName]);
+        comp.signals.set(eventName as string, this);
       } else {
         console.error(
           ` ✘  Cradova err:  ${
@@ -355,7 +384,7 @@ export class Page {
         return;
       }
       const snapshot = doc.documentElement.outerHTML;
-      await fetch(`${location.origin}`, {
+      await fetch(location.origin, {
         body: snapshot,
         method: "POST",
         headers: {
@@ -395,14 +424,13 @@ export class Page {
       );
     }
     // ?
-    document.title = this._name;
+    if (this._name) document.title = this._name;
     RouterBox.doc!.innerHTML = "";
-    // ? tell all Comps to re-render
-    CradovaEvent.dispatchEvent("beforeMountActive");
+    // ? create save the snapshot html
     if (this._snapshot) this._snapshot_html = this._template.outerHTML;
     RouterBox.doc!.appendChild(this._template);
     // ? call any onmount event added in the cradova event loop
-    CradovaEvent.dispatchEvent("afterMount");
+    CradovaEvent.dispatchEvent("after_comp_is_mounted");
     window.scrollTo({
       top: 0,
       left: 0,
@@ -410,7 +438,7 @@ export class Page {
       behavior: "instant",
     });
     // ? call all return functions of useEffects
-    CradovaEvent.dispatchEvent("afterDeactivate");
+    CradovaEvent.dispatchEvent("after_page_is_killed");
     if (this._snapshot) this._takeSnapShot();
   }
 }

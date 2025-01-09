@@ -1,12 +1,11 @@
 # What does Cradova needs?
 
-- Building cradova CLI (in progress)
-- setting up server side rendering (currently Naxtjs)
 - Cradova Documentation Website
 - UI component libraries for cradova
 - Sample projects
+- setting up server side rendering (currently Naxtjs)
 - maintenance
 
 ##### Cradova community
 
-[Telegram](https://t.me/uiedbookHQ)
+[Telegram](https://t.me/uiedbook)

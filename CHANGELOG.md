@@ -181,22 +181,22 @@ we went along with it.
 # v3.1.1
 
 - Added useState, useEffect and useRef hooks
-- did some more optimisation
+- did some more optimization
 - other changes
 
 # v3.1.4
 
 - fixed bug parallel rendering in comp by managing page id events making them
-  more powerful by also now reactiving to page changes
-- other optimisations in prerendering
+  more powerful by also now reactivity to page changes
+- other optimizations in pre-rendering
 
 # v3.2.0
 
-- introduced a more standardised reference class for manageing dom references
+- introduced a more standardized reference class for managing dom references
   update the previous implementations.
 - fixed more bug parallel rendering in comp by managing page id events making
-  them more powerful by also now reactiving to page changes
-- other optimisations in prerendering
+  them more powerful by also now reactivity to page changes
+- other optimizations in pre-rendering
 
 # v3.3.0
 
@@ -206,7 +206,7 @@ we went along with it.
 - introduced active option in Comps to fine tune multi-rendered Comps mostly in
   parallel rendered situations, hence further making parallel rendering more
   stable and rock solid with this new feature.
-- tested in production across serveral persoanl projects and did some custom
+- tested in production across several personal projects and did some custom
   testing
 - introduced the raw tag, just put in raw html strings if you need to for static
   contents/makeup, better for seo and faster render of none-dynamic contents.
@@ -217,10 +217,12 @@ we went along with it.
 
 # v3.4.0
 
-- fixed type system, removed templating more perfomance, fixed perfomance in
+- fixed type system, removed templating more performance, fixed performance in
   routing system, pages, and comp
 - more standard and speed.
 
-# v4.0.0
+# v3.5.8
 
-- removed & renamed a lot of things, lighter, faster and more smaller.
+- fixed type system, fixed performance in
+  routing system, pages, and comp
+- more standard and more speed.

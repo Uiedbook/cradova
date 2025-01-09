@@ -24,12 +24,10 @@ export const li = cra<HTMLLIElement>("li");
 export const main = cra<HTMLElement>("main");
 export const nav = cra<HTMLElement>("nav");
 export const ol = cra<HTMLOListElement>("ol");
-export const optgroup = cra<HTMLOptGroupElement>("optgroup");
 export const option = cra<HTMLOptionElement>("option");
 export const p = cra<HTMLParagraphElement>("p");
 export const section = cra<HTMLElement>("section");
 export const select = cra<HTMLSelectElement>("select");
-export const source = cra<HTMLSourceElement>("source");
 export const span = cra<HTMLSpanElement>("span");
 export const textarea = cra<HTMLTextAreaElement>("textarea");
 export const ul = cra<HTMLUListElement>("ul");
@@ -41,7 +39,7 @@ export const tr = cra<HTMLTableColElement>("tr");
 
 export const svg = (
   svg: string,
-  properties?: VJS_params_TYPE<HTMLSpanElement>,
+  properties?: VJS_params_TYPE<HTMLSpanElement>
 ): HTMLSpanElement => {
   const span = document.createElement("span");
   span.innerHTML = svg;
