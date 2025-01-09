@@ -302,20 +302,23 @@ export const sendSignal = (func: CradovaFunc, name: string, data: any) => {
 };
 
 const isArrowFunc = (fn: Function) => !fn.hasOwnProperty("prototype");
+const DEFAULT_STATE = {
+  rendered: false,
+  published: false,
+  preRendered: null,
+  reference: null,
+  effectuate: null,
+  _state_index: 0,
+};
 const toFunc = (func: any) => {
   if (func.id) return funcManager.render(func);
   cradovaEvent.compId += 1;
   func.id = cradovaEvent.compId;
-  func.effects = [];
-  func.rendered = false;
-  func.published = false;
-  func.preRendered = null;
-  func.reference = null;
+  Object.assign(func, DEFAULT_STATE);
   func.signals = new Map();
   func.pipes = new Map();
+  func.effects = [];
   func._state = [];
-  func._state_index = 0;
-  func.effectuate = null;
   return funcManager.render(func);
 };
 
