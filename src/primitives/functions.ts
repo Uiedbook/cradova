@@ -1,5 +1,5 @@
 import type { VJS_params_TYPE, CradovaFunc } from "./types.js";
-import { CradovaEvent, Router, cradovaEvent, __raw_ref } from "./classes.js";
+import { CradovaEvent, cradovaEvent, __raw_ref } from "./classes.js";
 
 export const makeElement = <E extends HTMLElement>(
   element: E & HTMLElement,
@@ -50,28 +50,6 @@ export const makeElement = <E extends HTMLElement>(
       // adding styles
       if (prop === "style" && typeof value === "object") {
         Object.assign(element.style, value);
-        continue;
-      }
-
-      // A tags (the only special tag)
-      if (prop === "href") {
-        const href = (value || "") as string;
-        if (!href.includes("://")) {
-          element.addEventListener(
-            "click",
-            (e: { preventDefault: () => void }) => {
-              e.preventDefault();
-
-              Router.navigate((element as unknown as HTMLAnchorElement).href);
-              //? get url hash here and scroll into view
-              if (href.includes("#")) {
-                const l = href.split("#").at(-1);
-                document.getElementById("#" + l)?.scrollIntoView();
-              }
-            }
-          );
-        }
-        element.setAttribute(prop, value as string);
         continue;
       }
 
