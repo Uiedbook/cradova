@@ -136,9 +136,15 @@ export class Signal<Type extends Record<string, any>> {
         });
         return;
       }
-      if (this.pipe[eventName]) {
+      if (eventName in this.pipe) {
         comp.pipes.set(eventName as string, this.pipe[eventName]);
         comp.signals.set(eventName as string, this);
+      } else {
+        console.error(
+          ` ✘  Cradova err:  ${String(
+            eventName
+          )} is not a valid event for this Signal`
+        );
       }
       // ? avoid adding a specific Function repeatedly to a Signal
       if (this.subs![eventName]?.find((cmp) => cmp.id === comp.id)) {
