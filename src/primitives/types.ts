@@ -1,10 +1,7 @@
 import * as CSS from "csstype";
 import { __raw_ref, Page, Signal } from "./classes.js";
 
-type DataAttributes = { [key: `data-${string}`]: string };
-type AriaAttributes = { [key: `aria-${string}`]: string };
-
-type Attributes = {
+type Attributes<E> = {
   src?: string;
   alt?: string;
   for?: string;
@@ -26,28 +23,29 @@ type Attributes = {
   autocomplete?: string;
   style?: CSS.Properties;
   recall?: (P: any) => void;
-  onmount?: (this: HTMLElement & Attributes) => void;
+  [key: `data-${string}` | `data-${string}`]: string | undefined;
+  [key: `on${string}`]: (this: E) => void;
+  /**
+   * Cradova calls this function when this element is rendered on the DOM.
+   */
+  onmount: (this: E) => void;
 };
 
-export type VJS_params_TYPE<E extends HTMLElement> =
-  // children type
-  (
-    | string
-    | undefined
-    | HTMLElement
-    | HTMLElement[]
-    | DocumentFragment
-    | DocumentFragment[]
-    // property type
-    | Attributes
-    | Partial<Attributes>
-    | (() => HTMLElement)
-    | Partial<E>
-    | Record<string, (this: E) => void>
-    | Partial<DataAttributes>
-    | Partial<AriaAttributes>
-    | CSS.Properties<string | number>
-  )[];
+export type VJS_params_TYPE<E extends HTMLElement> = (
+  | undefined
+  // children types
+  | string
+  | HTMLElement
+  | HTMLElement[]
+  | DocumentFragment
+  | DocumentFragment[]
+  | (() => HTMLElement)
+  // property types
+  | Partial<Attributes<E>>
+  | Partial<E>
+  // css types
+  | { style: CSS.Properties }
+)[];
 
 export interface RouterRouteObject {
   _html:
@@ -113,17 +111,15 @@ export type browserPageType<importType = Page> =
   | Promise<importType>
   | (() => Promise<importType>);
 
-export type CradovaFunc = {
+export type Func = {
   (): HTMLElement;
-  id?: number;
-  rendered: boolean;
-  published: boolean;
-  reference: HTMLElement | null;
-  signals: Map<string, Signal<any>>;
-  pipes: Map<string, any>;
-  _state: unknown[];
-  _state_index: number;
-  effects: (() => Promise<void> | void)[];
-  effectuate: ((this: any) => void) | null;
-  // test?: string;
+  rendered?: boolean;
+  published?: boolean;
+  reference?: HTMLElement | null;
+  signals?: Map<string, Signal<any>>;
+  pipes?: Map<string, any>;
+  effects?: (() => Promise<void> | void)[];
+  effectuate?: ((this: any) => void) | null;
+  _state?: unknown[];
+  _state_index?: number;
 };

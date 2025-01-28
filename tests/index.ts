@@ -15,6 +15,7 @@ import {
   useRef,
   useState,
 } from "../dist/index.js";
+import { Func } from "../dist/primitives/types.js";
 
 // creating a store
 const todoStore = new Signal({
@@ -34,7 +35,7 @@ const removeTodo = function (todo: string) {
 function TodoList() {
   // can be used to hold multiple references
   const referenceSet = useRef();
-  // bind Functionto Signal
+  // bind Function to Signal
   todoStore.subscribe("todo", todoList);
   // markup
   return main(
@@ -47,17 +48,18 @@ function TodoList() {
       button("Add todo", {
         onclick() {
           addTodo(
-            referenceSet.elem<HTMLInputElement>("todoInput")?.value || ""
+            referenceSet.elem<HTMLInputElement>("todoInput")?.value || "",
           );
           referenceSet.elem<HTMLInputElement>("todoInput")!.value = "";
         },
-      })
+        style: { backgroundColor: "blue" },
+      }),
     ),
-    todoList
+    todoList,
   );
 }
 
-const todoList = function () {
+const todoList: Func = function () {
   const data = this.pipes.get("todo");
   return div(
     data.map((item: any) =>
@@ -67,7 +69,7 @@ const todoList = function () {
           removeTodo(item);
         },
       })
-    )
+    ),
   );
 };
 
@@ -118,7 +120,7 @@ function typingExample() {
       placeholder: "typing simulation",
     }),
     p(" no thing typed yet!", { ref: ref.bindAs("text") }),
-    a({ href: "/p" }, "log lol in the console")
+    a({ href: "/p" }, "log lol in the console"),
   );
 }
 
@@ -143,7 +145,7 @@ Router.BrowserRoutes({
           },
         }),
         TodoList,
-        App
+        App,
       );
     },
   }),
@@ -158,7 +160,7 @@ Router.BrowserRoutes({
           },
         }),
         TodoList,
-        App
+        App,
       );
     },
   }),

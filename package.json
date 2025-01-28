@@ -18,6 +18,7 @@
     "lint": "eslint . --fix"
   },
   "keywords": [
+    "frontend library",
     "PWA",
     "webapp",
     "SPA",

@@ -1,9 +1,9 @@
-import type { VJS_params_TYPE, CradovaFunc } from "./types.js";
-import { CradovaEvent, cradovaEvent, __raw_ref } from "./classes.js";
+import type { Func, VJS_params_TYPE } from "./types.js";
+import { __raw_ref, CradovaEvent } from "./classes.js";
 
 export const makeElement = <E extends HTMLElement>(
   element: E & HTMLElement,
-  ElementChildrenAndPropertyList: VJS_params_TYPE<E>
+  ElementChildrenAndPropertyList: VJS_params_TYPE<E>,
 ) => {
   const props: Record<string, any> = {};
   let text: string | undefined = undefined;
@@ -76,7 +76,7 @@ export const makeElement = <E extends HTMLElement>(
         ) {
           ((value! as unknown[])![0] as __raw_ref)._append(
             (value! as unknown[])![1] as string,
-            element
+            element,
           );
           continue;
         }
@@ -172,8 +172,8 @@ export function loop<Type>(
   component: (
     value: Type,
     index?: number,
-    array?: LoopData<Type>
-  ) => HTMLElement | DocumentFragment | undefined
+    array?: LoopData<Type>,
+  ) => HTMLElement | DocumentFragment | undefined,
 ) {
   return Array.isArray(datalist)
     ? (datalist.map(component) as unknown as HTMLElement[])
@@ -219,14 +219,14 @@ export const frag = function (children: VJS_params_TYPE<HTMLElement>) {
  */
 export function useState<S = unknown>(
   newState: S,
-  self: any
+  self: any,
 ): [S, (newState: S | ((preS: S) => S)) => void] {
   if (typeof self !== "function") return null as any;
-  const Func = self as CradovaFunc;
-  Func._state_index += 1;
-  const idx = Func._state_index;
-  if (idx >= Func._state.length) {
-    Func._state[idx] = newState;
+  const Func = self as Func;
+  Func._state_index! += 1;
+  const idx = Func._state_index!;
+  if (idx >= Func._state!.length) {
+    Func._state![idx] = newState;
   }
 
   /**
@@ -237,12 +237,12 @@ export function useState<S = unknown>(
    */
   function setState(newState: S | ((preS: S) => S)) {
     if (typeof newState === "function") {
-      newState = (newState as (preS: S) => S)(Func._state[idx] as any);
+      newState = (newState as (preS: S) => S)(Func._state![idx] as any);
     }
-    Func._state[idx] = newState;
+    Func._state![idx] = newState;
     funcManager.recall(Func);
   }
-  return [Func._state[idx] as S, setState];
+  return [Func._state![idx] as S, setState];
 }
 /**
  * Cradova
@@ -266,12 +266,12 @@ export function useRef() {
   return new __raw_ref();
 }
 
-export const getSignal = (func: CradovaFunc, name: string) => {
-  return func.pipes.get(name);
+export const getSignal = (name: string, func: Func) => {
+  return func.pipes!.get(name);
 };
 
-export const sendSignal = (func: CradovaFunc, name: string, data: any) => {
-  const signal = func.signals.get(name);
+export const sendSignal = (name: string, data: any, func: Func) => {
+  const signal = func.signals!.get(name);
   if (signal) {
     signal.publish(name, data as any);
   } else {
@@ -287,27 +287,20 @@ const DEFAULT_STATE = {
   reference: null,
   effectuate: null,
   _state_index: 0,
+  effects: [],
+  _state: [],
 };
 const toFunc = (func: any) => {
-  if (func.id) return funcManager.render(func);
-  cradovaEvent.compId += 1;
-  func.id = cradovaEvent.compId;
+  if (typeof func._state_index === "number") return funcManager.render(func);
   Object.assign(func, DEFAULT_STATE);
   func.signals = new Map();
   func.pipes = new Map();
-  func.effects = [];
-  func._state = [];
   return funcManager.render(func);
 };
 
 export const funcManager = {
-  render(func: CradovaFunc) {
-    cradovaEvent.compId += 1;
-    func.id = cradovaEvent.compId;
-    func.effects = [];
-    func.rendered = false;
-    func._state_index = 0;
-    func._state = [];
+  render(func: Func) {
+    Object.assign(func, DEFAULT_STATE);
     const html = func.apply(func);
     // parking
     if (html instanceof HTMLElement) {
@@ -320,14 +313,14 @@ export const funcManager = {
     }
     return html;
   },
-  _effect(func: CradovaFunc, fn: () => Promise<void> | void) {
+  _effect(func: Func, fn: () => Promise<void> | void) {
     if (!func.rendered) {
-      func.effects.push(fn);
+      func.effects!.push(fn);
     }
   },
-  async effector(func: CradovaFunc) {
-    for (let i = 0; i < func.effects.length; i++) {
-      const fn: any = await func.effects[i].apply(func);
+  async effector(func: Func) {
+    for (let i = 0; i < func.effects!.length; i++) {
+      const fn: any = await func.effects![i].apply(func);
       if (typeof fn === "function") {
         CradovaEvent.after_page_is_killed.push(fn);
       }
@@ -338,7 +331,7 @@ export const funcManager = {
       func.effectuate = null;
     }
   },
-  recall(func: CradovaFunc) {
+  recall(func: Func) {
     if (!func.rendered) {
       func.effectuate = () => {
         if (func.published) {
@@ -353,13 +346,13 @@ export const funcManager = {
       }
     }
   },
-  async activate(func: CradovaFunc) {
+  async activate(func: Func) {
     func.published = false;
     if (!func.rendered) {
       return;
     }
     func._state_index = 0;
-    const node = func.reference;
+    const node = func.reference!;
     // ? check if this Function element is still in the dom
     if (document.contains(node)) {
       // ? compile the Function again
