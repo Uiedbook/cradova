@@ -115,7 +115,7 @@ function typingExample() {
   const ref = useRef();
   return div(
     input({
-      oninput(this) {
+      oninput() {
         ref.elem<HTMLParagraphElement>("text")!.innerText = this.value;
       },
       placeholder: "typing simulation",

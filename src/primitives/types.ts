@@ -20,16 +20,14 @@ type Attributes<E> = {
   checked?: boolean;
   required?: boolean;
   frameBorder?: string;
+  disabled?: string;
   placeholder?: string;
   ref?: __raw_ref;
   autocomplete?: string;
   style?: CSS.Properties;
   recall?: (P: any) => void;
   [key: `data-${string}` | `data-${string}`]: string | undefined;
-  [key: `on${string}`]: (
-    this: E,
-    event: Event & { EventTarget: E | null }
-  ) => void;
+  [key: `on${string}`]: (this: E, event: Event) => void;
 } & {
   /**
    * Cradova calls this function when this element is rendered on the DOM.
