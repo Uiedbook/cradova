@@ -16,7 +16,7 @@ type Attributes<E> = {
   target?: string;
   method?: string;
   checked?: boolean;
-  required?: string;
+  required?: boolean;
   frameBorder?: string;
   placeholder?: string;
   ref?: __raw_ref;
