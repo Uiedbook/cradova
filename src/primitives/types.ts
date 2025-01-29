@@ -20,7 +20,7 @@ type Attributes<E> = {
   checked?: boolean;
   required?: boolean;
   frameBorder?: string;
-  disabled?: string;
+  disabled?: boolean;
   placeholder?: string;
   ref?: __raw_ref;
   autocomplete?: string;
