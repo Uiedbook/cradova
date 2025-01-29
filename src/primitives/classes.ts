@@ -25,7 +25,7 @@ export class cradovaEvent {
    */
 
   dispatchEvent(
-    eventName: "after_comp_is_mounted" | "after_page_is_killed",
+    eventName: "after_comp_is_mounted" | "after_page_is_killed"
   ): void {
     const eventListeners = this[eventName];
     if (eventName.includes("Active")) {
@@ -139,11 +139,9 @@ export class Signal<Type extends Record<string, any>> {
         comp.signals.set(eventName as string, this);
       } else {
         console.error(
-          ` ✘  Cradova err:  ${
-            String(
-              eventName,
-            )
-          } is not a valid event for this Signal`,
+          ` ✘  Cradova err:  ${String(
+            eventName
+          )} is not a valid event for this Signal`
         );
       }
       // ? avoid adding a specific Function repeatedly to a Signal
@@ -189,12 +187,12 @@ export class Page {
   private _dropped = false;
   private _snapshot: boolean;
   private _snapshot_html?: string;
-  _de_active_CB?: () => Promise<void> | void;
+  _unload_CB?: () => Promise<void> | void;
   constructor(pageParams: CradovaPageType) {
     const { template, name } = pageParams;
     if (typeof template !== "function") {
       throw new Error(
-        ` ✘  Cradova err:  template function for the page is not a function`,
+        ` ✘  Cradova err:  template function for the page is not a function`
       );
     }
     this._html = template;
@@ -234,7 +232,7 @@ export class Page {
     this._snapshot_html = undefined;
   }
   set onDeactivate(cb: () => Promise<void> | void) {
-    this._de_active_CB = cb;
+    this._unload_CB = cb;
   }
   drop(state?: boolean) {
     if (typeof state === "boolean") {
@@ -242,8 +240,7 @@ export class Page {
       return undefined;
     } else return this._dropped;
   }
-  /** @internal */
-  async _activate() {
+  async _load() {
     //? check if the page is dropped
     if (this._dropped) {
       history.go(-1);
@@ -339,7 +336,7 @@ class RouterBoxClass {
         // lazy loaded pages
         if (typeof route === "function") {
           if (this.loadingPage instanceof Page) {
-            await this.loadingPage._activate();
+            await this.loadingPage._load();
           }
           route = await (route as () => Promise<any>)();
         }
@@ -355,9 +352,9 @@ class RouterBoxClass {
         if (params) {
           this.pageData.params = params;
         }
-        await route!._activate();
+        await route!._load();
         this.lastNavigatedRouteController &&
-          this.lastNavigatedRouteController._de_active_CB?.();
+          this.lastNavigatedRouteController._unload_CB?.();
         this.lastNavigatedRoute = url;
         this.lastNavigatedRouteController = route;
       } catch (error) {
@@ -370,13 +367,13 @@ class RouterBoxClass {
     } else {
       // or 404
       if (this.routes["*"]) {
-        await (this.routes["*"] as Page)._activate();
+        await (this.routes["*"] as Page)._load();
       }
     }
   }
 
   checker(
-    url: string,
+    url: string
   ): [Page | (() => Promise<Page | undefined>), Record<string, any>] {
     if (url[0] !== "/") {
       url = url.slice(url.indexOf("/", 8));
@@ -489,9 +486,8 @@ export class Router {
       ) {
         // ? creating the lazy
         RouterBox.routes[path] = async () => {
-          const paged: Page = typeof page === "function"
-            ? await page()
-            : await page;
+          const paged: Page =
+            typeof page === "function" ? await page() : await page;
           return RouterBox.route(path, paged);
         };
       } else {
@@ -530,7 +526,7 @@ export class Router {
       console.error(
         " ✘  Cradova err:  href must be a defined path but got " +
           href +
-          " instead",
+          " instead"
       );
     }
     let route = null,
@@ -566,7 +562,7 @@ export class Router {
       RouterBox.loadingPage = page;
     } else {
       throw new Error(
-        " ✘  Cradova err:  Loading Page should be a cradova page class",
+        " ✘  Cradova err:  Loading Page should be a cradova page class"
       );
     }
   }
@@ -598,7 +594,7 @@ export class Router {
       RouterBox["errorHandler"] = callback;
     } else {
       throw new Error(
-        " ✘  Cradova err:  callback for error event is not a function",
+        " ✘  Cradova err:  callback for error event is not a function"
       );
     }
   }
@@ -610,7 +606,7 @@ export class Router {
       RouterBox.doc = doc;
     } else {
       throw new Error(
-        `✘  Cradova err: please add '<div data-wrapper="app"></div>' to the body of your index.html file `,
+        `✘  Cradova err: please add '<div data-wrapper="app"></div>' to the body of your index.html file `
       );
     }
     window.addEventListener("pageshow", () => RouterBox.router());

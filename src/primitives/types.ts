@@ -24,7 +24,8 @@ type Attributes<E> = {
   style?: CSS.Properties;
   recall?: (P: any) => void;
   [key: `data-${string}` | `data-${string}`]: string | undefined;
-  [key: `on${string}`]: (this: E) => void;
+  [key: `on${string}`]: (this: E, event: Event) => void;
+} & {
   /**
    * Cradova calls this function when this element is rendered on the DOM.
    */
@@ -42,7 +43,6 @@ export type VJS_params_TYPE<E extends HTMLElement> = (
   | (() => HTMLElement)
   // property types
   | Partial<Attributes<E>>
-  | Partial<E>
   // css types
   | { style: CSS.Properties }
 )[];
