@@ -13,6 +13,8 @@ type Attributes<E> = {
   value?: string;
   accept: string;
   action?: string;
+  maxLength: number;
+  minLength: number;
   target?: string;
   method?: string;
   checked?: boolean;
@@ -24,7 +26,10 @@ type Attributes<E> = {
   style?: CSS.Properties;
   recall?: (P: any) => void;
   [key: `data-${string}` | `data-${string}`]: string | undefined;
-  [key: `on${string}`]: (this: E, event: Event) => void;
+  [key: `on${string}`]: (
+    this: E,
+    event: Event & { EventTarget: E | null }
+  ) => void;
 } & {
   /**
    * Cradova calls this function when this element is rendered on the DOM.
