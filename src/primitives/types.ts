@@ -2,38 +2,17 @@ import * as CSS from "csstype";
 import { __raw_ref, Page, Signal } from "./classes.js";
 
 type Attributes<E> = {
-  src?: string;
-  alt?: string;
-  for?: string;
-  rel?: string;
-  href?: string;
-  type?: string;
-  name?: string;
-  rows?: string;
-  value?: string;
-  accept: string;
-  action?: string;
-  maxLength: number;
-  minLength: number;
-  target?: string;
-  method?: string;
-  checked?: boolean;
-  required?: boolean;
-  frameBorder?: string;
-  disabled?: boolean;
-  placeholder?: string;
   ref?: __raw_ref;
-  autocomplete?: string;
   style?: CSS.Properties;
   recall?: (P: any) => void;
-  [key: `data-${string}` | `data-${string}`]: string | undefined;
+  [key: `data-${string}`]: string | undefined;
   [key: `on${string}`]: (this: E, event: Event) => void;
 } & {
   /**
    * Cradova calls this function when this element is rendered on the DOM.
    */
   onmount: (this: E) => void;
-};
+} & Partial<Omit<E, "style" | `data-${string}` | `on${string}`>>;
 
 export type VJS_params_TYPE<E extends HTMLElement> = (
   | undefined

@@ -144,6 +144,8 @@ Router.BrowserRoutes({
           onclick() {
             Router.navigate("/p");
           },
+          name: "friday",
+          type: "button",
         }),
         TodoList,
         App
