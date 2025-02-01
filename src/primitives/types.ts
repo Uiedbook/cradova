@@ -1,7 +1,7 @@
 import * as CSS from "csstype";
 import { __raw_ref, Page, Signal } from "./classes.js";
 
-type Attributes<E> = {
+type Attributes<E extends HTMLElement> = {
   ref?: __raw_ref;
   style?: CSS.Properties;
   recall?: (P: any) => void;
@@ -11,8 +11,10 @@ type Attributes<E> = {
   /**
    * Cradova calls this function when this element is rendered on the DOM.
    */
-  onmount: (this: E) => void;
-} & Partial<Omit<E, "style" | `data-${string}` | `on${string}`>>;
+  onmount?: (this: E) => void;
+} & Partial<
+    Omit<E, "style" | `data-${string}` | `on${string}` | "ref" | "recall">
+  >;
 
 export type VJS_params_TYPE<E extends HTMLElement> = (
   | undefined

@@ -14,8 +14,8 @@ import {
   useEffect,
   useRef,
   useState,
+  Func,
 } from "../dist/index.js";
-import { Func } from "../dist/primitives/types.js";
 
 // creating a store
 const todoStore = new Signal({
@@ -52,8 +52,6 @@ function TodoList() {
           );
           referenceSet.elem<HTMLInputElement>("todoInput")!.value = "";
         },
-        style: { backgroundColor: "blue" },
-        "data-lkl": "ij",
       })
     ),
     todoList
@@ -167,4 +165,12 @@ Router.BrowserRoutes({
       );
     },
   }),
+});
+
+const something = input({
+  oninput(e) {
+    e.target;
+    console.log(this.value); // ✅ Works! `this` is correctly inferred as `HTMLInputElement`
+  },
+  placeholder: "Typing simulation",
 });

@@ -13,3 +13,4 @@ and limitations under the License.
 export * from "./primitives/classes.js";
 export * from "./primitives/functions.js";
 export * from "./primitives/dom-objects.js";
+export type { Func } from "./primitives/types.js";
