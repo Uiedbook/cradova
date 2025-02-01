@@ -176,7 +176,7 @@ export class Signal<Type extends Record<string, any>> {
  * @param name
  * @param template
  */
-
+// TODO: make this class internal using lower abstractions for pages, let users provide regular FUncs type instead.
 export class Page {
   /**
    * used internally
@@ -184,7 +184,6 @@ export class Page {
   private _name: string;
   public _html: (this: Page) => HTMLElement;
   public _template?: HTMLElement;
-  private _dropped = false;
   private _snapshot: boolean;
   private _snapshot_html?: string;
   _unload_CB?: () => Promise<void> | void;
@@ -234,18 +233,7 @@ export class Page {
   set onDeactivate(cb: () => Promise<void> | void) {
     this._unload_CB = cb;
   }
-  drop(state?: boolean) {
-    if (typeof state === "boolean") {
-      this._dropped = state;
-      return undefined;
-    } else return this._dropped;
-  }
   async _load() {
-    //? check if the page is dropped
-    if (this._dropped) {
-      history.go(-1);
-      return;
-    }
     // ? setting title
     if (this._name) document.title = this._name;
     //? packaging the page dom

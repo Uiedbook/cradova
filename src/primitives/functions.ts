@@ -3,7 +3,7 @@ import { __raw_ref, CradovaEvent } from "./classes.js";
 
 export const makeElement = <E extends HTMLElement>(
   element: E & HTMLElement,
-  ElementChildrenAndPropertyList: VJS_params_TYPE<E>,
+  ElementChildrenAndPropertyList: VJS_params_TYPE<E>
 ) => {
   const props: Record<string, any> = {};
   let text: string | undefined = undefined;
@@ -64,6 +64,7 @@ export const makeElement = <E extends HTMLElement>(
 
       // data-(s) &  aria-(s)
       if (prop.includes("data-") || prop.includes("aria-")) {
+        9;
         element.setAttribute(prop, value as string);
         continue;
       }
@@ -76,7 +77,7 @@ export const makeElement = <E extends HTMLElement>(
         ) {
           ((value! as unknown[])![0] as __raw_ref)._append(
             (value! as unknown[])![1] as string,
-            element,
+            element
           );
           continue;
         }
@@ -172,8 +173,8 @@ export function loop<Type>(
   component: (
     value: Type,
     index?: number,
-    array?: LoopData<Type>,
-  ) => HTMLElement | DocumentFragment | undefined,
+    array?: LoopData<Type>
+  ) => HTMLElement | DocumentFragment | undefined
 ) {
   return Array.isArray(datalist)
     ? (datalist.map(component) as unknown as HTMLElement[])
@@ -219,7 +220,7 @@ export const frag = function (children: VJS_params_TYPE<HTMLElement>) {
  */
 export function useState<S = unknown>(
   newState: S,
-  self: any,
+  self: any
 ): [S, (newState: S | ((preS: S) => S)) => void] {
   if (typeof self !== "function") return null as any;
   const Func = self as Func;
