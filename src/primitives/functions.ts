@@ -223,7 +223,7 @@ export function useState<S = unknown>(
   self: any
 ): [S, (newState: S | ((preS: S) => S)) => void] {
   if (typeof self !== "function") {
-    console.error("Invalid setState this value");
+    console.error("Invalid setState 'this' value");
     return null as any;
   }
 
@@ -258,7 +258,7 @@ Allows side effects to be performed in functional components, such as fetching d
  */
 export function useEffect(effect: () => void, self: any) {
   if (typeof self !== "function") {
-    console.error("Invalid setState this value");
+    console.error("Invalid setState 'this' value");
     return;
   }
   funcManager._effect(self as any, effect);
