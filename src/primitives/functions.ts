@@ -71,10 +71,7 @@ export const makeElement = <E extends HTMLElement>(
 
       if (Array.isArray(value)) {
         // reference
-        if (
-          prop == "reference" &&
-          (value! as unknown[])![0] instanceof __raw_ref
-        ) {
+        if (prop == "ref" && (value! as unknown[])![0] instanceof __raw_ref) {
           ((value! as unknown[])![0] as __raw_ref)._append(
             (value! as unknown[])![1] as string,
             element
