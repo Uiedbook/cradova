@@ -596,7 +596,7 @@ export class Router {
         `✘  Cradova err: please add '<div data-wrapper="app"></div>' to the body of your index.html file `
       );
     }
-    window.addEventListener("pageshow", RouterBox.router);
+    window.addEventListener("pageshow", () => RouterBox.router());
     window.addEventListener("popstate", (_e) => {
       _e.preventDefault();
       RouterBox.router();
