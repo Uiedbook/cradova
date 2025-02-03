@@ -14,3 +14,16 @@ export * from "./primitives/classes.js";
 export * from "./primitives/functions.js";
 export * from "./primitives/dom-objects.js";
 export type { Func } from "./primitives/types.js";
+
+declare global {
+  interface Function {
+    cloneFunc(): Function;
+  }
+}
+
+Function.prototype.cloneFunc = function () {
+  const pre = this;
+  return function funcClone(this: any) {
+    return pre.call(this);
+  };
+};

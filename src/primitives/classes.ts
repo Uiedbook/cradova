@@ -297,10 +297,9 @@ class RouterBoxClass {
    * the click happens on a link that is supposed to be handled
    * by the router, it loads and displays the target page.
    * * Responds to popstate and load events and does it's job
-   * @param {Event} _e  popstate event | load event.
    */
 
-  async router(_e?: unknown, _force?: boolean) {
+  async router() {
     const url = window.location.href;
     let route: Page, params;
     // ? abort navigation when router is paused
@@ -532,7 +531,7 @@ export class Router {
       }
       RouterBox.pageData.params = params;
       RouterBox.pageData.data = data;
-      RouterBox.router(null);
+      RouterBox.router();
     }
   }
 
@@ -597,7 +596,7 @@ export class Router {
         `✘  Cradova err: please add '<div data-wrapper="app"></div>' to the body of your index.html file `
       );
     }
-    window.addEventListener("pageshow", () => RouterBox.router());
+    window.addEventListener("pageshow", RouterBox.router);
     window.addEventListener("popstate", (_e) => {
       _e.preventDefault();
       RouterBox.router();
