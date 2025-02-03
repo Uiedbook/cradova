@@ -1,6 +1,6 @@
 {
   "name": "cradova",
-  "version": "3.6.19",
+  "version": "3.6.20",
   "description": "Build Powerful ⚡ Web Apps with Ease",
   "main": "dist/index.js",
   "type": "module",
