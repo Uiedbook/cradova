@@ -6,6 +6,7 @@ type Attributes<E extends HTMLElement> = {
   style?: CSS.Properties;
   recall?: (P: any) => void;
   [key: `data-${string}`]: string | undefined;
+  [key: `aria-${string}`]: string | undefined;
   [key: `on${string}`]: (this: E, event: Event) => void;
 } & {
   /**
@@ -13,7 +14,15 @@ type Attributes<E extends HTMLElement> = {
    */
   onmount?: (this: E) => void;
 } & Partial<
-    Omit<E, "style" | `data-${string}` | `on${string}` | "ref" | "recall">
+    Omit<
+      E,
+      | "style"
+      | `data-${string}`
+      | `aria-${string}`
+      | `on${string}`
+      | "ref"
+      | "recall"
+    >
   >;
 
 export type VJS_params_TYPE<E extends HTMLElement> = (
