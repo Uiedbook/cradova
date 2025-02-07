@@ -55,6 +55,7 @@ function TodoList() {
 function todoList() {
   useEffect(() => {
     todoStore.subscribe("todo", todoList);
+    console.log("boohoo 1");
   }, this);
   const data = todoStore.pipe.todo;
   return div(
@@ -71,10 +72,12 @@ function todoList() {
 function count() {
   const [count, setCounter] = useState(0, this);
   useEffect(() => {
+    console.log("boohoo 2");
     const i = setInterval(() => {
       setCounter((p) => p + 1);
     }, 1000);
     return () => {
+      console.log("boohoo 2");
       clearInterval(i);
     };
   }, this);

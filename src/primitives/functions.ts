@@ -329,7 +329,9 @@ export const funcManager = {
   recall(func: Func) {
     if (func.rendered) {
       if (func.published) {
-        this.activate(func);
+        setTimeout(() => {
+          this.activate(func);
+        });
       }
     }
   },

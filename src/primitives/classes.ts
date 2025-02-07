@@ -24,9 +24,7 @@ export class cradovaEvent {
    * @param eventName
    */
 
-  async dispatchEvent(
-    eventName: "after_comp_is_mounted" | "after_page_is_killed"
-  ) {
+  dispatchEvent(eventName: "after_comp_is_mounted" | "after_page_is_killed") {
     const eventListeners = this[eventName];
     // if (eventName.includes("Active")) {
     //   for (let i = 0; i < eventListeners.length; i++) {
@@ -35,7 +33,7 @@ export class cradovaEvent {
     //   return;
     // }
     while (eventListeners.length !== 0) {
-      const en_cb = await eventListeners.shift()!();
+      const en_cb = eventListeners.shift()!();
       if (en_cb) {
         this.after_page_is_killed.push(en_cb);
       }
@@ -304,6 +302,8 @@ export class Page {
     // ? setting title
     if (this._name) document.title = this._name;
     //? packaging the page dom
+    // ? call all return functions of useEffects
+    CradovaEvent.dispatchEvent("after_page_is_killed");
     this._template = div({ id: "page" }, this._html);
     RouterBox.doc!.innerHTML = "";
     // ? create save the snapshot html
@@ -317,8 +317,6 @@ export class Page {
       // @ts-ignore
       behavior: "instant",
     });
-    // ? call all return functions of useEffects
-    CradovaEvent.dispatchEvent("after_page_is_killed");
     if (this._snapshot) this._takeSnapShot();
   }
 }
