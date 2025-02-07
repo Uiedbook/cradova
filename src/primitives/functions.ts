@@ -1,5 +1,5 @@
 import type { Func, VJS_params_TYPE } from "./types.js";
-import { __raw_ref, CradovaEvent } from "./classes.js";
+import { __raw_ref, CradovaEvent, Signal } from "./classes.js";
 
 export const makeElement = <E extends HTMLElement>(
   element: E & HTMLElement,
@@ -18,6 +18,7 @@ export const makeElement = <E extends HTMLElement>(
       // appending child
       if (child instanceof HTMLElement || child instanceof DocumentFragment) {
         element.appendChild(child as Node);
+
         continue;
       }
 
@@ -76,6 +77,15 @@ export const makeElement = <E extends HTMLElement>(
             (value! as unknown[])![1] as string,
             element
           );
+          continue;
+        }
+        // event = [signal, subscriptions , function]
+        if (
+          prop == "subscription" &&
+          (value! as unknown[])![0] instanceof Signal
+        ) {
+          const a = value as [Signal<any>, string[], () => void];
+          a[0].listen(a[1], element, a[2]);
           continue;
         }
       }
@@ -253,12 +263,13 @@ Allows side effects to be performed in functional components, such as fetching d
  * @param effect
  * @returns
  */
-export function useEffect(effect: () => void, self: any) {
+export function useEffect(effect: () => void, self: Func) {
   if (typeof self !== "function") {
-    console.error("Invalid setState 'this' value");
+    console.error("Invalid 'this' value in setEffect");
     return;
   }
-  funcManager._effect(self as any, effect);
+  if (self.rendered) return;
+  CradovaEvent.after_comp_is_mounted.push(effect);
 }
 
 /**
@@ -290,9 +301,7 @@ const DEFAULT_STATE = {
   published: false,
   preRendered: null,
   reference: null,
-  effectuate: null,
   _state_index: 0,
-  effects: [],
   _state: [],
 };
 const toFunc = (func: any) => {
@@ -307,10 +316,9 @@ export const funcManager = {
   render(func: Func) {
     Object.assign(func, DEFAULT_STATE);
     const html = func.apply(func);
-    // parking
+    //? parking
     if (html instanceof HTMLElement) {
       func.reference = html;
-      this.effector(func);
       func.rendered = true;
       func.published = true;
     } else {
@@ -318,36 +326,10 @@ export const funcManager = {
     }
     return html;
   },
-  _effect(func: Func, fn: () => Promise<void> | void) {
-    if (!func.rendered) {
-      func.effects!.push(fn);
-    }
-  },
-  async effector(func: Func) {
-    for (let i = 0; i < func.effects!.length; i++) {
-      const fn: any = await func.effects![i].apply(func);
-      if (typeof fn === "function") {
-        CradovaEvent.after_page_is_killed.push(fn);
-      }
-    }
-    func.effects = [];
-    if (func.effectuate) {
-      func.effectuate();
-      func.effectuate = null;
-    }
-  },
   recall(func: Func) {
-    if (!func.rendered) {
-      func.effectuate = () => {
-        if (func.published) {
-          this.activate(func);
-        }
-      };
-    } else {
+    if (func.rendered) {
       if (func.published) {
-        setTimeout(() => {
-          this.activate(func);
-        });
+        this.activate(func);
       }
     }
   },
@@ -378,3 +360,35 @@ export const funcManager = {
     }
   },
 };
+
+// function getSelectorPath(element: HTMLElement) {
+//   if (!(element instanceof Element)) return "";
+//   const path = [];
+//   while (element) {
+//     let selector = element.nodeName.toLowerCase();
+//     if (element.id) {
+//       selector += `#${element.id}`;
+//       path.push(selector);
+//       break;
+//     } else {
+//       const parent = element.parentElement;
+//       if (!parent) {
+//         path.push(selector);
+//         break;
+//       }
+//       const nodeName = element.nodeName;
+//       const children = parent.children;
+//       let total = 0,
+//         index = 0;
+//       for (let i = 0; i < children.length; i++) {
+//         if (children[i].nodeName === nodeName) {
+//           total++;
+//           if (children[i] === element) index = total;
+//         }
+//       }
+//       if (total > 1) selector += `:nth-of-type(${index})`;
+//     }
+//     path.push(selector);
+//   }
+//   return path.reverse().join(" > ");
+// }

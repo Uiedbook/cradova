@@ -3,6 +3,7 @@ import { __raw_ref, Page, Signal } from "./classes.js";
 
 type Attributes<E extends HTMLElement> = {
   ref?: __raw_ref;
+  subscription?: Signal<any>;
   style?: CSS.Properties;
   recall?: (P: any) => void;
   [key: `data-${string}`]: string | undefined;
@@ -111,8 +112,6 @@ export type Func = {
   reference?: HTMLElement | null;
   signals?: Map<string, Signal<any>>;
   pipes?: Map<string, any>;
-  effects?: (() => Promise<void> | void)[];
-  effectuate?: ((this: any) => void) | null;
   _state?: unknown[];
   _state_index?: number;
 };

@@ -24,18 +24,21 @@ export class cradovaEvent {
    * @param eventName
    */
 
-  dispatchEvent(
+  async dispatchEvent(
     eventName: "after_comp_is_mounted" | "after_page_is_killed"
-  ): void {
+  ) {
     const eventListeners = this[eventName];
-    if (eventName.includes("Active")) {
-      for (let i = 0; i < eventListeners.length; i++) {
-        eventListeners[i]();
-      }
-      return;
-    }
+    // if (eventName.includes("Active")) {
+    //   for (let i = 0; i < eventListeners.length; i++) {
+    //     eventListeners[i]();
+    //   }
+    //   return;
+    // }
     while (eventListeners.length !== 0) {
-      eventListeners.shift()!();
+      const en_cb = await eventListeners.shift()!();
+      if (en_cb) {
+        this.after_page_is_killed.push(en_cb);
+      }
     }
   }
 }
@@ -55,7 +58,11 @@ export const CradovaEvent = new cradovaEvent();
 
 export class Signal<Type extends Record<string, any>> {
   private pn?: string;
-  private subs?: Record<keyof Type, Func[]>;
+  private subs: Record<keyof Type, Func[]> = {} as any;
+  private listening_subs: Record<
+    keyof Type,
+    Map<HTMLElement, (data: Partial<Type>) => void>
+  > = {} as any;
   pipe: Type;
   constructor(initial: Type, props?: { persistName?: string | undefined }) {
     this.pipe = initial;
@@ -90,6 +97,10 @@ export class Signal<Type extends Record<string, any>> {
       c.pipes!.set(eventName as string, this.pipe[eventName]);
       funcManager.recall(c);
     }
+    const subs2 = this.listening_subs![eventName as string] || [];
+    for (const [el, fn] of subs2.entries()) {
+      fn.apply(el, [{ [eventName]: data } as any]);
+    }
     if (this.pn) {
       localStorage.setItem(this.pn, JSON.stringify(this.pipe));
     }
@@ -99,8 +110,9 @@ export class Signal<Type extends Record<string, any>> {
    * ----
    *  fires actions if any available
    */
-  batchPublish<T extends keyof Type>(events: Record<T, Type[T]>) {
+  batchPublish(events: Partial<Type>) {
     const s = new Set<Func>();
+    const s2 = new Map<HTMLElement, (data: Partial<Type>) => void>();
     for (const [eventName, data] of Object.entries(events)) {
       // @ts-ignore
       this.pipe[eventName] = data;
@@ -110,10 +122,15 @@ export class Signal<Type extends Record<string, any>> {
         c.pipes!.set(eventName as string, this.pipe[eventName]);
         s.add(c);
       }
+      const subs2 = this.listening_subs![eventName as string];
+      for (const [el, fn] of subs2.entries()) {
+        s2.set(el, fn);
+      }
     }
     for (const c of s.values()) {
       funcManager.recall(c);
     }
+    for (const [el, fn] of s2.entries()) fn.apply(el, [events]);
     if (this.pn) {
       localStorage.setItem(this.pn, JSON.stringify(this.pipe));
     }
@@ -127,13 +144,14 @@ export class Signal<Type extends Record<string, any>> {
    * @param Func component to bind to.
    */
   subscribe<T extends keyof Type>(eventName: T | T[], comp: any) {
-    if (typeof Function === "function") {
+    if (typeof comp === "function") {
       if (Array.isArray(eventName)) {
         eventName.forEach((en) => {
           this.subscribe(en, comp);
         });
         return;
       }
+      if (comp.signals.get(eventName as string)) return;
       if (eventName in this.pipe) {
         comp.pipes.set(eventName as string, this.pipe[eventName]);
         comp.signals.set(eventName as string, this);
@@ -145,8 +163,6 @@ export class Signal<Type extends Record<string, any>> {
         );
       }
       // ? avoid adding a specific Function repeatedly to a Signal
-      if (comp.signals.get(eventName as string)) return;
-
       if (!this.subs![eventName]) {
         this.subs![eventName] = [comp];
       } else {
@@ -155,6 +171,46 @@ export class Signal<Type extends Record<string, any>> {
     } else {
       console.error(` ✘  Cradova err:  ${comp} is not a valid component`);
     }
+  }
+  /**
+   *  Cradova Signal
+   * ----
+   *  subscribe to an event
+   *
+   * @param name of event.
+   * @param Func component to bind to.
+   * @internal
+   */
+  listen<T extends keyof Type>(
+    eventName: T | T[],
+    el: HTMLElement,
+    fn: (data: Partial<Type>) => void
+  ) {
+    if (Array.isArray(eventName)) {
+      eventName.forEach((en) => {
+        this.listen(en, el, fn);
+      });
+      return;
+    }
+    if (!this.listening_subs[eventName]) {
+      this.listening_subs[eventName] = new Map();
+    }
+    this.listening_subs[eventName].set(el, fn);
+  }
+  /**
+   *  Cradova Signal
+   * ----
+   *  subscribe an element to an event
+   *
+   * @param name(s) of event.
+   * @param Func to bind to.
+   */
+  subscriber<T extends keyof Type>(
+    eventName: T | T[],
+    fn: (this: HTMLElement, data: Partial<Type>) => void
+  ) {
+    // event = [signal, subscriptions , function]
+    return [this, eventName, fn] as unknown as Signal<any>;
   }
 
   /**
@@ -176,7 +232,7 @@ export class Signal<Type extends Record<string, any>> {
  * @param name
  * @param template
  */
-// TODO: make this class internal using lower abstractions for pages, let users provide regular FUncs type instead.
+// TODO: make this class internal using lower abstractions for pages, let users provide regular Funcs type instead.
 export class Page {
   /**
    * used internally
@@ -186,6 +242,9 @@ export class Page {
   public _template?: HTMLElement;
   private _snapshot: boolean;
   private _snapshot_html?: string;
+  /**
+   * @internal
+   */
   _unload_CB?: () => Promise<void> | void;
   constructor(pageParams: CradovaPageType) {
     const { template, name } = pageParams;
@@ -230,9 +289,13 @@ export class Page {
     }
     this._snapshot_html = undefined;
   }
+
   set onDeactivate(cb: () => Promise<void> | void) {
     this._unload_CB = cb;
   }
+  /**
+   * @internal
+   */
   async _load() {
     // ? setting title
     if (this._name) document.title = this._name;
@@ -630,6 +693,7 @@ export class __raw_ref {
    * Append a DOM element to the reference, overwriting any existing reference.
    * @param name - The name to reference the DOM element by.
    * @param element - The DOM element to reference.
+   * @internal
    */
   _append(name: string, Element: HTMLElement) {
     this.tree[name] = Element;

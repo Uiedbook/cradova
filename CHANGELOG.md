@@ -231,3 +231,7 @@ we went along with it.
 
 - removed Comp or Ref classes
 - Implemented a system to use function as functional components
+
+# v3.7.0
+
+- Implemented signal.subscriber for binding signal event to specific elements in th a function, a way to self handle reactivity and avoid complex diffing algorithms,

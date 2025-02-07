@@ -2,7 +2,6 @@
 import {
   a,
   button,
-  Comp,
   div,
   h1,
   input,
@@ -11,10 +10,11 @@ import {
   Page,
   Router,
   Signal,
+  span,
   useEffect,
   useRef,
   useState,
-} from "../dist/index.js";
+} from "./dist/index.js";
 // creating a store
 const todoStore = new Signal({
   todo: ["take bath", "code coded", "take a break"],
@@ -28,18 +28,18 @@ const removeTodo = function (todo) {
   todoStore.pipe.todo.splice(ind, 1);
   todoStore.publish("todo", todoStore.pipe.todo);
 };
+
 function TodoList() {
   // can be used to hold multiple references
   const referenceSet = useRef();
   // bind Function to Signal
-  todoStore.subscribe("todo", todoList);
   // markup
   return main(
     h1(`Todo List`),
     div(
       input({
         placeholder: "type in todo",
-        reference: referenceSet.bindAs("todoInput"),
+        ref: referenceSet.bindAs("todoInput"),
       }),
       button("Add todo", {
         onclick() {
@@ -51,8 +51,12 @@ function TodoList() {
     todoList
   );
 }
-const todoList = function () {
-  const data = this.subPipe;
+
+function todoList() {
+  useEffect(() => {
+    todoStore.subscribe("todo", todoList);
+  }, this);
+  const data = todoStore.pipe.todo;
   return div(
     data.map((item) =>
       p(item, {
@@ -63,16 +67,36 @@ const todoList = function () {
       })
     )
   );
-};
-const count = function () {
+}
+function count() {
   const [count, setCounter] = useState(0, this);
   useEffect(() => {
-    setInterval(() => {
+    const i = setInterval(() => {
       setCounter((p) => p + 1);
     }, 1000);
+    return () => {
+      clearInterval(i);
+    };
   }, this);
   return h1(" count: " + count);
-};
+}
+
+const counterSignal = new Signal({ count: 0 });
+function count2() {
+  useEffect(() => {
+    let count = 0;
+    setInterval(() => {
+      count++;
+      counterSignal.publish("count", count);
+    }, 1000);
+  }, this);
+  return h1(" count: 0", {
+    subscription: counterSignal.subscriber("count", function ({ count }) {
+      this.innerText = " count: " + count;
+    }),
+  });
+}
+
 function HelloMessage() {
   return div("Click to get a greeting", {
     onclick() {
@@ -105,12 +129,14 @@ function typingExample() {
       },
       placeholder: "typing simulation",
     }),
-    p(" no thing typed yet!", { reference: ref.bindAs("text") }),
-    a({ href: "/p" }, "log lol in the console")
+    div(
+      p(" no thing typed yet!", { ref: ref.bindAs("text") }),
+      a({ href: "/p" }, "log lol in the console")
+    )
   );
 }
 function App() {
-  return div(count, HelloMessage, nameRef, typingExample);
+  return div(count, count2, HelloMessage, nameRef, typingExample);
 }
 Router.BrowserRoutes({
   "/p": new Page({
@@ -123,7 +149,7 @@ Router.BrowserRoutes({
     snapshotIsolation: true,
     template() {
       return div(
-        button("go to Functionas page", {
+        button("go to Function as page", {
           onclick() {
             Router.navigate("/p");
           },
@@ -138,7 +164,7 @@ Router.BrowserRoutes({
     name: "boohoo 2",
     template() {
       return div(
-        button("go to Functionas page", {
+        button("go to Function as page", {
           onclick() {
             Router.navigate("/p");
           },
