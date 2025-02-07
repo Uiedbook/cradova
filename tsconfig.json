@@ -23,7 +23,8 @@
     // Some stricter flags
     "useUnknownInCatchVariables": true,
     "noPropertyAccessFromIndexSignature": true,
-    "outDir": "tests/dist",
+    "outDir": "dist",
+    // "outDir": "tests/dist",
     "stripInternal": true
   },
   "include": ["src"]

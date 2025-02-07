@@ -52,7 +52,23 @@ const Cradova = function () {
   });
 };
 
-// NOTE: all cradova elements returns html elements
+// add reactivity to a signal element.
+const counterSignal = new Signal({ count: 0 });
+function count2() {
+  useEffect(() => {
+    let count = 0;
+    setInterval(() => {
+      count++;
+      counterSignal.publish("count", count);
+    }, 1000);
+  }, this);
+
+  return h1(" count: 0", {
+    subscription: counterSignal.subscriber("count", function ({ count }) {
+      this.innerText = " count: " + count;
+    }),
+  });
+}
 
 // converts to html and append to the Dom
 document.body.appendChild(div(Cradova));
