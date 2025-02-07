@@ -368,35 +368,3 @@ export const funcManager = {
     }
   },
 };
-
-// function getSelectorPath(element: HTMLElement) {
-//   if (!(element instanceof Element)) return "";
-//   const path = [];
-//   while (element) {
-//     let selector = element.nodeName.toLowerCase();
-//     if (element.id) {
-//       selector += `#${element.id}`;
-//       path.push(selector);
-//       break;
-//     } else {
-//       const parent = element.parentElement;
-//       if (!parent) {
-//         path.push(selector);
-//         break;
-//       }
-//       const nodeName = element.nodeName;
-//       const children = parent.children;
-//       let total = 0,
-//         index = 0;
-//       for (let i = 0; i < children.length; i++) {
-//         if (children[i].nodeName === nodeName) {
-//           total++;
-//           if (children[i] === element) index = total;
-//         }
-//       }
-//       if (total > 1) selector += `:nth-of-type(${index})`;
-//     }
-//     path.push(selector);
-//   }
-//   return path.reverse().join(" > ");
-// }
