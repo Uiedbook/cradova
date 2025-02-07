@@ -181,7 +181,13 @@ export function loop<Type>(
     value: Type,
     index?: number,
     array?: LoopData<Type>
-  ) => HTMLElement | DocumentFragment | undefined
+  ) =>
+    | HTMLElement
+    | HTMLElement[]
+    | DocumentFragment
+    | DocumentFragment[]
+    | undefined
+    | undefined[]
 ) {
   return Array.isArray(datalist)
     ? (datalist.map(component) as unknown as HTMLElement[])

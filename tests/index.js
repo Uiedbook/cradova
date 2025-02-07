@@ -81,7 +81,11 @@ function count() {
       clearInterval(i);
     };
   }, this);
-  return h1(" count: " + count);
+  return h1(" count: " + count, {
+    onmount() {
+      console.log("lol");
+    },
+  });
 }
 
 const counterSignal = new Signal({ count: 0 });

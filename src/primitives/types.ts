@@ -3,6 +3,7 @@ import { __raw_ref, Page, Signal } from "./classes.js";
 
 type Attributes<E extends HTMLElement> = {
   ref?: __raw_ref;
+  value?: any;
   subscription?: Signal<any>;
   style?: CSS.Properties;
   recall?: (P: any) => void;
