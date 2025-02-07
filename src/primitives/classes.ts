@@ -97,9 +97,11 @@ export class Signal<Type extends Record<string, any>> {
       c.pipes!.set(eventName as string, this.pipe[eventName]);
       funcManager.recall(c);
     }
-    const subs2 = this.listening_subs![eventName as string] || [];
-    for (const [el, fn] of subs2.entries()) {
-      fn.apply(el, [{ [eventName]: data } as any]);
+    const subs2 = this.listening_subs![eventName as string];
+    if (subs2) {
+      for (const [el, fn] of subs2.entries()) {
+        fn.apply(el, [{ [eventName]: data } as any]);
+      }
     }
     if (this.pn) {
       localStorage.setItem(this.pn, JSON.stringify(this.pipe));
@@ -123,8 +125,10 @@ export class Signal<Type extends Record<string, any>> {
         s.add(c);
       }
       const subs2 = this.listening_subs![eventName as string];
-      for (const [el, fn] of subs2.entries()) {
-        s2.set(el, fn);
+      if (subs2) {
+        for (const [el, fn] of subs2.entries()) {
+          s2.set(el, fn);
+        }
       }
     }
     for (const c of s.values()) {
