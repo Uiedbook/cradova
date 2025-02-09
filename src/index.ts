@@ -17,7 +17,7 @@ export type { Func } from "./primitives/types.js";
 
 declare global {
   interface Function {
-    cloneFunc(): Function;
+    cloneFunc(): () => HTMLElement;
   }
 }
 
